@@ -1,0 +1,420 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
+import AddCategoryModal from '@/app/components/AddCategoryModal'
+import AddItemModal from '@/app/components/AddItemModal'
+import EditItemModal from '@/components/EditItemModal'
+import InventoryTable from '@/components/InventoryTable'
+import SupplierManager from '@/components/SupplierManager'
+import RoomCountingInterface from '@/components/RoomCountingInterface'
+import OrderReport from '@/components/OrderReport'
+import RoomManager from '@/components/RoomManager'
+import ActivityDashboard from '@/components/ActivityDashboard'
+import { 
+  Package, 
+  Users, 
+  ShoppingCart, 
+  Building2, 
+  ClipboardList,
+  Crown,
+  MapPin,
+  Activity
+} from 'lucide-react'
+import Link from 'next/link'
+
+interface Category {
+  id: string
+  name: string
+}
+
+interface Supplier {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  contact_person?: string
+  notes?: string
+}
+
+interface InventoryItem {
+  id: string
+  brand: string
+  size: string
+  category_id: string
+  supplier_id: string
+  threshold: number
+  par_level: number
+  barcode?: string
+  categories: { name: string } | null
+  suppliers: { name: string } | null
+}
+
+export default function Dashboard() {
+  const { user, signOut } = useAuth()
+  const [activeTab, setActiveTab] = useState('inventory')
+  const [categories, setCategories] = useState<Category[]>([])
+  const [suppliers, setSuppliers] = useState<Supplier[]>([])
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
+  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showAddItem, setShowAddItem] = useState(false)
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    totalItems: 0,
+    totalCategories: 0,
+    totalSuppliers: 0,
+    totalRooms: 0
+  })
+
+  const isAdmin = user?.email === 'alejogaleis@gmail.com'
+
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user])
+
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      console.log('🔍 Starting data fetch...')
+
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
+
+      if (categoriesError) {
+        console.error('❌ Categories error:', categoriesError)
+      } else {
+        console.log('✅ Categories:', categoriesData?.length, categoriesData)
+      }
+
+      // Fetch suppliers
+      const { data: suppliersData, error: suppliersError } = await supabase
+        .from('suppliers')
+        .select('*')
+        .order('name')
+
+      if (suppliersError) {
+        console.error('❌ Suppliers error:', suppliersError)
+      } else {
+        console.log('✅ Suppliers:', suppliersData?.length, suppliersData)
+      }
+
+      // Fetch rooms for stats
+      const { data: roomsData, error: roomsError } = await supabase
+        .from('rooms')
+        .select('*')
+        .order('display_order')
+
+      if (roomsError) {
+        console.error('❌ Rooms error:', roomsError)
+      } else {
+        console.log('✅ Rooms:', roomsData?.length, roomsData)
+      }
+
+      // Fetch inventory items
+      console.log('📦 Fetching inventory items...')
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .order('brand')
+
+      if (inventoryError) {
+        console.error('❌ Inventory error:', inventoryError)
+      } else {
+        console.log('✅ Raw inventory items:', inventoryData?.length, inventoryData)
+
+        // Manually add category and supplier names
+        const enrichedItems = inventoryData?.map(item => {
+          const category = categoriesData?.find(cat => cat.id === item.category_id)
+          const supplier = suppliersData?.find(sup => sup.id === item.supplier_id)
+          
+          return {
+            ...item,
+            categories: category ? { name: category.name } : null,
+            suppliers: supplier ? { name: supplier.name } : null
+          }
+        })
+
+        console.log('✅ Enriched inventory items:', enrichedItems?.length, enrichedItems)
+        setInventoryItems(enrichedItems || [])
+      }
+
+      setCategories(categoriesData || [])
+      setSuppliers(suppliersData || [])
+
+      setStats({
+        totalItems: inventoryData?.length || 0,
+        totalCategories: categoriesData?.length || 0,
+        totalSuppliers: suppliersData?.length || 0,
+        totalRooms: roomsData?.length || 0
+      })
+
+    } catch (error) {
+      console.error('💥 Unexpected error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCategoryAdded = () => {
+    fetchData()
+    setShowAddCategory(false)
+  }
+
+  const handleItemAdded = () => {
+    fetchData()
+    setShowAddItem(false)
+  }
+
+  const handleItemUpdated = () => {
+    fetchData()
+    setEditingItem(null)
+  }
+
+  const handleItemDeleted = () => {
+    fetchData()
+  }
+
+  const handleRoomUpdated = () => {
+    fetchData()
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <header className="bg-white/10 backdrop-blur-md border-b border-white/20">
+        <div className="flex items-center justify-between px-8 py-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Liquor Inventory Management</h1>
+            <p className="text-white/60">Welcome back, {user?.email}</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            {isAdmin && (
+              <Link 
+                href="/admin"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white rounded-lg transition-colors shadow-lg"
+              >
+                <Crown className="h-4 w-4" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium">Total Items</p>
+                <p className="text-2xl font-bold text-white">{stats.totalItems}</p>
+              </div>
+              <Package className="h-8 w-8 text-blue-400" />
+            </div>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium">Categories</p>
+                <p className="text-2xl font-bold text-white">{stats.totalCategories}</p>
+              </div>
+              <ClipboardList className="h-8 w-8 text-green-400" />
+            </div>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium">Suppliers</p>
+                <p className="text-2xl font-bold text-white">{stats.totalSuppliers}</p>
+              </div>
+              <Users className="h-8 w-8 text-purple-400" />
+            </div>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium">Rooms</p>
+                <p className="text-2xl font-bold text-white">{stats.totalRooms}</p>
+              </div>
+              <Building2 className="h-8 w-8 text-yellow-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Updated Navigation Tabs with Activity Dashboard */}
+        <div className="flex space-x-1 mb-8 bg-white/5 rounded-xl p-1 overflow-x-auto">
+          {[
+            { id: 'inventory', label: 'Inventory', icon: Package },
+            { id: 'categories', label: 'Categories', icon: ClipboardList },
+            { id: 'suppliers', label: 'Suppliers', icon: Users },
+            { id: 'rooms', label: 'Rooms', icon: MapPin },
+            { id: 'count', label: 'Count', icon: Building2 },
+            { id: 'orders', label: 'Orders', icon: ShoppingCart },
+            { id: 'activity', label: 'Reports', icon: Activity }
+          ].map((tab) => {
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-white/10 text-white shadow-lg'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 min-h-[500px]">
+          {activeTab === 'inventory' && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-white">Inventory Management</h2>
+                <button
+                  onClick={() => setShowAddItem(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Add Item
+                </button>
+              </div>
+              
+              {loading ? (
+                <div className="text-center py-8">
+                  <p className="text-white/60">Loading inventory...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-4 text-white/60 text-sm">
+                    🔍 Found {inventoryItems.length} items organized by category with room counts
+                  </div>
+                  <InventoryTable 
+                    items={inventoryItems} 
+                    onEdit={setEditingItem}
+                    onDelete={handleItemDeleted}
+                  />
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'categories' && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-white">Categories</h2>
+                <button
+                  onClick={() => setShowAddCategory(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Add Category
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {categories.map((category) => (
+                  <div key={category.id} className="bg-white/10 rounded-lg p-4 border border-white/20">
+                    <h3 className="text-white font-medium">{category.name}</h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'suppliers' && (
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Supplier Management</h2>
+              <SupplierManager suppliers={suppliers} onUpdate={fetchData} />
+            </div>
+          )}
+
+          {activeTab === 'rooms' && (
+            <div className="p-6">
+              <RoomManager onUpdate={handleRoomUpdated} />
+            </div>
+          )}
+
+          {activeTab === 'count' && (
+  <div className="p-6">
+    <h2 className="text-xl font-semibold text-white mb-6">Room Counting</h2>
+    <RoomCountingInterface userEmail={user?.email || ''} />
+  </div>
+)}
+
+          {activeTab === 'orders' && (
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Order Reports</h2>
+              <OrderReport />
+            </div>
+          )}
+
+          {/* NEW: Activity Dashboard */}
+          {activeTab === 'activity' && (
+            <div className="p-6">
+              <ActivityDashboard userEmail={user?.email || ''} />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showAddCategory && (
+        <AddCategoryModal
+          onClose={() => setShowAddCategory(false)}
+          onCategoryAdded={handleCategoryAdded}
+        />
+      )}
+
+      {showAddItem && (
+        <AddItemModal
+          categories={categories}
+          suppliers={suppliers}
+          onClose={() => setShowAddItem(false)}
+          onItemAdded={handleItemAdded}
+        />
+      )}
+
+      {editingItem && (
+        <EditItemModal
+          item={editingItem}
+          categories={categories}
+          suppliers={suppliers}
+          onClose={() => setEditingItem(null)}
+          onItemUpdated={handleItemUpdated}
+        />
+      )}
+    </div>
+  )
+}
