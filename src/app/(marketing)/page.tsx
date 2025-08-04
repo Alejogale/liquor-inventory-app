@@ -2,15 +2,15 @@ import Link from 'next/link'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Navigation */}
-      <nav className="bg-white/10 backdrop-blur-lg border-b border-white/20">
+      <nav className="bg-white/80 backdrop-blur-lg border-b border-blue-200/30">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div className="text-2xl font-bold text-white">Liquor Inventory Manager</div>
+            <div className="text-2xl font-bold text-slate-800">Liquor Inventory Manager</div>
             <div className="flex items-center gap-4">
-              <a href="#pricing" className="text-white/80 hover:text-white">Pricing</a>
-              <a href="#features" className="text-white/80 hover:text-white">Features</a>
+              <a href="#pricing" className="text-slate-600 hover:text-slate-800">Pricing</a>
+              <a href="#features" className="text-slate-600 hover:text-slate-800">Features</a>
               <Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                 Sign In
               </Link>
@@ -21,9 +21,9 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl font-bold text-white mb-6">
+        <h1 className="text-5xl font-bold text-slate-800 mb-6">
           Professional Bar Inventory<br/>
-          <span className="text-blue-400">Made Simple</span>
+          <span className="text-blue-600">Made Simple</span>
         </h1>
         <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
           Streamline your liquor inventory with real-time counting, automated ordering, 

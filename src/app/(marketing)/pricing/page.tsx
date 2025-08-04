@@ -2,27 +2,28 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { 
-  ArrowLeft,
-  ArrowRight, 
+import {
+  ArrowRight,
   CheckCircle,
   Package,
   Zap,
   Crown,
-  Users,
   Building,
   Star
 } from 'lucide-react'
 
 export default function PricingPage() {
-  const [selectedPlan, setSelectedPlan] = useState<number | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annually'>('monthly')
 
   const pricingPlans = [
     {
       name: "Starter",
       monthlyPrice: 29,
-      annualPrice: 24,
+      annualPrice: 278.40,
+      stripePriceId: {
+        monthly: 'price_1RraSpGp6QH8POrPJhMku7do',
+        annual: 'price_1RraXVGp6QH8POrPzVMkXm6m',
+      },
       description: "Perfect for small bars and restaurants",
       icon: <Zap className="h-6 w-6" />,
       features: [
@@ -34,19 +35,23 @@ export default function PricingPage() {
         "14-day free trial"
       ],
       popular: false,
-      buttonText: "Start Free Trial",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      name: "Professional", 
+      name: "Professional",
       monthlyPrice: 79,
-      annualPrice: 65,
+      annualPrice: 758.40,
+      stripePriceId: {
+        monthly: 'price_1RraTyGp6QH8POrPmO6Zob82',
+        annual: 'price_1RraYCGp6QH8POrP8s29ZleI',
+      },
       description: "For growing businesses with multiple locations",
       icon: <Crown className="h-6 w-6" />,
       features: [
         "Unlimited items",
         "Unlimited rooms/locations",
-        "Advanced barcode scanning",
+        "Advanced barcode scanning", 
+        "QuickBooks Integration",
         "Real-time reports & analytics",
         "Activity logging & audit trails",
         "Priority support",
@@ -55,13 +60,16 @@ export default function PricingPage() {
         "14-day free trial"
       ],
       popular: true,
-      buttonText: "Start Free Trial",
       color: "from-purple-500 to-pink-500"
     },
     {
       name: "Enterprise",
       monthlyPrice: 199,
-      annualPrice: 165,
+      annualPrice: 1910.40,
+      stripePriceId: {
+        monthly: 'price_1RraYzGp6QH8POrPfXKLCmes',
+        annual: 'price_1RraZQGp6QH8POrP3iJKGMJs',
+      },
       description: "For large operations and chains",
       icon: <Building className="h-6 w-6" />,
       features: [
@@ -76,23 +84,23 @@ export default function PricingPage() {
         "Priority feature requests"
       ],
       popular: false,
-      buttonText: "Contact Sales",
       color: "from-green-500 to-emerald-500"
     }
   ]
 
-  const handleSelectPlan = (planIndex: number) => {
-    setSelectedPlan(planIndex)
+  const getSignupUrl = (planIndex: number) => {
     const plan = pricingPlans[planIndex]
-    const price = billingPeriod === 'monthly' ? plan.monthlyPrice : plan.annualPrice
+    const priceId = billingPeriod === 'monthly' 
+      ? plan.stripePriceId.monthly 
+      : plan.stripePriceId.annual
+
+    const params = new URLSearchParams({
+      plan: plan.name.toLowerCase(),
+      billing: billingPeriod,
+      priceId: priceId,
+    })
     
-    if (plan.buttonText === "Contact Sales") {
-      // Handle enterprise contact
-      alert("Enterprise plan selected! We'll contact you soon.")
-    } else {
-      // Navigate to signup flow
-      window.location.href = `/signup?plan=${plan.name.toLowerCase()}&billing=${billingPeriod}&price=${price}`
-    }
+    return `/signup?${params.toString()}`
   }
 
   return (
@@ -108,16 +116,10 @@ export default function PricingPage() {
           </Link>
           
           <div className="flex items-center space-x-4">
-            <Link 
-              href="/login"
-              className="text-white/80 hover:text-white transition-colors"
-            >
+            <Link href="/login" className="text-white/80 hover:text-white transition-colors">
               Log In
             </Link>
-            <Link 
-              href="/"
-              className="text-white/60 hover:text-white transition-colors"
-            >
+            <Link href="/" className="text-white/60 hover:text-white transition-colors">
               ← Back to Home
             </Link>
           </div>
@@ -139,7 +141,7 @@ export default function PricingPage() {
           </h1>
           
           <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Start with a 14-day free trial. No credit card required. 
+            Start with a 14-day free trial. No credit card required.
             Cancel anytime with no questions asked.
           </p>
 
@@ -149,8 +151,8 @@ export default function PricingPage() {
               <button
                 onClick={() => setBillingPeriod('monthly')}
                 className={`px-6 py-2 rounded-lg transition-all ${
-                  billingPeriod === 'monthly' 
-                    ? 'bg-white/20 text-white shadow-lg' 
+                  billingPeriod === 'monthly'
+                    ? 'bg-white/20 text-white shadow-lg'
                     : 'text-white/60 hover:text-white'
                 }`}
               >
@@ -159,8 +161,8 @@ export default function PricingPage() {
               <button
                 onClick={() => setBillingPeriod('annually')}
                 className={`px-6 py-2 rounded-lg transition-all relative ${
-                  billingPeriod === 'annually' 
-                    ? 'bg-white/20 text-white shadow-lg' 
+                  billingPeriod === 'annually'
+                    ? 'bg-white/20 text-white shadow-lg'
                     : 'text-white/60 hover:text-white'
                 }`}
               >
@@ -180,19 +182,17 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingPlans.map((plan, index) => {
               const price = billingPeriod === 'monthly' ? plan.monthlyPrice : plan.annualPrice
-              const isSelected = selectedPlan === index
+              const monthlyEquivalent = billingPeriod === 'annually' ? plan.annualPrice / 12 : plan.monthlyPrice
+              const annualSavings = billingPeriod === 'annually' ? (plan.monthlyPrice * 12) - plan.annualPrice : 0
               
               return (
-                <div 
+                <div
                   key={index}
-                  className={`relative bg-white/10 backdrop-blur-md rounded-2xl p-8 border transition-all duration-300 cursor-pointer hover:scale-105 ${
-                    plan.popular 
-                      ? 'border-blue-400 shadow-2xl shadow-blue-500/20 scale-105' 
-                      : isSelected
-                      ? 'border-purple-400 shadow-2xl shadow-purple-500/20'
+                  className={`relative bg-white/10 backdrop-blur-md rounded-2xl p-8 border transition-all duration-300 hover:scale-105 ${
+                    plan.popular
+                      ? 'border-blue-400 shadow-2xl shadow-blue-500/20 scale-105'
                       : 'border-white/20 hover:border-white/30'
                   }`}
-                  onClick={() => setSelectedPlan(index)}
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -210,12 +210,12 @@ export default function PricingPage() {
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
                     <div className="text-4xl font-bold text-white mb-2">
-                      ${price}
+                      ${billingPeriod === 'monthly' ? price : price.toFixed(0)}
                       <span className="text-lg text-white/60">/{billingPeriod === 'monthly' ? 'month' : 'year'}</span>
                     </div>
                     {billingPeriod === 'annually' && (
                       <div className="text-green-400 text-sm">
-                        Save ${(plan.monthlyPrice - plan.annualPrice) * 12}/year
+                        ${monthlyEquivalent.toFixed(0)}/month • Save ${annualSavings.toFixed(0)}/year
                       </div>
                     )}
                     <p className="text-white/70 mt-2">{plan.description}</p>
@@ -232,25 +232,17 @@ export default function PricingPage() {
                   </ul>
 
                   {/* CTA Button */}
-                  <button
-                    onClick={() => handleSelectPlan(index)}
-                    className={`w-full py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center group ${
+                  <Link
+                    href={plan.name === 'Enterprise' ? '/contact' : getSignupUrl(index)}
+                    className={`w-full py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center group text-center ${
                       plan.popular
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
-                        : isSelected
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg'
                         : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                     }`}
                   >
-                    {plan.buttonText}
+                    {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  
-                  {isSelected && (
-                    <p className="text-center text-blue-300 text-sm mt-3 animate-pulse">
-                      ✨ Selected - Click to continue
-                    </p>
-                  )}
+                  </Link>
                 </div>
               )
             })}
