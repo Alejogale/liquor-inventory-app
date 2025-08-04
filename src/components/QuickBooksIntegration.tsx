@@ -1,0 +1,204 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { User } from '@supabase/supabase-js';
+import { ExternalLink, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+
+interface QuickBooksIntegrationProps {
+  user: User;
+}
+
+export default function QuickBooksIntegration({ user }: QuickBooksIntegrationProps) {
+  const [isConnected, setIsConnected] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
+    try {
+      const { data } = await supabase
+        .from('organizations')
+        .select('quickbooks_company_id, quickbooks_access_token')
+        .eq('id', user.user_metadata?.organization_id)
+        .single();
+
+      if (data?.quickbooks_company_id) {
+        setIsConnected(true);
+        fetchCompanyInfo();
+      }
+    } catch (error) {
+      console.error('Error checking QuickBooks connection:', error);
+    }
+  };
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await fetch('/api/quickbooks/company-info', {
+        method: 'GET',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCompanyInfo(data);
+      }
+    } catch (error) {
+      console.error('Error fetching company info:', error);
+    }
+  };
+
+  const connectToQuickBooks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/quickbooks/auth-url', {
+        method: 'GET',
+      });
+      
+      const { authUrl } = await response.json();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Error connecting to QuickBooks:', error);
+      setLoading(false);
+    }
+  };
+
+  const disconnectQuickBooks = async () => {
+    if (!confirm('Are you sure you want to disconnect QuickBooks?')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/quickbooks/disconnect', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        setIsConnected(false);
+        setCompanyInfo(null);
+      }
+    } catch (error) {
+      console.error('Error disconnecting QuickBooks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const syncInventory = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/quickbooks/sync-inventory', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        alert('Inventory sync completed successfully!');
+      }
+    } catch (error) {
+      console.error('Error syncing inventory:', error);
+      alert('Sync failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+            <ExternalLink className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">QuickBooks Integration</h3>
+            <p className="text-sm text-white/60">Sync your inventory data with QuickBooks Online</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          {isConnected ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Connected
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+              <AlertCircle className="w-3 h-3 mr-1" />
+              Not Connected
+            </span>
+          )}
+        </div>
+      </div>
+
+      {isConnected && companyInfo ? (
+        <div className="space-y-4">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+            <h4 className="font-medium text-green-400 mb-2">Connected Company</h4>
+            <p className="text-sm text-green-300">
+              <strong>{companyInfo.CompanyName}</strong>
+            </p>
+            <p className="text-xs text-green-400/60 mt-1">
+              Company ID: {companyInfo.Id}
+            </p>
+          </div>
+
+          <div className="flex space-x-3">
+            <button
+              onClick={syncInventory}
+              disabled={loading}
+              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Syncing...' : 'Sync Inventory Now'}
+            </button>
+            
+            <button
+              onClick={disconnectQuickBooks}
+              disabled={loading}
+              className="px-4 py-2 border border-red-400/30 text-red-400 rounded-lg hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Disconnect
+            </button>
+          </div>
+
+          <div className="text-xs text-white/40 mt-4">
+            <p>• Inventory purchases will automatically create expense entries in QuickBooks</p>
+            <p>• Supplier bills will be tracked and recorded</p>
+            <p>• Inventory values will update your balance sheet</p>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-white/80 mb-4">
+            Connect your QuickBooks Online account to automatically sync inventory purchases and expenses.
+          </p>
+          
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+            <h4 className="font-medium text-blue-400 mb-2">What gets synced:</h4>
+            <ul className="text-sm text-blue-300 space-y-1">
+              <li>• Inventory purchases → QuickBooks expenses</li>
+              <li>• Supplier bills → Vendor payments tracking</li>
+              <li>• Inventory values → Balance sheet updates</li>
+              <li>• COGS calculations when inventory is consumed</li>
+            </ul>
+          </div>
+
+          <button
+            onClick={connectToQuickBooks}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Connecting...' : 'Connect to QuickBooks'}
+          </button>
+          
+          <p className="text-xs text-white/40 mt-3">
+            Requires QuickBooks Online subscription. Integration is secure and read-only.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

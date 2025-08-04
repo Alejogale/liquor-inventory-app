@@ -14,7 +14,9 @@ import {
   Menu,
   X,
   LogOut,
-  Home
+  Home,
+  Upload,
+  Settings
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -36,12 +38,14 @@ export default function DashboardSidebar({
 
   const navigationItems = [
     { id: 'inventory', label: 'Inventory', icon: Package, description: 'Manage items & stock' },
+    { id: 'import', label: 'Import Data', icon: Upload, description: 'Bulk upload via CSV' },
     { id: 'categories', label: 'Categories', icon: ClipboardList, description: 'Product categories' },
     { id: 'suppliers', label: 'Suppliers', icon: Users, description: 'Vendor management' },
     { id: 'rooms', label: 'Rooms', icon: MapPin, description: 'Location setup' },
     { id: 'count', label: 'Count', icon: Building2, description: 'Room counting' },
     { id: 'orders', label: 'Orders', icon: ShoppingCart, description: 'Order reports' },
-    { id: 'activity', label: 'Reports', icon: Activity, description: 'Analytics & logs' }
+    { id: 'activity', label: 'Reports', icon: Activity, description: 'Analytics & logs' },
+    { id: 'integrations', label: 'Integrations', icon: Settings, description: 'QuickBooks & more' }
   ]
 
   return (

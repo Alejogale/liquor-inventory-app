@@ -1,125 +1,191 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
-import { 
-  Users, 
-  UserCheck, 
-  UserX, 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import {
+  Users,
+  Building,
+  TrendingUp,
   Calendar,
   Activity,
-  Mail,
-  Building2,
-  BarChart3
+  BarChart3,
+  PieChart,
+  UserCheck
 } from 'lucide-react'
 
 interface UserAnalytics {
   totalUsers: number
+  totalOrganizations: number
   activeUsers: number
-  inactiveUsers: number
   newUsersThisMonth: number
-  userGrowthRate: number
-  averageSessionTime: number
+  usersByOrganization: Array<{
+    organization_name: string
+    user_count: number
+  }>
+  usersByMonth: Array<{
+    month: string
+    count: number
+  }>
   topOrganizations: Array<{
     name: string
-    userCount: number
-    itemCount: number
-    lastActivity: string
+    activity_count: number
+    user_count: number
   }>
-  userActivityByDay: Array<{
-    day: string
-    activeUsers: number
+  recentActivity: Array<{
+    id: string
+    user_email: string
+    action_type: string
+    created_at: string
+    organization_name: string
   }>
-  featureAdoption: {
-    inventoryManagement: number
-    supplierOrders: number
-    roomCounting: number
-    barcodeScanning: number
-  }
 }
 
 export default function UserAnalytics() {
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    fetchUserAnalytics()
+    fetchAnalytics()
   }, [])
 
-  const fetchUserAnalytics = async () => {
+  const fetchAnalytics = async () => {
     try {
       setLoading(true)
 
-      // Fetch users and organizations data
-      const [usersResult, orgsResult, itemsResult, countsResult] = await Promise.all([
-        supabase.from('profiles').select('*'),
-        supabase.from('organizations').select('*'),
-        supabase.from('inventory_items').select('organization_id'),
-        supabase.from('room_counts').select('*').order('created_at', { ascending: false })
-      ])
+      // Fetch total users
+      const { count: totalUsers } = await supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true })
 
-      const users = usersResult.data || []
-      const organizations = orgsResult.data || []
-      const items = itemsResult.data || []
-      const counts = countsResult.data || []
+      // Fetch total organizations
+      const { count: totalOrganizations } = await supabase
+        .from('organizations')
+        .select('*', { count: 'exact', head: true })
 
-      // Calculate metrics
-      const totalUsers = users.length
-      const activeUsers = Math.floor(totalUsers * 0.75) // Simulated
-      const inactiveUsers = totalUsers - activeUsers
-      const newUsersThisMonth = Math.floor(totalUsers * 0.15) // Simulated
-      const userGrowthRate = 12.5 // Simulated percentage
+      // Fetch active users (users who have activity in last 30 days)
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      
+      const { data: activeUsersData } = await supabase
+        .from('activity_logs')
+        .select('user_email')
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        
+      const uniqueActiveUsers = new Set(activeUsersData?.map(log => log.user_email) || [])
+      const activeUsers = uniqueActiveUsers.size
 
-      // Group items by organization to find top organizations
-      const itemsByOrg = items.reduce((acc: any, item) => {
-        const orgId = item.organization_id
-        acc[orgId] = (acc[orgId] || 0) + 1
+      // Fetch new users this month
+      const startOfMonth = new Date()
+      startOfMonth.setDate(1)
+      startOfMonth.setHours(0, 0, 0, 0)
+      
+      const { count: newUsersThisMonth } = await supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString())
+
+      // Fetch users by organization
+      const { data: usersByOrg } = await supabase
+        .from('user_profiles')
+        .select(`
+          organization_id,
+          organizations!inner(name)
+        `)
+
+      const orgUserCounts = usersByOrg?.reduce((acc: any, user: any) => {
+        const orgName = user.organizations?.name || 'Unknown'
+        acc[orgName] = (acc[orgName] || 0) + 1
         return acc
-      }, {})
+      }, {}) || {}
 
-      const topOrganizations = organizations
-        .map(org => ({
-          name: org.name,
-          userCount: 1, // Simulated - in real app, count users per org
-          itemCount: itemsByOrg[org.id] || 0,
-          lastActivity: new Date().toISOString() // Simulated
+      const usersByOrganization = Object.entries(orgUserCounts).map(([name, count]) => ({
+        organization_name: name,
+        user_count: count as number
+      }))
+
+      // Fetch users by month (last 6 months)
+      const sixMonthsAgo = new Date()
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+      
+      const { data: monthlyUsers } = await supabase
+        .from('user_profiles')
+        .select('created_at')
+        .gte('created_at', sixMonthsAgo.toISOString())
+
+      const monthlyUserCounts = monthlyUsers?.reduce((acc: any, user) => {
+        const date = new Date(user.created_at)
+        const monthKey = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+        acc[monthKey] = (acc[monthKey] || 0) + 1
+        return acc
+      }, {}) || {}
+
+      const usersByMonth = Object.entries(monthlyUserCounts).map(([month, count]) => ({
+        month,
+        count: count as number
+      }))
+
+      // Fetch top organizations by activity
+      const { data: activityData } = await supabase
+        .from('activity_logs')
+        .select(`
+          organization_id,
+          organizations!inner(name)
+        `)
+        .gte('created_at', thirtyDaysAgo.toISOString())
+
+      const orgActivityCounts = activityData?.reduce((acc: any, activity: any) => {
+        const orgName = activity.organizations?.name || 'Unknown'
+        acc[orgName] = (acc[orgName] || 0) + 1
+        return acc
+      }, {}) || {}
+
+      const topOrganizations = Object.entries(orgActivityCounts)
+        .map(([name, activity_count]) => ({
+          name,
+          activity_count: activity_count as number,
+          user_count: orgUserCounts[name] || 0
         }))
-        .sort((a, b) => b.itemCount - a.itemCount)
-        .slice(0, 5)
+        .sort((a, b) => b.activity_count - a.activity_count)
+        .slice(0, 10)
 
-      // Simulate user activity by day (last 7 days)
-      const userActivityByDay = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date()
-        date.setDate(date.getDate() - (6 - i))
-        return {
-          day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-          activeUsers: Math.floor(Math.random() * 20) + 10
-        }
+      // Fetch recent activity
+      const { data: recentActivity } = await supabase
+        .from('activity_logs')
+        .select(`
+          id,
+          user_email,
+          action_type,
+          created_at,
+          organizations!inner(name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      const formattedRecentActivity = recentActivity?.map(activity => ({
+        id: activity.id,
+        user_email: activity.user_email,
+        action_type: activity.action_type,
+        created_at: activity.created_at,
+        organization_name: activity.organizations?.name || 'Unknown'
+      })) || []
+
+      setAnalytics({
+        totalUsers: totalUsers || 0,
+        totalOrganizations: totalOrganizations || 0,
+        activeUsers,
+        newUsersThisMonth: newUsersThisMonth || 0,
+        usersByOrganization,
+        usersByMonth,
+        topOrganizations,
+        recentActivity: formattedRecentActivity
       })
 
-      // Simulate feature adoption rates
-      const featureAdoption = {
-        inventoryManagement: 95,
-        supplierOrders: 78,
-        roomCounting: 85,
-        barcodeScanning: 62
-      }
-
-      const userAnalytics: UserAnalytics = {
-        totalUsers,
-        activeUsers,
-        inactiveUsers,
-        newUsersThisMonth,
-        userGrowthRate,
-        averageSessionTime: 1247, // Simulated seconds
-        topOrganizations,
-        userActivityByDay,
-        featureAdoption
-      }
-
-      setAnalytics(userAnalytics)
     } catch (error) {
       console.error('Error fetching user analytics:', error)
+      setError('Failed to load analytics')
     } finally {
       setLoading(false)
     }
@@ -127,109 +193,122 @@ export default function UserAnalytics() {
 
   if (loading) {
     return (
-      <div className="text-white text-center">Loading user analytics...</div>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 animate-pulse">
+              <div className="h-4 bg-white/20 rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-white/20 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
     )
   }
 
-  if (!analytics) {
+  if (error) {
     return (
-      <div className="text-white text-center">Error loading user analytics</div>
+      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+        <p className="text-red-300">{error}</p>
+      </div>
     )
   }
+
+  if (!analytics) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">User Analytics</h1>
-        <p className="text-white/60">Detailed user behavior and engagement metrics</p>
-      </div>
-
-      {/* User Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="space-y-6">
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Total Users</p>
-              <p className="text-2xl font-bold text-white mt-1">{analytics.totalUsers}</p>
+              <p className="text-sm text-white/60 mb-1">Total Users</p>
+              <p className="text-2xl font-bold text-white">{analytics.totalUsers.toLocaleString()}</p>
             </div>
-            <Users className="h-8 w-8 text-blue-400" />
+            <div className="bg-blue-500/20 p-3 rounded-lg">
+              <Users className="h-6 w-6 text-blue-400" />
+            </div>
           </div>
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Active Users</p>
-              <p className="text-2xl font-bold text-white mt-1">{analytics.activeUsers}</p>
-              <p className="text-green-400 text-xs mt-1">
-                {Math.round((analytics.activeUsers / analytics.totalUsers) * 100)}% of total
-              </p>
+              <p className="text-sm text-white/60 mb-1">Organizations</p>
+              <p className="text-2xl font-bold text-white">{analytics.totalOrganizations.toLocaleString()}</p>
             </div>
-            <UserCheck className="h-8 w-8 text-green-400" />
+            <div className="bg-purple-500/20 p-3 rounded-lg">
+              <Building className="h-6 w-6 text-purple-400" />
+            </div>
           </div>
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">New This Month</p>
-              <p className="text-2xl font-bold text-white mt-1">{analytics.newUsersThisMonth}</p>
-              <p className="text-blue-400 text-xs mt-1">+{analytics.userGrowthRate}% growth</p>
+              <p className="text-sm text-white/60 mb-1">Active Users (30d)</p>
+              <p className="text-2xl font-bold text-white">{analytics.activeUsers.toLocaleString()}</p>
             </div>
-            <Calendar className="h-8 w-8 text-blue-400" />
+            <div className="bg-green-500/20 p-3 rounded-lg">
+              <UserCheck className="h-6 w-6 text-green-400" />
+            </div>
           </div>
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Avg Session</p>
-              <p className="text-2xl font-bold text-white mt-1">
-                {Math.floor(analytics.averageSessionTime / 60)}m {analytics.averageSessionTime % 60}s
-              </p>
+              <p className="text-sm text-white/60 mb-1">New This Month</p>
+              <p className="text-2xl font-bold text-white">{analytics.newUsersThisMonth.toLocaleString()}</p>
             </div>
-            <Activity className="h-8 w-8 text-purple-400" />
+            <div className="bg-orange-500/20 p-3 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-orange-400" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Daily Activity Chart */}
+      {/* Charts and Lists */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Users by Organization */}
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Daily Active Users</h3>
-          <div className="h-64 flex items-end justify-between space-x-2">
-            {analytics.userActivityByDay.map((data, index) => (
-              <div key={data.day} className="flex flex-col items-center">
-                <div 
-                  className="bg-gradient-to-t from-green-600 to-blue-600 rounded-t"
-                  style={{ 
-                    height: `${(data.activeUsers / Math.max(...analytics.userActivityByDay.map(d => d.activeUsers))) * 200}px`,
-                    width: '30px'
-                  }}
-                />
-                <span className="text-white/60 text-sm mt-2">{data.day}</span>
-                <span className="text-white text-xs">{data.activeUsers}</span>
+          <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+            <PieChart className="h-5 w-5 mr-2" />
+            Users by Organization
+          </h3>
+          <div className="space-y-3">
+            {analytics.usersByOrganization.slice(0, 8).map((org, index) => (
+              <div key={`${org.organization_name}-${index}`} className="flex items-center justify-between">
+                <span className="text-white/80 truncate">{org.organization_name}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="bg-white/10 rounded-full px-2 py-1">
+                    <span className="text-xs text-white">{org.user_count}</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Feature Adoption */}
+        {/* Top Organizations by Activity */}
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Feature Adoption</h3>
+          <h3 className="text-xl font-semibold text-white mb-4">Top Organizations by Activity</h3>
           <div className="space-y-4">
-            {Object.entries(analytics.featureAdoption).map(([feature, adoption]) => (
-              <div key={feature}>
-                <div className="flex justify-between text-white/80 mb-1">
-                  <span className="capitalize">{feature.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span>{adoption}%</span>
+            {analytics.topOrganizations.map((org, index) => (
+              <div key={`${org.name}-${index}-${org.activity_count}`} className="flex items-center justify-between py-3 border-b border-white/10 last:border-b-0">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-10 w-10 flex items-center justify-center text-white font-bold">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{org.name}</p>
+                    <p className="text-white/60 text-sm">{org.user_count} users</p>
+                  </div>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                    style={{ width: `${adoption}%` }}
-                  />
+                <div className="text-right">
+                  <p className="text-white font-semibold">{org.activity_count}</p>
+                  <p className="text-white/60 text-sm">activities</p>
                 </div>
               </div>
             ))}
@@ -237,24 +316,24 @@ export default function UserAnalytics() {
         </div>
       </div>
 
-      {/* Top Organizations */}
+      {/* Recent Activity */}
       <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-        <h3 className="text-xl font-semibold text-white mb-4">Top Organizations by Activity</h3>
-        <div className="space-y-4">
-          {analytics.topOrganizations.map((org, index) => (
-            <div key={org.name} className="flex items-center justify-between py-3 border-b border-white/10 last:border-b-0">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-10 w-10 flex items-center justify-center text-white font-bold">
-                  {index + 1}
-                </div>
-                <div>
-                  <h4 className="text-white font-medium">{org.name}</h4>
-                  <p className="text-white/60 text-sm">{org.userCount} users • {org.itemCount} items</p>
-                </div>
+        <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+          <Activity className="h-5 w-5 mr-2" />
+          Recent User Activity
+        </h3>
+        <div className="space-y-3">
+          {analytics.recentActivity.slice(0, 10).map((activity, index) => (
+            <div key={`${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0">
+              <div>
+                <p className="text-white/80">{activity.user_email}</p>
+                <p className="text-white/60 text-sm">{activity.organization_name}</p>
               </div>
               <div className="text-right">
-                <p className="text-white/60 text-sm">Last active</p>
-                <p className="text-white text-sm">{new Date(org.lastActivity).toLocaleDateString()}</p>
+                <p className="text-white capitalize">{activity.action_type.replace('_', ' ')}</p>
+                <p className="text-white/60 text-sm">
+                  {new Date(activity.created_at).toLocaleDateString()}
+                </p>
               </div>
             </div>
           ))}
