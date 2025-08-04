@@ -1,17 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Modal from '@/components/Modal'
 
-interface AddCategoryModalProps {
-  organization: { id: string }
-  onClose: () => void
-  onCategoryAdded: () => void
+interface Category {
+  id: string
+  name: string
 }
 
-export default function AddCategoryModal({ onClose, onCategoryAdded, organization }: AddCategoryModalProps) {
-  const [categoryName, setCategoryName] = useState('')
+interface EditCategoryModalProps {
+  category: Category
+  organization: { id: string }
+  onClose: () => void
+  onCategoryUpdated: () => void
+}
+
+export default function EditCategoryModal({ category, organization, onClose, onCategoryUpdated }: EditCategoryModalProps) {
+  const [categoryName, setCategoryName] = useState(category.name)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,29 +26,32 @@ export default function AddCategoryModal({ onClose, onCategoryAdded, organizatio
 
     setLoading(true)
     try {
+      if (!organization?.id) {
+        console.error("No organization loaded")
+        setLoading(false)
+        return
+      }
+
       const { error } = await supabase
         .from('categories')
-        .insert([
-          {
-            name: categoryName.trim(),
-            organization_id: organization.id
-          }
-        ])
+        .update({
+          name: categoryName.trim()
+        })
+        .eq('id', category.id)
+        .eq('organization_id', organization.id)
 
       if (error) throw error
 
-      onCategoryAdded()
-      setCategoryName('')
+      onCategoryUpdated()
     } catch (error) {
-      console.error('Error adding category:', error)
-      alert('Error adding category. Please try again.')
+      console.error('Error updating category:', error)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Add Category">
+    <Modal isOpen={true} onClose={onClose} title="Edit Category">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="categoryName" className="block text-sm font-medium text-white mb-2">
@@ -53,14 +62,13 @@ export default function AddCategoryModal({ onClose, onCategoryAdded, organizatio
             id="categoryName"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            placeholder="e.g., Whiskey, Vodka, Beer"
-            className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+            placeholder="Enter category name"
             required
-            autoFocus
           />
         </div>
-        
-        <div className="flex space-x-3">
+
+        <div className="flex space-x-3 pt-4">
           <button
             type="button"
             onClick={onClose}
@@ -71,9 +79,9 @@ export default function AddCategoryModal({ onClose, onCategoryAdded, organizatio
           <button
             type="submit"
             disabled={loading || !categoryName.trim() || !organization?.id}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Adding...' : 'Add Category'}
+            {loading ? 'Updating...' : 'Update Category'}
           </button>
         </div>
       </form>

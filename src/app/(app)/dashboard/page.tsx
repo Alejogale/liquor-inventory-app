@@ -1,9 +1,12 @@
 'use client'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { CheckCircle } from 'lucide-react'
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import AddCategoryModal from '@/app/components/AddCategoryModal'
+import EditCategoryModal from '@/app/components/EditCategoryModal'
 import AddItemModal from '@/app/components/AddItemModal'
 import EditItemModal from '@/components/EditItemModal'
 import InventoryTable from '@/components/InventoryTable'
@@ -12,7 +15,11 @@ import RoomCountingInterface from '@/components/RoomCountingInterface'
 import OrderReport from '@/components/OrderReport'
 import RoomManager from '@/components/RoomManager'
 import ActivityDashboard from '@/components/ActivityDashboard'
+import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
+import QuickBooksIntegration from '@/components/QuickBooksIntegration'
+
+
 import {
   Package,
   Users,
@@ -49,12 +56,14 @@ interface InventoryItem {
 }
 
 export default function Dashboard() {
-  const { user, signOut } = useAuth()
+  const { user, userProfile, organization, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('inventory')
   const [categories, setCategories] = useState<Category[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
   const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showEditCategory, setShowEditCategory] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [showAddItem, setShowAddItem] = useState(false)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
   const [loading, setLoading] = useState(true)
@@ -169,6 +178,31 @@ export default function Dashboard() {
     setShowAddItem(false)
   }
 
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category)
+    setShowEditCategory(true)
+  }
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return
+    try {
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", categoryId)
+        .eq("organization_id", organization?.id)
+      if (error) throw error
+      fetchData()
+    } catch (error) {
+      console.error("Error deleting category:", error)
+    }
+  }
+
+  const handleCategoryUpdated = () => {
+    fetchData()
+    setShowEditCategory(false)
+    setEditingCategory(null)
+  }
   const handleItemUpdated = () => {
     fetchData()
     setEditingItem(null)
@@ -180,6 +214,10 @@ export default function Dashboard() {
 
   const handleRoomUpdated = () => {
     fetchData()
+  }
+
+  const handleImportComplete = () => {
+    fetchData() // Refresh data after import
   }
 
   const handleSignOut = async () => {
@@ -302,6 +340,11 @@ export default function Dashboard() {
               </div>
             )}
 
+            {/* NEW: Import Data Tab */}
+            {activeTab === 'import' && (
+              <ImportData onImportComplete={handleImportComplete} />
+            )}
+
             {activeTab === 'categories' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
@@ -324,7 +367,20 @@ export default function Dashboard() {
                       </div>
                       <h3 className="text-white font-semibold text-lg">{category.name}</h3>
                       <p className="text-white/60 text-sm mt-1">Product category</p>
-                    </div>
+                      <div className="flex space-x-2 mt-3">
+                        <button
+                          onClick={() => handleEditCategory(category)}
+                          className="flex-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="flex-1 px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>                    </div>
                   ))}
                 </div>
               </div>
@@ -379,6 +435,16 @@ export default function Dashboard() {
                 <ActivityDashboard userEmail={user?.email || ''} />
               </div>
             )}
+
+            {activeTab === 'integrations' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white">Integrations</h2>
+                  <p className="text-white/60 mt-1">Connect with QuickBooks and other business tools</p>
+                </div>
+                <QuickBooksIntegration user={user} />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -388,9 +454,17 @@ export default function Dashboard() {
         <AddCategoryModal
           onClose={() => setShowAddCategory(false)}
           onCategoryAdded={handleCategoryAdded}
-        />
+          organization={organization}        />
       )}
 
+      {showEditCategory && editingCategory && (
+        <EditCategoryModal
+          category={editingCategory}
+          organization={organization}
+          onClose={() => setShowEditCategory(false)}
+          onCategoryUpdated={handleCategoryUpdated}
+        />
+      )}
       {showAddItem && (
         <AddItemModal
           categories={categories}
