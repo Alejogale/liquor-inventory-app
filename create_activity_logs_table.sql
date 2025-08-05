@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     old_value INTEGER,
     new_value INTEGER,
     change_type TEXT CHECK (change_type IN ('scan', 'manual', 'button')),
-    organization_id INTEGER REFERENCES organizations(id),
+    organization_id UUID REFERENCES organizations(id),  -- Changed from INTEGER to UUID
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -20,6 +20,15 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_organization ON activity_logs(organ
 -- Enable RLS
 ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policy
+-- Drop existing policy if it exists
+DROP POLICY IF EXISTS "Users can view activity logs for their organization" ON activity_logs;
+
+-- Create proper RLS policy using organization context
 CREATE POLICY "Users can view activity logs for their organization" ON activity_logs
-    FOR ALL USING (organization_id = 1);
+    FOR ALL USING (
+        organization_id IN (
+            SELECT organization_id 
+            FROM user_profiles 
+            WHERE id = auth.uid()
+        )
+    );

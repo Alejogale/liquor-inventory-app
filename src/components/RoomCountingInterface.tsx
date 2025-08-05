@@ -57,9 +57,13 @@ interface SaveStatus {
 
 interface RoomCountingInterfaceProps {
   userEmail?: string
+  organizationId?: string
 }
 
-export default function RoomCountingInterface({ userEmail = 'user@example.com' }: RoomCountingInterfaceProps) {
+export default function RoomCountingInterface({ 
+  userEmail = 'user@example.com',
+  organizationId 
+}: RoomCountingInterfaceProps) {
   const [rooms, setRooms] = useState<Room[]>([])
   const [selectedRoom, setSelectedRoom] = useState<string>('')
   const [selectedRoomName, setSelectedRoomName] = useState<string>('')
@@ -86,9 +90,33 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
   const saveQueueRef = useRef<{ [itemId: string]: number }>({}) // Offline queue
 
+  // Add helper function to get current organization
+  const getCurrentOrganization = async () => {
+    if (organizationId) return organizationId
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      return profile?.organization_id || null
+    } catch (error) {
+      console.error('Error getting organization:', error)
+      return null
+    }
+  }
+
+  // Update useEffect to trigger when organizationId is available
   useEffect(() => {
-    fetchRoomsAndInventory()
-  }, [])
+    if (organizationId) {
+      fetchRoomsAndInventory()
+    }
+  }, [organizationId])
 
   useEffect(() => {
     if (selectedRoom) {
@@ -163,6 +191,12 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
     changeType?: 'scan' | 'manual' | 'button'
   ) => {
     try {
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        console.warn('No organization found for activity logging')
+        return
+      }
+
       const activityData = {
         user_email: userEmail,
         action_type: actionType,
@@ -171,7 +205,7 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
         old_value: oldValue || null,
         new_value: newValue || null,
         change_type: changeType || null,
-        organization_id: 1
+        organization_id: currentOrg
       }
 
       console.log('📝 Logging activity:', activityData)
@@ -264,10 +298,17 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
       setLoading(true)
       console.log('🔄 Loading rooms and inventory...')
 
-      // Fetch dynamic rooms from database
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        console.error('No organization found')
+        return
+      }
+
+      // Fetch rooms with organization filter
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
+        .eq('organization_id', currentOrg)
         .order('display_order')
 
       if (roomsError) {
@@ -283,23 +324,26 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
         }
       }
 
-      // Fetch inventory items
+      // Fetch inventory items with organization filter
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
+        .eq('organization_id', currentOrg)
         .order('brand')
 
       if (inventoryError) {
         console.error('❌ Error fetching inventory:', inventoryError)
       } else {
-        // Manually enrich with category names
+        // Fetch categories and suppliers with organization filter
         const { data: categoriesData } = await supabase
           .from('categories')
           .select('*')
+          .eq('organization_id', currentOrg)
         
         const { data: suppliersData } = await supabase
           .from('suppliers')
           .select('*')
+          .eq('organization_id', currentOrg)
 
         const enrichedItems = inventoryData?.map(item => {
           const category = categoriesData?.find(cat => cat.id === item.category_id)
@@ -327,6 +371,12 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
     try {
       console.log('📋 Loading existing counts for room:', roomId)
       
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        console.error('No organization found for loading room counts')
+        return
+      }
+
       // Log room change activity
       const room = rooms.find(r => r.id === roomId)
       if (room) {
@@ -338,6 +388,7 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
         .from('room_counts')
         .select('inventory_item_id, count, last_counted_at')
         .eq('room_id', roomId)
+        .eq('organization_id', currentOrg)
 
       if (error) {
         console.error('❌ Error loading room counts:', error)
@@ -470,12 +521,17 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
         return
       }
 
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        throw new Error('No organization found for saving')
+      }
+
       // Only update/insert changed items (INCREMENTAL APPROACH)
       const changedCounts = Array.from(changedItems).map(itemId => ({
         room_id: selectedRoom,
         inventory_item_id: itemId,
         count: counts[itemId] || 0,
-        organization_id: 1,
+        organization_id: currentOrg,
         last_counted_at: new Date().toISOString()
       }))
 
@@ -486,6 +542,7 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
           .from('room_counts')
           .delete()
           .eq('room_id', selectedRoom)
+          .eq('organization_id', currentOrg)
           .in('inventory_item_id', itemIds)
       }
 
@@ -611,18 +668,18 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="text-white/60">Loading rooms and inventory...</div>
+        <div className="text-slate-600">Loading rooms and inventory...</div>
       </div>
     )
   }
 
   if (rooms.length === 0) {
     return (
-      <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-        <AlertCircle className="h-12 w-12 text-orange-400 mx-auto mb-4" />
-        <p className="text-white/60 text-lg">No rooms configured</p>
-        <p className="text-white/40 text-sm mt-2">
-          Go to the "Rooms" tab to add your first room before counting inventory
+      <div className="text-center py-12 bg-white rounded-lg border border-blue-200 shadow-sm">
+        <AlertCircle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+        <p className="text-slate-600 text-lg">No rooms configured</p>
+        <p className="text-slate-500 text-sm mt-2">
+          Go to the &ldquo;Rooms&rdquo; tab to add your first room before counting inventory
         </p>
       </div>
     )
@@ -633,14 +690,14 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
       {/* Auto-save Status Banner */}
       <div className={`rounded-lg p-4 border transition-all ${
         saveStatus.status === 'saved' 
-          ? 'bg-green-500/10 border-green-500/20' 
+          ? 'bg-green-50 border-green-200' 
           : saveStatus.status === 'saving'
-          ? 'bg-blue-500/10 border-blue-500/20'
+          ? 'bg-blue-50 border-blue-200'
           : saveStatus.status === 'pending'
-          ? 'bg-yellow-500/10 border-yellow-500/20'
+          ? 'bg-yellow-50 border-yellow-200'
           : saveStatus.status === 'offline'
-          ? 'bg-orange-500/10 border-orange-500/20'
-          : 'bg-red-500/10 border-red-500/20'
+          ? 'bg-orange-50 border-orange-200'
+          : 'bg-red-50 border-red-200'
       }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -655,10 +712,10 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
             )}
             <div>
               <h3 className={`font-medium ${
-                saveStatus.status === 'saved' ? 'text-green-200' : 
-                saveStatus.status === 'saving' ? 'text-blue-200' :
-                saveStatus.status === 'pending' ? 'text-yellow-200' :
-                saveStatus.status === 'offline' ? 'text-orange-200' : 'text-red-200'
+                saveStatus.status === 'saved' ? 'text-green-700' : 
+                saveStatus.status === 'saving' ? 'text-blue-700' :
+                saveStatus.status === 'pending' ? 'text-yellow-700' :
+                saveStatus.status === 'offline' ? 'text-orange-700' : 'text-red-700'
               }`}>
                 {saveStatus.status === 'saved' && saveStatus.pendingChanges === 0 && '✅ All Changes Saved'}
                 {saveStatus.status === 'saved' && saveStatus.pendingChanges > 0 && '✅ Saved (changes pending)'}
@@ -668,10 +725,10 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
                 {saveStatus.status === 'error' && '❌ Save Error - Retrying'}
               </h3>
               <p className={`text-sm ${
-                saveStatus.status === 'saved' ? 'text-green-300' : 
-                saveStatus.status === 'saving' ? 'text-blue-300' :
-                saveStatus.status === 'pending' ? 'text-yellow-300' :
-                saveStatus.status === 'offline' ? 'text-orange-300' : 'text-red-300'
+                saveStatus.status === 'saved' ? 'text-green-600' : 
+                saveStatus.status === 'saving' ? 'text-blue-600' :
+                saveStatus.status === 'pending' ? 'text-yellow-600' :
+                saveStatus.status === 'offline' ? 'text-orange-600' : 'text-red-600'
               }`}>
                 {saveStatus.lastSaved && `Last saved: ${saveStatus.lastSaved.toLocaleTimeString()}`}
                 {saveStatus.pendingChanges > 0 && ` • ${saveStatus.pendingChanges} pending changes`}
@@ -680,8 +737,8 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Clock className="h-4 w-4 text-white/40" />
-            <span className="text-white/60 text-sm">Auto-saves every 30s • Activity logged</span>
+            <Clock className="h-4 w-4 text-slate-400" />
+            <span className="text-slate-600 text-sm">Auto-saves every 30s • Activity logged</span>
           </div>
         </div>
       </div>
@@ -690,27 +747,27 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
       {/* Barcode Scanner Status */}
       <div className={`rounded-lg p-4 border transition-all ${
         scannerStatus === 'detected' 
-          ? 'bg-green-500/20 border-green-500/40' 
+          ? 'bg-green-50 border-green-200' 
           : scannerStatus === 'not_found'
-          ? 'bg-red-500/20 border-red-500/40'
-          : 'bg-blue-500/10 border-blue-500/20'
+          ? 'bg-red-50 border-red-200'
+          : 'bg-blue-50 border-blue-200'
       }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Zap className={`h-5 w-5 ${
               scannerStatus === 'detected' 
-                ? 'text-green-400' 
+                ? 'text-green-500' 
                 : scannerStatus === 'not_found'
-                ? 'text-red-400'
-                : 'text-blue-400'
+                ? 'text-red-500'
+                : 'text-blue-500'
             }`} />
             <div>
               <h3 className={`font-medium ${
                 scannerStatus === 'detected' 
-                  ? 'text-green-200' 
+                  ? 'text-green-700' 
                   : scannerStatus === 'not_found'
-                  ? 'text-red-200'
-                  : 'text-blue-200'
+                  ? 'text-red-700'
+                  : 'text-blue-700'
               }`}>
                 {scannerStatus === 'detected' 
                   ? '✅ Ready for Count Input!' 
@@ -720,10 +777,10 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
               </h3>
               <p className={`text-sm ${
                 scannerStatus === 'detected' 
-                  ? 'text-green-300' 
+                  ? 'text-green-600' 
                   : scannerStatus === 'not_found'
-                  ? 'text-red-300'
-                  : 'text-blue-300'
+                  ? 'text-red-600'
+                  : 'text-blue-600'
               }`}>
                 {scannerStatus === 'detected' 
                   ? `Scan found! Type count then scan next item` 
@@ -753,9 +810,9 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
       </div>
 
       {/* Room Selection Cards */}
-      <div className="bg-white/10 rounded-lg p-6 border border-white/20">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <Building2 className="h-5 w-5 mr-2 text-blue-400" />
+      <div className="bg-white rounded-lg p-6 border border-blue-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <Building2 className="h-5 w-5 mr-2 text-blue-500" />
           Select Room for Counting
         </h3>
         
@@ -766,22 +823,22 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
               onClick={() => setSelectedRoom(room.id)}
               className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                 selectedRoom === room.id
-                  ? 'bg-blue-600/20 border-blue-400 shadow-lg shadow-blue-500/20'
-                  : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30'
+                  ? 'bg-blue-50 border-blue-400 shadow-lg'
+                  : 'bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-300'
               }`}
             >
               <div className="flex items-center space-x-3">
                 <MapPin className={`h-5 w-5 ${
-                  selectedRoom === room.id ? 'text-blue-400' : 'text-white/60'
+                  selectedRoom === room.id ? 'text-blue-500' : 'text-slate-600'
                 }`} />
                 <div>
                   <h4 className={`font-medium ${
-                    selectedRoom === room.id ? 'text-white' : 'text-white/80'
+                    selectedRoom === room.id ? 'text-slate-800' : 'text-slate-700'
                   }`}>
                     {room.name}
                   </h4>
                   <p className={`text-sm ${
-                    selectedRoom === room.id ? 'text-blue-200' : 'text-white/50'
+                    selectedRoom === room.id ? 'text-blue-600' : 'text-slate-500'
                   }`}>
                     Tap to select
                   </p>
@@ -789,14 +846,14 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
               </div>
               
               {selectedRoom === room.id && (
-                <div className="mt-3 pt-3 border-t border-blue-400/20">
+                <div className="mt-3 pt-3 border-t border-blue-200">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-200">Items counted:</span>
-                    <span className="text-blue-100 font-medium">{totalItemsCounted}</span>
+                    <span className="text-blue-600">Items counted:</span>
+                    <span className="text-blue-700 font-medium">{totalItemsCounted}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-1">
-                    <span className="text-blue-200">Total bottles:</span>
-                    <span className="text-blue-100 font-medium">{totalBottlesCounted.toFixed(2)}</span>
+                    <span className="text-blue-600">Total bottles:</span>
+                    <span className="text-blue-700 font-medium">{totalBottlesCounted.toFixed(2)}</span>
                   </div>
                   {changedItems.size > 0 && (
                     <div className="flex items-center justify-between text-sm mt-1">
@@ -816,13 +873,13 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
           {/* Search and Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Manual search (auto-clears after scan)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-2">
@@ -855,21 +912,21 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
           </div>
 
           {/* Inventory Items */}
-          <div className="bg-white/10 rounded-lg border border-white/20">
-            <div className="p-4 border-b border-white/10">
-              <h3 className="text-lg font-semibold text-white flex items-center">
-                <Package className="h-5 w-5 mr-2 text-purple-400" />
+          <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div className="p-4 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-800 flex items-center">
+                <Package className="h-5 w-5 mr-2 text-purple-600" />
                 Inventory Count
-                <span className="ml-2 text-white/60 text-sm">
+                <span className="ml-2 text-slate-600 text-sm">
                   ({filteredItems.length} items)
                 </span>
               </h3>
-              <p className="text-white/60 text-sm mt-1">
-                Room: <span className="text-white font-medium">
+              <p className="text-slate-600 text-sm mt-1">
+                Room: <span className="text-slate-800 font-medium">
                   {rooms.find(r => r.id === selectedRoom)?.name}
                 </span>
                 {focusedInput && (
-                  <span className="text-blue-300 ml-4">
+                  <span className="text-blue-600 ml-4">
                     🎯 Ready for input
                   </span>
                 )}
@@ -879,9 +936,9 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
             <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
               {filteredItems.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-white/60">No items found</p>
+                  <p className="text-slate-600">No items found</p>
                   {searchTerm && (
-                    <p className="text-white/40 text-sm mt-1">
+                    <p className="text-slate-500 text-sm mt-1">
                       Try scanning a barcode or adjusting your search term
                     </p>
                   )}
@@ -899,45 +956,45 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
                       id={`item-${item.id}`}
                       className={`rounded-lg p-4 border transition-all duration-300 ${
                         highlightedItem === item.id
-                          ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-500/20'
+                          ? 'bg-green-50 border-green-400 shadow-lg shadow-green-500/20'
                           : focusedInput === item.id
-                          ? 'bg-blue-500/20 border-blue-400'
+                          ? 'bg-blue-50 border-blue-400'
                           : isChanged
-                          ? 'bg-orange-500/10 border-orange-400/50'
-                          : 'bg-white/5 border-white/10'
+                          ? 'bg-orange-50 border-orange-400'
+                          : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h4 className="text-white font-medium">{item.brand}</h4>
-                          <div className="flex items-center flex-wrap gap-2 text-sm text-white/60 mt-1">
+                          <h4 className="text-slate-800 font-medium">{item.brand}</h4>
+                          <div className="flex items-center flex-wrap gap-2 text-sm text-slate-600 mt-1">
                             {item.categories?.name && (
-                              <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded">
+                              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
                                 {item.categories.name}
                               </span>
                             )}
                             {item.barcode && (
-                              <span className="bg-gray-500/20 text-gray-300 px-2 py-1 rounded font-mono">
+                              <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded font-mono">
                                 {item.barcode}
                               </span>
                             )}
                             {highlightedItem === item.id && (
-                              <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded animate-pulse">
+                              <span className="bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse">
                                 ✅ Just Scanned
                               </span>
                             )}
                             {focusedInput === item.id && (
-                              <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded">
+                              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
                                 🎯 Ready for Input
                               </span>
                             )}
                             {isChanged && (
-                              <span className="bg-orange-500/20 text-orange-300 px-2 py-1 rounded">
+                              <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded">
                                 📝 {originalValue} → {currentValue}
                               </span>
                             )}
                             {history && (
-                              <span className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded flex items-center">
+                              <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded flex items-center">
                                 <History className="h-3 w-3 mr-1" />
                                 {formatTime(history.changedAt)}
                                 {history.changeType === 'scan' && ' (scanned)'}
@@ -976,12 +1033,12 @@ export default function RoomCountingInterface({ userEmail = 'user@example.com' }
                               onChange={(e) => updateCount(item.id, parseFloat(e.target.value) || 0, 'manual')}
                               onFocus={() => setFocusedInput(item.id)}
                               onBlur={() => setFocusedInput(null)}
-                              className={`w-full text-center border rounded-lg py-2 text-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                              className={`w-full text-center border rounded-lg py-2 text-slate-800 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 focusedInput === item.id
-                                  ? 'bg-blue-500/20 border-blue-400 ring-2 ring-blue-500'
+                                  ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-500'
                                   : isChanged
-                                  ? 'bg-orange-500/10 border-orange-400'
-                                  : 'bg-white/10 border-white/20'
+                                  ? 'bg-orange-50 border-orange-400'
+                                  : 'bg-white border-slate-200'
                               }`}
                             />
                           </div>

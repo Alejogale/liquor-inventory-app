@@ -158,25 +158,25 @@ export default function AdminDashboard() {
     trendUp?: boolean
     subtitle?: string | null
   }) => (
-    <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+    <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-white/60 text-sm font-medium">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
-          {subtitle && <p className="text-white/40 text-xs mt-1">{subtitle}</p>}
+          <p className="text-slate-600 text-sm font-medium">{title}</p>
+          <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
+          {subtitle && <p className="text-slate-500 text-xs mt-1">{subtitle}</p>}
         </div>
-        <div className={`p-3 rounded-lg ${trendUp ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-          <Icon className={`h-6 w-6 ${trendUp ? 'text-green-400' : 'text-red-400'}`} />
+        <div className={`p-3 rounded-lg ${trendUp ? 'bg-green-100' : 'bg-red-100'}`}>
+          <Icon className={`h-6 w-6 ${trendUp ? 'text-green-600' : 'text-red-600'}`} />
         </div>
       </div>
       {trend !== null && (
         <div className="flex items-center mt-3">
           {trendUp ? (
-            <ArrowUpRight className="h-4 w-4 text-green-400 mr-1" />
+            <ArrowUpRight className="h-4 w-4 text-green-600 mr-1" />
           ) : (
-            <ArrowDownRight className="h-4 w-4 text-red-400 mr-1" />
+            <ArrowDownRight className="h-4 w-4 text-red-600 mr-1" />
           )}
-          <span className={`text-sm ${trendUp ? 'text-green-400' : 'text-red-400'}`}>
+          <span className={`text-sm ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
             {trend}% vs last month
           </span>
         </div>
@@ -186,33 +186,33 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading admin dashboard...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <div className="text-slate-800 text-xl">Loading admin dashboard...</div>
       </div>
     )
   }
 
   if (!metrics) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-white text-xl">Error loading metrics</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <div className="text-slate-800 text-xl">Error loading metrics</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       <div className="p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Admin Analytics Dashboard</h1>
-          <p className="text-white/60">Business intelligence and performance metrics</p>
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">Admin Analytics Dashboard</h1>
+          <p className="text-slate-600">Business intelligence and performance metrics</p>
           
           <div className="flex items-center space-x-4 mt-4">
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white"
+              className="bg-white border border-blue-200 rounded-lg px-4 py-2 text-slate-800"
             >
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
@@ -292,11 +292,11 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* Charts and Analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Organization Growth Chart */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4">Organization Growth</h3>
+                  {/* Charts and Analytics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Organization Growth Chart */}
+            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+              <h3 className="text-xl font-semibold text-slate-800 mb-4">Organization Growth</h3>
             <div className="h-64 flex items-end justify-between space-x-2">
               {metrics.organizationGrowth.map((data, index) => (
                 <div key={`growth-${data.month}-${index}`} className="flex flex-col items-center">
@@ -307,24 +307,24 @@ export default function AdminDashboard() {
                       width: '40px'
                     }}
                   />
-                  <span className="text-white/60 text-sm mt-2">{data.month}</span>
-                  <span className="text-white text-xs">{data.count}</span>
+                  <span className="text-slate-600 text-sm mt-2">{data.month}</span>
+                  <span className="text-slate-800 text-xs">{data.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Feature Usage */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4">Feature Usage</h3>
+          <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+            <h3 className="text-xl font-semibold text-slate-800 mb-4">Feature Usage</h3>
             <div className="space-y-4">
               {Object.entries(metrics.featureUsage).map(([feature, usage], index) => (
                 <div key={`feature-${feature}-${index}`}>
-                  <div className="flex justify-between text-white/80 mb-1">
+                  <div className="flex justify-between text-slate-700 mb-1">
                     <span className="capitalize">{feature.replace(/([A-Z])/g, ' $1').trim()}</span>
                     <span>{usage}%</span>
                   </div>
-                  <div className="w-full bg-white/10 rounded-full h-2">
+                  <div className="w-full bg-slate-100 rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
                       style={{ width: `${usage}%` }}
@@ -337,21 +337,21 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Recent Activity</h3>
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Recent Activity</h3>
           <div className="space-y-3">
             {metrics.recentActivity.slice(0, 8).map((activity, index) => (
-              <div key={`activity-${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0">
+              <div key={`activity-${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-blue-100 last:border-b-0">
                 <div className="flex items-center space-x-3">
-                  <Activity className="h-4 w-4 text-blue-400" />
+                  <Activity className="h-4 w-4 text-blue-500" />
                   <div>
-                    <p className="text-white text-sm">{activity.action}</p>
-                    <p className="text-white/60 text-xs">{activity.organization_name}</p>
+                    <p className="text-slate-800 text-sm">{activity.action}</p>
+                    <p className="text-slate-600 text-xs">{activity.organization_name}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-white/60 text-xs">{new Date(activity.timestamp).toLocaleDateString()}</p>
-                  <p className="text-white/40 text-xs">{new Date(activity.timestamp).toLocaleTimeString()}</p>
+                  <p className="text-slate-600 text-xs">{new Date(activity.timestamp).toLocaleDateString()}</p>
+                  <p className="text-slate-500 text-xs">{new Date(activity.timestamp).toLocaleTimeString()}</p>
                 </div>
               </div>
             ))}

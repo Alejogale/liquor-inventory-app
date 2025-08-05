@@ -98,565 +98,472 @@ export default function LandingPage() {
     },
     {
       icon: <Star className="h-8 w-8" />,
-      title: "Wedding & Event Venues",
-      description: "Track inventory for multiple events simultaneously. Ensure you never run out during your most important occasions.",
-      benefits: ["Event-specific tracking", "Supplier coordination", "Real-time alerts"],
-      color: "from-pink-500 to-rose-500",
-      featured: false
-    },
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Corporate Event Centers",
-      description: "Professional inventory management for conference centers, corporate retreats, and business entertainment venues.",
-      benefits: ["Client billing integration", "Professional reporting", "Compliance tracking"],
-      color: "from-emerald-500 to-teal-500",
-      featured: false
-    },
-    {
-      icon: <MapPin className="h-8 w-8" />,
-      title: "Yacht Clubs & Marinas",
-      description: "Specialized for waterfront dining and exclusive member venues. Handle seasonal fluctuations with precision.",
-      benefits: ["Seasonal inventory planning", "Member preferences", "Marine compliance"],
-      color: "from-cyan-500 to-blue-500",
+      title: "Fine Dining Restaurants",
+      description: "Perfect for upscale restaurants with extensive wine lists, craft cocktails, and premium spirits.",
+      benefits: ["Wine cellar management", "Craft cocktail tracking", "Premium spirit control"],
+      color: "from-purple-500 to-pink-500",
       featured: false
     },
     {
       icon: <Trophy className="h-8 w-8" />,
-      title: "Private Dining Clubs",
-      description: "Exclusive venues demand exclusive service. Maintain premium standards with professional inventory control.",
-      benefits: ["Premium brand tracking", "Member billing", "White-glove service"],
-      color: "from-blue-500 to-blue-600",
+      title: "Sports Bars & Pubs",
+      description: "Manage high-volume inventory with multiple bars, draft systems, and game day specials.",
+      benefits: ["Draft system tracking", "Game day inventory", "High-volume management"],
+      color: "from-green-500 to-teal-500",
       featured: false
     }
   ]
 
-  const pricingPlans = [
-    {
-      name: "Starter",
-      price: 29,
-      description: "Perfect for small bars and restaurants",
-      features: [
-        "Up to 500 items",
-        "2 rooms/locations",
-        "Basic barcode scanning",
-        "Email reports",
-        "Standard support"
-      ],
-      popular: false,
-      buttonText: "Start Free Trial"
-    },
-    {
-      name: "Professional",
-      price: 79,
-      description: "For growing businesses with multiple locations",
-      features: [
-        "Unlimited items",
-        "Unlimited rooms/locations",
-        "Advanced barcode scanning",
-        "Real-time reports",
-        "Activity logging",
-        "Priority support",
-        "API access"
-      ],
-      popular: true,
-      buttonText: "Start Free Trial"
-    },
-    {
-      name: "Enterprise",
-      price: 199,
-      description: "For large operations and chains",
-      features: [
-        "Everything in Professional",
-        "Multi-organization management",
-        "Custom integrations",
-        "Dedicated support",
-        "Training sessions",
-        "White-label options"
-      ],
-      popular: false,
-      buttonText: "Contact Sales"
-    }
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      {/* Navigation */}
-      <nav className="relative z-50 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-700 rounded-lg flex items-center justify-center">
-              <Package className="h-5 w-5 text-slate-800" />
-            </div>
-            <span className="text-2xl font-bold text-slate-800">LiquorTrack</span>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#industries" className="text-slate-600 hover:text-slate-800 transition-colors">Industries</a>
-            <a href="#features" className="text-slate-600 hover:text-slate-800 transition-colors">Features</a>
-            <a href="#pricing" className="text-slate-600 hover:text-slate-800 transition-colors">Pricing</a>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/login"
-              className="text-slate-600 hover:text-slate-800 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/pricing"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative px-6 py-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="mb-6">
-            <span className="bg-blue-500/10 text-blue-300 px-4 py-2 rounded-full text-sm font-medium border border-blue-500/20">
-              ✨ Professional Inventory Management
-            </span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold text-slate-800 mb-6 leading-tight">
-            Premium Inventory
-            <span className="bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent"> Management</span>
-          </h1>
-          
-          <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Enterprise-grade liquor inventory management designed for country clubs, luxury hotels, 
-            and premium venues. Barcode scanning, real-time tracking, and automated reporting.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link
-              href="/pricing"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center justify-center group"
-            >
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <button className="bg-white/70 hover:bg-white/20 text-slate-800 px-8 py-4 rounded-xl transition-all duration-200 backdrop-blur-sm border border-blue-200/30 font-semibold">
-              Watch Demo
-            </button>
-          </div>
-
-          {/* Updated Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-slate-800 mb-2">99.9%</div>
-              <div className="text-slate-500">Accuracy Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-slate-800 mb-2">70%</div>
-              <div className="text-slate-500">Time Saved</div>
-            </div>
-          </div>
-        </div>
-
-        {/* TOP RIGHT - Floating Inventory Dashboard */}
-        <div className="absolute top-4 right-4 transform hidden 2xl:block animate-pulse">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-4 border border-blue-200/30 shadow-2xl">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+    <div className="min-h-screen bg-white">
+      {/* Glassmorphic Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">L</span>
               </div>
-              <span className="text-slate-500 text-xs">Dashboard</span>
+              <span className="text-lg font-semibold text-slate-900">Liquor Inventory</span>
             </div>
-            
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-600">Items</span>
-                <span className="text-green-400 font-bold">847</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-600">Low Stock</span>
-                <span className="text-orange-400 font-bold">12</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-600">Value</span>
-                <span className="text-blue-400 font-bold">$24K</span>
-              </div>
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-slate-600 hover:text-slate-900 transition-colors text-sm">Features</a>
+              <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors text-sm">Pricing</a>
+              <a href="#industries" className="text-slate-600 hover:text-slate-900 transition-colors text-sm">Industries</a>
+              <Link href="/contact" className="text-slate-600 hover:text-slate-900 transition-colors text-sm">Contact</Link>
             </div>
-            
-            <div className="mt-3 pt-2 border-t border-blue-100/40">
-              <span className="text-green-300 text-xs">✅ Auto-saved</span>
-            </div>
-          </div>
-        </div>
-
-        {/* BOTTOM LEFT - Mobile Scanner */}
-        <div className="absolute bottom-4 left-4 transform hidden xl:block animate-bounce">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-blue-200/30 shadow-2xl">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                <Smartphone className="h-4 w-4 text-slate-800" />
-              </div>
-              <div>
-                <div className="text-slate-800 font-semibold text-xs">Scanned</div>
-                <div className="text-slate-500 text-xs">Grey Goose</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Background Decorative Elements */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
-      </section>
-
-      {/* Business Impact Section */}
-      <section className="px-6 py-20 bg-white/50 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">Transform Your Business</h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              See the real impact LiquorTrack has on your operations and bottom line
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {businessImpacts.map((impact, index) => (
-              <div
-                key={index}
-                className="relative group"
-              >
-                {/* Floating Card */}
-                <div className="bg-white/70 backdrop-blur-md rounded-2xl p-8 border border-blue-200/30 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${impact.color} rounded-2xl flex items-center justify-center mb-6 text-slate-800`}>
-                    {impact.icon}
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-slate-800 mb-3">{impact.title}</h3>
-                  <p className="text-slate-600 mb-4 leading-relaxed">{impact.description}</p>
-                  
-                  <div className="bg-black/20 rounded-lg p-4 border border-blue-100/40">
-                    <div className="text-lg font-bold text-slate-800">{impact.metric}</div>
-                    <div className="text-slate-500 text-sm">Average improvement</div>
-                  </div>
-                </div>
-
-                {/* Decorative Elements */}
-                <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500/20 rounded-full blur-sm"></div>
-                <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-purple-500/20 rounded-full blur-sm"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* TOP LEFT - Security Badge */}
-        <div className="absolute top-4 left-4 transform hidden xl:block animate-pulse">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-green-400/30 shadow-2xl">
-            <div className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-green-400" />
-              <div>
-                <div className="text-green-300 font-semibold text-xs">Secure</div>
-                <div className="text-slate-500 text-xs">Encrypted</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* BOTTOM RIGHT - Low Stock Alert */}
-        <div className="absolute bottom-4 right-4 transform hidden xl:block">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-yellow-400/30 shadow-2xl animate-pulse">
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" />
-              <div>
-                <div className="text-yellow-300 font-semibold text-xs">Low Stock</div>
-                <div className="text-slate-500 text-xs">Dom Pérignon</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Industries Section */}
-      <section id="industries" className="px-6 py-20 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="mb-6">
-              <span className="bg-amber-500/10 text-amber-300 px-4 py-2 rounded-full text-sm font-medium border border-amber-500/20">
-                🏆 Premium Venues
-              </span>
-            </div>
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">Built for Excellence</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              LiquorTrack was specifically designed for country clubs and premium hospitality venues 
-              that demand professional-grade inventory management and exceptional service standards.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {industries.map((industry, index) => (
-              <div
-                key={index}
-                className={`relative group cursor-pointer ${
-                  industry.featured ? 'md:col-span-2 lg:col-span-1' : ''
-                }`}
-                onMouseEnter={() => setHoveredIndustry(index)}
-                onMouseLeave={() => setHoveredIndustry(null)}
-              >
-                <div className={`bg-white/70 backdrop-blur-md rounded-2xl p-8 border transition-all duration-300 hover:scale-105 h-full ${
-                  industry.featured
-                    ? 'border-amber-400/50 shadow-2xl shadow-amber-500/20'
-                    : hoveredIndustry === index
-                    ? 'border-white/30 shadow-2xl'
-                    : 'border-blue-200/30 hover:border-white/30'
-                }`}>
-                  {industry.featured && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-slate-800 px-4 py-1 rounded-full text-sm font-medium flex items-center">
-                        <Crown className="h-4 w-4 mr-1" />
-                        Primary Focus
-                      </span>
-                    </div>
-                  )}
-
-                  <div className={`w-16 h-16 bg-gradient-to-r ${industry.color} rounded-2xl flex items-center justify-center mb-6 text-slate-800`}>
-                    {industry.icon}
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-slate-800 mb-3">{industry.title}</h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">{industry.description}</p>
-                  
-                  <div className="space-y-3">
-                    <div className="text-sm font-semibold text-slate-800/90 mb-2">Key Benefits:</div>
-                    {industry.benefits.map((benefit, benefitIndex) => (
-                      <div key={benefitIndex} className="flex items-center text-slate-600">
-                        <CheckCircle className="h-4 w-4 text-green-400 mr-3 flex-shrink-0" />
-                        <span className="text-sm">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {industry.featured && (
-                    <div className="mt-6 pt-6 border-t border-blue-200/30">
-                      <Link
-                        href="/pricing"
-                        className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-slate-800 px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center justify-center group"
-                      >
-                        Get Started
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* Decorative Elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500/20 rounded-full blur-sm"></div>
-                <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-purple-500/20 rounded-full blur-sm"></div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA for Industries */}
-          <div className="text-center mt-16">
-            <div className="bg-white/50 backdrop-blur-md rounded-2xl p-8 border border-blue-200/30 max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">Don't See Your Industry?</h3>
-              <p className="text-slate-600 mb-6">
-                LiquorTrack adapts to any premium venue with liquor inventory needs. 
-                From private events to exclusive restaurants, we've got you covered.
-              </p>
-              <Link
-                href="/pricing"
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold inline-flex items-center"
-              >
-                Schedule a Demo
-                <ArrowRight className="ml-2 h-5 w-5" />
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="text-slate-600 hover:text-slate-900 transition-colors text-sm">
+                Sign In
+              </Link>
+              <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                Start Free Trial
               </Link>
             </div>
           </div>
         </div>
+      </nav>
 
-        {/* TOP LEFT - Event Calendar */}
-        <div className="absolute top-4 left-4 transform hidden 2xl:block">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-blue-200/30 shadow-2xl animate-pulse">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-blue-400" />
-              <div>
-                <div className="text-slate-800 font-semibold text-xs">Wedding</div>
-                <div className="text-slate-500 text-xs">150 guests</div>
-              </div>
-            </div>
-          </div>
+      {/* Hero Section - Premium Frosted Glass */}
+      <section className="pt-32 pb-20 relative overflow-hidden">
+        {/* Complex Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100"></div>
+        <div className="absolute inset-0 bg-gradient-to-tl from-slate-200/40 via-transparent to-blue-200/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-100/20 via-transparent to-slate-100/40"></div>
+        
+        {/* Subtle Pattern Overlay */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-200/20 via-transparent to-indigo-200/20"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tl from-slate-300/10 via-transparent to-blue-300/10"></div>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="px-6 py-20 bg-white/50 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">Powerful Features</h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Everything you need for modern inventory management
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="group bg-white/50 hover:bg-white/70 rounded-2xl p-8 border border-blue-100/40 hover:border-blue-200/30 transition-all duration-300 cursor-pointer"
-                onMouseEnter={() => setHoveredFeature(index)}
-                onMouseLeave={() => setHoveredFeature(null)}
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${
-                  hoveredFeature === index
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-slate-800'
-                    : 'bg-white/70 text-slate-600'
-                }`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* BOTTOM RIGHT - Analytics Chart */}
-        <div className="absolute bottom-4 right-4 transform hidden xl:block">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-blue-200/30 shadow-2xl">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-green-400" />
-              <div>
-                <div className="text-slate-800 font-semibold text-xs">Report</div>
-                <div className="text-green-400 text-xs">↗ +23%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="px-6 py-20 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Choose the plan that fits your business. Start with a 14-day free trial.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div
-                key={index}
-                className={`relative bg-white/70 backdrop-blur-md rounded-2xl p-8 border transition-all duration-300 hover:scale-105 ${
-                  plan.popular
-                    ? 'border-blue-400 shadow-2xl shadow-blue-500/20'
-                    : 'border-blue-200/30 hover:border-white/30'
-                }`}
-                onMouseEnter={() => setHoveredPlan(index)}
-                onMouseLeave={() => setHoveredPlan(null)}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-800 px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
+        
+        {/* Premium Frosted Glass Container */}
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-12 border border-white/30 shadow-2xl relative overflow-hidden">
+            {/* Inner Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
+            
+            {/* Dynamic Layout */}
+            <div className="relative">
+              {/* Main Content Area */}
+              <div className="relative z-10">
+                {/* Hero Text - Centered with Dynamic Positioning */}
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-slate-800 mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold text-slate-800 mb-2">
-                    ${plan.price}<span className="text-lg text-slate-500">/month</span>
-                  </div>
-                  <p className="text-slate-600">{plan.description}</p>
+                  <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 leading-tight drop-shadow-sm mb-4">
+                    Professional Inventory
+                    <span className="block text-blue-600">Management</span>
+                  </h1>
+                  <p className="text-base lg:text-lg text-slate-700 leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
+                    Streamline your liquor inventory with real-time counting, automated ordering, 
+                    and detailed reporting. Built for modern hospitality businesses.
+                  </p>
                 </div>
 
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-slate-600">
-                      <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+                {/* Dynamic Action Section */}
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-8">
+                  <Link href="/signup" className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 flex items-center gap-3 group shadow-lg hover:shadow-xl transform hover:scale-105">
+                    Start Free Trial
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <button className="bg-white/60 backdrop-blur-sm border border-slate-200/50 text-slate-700 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/80 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    Watch Demo
+                  </button>
+                </div>
 
-                <Link
-                  href="/pricing"
-                  className={`block text-center py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    plan.popular
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-white/70 hover:bg-white/20 text-slate-800 border border-blue-200/30'
-                  }`}
-                >
-                  {plan.buttonText}
-                </Link>
+                {/* Trust Indicators - Dynamic Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-white/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <span>Free to start</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-white/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <span>No setup fees</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-white/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <span>Cancel anytime</span>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
 
-          <div className="text-center mt-12">
-            <p className="text-slate-500 text-sm">
-              All plans include 14-day free trial • No setup fees • Cancel anytime
-            </p>
+              {/* Floating Elements for Dynamic Feel */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl"></div>
+              <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-slate-200/30 rounded-full blur-xl"></div>
+            </div>
           </div>
         </div>
 
-        {/* TOP RIGHT - Success Notification */}
-        <div className="absolute top-4 right-4 transform hidden xl:block animate-bounce">
-          <div className="bg-white/70 backdrop-blur-md rounded-xl p-3 border border-green-400/30 shadow-2xl">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-400" />
-              <div>
-                <div className="text-green-300 font-semibold text-xs">Order Sent</div>
-                <div className="text-slate-500 text-xs">Confirmed</div>
+        {/* Side Elements - Positioned Outside Main Container */}
+        <div className="hidden lg:block absolute top-1/2 transform -translate-y-1/2 left-4 max-w-xs">
+          <div className="space-y-6 animate-scroll-up">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Real-time Sync</span>
               </div>
+              <p className="text-xs text-slate-600">Instant inventory updates across all devices</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Smart Analytics</span>
+              </div>
+              <p className="text-xs text-slate-600">Advanced reporting and insights</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-indigo-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Cloud Backup</span>
+              </div>
+              <p className="text-xs text-slate-600">Secure data storage and recovery</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Real-time Sync</span>
+              </div>
+              <p className="text-xs text-slate-600">Instant inventory updates across all devices</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden lg:block absolute top-1/2 transform -translate-y-1/2 right-4 max-w-xs">
+          <div className="space-y-6 animate-scroll-down">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Auto Ordering</span>
+              </div>
+              <p className="text-xs text-slate-600">Smart reorder points and notifications</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Barcode Scanning</span>
+              </div>
+              <p className="text-xs text-slate-600">Quick and accurate inventory counting</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-pink-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Multi-location</span>
+              </div>
+              <p className="text-xs text-slate-600">Manage multiple venues from one dashboard</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-700">Auto Ordering</span>
+              </div>
+              <p className="text-xs text-slate-600">Smart reorder points and notifications</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-6 py-20 bg-gradient-to-r from-blue-600/20 to-blue-700/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-slate-800 mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-slate-600 mb-8">
-            Join premium venues already using LiquorTrack to streamline their inventory
-          </p>
+      {/* Business Impact Section - Simplified */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Transform Your Operations
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              See measurable improvements in efficiency, cost savings, and accuracy
+            </p>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/pricing"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-semibold"
-            >
-              Start Your Free Trial
-            </Link>
-            <button className="bg-white/70 hover:bg-white/20 text-slate-800 px-8 py-4 rounded-xl transition-all duration-200 backdrop-blur-sm border border-blue-200/30 font-semibold">
-              Schedule Demo
-            </button>
+          <div className="grid md:grid-cols-3 gap-8">
+            {businessImpacts.map((impact, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-xl p-8 border border-slate-200 hover:border-blue-300 transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className={`w-12 h-12 bg-gradient-to-br ${impact.color} rounded-lg flex items-center justify-center mb-6 text-white`}>
+                  {impact.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{impact.title}</h3>
+                <p className="text-slate-600 mb-4 leading-relaxed">{impact.description}</p>
+                <div className="text-lg font-bold text-slate-900">{impact.metric}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 py-12 border-t border-blue-100/40">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-700 rounded-lg flex items-center justify-center">
-                <Package className="h-5 w-5 text-slate-800" />
+      {/* Features Section - Simplified */}
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Everything You Need
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Powerful features designed specifically for the hospitality industry
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-xl p-6 border border-slate-200 hover:border-blue-300 transition-all duration-200 hover:-translate-y-1"
+              >
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <div className="text-blue-600">
+                    {feature.icon}
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
-              <span className="text-xl font-bold text-slate-800">LiquorTrack</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Industries Section - Simplified */}
+      <section id="industries" className="py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Built for Your Industry
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Tailored solutions for different hospitality sectors
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-6">
+            {industries.map((industry, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-xl p-8 border border-slate-200 hover:border-blue-300 transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${industry.color} rounded-lg flex items-center justify-center text-white flex-shrink-0`}>
+                    {industry.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{industry.title}</h3>
+                    <p className="text-slate-600 mb-4 text-sm leading-relaxed">{industry.description}</p>
+                    <div className="space-y-2">
+                      {industry.benefits.map((benefit, benefitIndex) => (
+                        <div key={benefitIndex} className="flex items-center gap-2 text-slate-600">
+                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section - Simplified */}
+      <section id="pricing" className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Simple Pricing
+            </h2>
+            <p className="text-lg text-slate-600">
+              Choose the plan that fits your business needs
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl p-8 border border-slate-200 hover:border-blue-300 transition-all duration-200 hover:-translate-y-1">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Starter</h3>
+              <div className="mb-6">
+                <span className="text-3xl font-bold text-slate-900">$29</span>
+                <span className="text-slate-500 ml-2">/month</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">1 Location</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">2 Team Members</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Basic Reporting</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Email Support</span>
+                </li>
+              </ul>
+              <Link href="/signup" className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center px-6 py-3 rounded-lg font-medium transition-colors text-sm">
+                Start Free Trial
+              </Link>
             </div>
             
-            <div className="text-slate-500 text-center md:text-right">
-              <p>&copy; 2024 LiquorTrack. All rights reserved.</p>
-              <div className="flex items-center justify-center md:justify-end space-x-6 mt-2">
-                <a href="#" className="hover:text-slate-800 transition-colors">Privacy</a>
-                <a href="#" className="hover:text-slate-800 transition-colors">Terms</a>
-                <a href="#" className="hover:text-slate-800 transition-colors">Support</a>
+            <div className="bg-white rounded-xl p-8 border-2 border-blue-500 relative shadow-lg hover:-translate-y-1 transition-transform">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                Most Popular
               </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Professional</h3>
+              <div className="mb-6">
+                <span className="text-3xl font-bold text-slate-900">$79</span>
+                <span className="text-slate-500 ml-2">/month</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">3 Locations</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">10 Team Members</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Advanced Reporting</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Barcode Scanning</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Priority Support</span>
+                </li>
+              </ul>
+              <Link href="/signup" className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-lg font-medium transition-colors text-sm">
+                Start Free Trial
+              </Link>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 border border-slate-200 hover:border-blue-300 transition-all duration-200 hover:-translate-y-1">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Enterprise</h3>
+              <div className="mb-6">
+                <span className="text-3xl font-bold text-slate-900">$199</span>
+                <span className="text-slate-500 ml-2">/month</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Unlimited Locations</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Unlimited Team Members</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Custom Reporting</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">API Access</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-slate-600 text-sm">Dedicated Support</span>
+                </li>
+              </ul>
+              <Link href="/contact" className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center px-6 py-3 rounded-lg font-medium transition-colors text-sm">
+                Contact Sales
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Simplified */}
+      <section className="py-20 bg-slate-900">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Ready to Get Started?
+          </h2>
+          <p className="text-lg text-slate-300 mb-8">
+            Join hundreds of bars and restaurants that have already streamlined their operations
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-colors">
+              Start Free Trial
+            </Link>
+            <Link href="/contact" className="border border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-colors">
+              Schedule Demo
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer - Simplified */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="col-span-2">
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                  <span className="text-slate-900 font-bold text-sm">L</span>
+                </div>
+                <span className="text-lg font-semibold">Liquor Inventory</span>
+              </div>
+              <p className="text-slate-400 mb-6 max-w-md text-sm">
+                Professional inventory management solution designed specifically for bars, restaurants, and hospitality businesses.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h3>
+              <ul className="space-y-3">
+                <li><a href="#features" className="text-slate-400 hover:text-white transition-colors text-sm">Features</a></li>
+                <li><a href="#pricing" className="text-slate-400 hover:text-white transition-colors text-sm">Pricing</a></li>
+                <li><Link href="/contact" className="text-slate-400 hover:text-white transition-colors text-sm">Demo</Link></li>
+                <li><Link href="/signup" className="text-slate-400 hover:text-white transition-colors text-sm">Free Trial</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h3>
+              <ul className="space-y-3">
+                <li><Link href="/contact" className="text-slate-400 hover:text-white transition-colors text-sm">Contact</Link></li>
+                <li><Link href="/privacy" className="text-slate-400 hover:text-white transition-colors text-sm">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-slate-400 hover:text-white transition-colors text-sm">Terms of Service</Link></li>
+                <li><a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">Support</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-800 mt-12 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-slate-400 text-sm">
+                &copy; 2024 Liquor Inventory Manager. All rights reserved.
+              </p>
+              <p className="text-slate-400 text-sm mt-4 md:mt-0">
+                Made with ❤️ for the hospitality industry
+              </p>
             </div>
           </div>
         </div>

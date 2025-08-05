@@ -45,11 +45,27 @@ export default function OrderReport() {
     try {
       setLoading(true)
       
+      // Get current organization from auth context
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Get user profile to find organization
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile?.organization_id) {
+        console.log('No organization found for user')
+        return
+      }
+
       // Get all inventory items with categories and suppliers
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select('id, brand, category_id, threshold, par_level, supplier_id')
-        .eq('organization_id', 1)
+        .eq('organization_id', profile.organization_id)
 
       if (itemsError) throw itemsError
 
@@ -57,7 +73,7 @@ export default function OrderReport() {
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('organization_id', 1)
+        .eq('organization_id', profile.organization_id)
 
       if (categoriesError) throw categoriesError
 
@@ -65,7 +81,7 @@ export default function OrderReport() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('id, name, email')
-        .eq('organization_id', 1)
+        .eq('organization_id', profile.organization_id)
 
       if (suppliersError) throw suppliersError
 
@@ -73,7 +89,7 @@ export default function OrderReport() {
       const { data: countsData, error: countsError } = await supabase
         .from('room_counts')
         .select('inventory_item_id, room_id, count')
-        .eq('organization_id', 1)
+        .eq('organization_id', profile.organization_id)
 
       if (countsError) throw countsError
 
@@ -81,7 +97,7 @@ export default function OrderReport() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('id, name')
-        .eq('organization_id', 1)
+        .eq('organization_id', profile.organization_id)
 
       if (roomsError) throw roomsError
 
@@ -257,7 +273,7 @@ export default function OrderReport() {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="text-white/60">Generating supplier order report...</div>
+        <div className="text-slate-600">Generating supplier order report...</div>
       </div>
     )
   }
@@ -271,8 +287,8 @@ export default function OrderReport() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Supplier Order Report</h2>
-          <p className="text-white/60">
+          <h2 className="text-2xl font-bold text-slate-800">Supplier Order Report</h2>
+          <p className="text-slate-600">
             Items below threshold, grouped by supplier • Generated: {lastGenerated}
           </p>
         </div>
@@ -300,23 +316,23 @@ export default function OrderReport() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-4">
-          <div className="text-2xl font-bold text-red-400">{totalItems}</div>
-          <div className="text-white/80">Items to Order</div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-2xl font-bold text-red-600">{totalItems}</div>
+          <div className="text-slate-700">Items to Order</div>
         </div>
-        <div className="bg-yellow-600/20 border border-yellow-500/30 rounded-lg p-4">
-          <div className="text-2xl font-bold text-yellow-400">{totalUnits}</div>
-          <div className="text-white/80">Total Units Needed</div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="text-2xl font-bold text-yellow-600">{totalUnits}</div>
+          <div className="text-slate-700">Total Units Needed</div>
         </div>
-        <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-4">
-          <div className="text-2xl font-bold text-purple-400">{suppliersAffected}</div>
-          <div className="text-white/80">Suppliers Affected</div>
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <div className="text-2xl font-bold text-purple-600">{suppliersAffected}</div>
+          <div className="text-slate-700">Suppliers Affected</div>
         </div>
-        <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg p-4">
-          <div className="text-2xl font-bold text-blue-400">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="text-2xl font-bold text-blue-600">
             {supplierGroups.filter(s => s.supplier_email).length}
           </div>
-          <div className="text-white/80">Can Email Directly</div>
+          <div className="text-slate-700">Can Email Directly</div>
         </div>
       </div>
 
@@ -324,28 +340,28 @@ export default function OrderReport() {
       {supplierGroups.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🎉</div>
-          <h3 className="text-xl font-bold text-white mb-2">No Orders Needed!</h3>
-          <p className="text-white/60">All inventory items are above their threshold levels.</p>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">No Orders Needed!</h3>
+          <p className="text-slate-600">All inventory items are above their threshold levels.</p>
         </div>
       ) : (
         <div className="space-y-6">
           {supplierGroups.map((supplier, index) => (
-            <div key={`${supplier.supplier_id}-${index}`} className="bg-white/10 rounded-xl p-6 border border-white/20">
+            <div key={`${supplier.supplier_id}-${index}`} className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm">
               {/* Supplier Header */}
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                     🏪 {supplier.supplier_name}
                     {!supplier.supplier_email && (
-                      <span className="text-xs bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded">
+                      <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
                         No Email
                       </span>
                     )}
                   </h3>
-                  <p className="text-white/60">
+                  <p className="text-slate-600">
                     {supplier.total_items} items • {supplier.total_units} units needed
                     {supplier.supplier_email && (
-                      <span className="text-green-400 ml-2">📧 {supplier.supplier_email}</span>
+                      <span className="text-green-600 ml-2">📧 {supplier.supplier_email}</span>
                     )}
                   </p>
                 </div>

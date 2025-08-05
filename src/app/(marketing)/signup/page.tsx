@@ -7,10 +7,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { 
   Eye, 
   EyeOff, 
-  Package, 
   CheckCircle,
   User,
-  Building
+  Building,
+  ArrowRight
 } from 'lucide-react'
 
 interface PlanDetails {
@@ -27,7 +27,7 @@ export default function SignupPage() {
   
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClientComponentClient() createClientComponentClient()
+  const supabase = createClientComponentClient()
 
   // Form data
   const [formData, setFormData] = useState({
@@ -99,42 +99,40 @@ export default function SignupPage() {
         throw new Error('Failed to create user - no user data returned')
       }
 
-      console.log('✅ User created:', authData.user.email)
-      console.log('🔍 User confirmation status:', authData.user.email_confirmed_at ? 'Confirmed' : 'Not confirmed')
+      console.log('✅ User account created:', authData.user.id)
 
-      // 2. If user is not immediately confirmed, sign them in 
-      if (!authData.user.email_confirmed_at) {
-        console.log('🔑 Email not confirmed, attempting sign in...')
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      // 2. Create user profile
+      console.log('📝 Creating user profile...')
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: authData.user.id,
+          full_name: formData.fullName,
           email: formData.email,
-          password: formData.password,
+          role: 'owner',
+          job_title: formData.jobTitle || null
         })
 
-        if (signInError) {
-          console.error('❌ Sign in error:', signInError)
-          throw new Error('Account created but unable to sign in. Please check your email confirmation settings.')
-        }
-        console.log('✅ User signed in successfully')
+      if (profileError) {
+        console.error('❌ Profile error:', profileError)
+        throw new Error(`Profile error: ${profileError.message}`)
       }
 
-      // 3. Create organization with slug
-      console.log('🏢 Creating organization...')
-      const orgSlug = generateSlug(formData.organizationName)
+      console.log('✅ User profile created')
+
+      // 3. Create organization
+      console.log('📝 Creating organization...')
+      const organizationSlug = generateSlug(formData.organizationName)
       
-      const orgInsert = {
-        Name: formData.organizationName,
-        slug: orgSlug,
-        created_by: authData.user.id,
-        subscription_status: 'trial',
-        subscription_plan: selectedPlan?.plan || 'starter',
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-      }
-
-      console.log('📤 Inserting organization:', orgInsert)
-
       const { data: orgData, error: orgError } = await supabase
         .from('organizations')
-        .insert([orgInsert])
+        .insert({
+          Name: formData.organizationName,
+          slug: organizationSlug,
+          subscription_status: 'trial',
+          subscription_plan: 'free',
+          owner_id: authData.user.id
+        })
         .select()
         .single()
 
@@ -143,63 +141,28 @@ export default function SignupPage() {
         throw new Error(`Organization error: ${orgError.message}`)
       }
 
-      console.log('✅ Organization created:', orgData)
+      console.log('✅ Organization created:', orgData.id)
 
-      // 3. Create user profile
-      console.log("🔍 Creating user profile...")
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert([{
-          id: authData.user.id,
-          full_name: formData.fullName,
-          email: formData.email,
-          role: "admin",
-          organization_id: orgData.id,
-          job_title: formData.jobTitle
-        }])
+      // 4. Update user profile with organization_id
+      console.log('📝 Updating user profile with organization...')
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ organization_id: orgData.id })
+        .eq('id', authData.user.id)
 
-      if (profileError) {
-        console.error("❌ Profile error:", profileError)
-        throw new Error(`Profile error: ${profileError.message}`)
+      if (updateError) {
+        console.error('❌ Update error:', updateError)
+        throw new Error(`Update error: ${updateError.message}`)
       }
 
-      console.log("✅ Profile created")
+      console.log('✅ User profile updated with organization')
 
-      // 4. Wait a moment for session to stabilize
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
-      // 5. If plan selected, go to Stripe checkout
-      if (selectedPlan && selectedPlan.priceId) {
-        console.log('💳 Processing payment for plan:', selectedPlan.plan)
-        
-        const response = await fetch('/api/stripe/create-subscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            priceId: selectedPlan.priceId,
-            billingPeriod: selectedPlan.billing,
-          }),
-        })
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('❌ Stripe API error:', errorText)
-          throw new Error(`Payment setup failed. Please contact support.`)
-        }
-
-        const { url, error: stripeError } = await response.json()
-
-        if (stripeError) {
-          throw new Error(`Payment setup failed: ${stripeError}`)
-        }
-
-        if (url) {
-          console.log('🔄 Redirecting to Stripe checkout...')
-          window.location.href = url
-          return
-        }
+      // 5. Handle paid plan - redirect to Stripe
+      if (selectedPlan) {
+        console.log('💰 Redirecting to Stripe for payment...')
+        const url = `/api/stripe/create-subscription?priceId=${selectedPlan.priceId}&organizationId=${orgData.id}`
+        window.location.href = url
+        return
       }
 
       // 6. Free trial - go directly to dashboard
@@ -215,63 +178,65 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Navigation */}
-      <nav className="relative z-50 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center">
-              <Package className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">LiquorTrack</span>
-          </Link>
-          
-          <div className="flex items-center space-x-4">
-            <Link href="/login" className="text-white/80 hover:text-white transition-colors">
-              Already have an account? Log in
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Glassmorphic Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">L</span>
+              </div>
+              <span className="text-xl font-bold text-slate-900">Liquor Inventory</span>
             </Link>
+            
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">
+                Already have an account? Sign in
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="flex items-center justify-center px-6 py-12">
+      <div className="flex items-center justify-center px-6 py-24">
         <div className="max-w-md w-full">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">Create Your Account</h1>
-              <p className="text-white/60">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Account</h1>
+              <p className="text-slate-600">
                 {selectedPlan ? `Sign up for ${selectedPlan.plan} plan` : 'Start your free trial today'}
               </p>
             </div>
 
             {/* Selected Plan Display */}
             {selectedPlan && (
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-blue-400" />
-                  <span className="text-blue-300 font-medium">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                  <span className="text-blue-900 font-medium">
                     {selectedPlan.plan.charAt(0).toUpperCase() + selectedPlan.plan.slice(1)} Plan
                   </span>
-                  <span className="text-blue-400">
+                  <span className="text-blue-700">
                     ({selectedPlan.billing})
                   </span>
                 </div>
-                <p className="text-blue-200 text-xs mt-1">
-                  You'll be redirected to secure payment after account creation
+                <p className="text-blue-700 text-sm mt-1">
+                  You&apos;ll be redirected to secure payment after account creation
                 </p>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-                <p className="text-red-300 text-sm">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Personal Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white flex items-center">
+                <h3 className="text-lg font-medium text-slate-900 flex items-center">
                   <User className="h-5 w-5 mr-2" />
                   Personal Information
                 </h3>
@@ -284,7 +249,7 @@ export default function SignupPage() {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
                 </div>
 
@@ -296,7 +261,7 @@ export default function SignupPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
                 </div>
 
@@ -309,12 +274,12 @@ export default function SignupPage() {
                     onChange={handleInputChange}
                     required
                     minLength={6}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white/60"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -327,14 +292,14 @@ export default function SignupPage() {
                     placeholder="Job Title (optional)"
                     value={formData.jobTitle}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
                 </div>
               </div>
 
               {/* Organization Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white flex items-center">
+                <h3 className="text-lg font-medium text-slate-900 flex items-center">
                   <Building className="h-5 w-5 mr-2" />
                   Organization Information
                 </h3>
@@ -347,7 +312,7 @@ export default function SignupPage() {
                     value={formData.organizationName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -355,17 +320,21 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-black hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
               >
                 {isLoading 
                   ? (selectedPlan ? 'Creating Account & Setting Up Payment...' : 'Creating Account...') 
                   : (selectedPlan ? 'Create Account & Continue to Payment' : 'Start Free Trial')
                 }
+                {!isLoading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
               </button>
             </form>
 
-            <p className="text-center text-white/40 text-sm mt-6">
-              By signing up, you agree to our Terms of Service and Privacy Policy
+            <p className="text-center text-slate-500 text-sm mt-6">
+              By signing up, you agree to our{' '}
+              <Link href="/terms" className="text-blue-600 hover:text-blue-700">Terms of Service</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-blue-600 hover:text-blue-700">Privacy Policy</Link>
             </p>
           </div>
         </div>

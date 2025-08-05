@@ -23,9 +23,10 @@ interface Room {
 
 interface RoomManagerProps {
   onUpdate?: () => void
+  organizationId?: string
 }
 
-export default function RoomManager({ onUpdate }: RoomManagerProps) {
+export default function RoomManager({ onUpdate, organizationId }: RoomManagerProps) {
   const [rooms, setRooms] = useState<Room[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -43,9 +44,30 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
       setLoading(true)
       console.log('🏠 Fetching rooms...')
       
+      // Use organizationId prop if available, otherwise fetch from database
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single()
+
+        currentOrg = profile?.organization_id;
+      }
+
+      if (!currentOrg) {
+        console.log('No organization found for user')
+        return
+      }
+
       const { data, error } = await supabase
         .from('rooms')
         .select('*')
+        .eq('organization_id', currentOrg)
         .order('display_order')
 
       if (error) {
@@ -71,10 +93,30 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
       // Calculate next display order
       const maxOrder = Math.max(...rooms.map(r => r.display_order || 0), 0)
       
+      // Use organizationId prop if available, otherwise fetch from database
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single()
+
+        currentOrg = profile?.organization_id;
+      }
+
+      if (!currentOrg) {
+        console.log('No organization found for user')
+        return
+      }
+
       const insertData = {
         name: newRoomName.trim(),
         display_order: maxOrder + 1,
-        organization_id: 1  // This organization exists based on debug info
+        organization_id: currentOrg
       }
       
       console.log('📝 Insert data:', insertData)
@@ -179,7 +221,7 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="text-white/60">Loading rooms...</div>
+        <div className="text-slate-600">Loading rooms...</div>
       </div>
     )
   }
@@ -187,12 +229,12 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
   return (
     <div className="space-y-6">
       {/* Success Message */}
-      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+      <div className="bg-green-100 border border-green-200 rounded-lg p-4">
         <div className="flex items-center space-x-2">
-          <CheckCircle className="h-5 w-5 text-green-400" />
-          <span className="text-green-200 font-medium">Database Ready</span>
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <span className="text-green-800 font-medium">Database Ready</span>
         </div>
-        <p className="text-green-100 text-sm mt-1">
+        <p className="text-green-700 text-sm mt-1">
           Rooms table configured properly. Organization ID 1 exists. Ready to add custom rooms!
         </p>
       </div>
@@ -200,8 +242,8 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-white">Room Management</h3>
-          <p className="text-white/60 text-sm">Customize locations for inventory counting</p>
+          <h3 className="text-lg font-semibold text-slate-800">Room Management</h3>
+          <p className="text-slate-600 text-sm">Customize locations for inventory counting</p>
         </div>
         <button
           onClick={() => setShowAddRoom(true)}
@@ -214,15 +256,15 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
 
       {/* Add Room Form */}
       {showAddRoom && (
-        <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-          <h4 className="text-white font-medium mb-3">Add New Room</h4>
+        <div className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm">
+          <h4 className="text-slate-800 font-medium mb-3">Add New Room</h4>
           <div className="flex items-center space-x-3">
             <input
               type="text"
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="e.g., Wine Cellar, Main Bar, Storage Room"
-              className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 bg-white border border-blue-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
               onKeyPress={(e) => e.key === 'Enter' && addRoom()}
             />
@@ -239,7 +281,7 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
                 setShowAddRoom(false)
                 setNewRoomName('')
               }}
-              className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 text-slate-600 hover:text-slate-800 hover:bg-blue-50 rounded-lg transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -250,14 +292,14 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
       {/* Rooms List */}
       <div className="space-y-3">
         {rooms.length === 0 ? (
-          <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-            <Building2 className="h-12 w-12 text-white/30 mx-auto mb-4" />
-            <p className="text-white/60">No rooms configured</p>
-            <p className="text-white/40 text-sm mt-1">Add your first room to get started</p>
+          <div className="text-center py-12 bg-white rounded-lg border border-blue-200 shadow-sm">
+            <Building2 className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <p className="text-slate-600">No rooms configured</p>
+            <p className="text-slate-500 text-sm mt-1">Add your first room to get started</p>
           </div>
         ) : (
           rooms.map((room) => (
-            <div key={room.id} className="bg-white/10 rounded-lg border border-white/20 p-4">
+            <div key={room.id} className="bg-white rounded-lg border border-blue-200 p-4 shadow-sm">
               <div className="flex items-center space-x-4">
                 <MapPin className="h-5 w-5 text-blue-400" />
                 
@@ -268,28 +310,28 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
                         type="text"
                         value={editingName}
                         onChange={(e) => setEditingName(e.target.value)}
-                        className="flex-1 px-3 py-1 bg-white/10 border border-white/20 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-1 bg-white border border-blue-200 rounded text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onKeyPress={(e) => e.key === 'Enter' && updateRoom(room.id, editingName)}
                         autoFocus
                       />
                       <button
                         onClick={() => updateRoom(room.id, editingName)}
                         disabled={!editingName.trim() || saving}
-                        className="p-1 text-green-400 hover:text-green-300 hover:bg-white/10 rounded transition-colors"
+                        className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
                       >
                         <Save className="h-4 w-4" />
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="p-1 text-white/60 hover:text-white hover:bg-white/10 rounded transition-colors"
+                        className="p-1 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                   ) : (
                     <div>
-                      <h4 className="text-white font-medium">{room.name}</h4>
-                      <p className="text-white/60 text-sm">
+                      <h4 className="text-slate-800 font-medium">{room.name}</h4>
+                      <p className="text-slate-600 text-sm">
                         Order: {room.display_order} • Created: {new Date(room.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -300,7 +342,7 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => startEdit(room)}
-                      className="p-2 text-blue-400 hover:text-blue-300 hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit room name"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -308,7 +350,7 @@ export default function RoomManager({ onUpdate }: RoomManagerProps) {
                     <button
                       onClick={() => deleteRoom(room.id, room.name)}
                       disabled={saving}
-                      className="p-2 text-red-400 hover:text-red-300 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                       title="Delete room"
                     >
                       <Trash2 className="h-4 w-4" />

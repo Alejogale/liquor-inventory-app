@@ -15,9 +15,10 @@ interface InventoryItem {
 interface BarcodeScannerProps {
   onItemFound: (item: InventoryItem) => void
   onClose: () => void
+  organizationId?: string  // Add this prop
 }
 
-export default function BarcodeScanner({ onItemFound, onClose }: BarcodeScannerProps) {
+export default function BarcodeScanner({ onItemFound, onClose, organizationId }: BarcodeScannerProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [manualBarcode, setManualBarcode] = useState('')
   const [items, setItems] = useState<InventoryItem[]>([])
@@ -25,28 +26,57 @@ export default function BarcodeScanner({ onItemFound, onClose }: BarcodeScannerP
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  // Add helper function to get current organization
+  const getCurrentOrganization = async () => {
+    if (organizationId) return organizationId
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      return profile?.organization_id || null
+    } catch (error) {
+      console.error('Error getting organization:', error)
+      return null
+    }
+  }
+
   useEffect(() => {
-    fetchItems()
+    if (organizationId) {
+      fetchItems()
+    }
     return () => {
       stopCamera()
     }
-  }, [])
+  }, [organizationId])
 
   const fetchItems = async () => {
     try {
-      // Get inventory items with categories
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        console.error('No organization found for barcode scanner')
+        return
+      }
+
+      // Get inventory items with categories - use proper organization
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select('id, brand, category_id, barcode, threshold, par_level')
-        .eq('organization_id', 1)
+        .eq('organization_id', currentOrg)
 
       if (itemsError) throw itemsError
 
-      // Get categories
+      // Get categories - use proper organization
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('organization_id', 1)
+        .eq('organization_id', currentOrg)
 
       if (categoriesError) throw categoriesError
 

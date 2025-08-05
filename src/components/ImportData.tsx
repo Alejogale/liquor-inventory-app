@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { supabase } from '@/lib/supabase'  // Add this import
 import {
   Upload,
   FileText,
@@ -18,15 +19,37 @@ import {
 
 interface ImportDataProps {
   onImportComplete?: () => void
+  organizationId?: string  // Add this prop
 }
 
-export default function ImportData({ onImportComplete }: ImportDataProps) {
+export default function ImportData({ onImportComplete, organizationId }: ImportDataProps) {
   const [activeImportType, setActiveImportType] = useState<string>('inventory')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [importResults, setImportResults] = useState<any>(null)
   const [previewData, setPreviewData] = useState<any[]>([])
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+
+  // Add helper function to get current organization
+  const getCurrentOrganization = async () => {
+    if (organizationId) return organizationId
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      return profile?.organization_id || null
+    } catch (error) {
+      console.error('Error getting organization:', error)
+      return null
+    }
+  }
 
   const importTypes = [
     {
@@ -211,8 +234,21 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
 
     setIsProcessing(true)
     try {
+      // Get current organization for import
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        throw new Error('No organization found for import')
+      }
+
       // Simulate import processing
       await new Promise(resolve => setTimeout(resolve, 3000))
+      
+      // TODO: When implementing actual imports, use currentOrg for organization_id
+      // Example:
+      // const importData = previewData.map(item => ({
+      //   ...item,
+      //   organization_id: currentOrg
+      // }))
       
       setImportResults({
         success: true,
@@ -261,8 +297,8 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Import Data</h2>
-        <p className="text-white/60">Bulk upload your data using CSV files</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Import Data</h2>
+        <p className="text-slate-600">Bulk upload your data using CSV files</p>
       </div>
 
       {/* Import Type Selection */}
@@ -277,37 +313,37 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
               onClick={() => setActiveImportType(type.id)}
               className={`p-6 rounded-xl border transition-all duration-200 text-left ${
                 isActive
-                  ? 'bg-white/15 border-blue-400/50 shadow-lg'
-                  : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30'
+                  ? 'bg-blue-50 border-blue-400 shadow-lg'
+                  : 'bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-300'
               }`}
             >
               <div className={`w-12 h-12 bg-gradient-to-r ${type.color} rounded-xl flex items-center justify-center mb-4`}>
                 <Icon className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-white font-semibold mb-2">{type.title}</h3>
-              <p className="text-white/60 text-sm">{type.description}</p>
+              <h3 className="text-slate-800 font-semibold mb-2">{type.title}</h3>
+              <p className="text-slate-600 text-sm">{type.description}</p>
             </button>
           )
         })}
       </div>
 
       {/* Field Requirements */}
-      <div className="bg-white/5 rounded-xl p-6 border border-white/10 mb-6">
-        <h3 className="text-white font-semibold mb-4">
+      <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm mb-6">
+        <h3 className="text-slate-800 font-semibold mb-4">
           Required Fields for {importTypes.find(t => t.id === activeImportType)?.title}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="text-green-300 font-medium mb-2">Required Columns:</h4>
-            <ul className="text-white/70 text-sm space-y-1">
+            <h4 className="text-green-700 font-medium mb-2">Required Columns:</h4>
+            <ul className="text-slate-700 text-sm space-y-1">
               {importTypes.find(t => t.id === activeImportType)?.requiredFields.map(field => (
                 <li key={field}>• {field}</li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="text-blue-300 font-medium mb-2">Optional Columns:</h4>
-            <ul className="text-white/70 text-sm space-y-1">
+            <h4 className="text-blue-700 font-medium mb-2">Optional Columns:</h4>
+            <ul className="text-slate-700 text-sm space-y-1">
               {importTypes.find(t => t.id === activeImportType)?.fields
                 .filter(field => !importTypes.find(t => t.id === activeImportType)?.requiredFields.includes(field))
                 .map(field => (
@@ -319,11 +355,11 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
       </div>
 
       {/* Template Download */}
-      <div className="bg-white/5 rounded-xl p-6 border border-white/10 mb-8">
+      <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-white font-semibold mb-2">Download Template</h3>
-            <p className="text-white/60 text-sm">
+            <h3 className="text-slate-800 font-semibold mb-2">Download Template</h3>
+            <p className="text-slate-600 text-sm">
               Get the correct CSV format for {importTypes.find(t => t.id === activeImportType)?.title}
             </p>
           </div>
@@ -338,23 +374,23 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
       </div>
 
       {/* File Upload Area */}
-      <div className="bg-white/10 rounded-xl border border-white/20 mb-8">
+      <div className="bg-white rounded-xl border border-blue-200 shadow-sm mb-8">
         {!uploadedFile ? (
           <div
             {...getRootProps()}
             className={`p-12 text-center cursor-pointer transition-all ${
-              isDragActive ? 'bg-white/20 border-blue-400' : 'hover:bg-white/15'
+              isDragActive ? 'bg-blue-50 border-blue-400' : 'hover:bg-blue-50'
             }`}
           >
             <input {...getInputProps()} />
-            <Upload className="h-12 w-12 text-white/60 mx-auto mb-4" />
-            <h3 className="text-white font-semibold text-lg mb-2">
+            <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-slate-800 font-semibold text-lg mb-2">
               {isDragActive ? 'Drop your CSV file here' : 'Upload CSV File'}
             </h3>
-            <p className="text-white/60 mb-4">
+            <p className="text-slate-600 mb-4">
               Drag and drop your CSV file or click to browse
             </p>
-            <p className="text-white/40 text-sm">
+            <p className="text-slate-500 text-sm">
               Maximum file size: 10MB • Supported format: CSV
             </p>
           </div>
@@ -362,30 +398,30 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <FileText className="h-8 w-8 text-blue-400" />
+                <FileText className="h-8 w-8 text-blue-500" />
                 <div>
-                  <h3 className="text-white font-semibold">{uploadedFile.name}</h3>
-                  <p className="text-white/60 text-sm">
+                  <h3 className="text-slate-800 font-semibold">{uploadedFile.name}</h3>
+                  <p className="text-slate-600 text-sm">
                     {(uploadedFile.size / 1024).toFixed(1)} KB • {previewData.length} rows
                   </p>
                 </div>
               </div>
               <button
                 onClick={clearImport}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
               >
-                <X className="h-5 w-5 text-white/60" />
+                <X className="h-5 w-5 text-slate-600" />
               </button>
             </div>
 
             {/* Validation Results */}
             {validationErrors.length > 0 && (
-              <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <div className="flex items-center space-x-2 mb-2">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                  <h4 className="text-red-300 font-semibold">Validation Errors</h4>
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <h4 className="text-red-700 font-semibold">Validation Errors</h4>
                 </div>
-                <ul className="text-red-200 text-sm space-y-1">
+                <ul className="text-red-600 text-sm space-y-1">
                   {validationErrors.map((error, index) => (
                     <li key={index}>• {error}</li>
                   ))}
@@ -396,13 +432,13 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
             {/* Preview Table */}
             {previewData.length > 0 && (
               <div className="mb-6">
-                <h4 className="text-white font-semibold mb-3">Preview (first 5 rows)</h4>
+                <h4 className="text-slate-800 font-semibold mb-3">Preview (first 5 rows)</h4>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-white/20">
+                      <tr className="border-b border-blue-200 bg-blue-50">
                         {Object.keys(previewData[0] || {}).map((header) => (
-                          <th key={header} className="text-left text-white/80 py-2 px-3">
+                          <th key={header} className="text-left text-slate-700 py-2 px-3">
                             {header}
                           </th>
                         ))}
@@ -410,9 +446,9 @@ export default function ImportData({ onImportComplete }: ImportDataProps) {
                     </thead>
                     <tbody>
                       {previewData.map((row, index) => (
-                        <tr key={index} className="border-b border-white/10">
+                        <tr key={index} className="border-b border-blue-100">
                           {Object.values(row).map((value: any, cellIndex) => (
-                            <td key={cellIndex} className="text-white/70 py-2 px-3">
+                            <td key={cellIndex} className="text-slate-700 py-2 px-3">
                               {value}
                             </td>
                           ))}

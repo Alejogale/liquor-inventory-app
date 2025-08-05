@@ -161,7 +161,7 @@ export default function RevenueAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Revenue Analytics</h1>
         <p className="text-white/60">Financial performance and subscription metrics</p>

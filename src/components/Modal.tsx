@@ -51,15 +51,15 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
       
       <div className="flex min-h-full items-center justify-center p-4">
         <div 
-          className={`relative w-full ${maxWidth} bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto`}
+          className={`relative w-full ${maxWidth} bg-white rounded-xl border border-blue-200 shadow-2xl max-h-[90vh] overflow-y-auto`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="sticky top-0 bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4 rounded-t-xl">
+          <div className="sticky top-0 bg-white border-b border-blue-200 px-6 py-4 rounded-t-xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">{title}</h2>
+              <h2 className="text-xl font-semibold text-slate-800">{title}</h2>
               <button
                 onClick={onClose}
-                className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+                className="text-slate-600 hover:text-slate-800 transition-colors p-1 rounded-lg hover:bg-blue-50"
               >
                 <X className="h-5 w-5" />
               </button>

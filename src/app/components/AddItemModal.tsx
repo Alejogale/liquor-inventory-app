@@ -19,13 +19,15 @@ interface AddItemModalProps {
   suppliers: Supplier[]
   onClose: () => void
   onItemAdded: () => void
+  organizationId?: string
 }
 
 export default function AddItemModal({
   categories,
   suppliers,
   onClose,
-  onItemAdded
+  onItemAdded,
+  organizationId
 }: AddItemModalProps) {
   const [formData, setFormData] = useState({
     brand: '',
@@ -57,6 +59,27 @@ export default function AddItemModal({
         throw new Error('Supplier is required')
       }
 
+      // Get current organization
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          throw new Error('No user found');
+        }
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+
+        currentOrg = profile?.organization_id;
+      }
+
+      if (!currentOrg) {
+        throw new Error('No organization found for user');
+      }
+
       // Prepare data for insertion - NO SIZE FIELD
       const insertData = {
         brand: formData.brand.trim(),
@@ -65,7 +88,7 @@ export default function AddItemModal({
         barcode: formData.barcode.trim() || null, // null if empty
         category_id: formData.category_id,
         supplier_id: formData.supplier_id,
-        organization_id: 1 // Add required organization_id
+        organization_id: currentOrg
       }
 
       console.log('📝 Inserting data:', insertData)

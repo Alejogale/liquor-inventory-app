@@ -33,6 +33,38 @@ CREATE POLICY "Users can view profiles in their organization" ON user_profiles
         )
     );
 
+-- Enable RLS on inventory_items table
+ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies for inventory_items
+CREATE POLICY "Users can view items in their organization" ON inventory_items
+    FOR SELECT USING (
+        organization_id IN (
+            SELECT organization_id FROM user_profiles WHERE id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can insert items in their organization" ON inventory_items
+    FOR INSERT WITH CHECK (
+        organization_id IN (
+            SELECT organization_id FROM user_profiles WHERE id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can update items in their organization" ON inventory_items
+    FOR UPDATE USING (
+        organization_id IN (
+            SELECT organization_id FROM user_profiles WHERE id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can delete items in their organization" ON inventory_items
+    FOR DELETE USING (
+        organization_id IN (
+            SELECT organization_id FROM user_profiles WHERE id = auth.uid()
+        )
+    );
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_user_profiles_organization ON user_profiles(organization_id);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);

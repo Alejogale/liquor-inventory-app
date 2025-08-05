@@ -31,19 +31,19 @@ export default function ComprehensiveAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header with Back Button */}
-      <div className="bg-white/10 backdrop-blur-md border-b border-white/20 px-8 py-4">
+      <div className="bg-white border-b border-blue-200 shadow-lg px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link 
               href="/dashboard"
-              className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-slate-800 rounded-lg transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Dashboard</span>
             </Link>
-            <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
           </div>
         </div>
       </div>

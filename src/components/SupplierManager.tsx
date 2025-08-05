@@ -4,47 +4,84 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../app/lib/supabase'
 
 interface Supplier {
-  id: number
+  id: string
   name: string
   email: string
   phone?: string
   contact_person?: string
   notes?: string
-  created_at: string
+  created_at?: string
 }
 
 interface SupplierManagerProps {
-  onRefresh?: () => void
+  suppliers?: Supplier[]  // Add this prop
+  onUpdate?: () => void   // Add this prop (rename from onRefresh)
+  onRefresh?: () => void  // Keep for backward compatibility
+  organizationId?: string // Add for consistency
 }
 
-export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
+export default function SupplierManager({ 
+  suppliers: externalSuppliers, 
+  onUpdate, 
+  onRefresh, 
+  organizationId 
+}: SupplierManagerProps) {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
 
+  // Add helper function to get current organization
+  const getCurrentOrganization = async () => {
+    if (organizationId) return organizationId;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      return profile?.organization_id || user.user_metadata?.organization_id;
+    } catch (error) {
+      console.error('Error getting organization:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
-    fetchSuppliers()
-  }, [])
+    if (externalSuppliers) {
+      setSuppliers(externalSuppliers);
+      setLoading(false);
+    } else {
+      fetchSuppliers();
+    }
+  }, [externalSuppliers, organizationId]);
 
   const fetchSuppliers = async () => {
     try {
+      const currentOrg = await getCurrentOrganization();
+      if (!currentOrg) return;
+
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('organization_id', 1)
-        .order('name')
+        .eq('organization_id', currentOrg)
+        .order('name');
 
-      if (error) throw error
-      setSuppliers(data || [])
+      if (error) throw error;
+      setSuppliers(data || []);
     } catch (error) {
-      console.error('Error fetching suppliers:', error)
+      console.error('Error fetching suppliers:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const deleteSupplier = async (supplierId: number) => {
+  const deleteSupplier = async (supplierId: string) => {
     if (!confirm('Are you sure? This cannot be undone.')) return
 
     try {
@@ -65,7 +102,7 @@ export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="text-white/60">Loading suppliers...</div>
+        <div className="text-slate-600">Loading suppliers...</div>
       </div>
     )
   }
@@ -75,8 +112,8 @@ export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Supplier Management</h2>
-          <p className="text-white/60">Manage your liquor suppliers and contacts</p>
+          <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
+          <p className="text-slate-600">Manage your liquor suppliers and contacts</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -90,8 +127,8 @@ export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
       {suppliers.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🏪</div>
-          <h3 className="text-xl font-bold text-white mb-2">No Suppliers Added</h3>
-          <p className="text-white/60 mb-6">Add your first supplier to get started with order management.</p>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">No Suppliers Added</h3>
+          <p className="text-slate-600 mb-6">Add your first supplier to get started with order management.</p>
           <button
             onClick={() => setShowAddModal(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
@@ -102,35 +139,35 @@ export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
       ) : (
         <div className="grid gap-4">
           {suppliers.map(supplier => (
-            <div key={supplier.id} className="bg-white/10 rounded-lg p-6 border border-white/20">
+            <div key={supplier.id} className="bg-white rounded-lg p-6 border border-blue-200 shadow-sm">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-2">{supplier.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">{supplier.name}</h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <div className="text-white/60 text-sm">Email</div>
-                      <div className="text-white">{supplier.email}</div>
+                      <div className="text-slate-600 text-sm">Email</div>
+                      <div className="text-slate-800">{supplier.email}</div>
                     </div>
                     
                     {supplier.phone && (
                       <div>
-                        <div className="text-white/60 text-sm">Phone</div>
-                        <div className="text-white">{supplier.phone}</div>
+                        <div className="text-slate-600 text-sm">Phone</div>
+                        <div className="text-slate-800">{supplier.phone}</div>
                       </div>
                     )}
                     
                     {supplier.contact_person && (
                       <div>
-                        <div className="text-white/60 text-sm">Contact Person</div>
-                        <div className="text-white">{supplier.contact_person}</div>
+                        <div className="text-slate-600 text-sm">Contact Person</div>
+                        <div className="text-slate-800">{supplier.contact_person}</div>
                       </div>
                     )}
                     
                     {supplier.notes && (
                       <div>
-                        <div className="text-white/60 text-sm">Notes</div>
-                        <div className="text-white">{supplier.notes}</div>
+                        <div className="text-slate-600 text-sm">Notes</div>
+                        <div className="text-slate-800">{supplier.notes}</div>
                       </div>
                     )}
                   </div>
@@ -160,6 +197,7 @@ export default function SupplierManager({ onRefresh }: SupplierManagerProps) {
       {(showAddModal || editingSupplier) && (
         <SupplierModal
           supplier={editingSupplier}
+          organizationId={organizationId}
           onClose={() => {
             setShowAddModal(false)
             setEditingSupplier(null)
@@ -181,9 +219,10 @@ interface SupplierModalProps {
   supplier?: Supplier | null
   onClose: () => void
   onSaved: () => void
+  organizationId?: string
 }
 
-function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
+function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierModalProps) {
   const [formData, setFormData] = useState({
     name: supplier?.name || '',
     email: supplier?.email || '',
@@ -193,14 +232,44 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
   })
   const [loading, setLoading] = useState(false)
 
+  // Add helper function to get current organization
+  const getCurrentOrganization = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      return profile?.organization_id || user.user_metadata?.organization_id;
+    } catch (error) {
+      console.error('Error getting organization:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name.trim() || !formData.email.trim()) return
 
     setLoading(true)
     try {
+      // Use the organizationId prop if available, otherwise fetch from database
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        currentOrg = await getCurrentOrganization();
+      }
+      
+      if (!currentOrg) {
+        alert('Error: No organization found. Please try again.');
+        return;
+      }
+
       const supplierData = {
-        organization_id: 1,
+        organization_id: currentOrg,
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim() || null,
@@ -235,14 +304,14 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-lg border border-white/20">
-        <h2 className="text-xl font-bold text-white mb-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-lg border border-slate-200 shadow-xl">
+        <h2 className="text-xl font-bold text-slate-800 mb-4">
           {supplier ? 'Edit Supplier' : 'Add New Supplier'}
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
+            <label className="block text-slate-700 text-sm font-medium mb-2">
               Supplier Name *
             </label>
             <input
@@ -250,13 +319,13 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               placeholder="e.g., Johnson Brothers, Southern Wine & Spirits"
-              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
+            <label className="block text-slate-700 text-sm font-medium mb-2">
               Email Address *
             </label>
             <input
@@ -264,13 +333,13 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               placeholder="orders@supplier.com"
-              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
+            <label className="block text-slate-700 text-sm font-medium mb-2">
               Phone Number
             </label>
             <input
@@ -278,12 +347,12 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
               placeholder="(555) 123-4567"
-              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
+            <label className="block text-slate-700 text-sm font-medium mb-2">
               Contact Person
             </label>
             <input
@@ -291,12 +360,12 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
               value={formData.contact_person}
               onChange={(e) => setFormData({...formData, contact_person: e.target.value})}
               placeholder="John Smith, Sales Rep"
-              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
+            <label className="block text-slate-700 text-sm font-medium mb-2">
               Notes
             </label>
             <textarea
@@ -304,7 +373,7 @@ function SupplierModal({ supplier, onClose, onSaved }: SupplierModalProps) {
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
               placeholder="Special instructions, delivery schedules, etc."
               rows={3}
-              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           

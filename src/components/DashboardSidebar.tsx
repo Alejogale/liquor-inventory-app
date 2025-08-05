@@ -53,27 +53,27 @@ export default function DashboardSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-2 text-white"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-2 text-slate-800 shadow-lg"
       >
         {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white/10 backdrop-blur-md border-r border-white/20 z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
         isCollapsed ? '-translate-x-full lg:w-20' : 'w-80 lg:w-80'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-white/20">
+          <div className="p-6 border-b border-blue-200">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${isCollapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
                   <Package className="h-6 w-6 text-white" />
                 </div>
                 {!isCollapsed && (
                   <div>
-                    <h1 className="text-xl font-bold text-white">LiquorTrack</h1>
-                    <p className="text-white/60 text-sm">Inventory System</p>
+                    <h1 className="text-xl font-bold text-slate-800">LiquorTrack</h1>
+                    <p className="text-slate-600 text-sm">Inventory System</p>
                   </div>
                 )}
               </div>
@@ -81,7 +81,7 @@ export default function DashboardSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -89,7 +89,7 @@ export default function DashboardSidebar({
 
             {/* User Info */}
             {!isCollapsed && (
-              <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
@@ -97,8 +97,8 @@ export default function DashboardSidebar({
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium text-sm truncate">{userEmail}</p>
-                    <p className="text-white/60 text-xs">Dashboard User</p>
+                    <p className="text-slate-800 font-medium text-sm truncate">{userEmail}</p>
+                    <p className="text-slate-600 text-xs">Dashboard User</p>
                   </div>
                 </div>
               </div>
@@ -117,23 +117,23 @@ export default function DashboardSidebar({
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 border border-blue-400/30 shadow-lg'
-                      : 'hover:bg-white/10 border border-transparent'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
+                      : 'hover:bg-blue-50 border border-transparent'
                   }`}
                 >
                   <Icon className={`h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-white' : 'text-white/60 group-hover:text-white'
+                    isActive ? 'text-white' : 'text-slate-700 group-hover:text-slate-900'
                   }`} />
                   
                   {!isCollapsed && (
                     <div className="ml-3 text-left">
                       <p className={`text-sm font-medium ${
-                        isActive ? 'text-white' : 'text-white/80 group-hover:text-white'
+                        isActive ? 'text-white' : 'text-slate-800 group-hover:text-slate-900'
                       }`}>
                         {item.label}
                       </p>
                       <p className={`text-xs ${
-                        isActive ? 'text-white/70' : 'text-white/50 group-hover:text-white/70'
+                        isActive ? 'text-white/90' : 'text-slate-700 group-hover:text-slate-800'
                       }`}>
                         {item.description}
                       </p>
@@ -159,16 +159,16 @@ export default function DashboardSidebar({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-white/20 space-y-2">
+          <div className="p-4 border-t border-blue-200 space-y-2">
             {/* Admin Button */}
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`w-full flex items-center p-3 rounded-xl bg-gradient-to-r from-yellow-600/50 to-orange-600/50 border border-yellow-400/30 hover:from-yellow-600/70 hover:to-orange-600/70 transition-all ${
+                className={`w-full flex items-center p-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 border border-yellow-400 hover:from-yellow-600 hover:to-orange-600 transition-all text-white ${
                   isCollapsed ? 'justify-center' : ''
                 }`}
               >
-                <Crown className="h-5 w-5 text-yellow-300 flex-shrink-0" />
+                <Crown className="h-5 w-5 text-white flex-shrink-0" />
                 {!isCollapsed && (
                   <span className="ml-3 text-white font-medium text-sm">Admin Dashboard</span>
                 )}
@@ -178,26 +178,26 @@ export default function DashboardSidebar({
             {/* Home Button */}
             <Link
               href="/"
-              className={`w-full flex items-center p-3 rounded-xl hover:bg-white/10 transition-colors ${
+              className={`w-full flex items-center p-3 rounded-xl hover:bg-blue-50 transition-colors ${
                 isCollapsed ? 'justify-center' : ''
               }`}
             >
-              <Home className="h-5 w-5 text-white/60 flex-shrink-0" />
+              <Home className="h-5 w-5 text-slate-600 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 text-white/80 text-sm">Back to Home</span>
+                <span className="ml-3 text-slate-600 text-sm">Back to Home</span>
               )}
             </Link>
 
             {/* Sign Out Button */}
             <button
               onClick={onSignOut}
-              className={`w-full flex items-center p-3 rounded-xl hover:bg-red-600/20 border border-transparent hover:border-red-500/30 transition-all ${
+              className={`w-full flex items-center p-3 rounded-xl hover:bg-red-50 border border-transparent hover:border-red-200 transition-all ${
                 isCollapsed ? 'justify-center' : ''
               }`}
             >
-              <LogOut className="h-5 w-5 text-red-400 flex-shrink-0" />
+              <LogOut className="h-5 w-5 text-red-500 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 text-red-400 text-sm">Sign Out</span>
+                <span className="ml-3 text-red-500 text-sm">Sign Out</span>
               )}
             </button>
           </div>

@@ -77,20 +77,27 @@ export default function Dashboard() {
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
   useEffect(() => {
-    if (user) {
+    if (user && organization) {
       fetchData()
     }
-  }, [user])
+  }, [user, organization])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       console.log('🔍 Starting data fetch...')
+      console.log('🏢 Current organization:', organization?.id)
+
+      if (!organization?.id) {
+        console.log('⚠️ No organization found, skipping data fetch')
+        return
+      }
 
       // Fetch categories
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('*')
+        .eq('organization_id', organization.id)
         .order('name')
 
       if (categoriesError) {
@@ -103,6 +110,7 @@ export default function Dashboard() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('*')
+        .eq('organization_id', organization.id)
         .order('name')
 
       if (suppliersError) {
@@ -115,6 +123,7 @@ export default function Dashboard() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
+        .eq('organization_id', organization.id)
         .order('display_order')
 
       if (roomsError) {
@@ -128,6 +137,7 @@ export default function Dashboard() {
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
+        .eq('organization_id', organization.id)
         .order('brand')
 
       if (inventoryError) {
@@ -204,6 +214,7 @@ export default function Dashboard() {
     setEditingCategory(null)
   }
   const handleItemUpdated = () => {
+    console.log('🔄 Item updated, refreshing data...')
     fetchData()
     setEditingItem(null)
   }
@@ -230,14 +241,14 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <div className="text-slate-800 text-xl">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex">
       {/* Sidebar Navigation */}
       <DashboardSidebar
         activeTab={activeTab}
@@ -248,15 +259,15 @@ export default function Dashboard() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-80 transition-all duration-300">
+      <div className="flex-1 lg:ml-80 transition-all duration-300 overflow-y-auto h-screen">
         {/* Top Stats Bar */}
         <div className="p-6 lg:p-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-colors">
+            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/60 text-sm font-medium">Total Items</p>
-                  <p className="text-2xl font-bold text-white">{stats.totalItems}</p>
+                  <p className="text-slate-600 text-sm font-medium">Total Items</p>
+                  <p className="text-2xl font-bold text-slate-800">{stats.totalItems}</p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                   <Package className="h-6 w-6 text-white" />
@@ -264,11 +275,11 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-colors">
+            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/60 text-sm font-medium">Categories</p>
-                  <p className="text-2xl font-bold text-white">{stats.totalCategories}</p>
+                  <p className="text-slate-600 text-sm font-medium">Categories</p>
+                  <p className="text-2xl font-bold text-slate-800">{stats.totalCategories}</p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
                   <ClipboardList className="h-6 w-6 text-white" />
@@ -276,11 +287,11 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-colors">
+            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/60 text-sm font-medium">Suppliers</p>
-                  <p className="text-2xl font-bold text-white">{stats.totalSuppliers}</p>
+                  <p className="text-slate-600 text-sm font-medium">Suppliers</p>
+                  <p className="text-2xl font-bold text-slate-800">{stats.totalSuppliers}</p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
@@ -288,11 +299,11 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-colors">
+            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/60 text-sm font-medium">Rooms</p>
-                  <p className="text-2xl font-bold text-white">{stats.totalRooms}</p>
+                  <p className="text-slate-600 text-sm font-medium">Rooms</p>
+                  <p className="text-2xl font-bold text-slate-800">{stats.totalRooms}</p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
                   <Building2 className="h-6 w-6 text-white" />
@@ -302,17 +313,17 @@ export default function Dashboard() {
           </div>
 
           {/* Main Content Area */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 min-h-[600px]">
+          <div className="bg-white rounded-xl border border-blue-200 shadow-lg min-h-[600px]">
             {activeTab === 'inventory' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Inventory Management</h2>
-                    <p className="text-white/60 mt-1">Manage your liquor inventory items and stock levels</p>
+                    <h2 className="text-2xl font-bold text-slate-800">Inventory Management</h2>
+                    <p className="text-slate-600 mt-1">Manage your liquor inventory items and stock levels</p>
                   </div>
                   <button
                     onClick={() => setShowAddItem(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
                   >
                     Add Item
                   </button>
@@ -321,13 +332,13 @@ export default function Dashboard() {
                 {loading ? (
                   <div className="text-center py-12">
                     <div className="w-8 h-8 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-white/60">Loading inventory...</p>
+                    <p className="text-slate-600">Loading inventory...</p>
                   </div>
                 ) : (
                   <>
-                    <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                      <p className="text-white/80 text-sm">
-                        🔍 Found <span className="font-semibold text-white">{inventoryItems.length}</span> items organized by category with room counts
+                    <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-slate-700 text-sm">
+                        🔍 Found <span className="font-semibold text-slate-800">{inventoryItems.length}</span> items organized by category with room counts
                       </p>
                     </div>
                     <InventoryTable
@@ -349,8 +360,8 @@ export default function Dashboard() {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Categories</h2>
-                    <p className="text-white/60 mt-1">Organize your inventory into categories</p>
+                    <h2 className="text-2xl font-bold text-slate-800">Categories</h2>
+                    <p className="text-slate-600 mt-1">Organize your inventory into categories</p>
                   </div>
                   <button
                     onClick={() => setShowAddCategory(true)}
@@ -361,12 +372,12 @@ export default function Dashboard() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categories.map((category) => (
-                    <div key={category.id} className="bg-white/5 hover:bg-white/10 rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all">
+                    <div key={category.id} className="bg-white hover:bg-blue-50 shadow-lg rounded-xl p-6 border border-blue-200 hover:border-blue-300 transition-all">
                       <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-4">
                         <ClipboardList className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-white font-semibold text-lg">{category.name}</h3>
-                      <p className="text-white/60 text-sm mt-1">Product category</p>
+                      <h3 className="text-slate-800 font-semibold text-lg">{category.name}</h3>
+                      <p className="text-slate-600 text-sm mt-1">Product category</p>
                       <div className="flex space-x-2 mt-3">
                         <button
                           onClick={() => handleEditCategory(category)}
@@ -389,58 +400,64 @@ export default function Dashboard() {
             {activeTab === 'suppliers' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Supplier Management</h2>
-                  <p className="text-white/60 mt-1">Manage your vendor relationships and contacts</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
+                  <p className="text-slate-600 mt-1">Manage your vendor relationships and contacts</p>
                 </div>
-                <SupplierManager suppliers={suppliers} onUpdate={fetchData} />
+                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organization?.id} />
               </div>
             )}
 
             {activeTab === 'rooms' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Room Management</h2>
-                  <p className="text-white/60 mt-1">Configure your venue locations and rooms</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Room Management</h2>
+                  <p className="text-slate-600 mt-1">Configure your venue locations and rooms</p>
                 </div>
-                <RoomManager onUpdate={handleRoomUpdated} />
+                <RoomManager onUpdate={handleRoomUpdated} organizationId={organization?.id} />
               </div>
             )}
 
             {activeTab === 'count' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Room Counting</h2>
-                  <p className="text-white/60 mt-1">Perform inventory counts by room or location</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Room Counting</h2>
+                  <p className="text-slate-600 mt-1">Perform inventory counts by room or location</p>
                 </div>
-                <RoomCountingInterface userEmail={user?.email || ''} />
+                <RoomCountingInterface 
+                  userEmail={user?.email || ''} 
+                  organizationId={organization?.id}
+                />
               </div>
             )}
 
             {activeTab === 'orders' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Order Reports</h2>
-                  <p className="text-white/60 mt-1">Generate and manage supplier orders</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Order Reports</h2>
+                  <p className="text-slate-600 mt-1">Generate and manage supplier orders</p>
                 </div>
-                <OrderReport />
+                <OrderReport organizationId={organization?.id} />
               </div>
             )}
 
             {activeTab === 'activity' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Reports & Analytics</h2>
-                  <p className="text-white/60 mt-1">View activity logs and performance analytics</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Reports & Analytics</h2>
+                  <p className="text-slate-600 mt-1">View activity logs and performance analytics</p>
                 </div>
-                <ActivityDashboard userEmail={user?.email || ''} />
+                <ActivityDashboard 
+                  userEmail={user?.email || ''} 
+                  organizationId={organization?.id}
+                />
               </div>
             )}
 
             {activeTab === 'integrations' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Integrations</h2>
-                  <p className="text-white/60 mt-1">Connect with QuickBooks and other business tools</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Integrations</h2>
+                  <p className="text-slate-600 mt-1">Connect with QuickBooks and other business tools</p>
                 </div>
                 <QuickBooksIntegration user={user} />
               </div>
@@ -471,6 +488,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setShowAddItem(false)}
           onItemAdded={handleItemAdded}
+          organizationId={organization?.id}
         />
       )}
 
@@ -481,6 +499,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setEditingItem(null)}
           onItemUpdated={handleItemUpdated}
+          organizationId={organization?.id}
         />
       )}
     </div>

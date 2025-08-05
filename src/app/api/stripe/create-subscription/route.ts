@@ -13,6 +13,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get user profile to find organization
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.organization_id) {
+      return NextResponse.json({ error: 'No organization found for user' }, { status: 400 });
+    }
+
     const { priceId, billingPeriod } = await request.json();
 
     if (!priceId) {
@@ -25,7 +36,7 @@ export async function POST(request: NextRequest) {
     const { data: org } = await supabase
       .from('organizations')
       .select('stripe_customer_id')
-      .eq('id', user.user_metadata?.organization_id)
+      .eq('id', profile.organization_id)  // Use proper organization ID
       .single();
 
     if (org?.stripe_customer_id) {
@@ -35,7 +46,7 @@ export async function POST(request: NextRequest) {
       const customer = await stripe.customers.create({
         email: user.email!,
         metadata: {
-          organization_id: user.user_metadata?.organization_id,
+          organization_id: profile.organization_id,  // Use proper organization ID
           user_id: user.id,
         },
       });
@@ -46,7 +57,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('organizations')
         .update({ stripe_customer_id: customer.id })
-        .eq('id', user.user_metadata?.organization_id);
+        .eq('id', profile.organization_id);  // Use proper organization ID
     }
 
     // Create Checkout Session
@@ -64,7 +75,7 @@ export async function POST(request: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=subscription_created`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
       metadata: {
-        organization_id: user.user_metadata?.organization_id,
+        organization_id: profile.organization_id,  // Use proper organization ID
         billing_period: billingPeriod,
       },
     });
