@@ -278,13 +278,18 @@ export default function InventoryTable({ items, onEdit, onDelete }: InventoryTab
                 </div>
               </button>
 
-              {/* Category Items Table */}
+                            {/* Category Items Table */}
               {isExpanded && (
                 <div className="border-t border-blue-200">
-                  <div className="overflow-x-auto">
+                  {categoryItems.length > 5 && (
+                    <div className="px-6 py-2 bg-blue-50 text-blue-700 text-sm font-medium">
+                      📜 {categoryItems.length} items - Scroll to see all
+                    </div>
+                  )}
+                  <div className={`overflow-x-auto ${categoryItems.length > 5 ? 'max-h-96 overflow-y-auto' : ''}`}>
                     <table className="w-full">
-                                              <thead>
-                          <tr className="border-b border-blue-200 bg-blue-100">
+                      <thead className="sticky top-0 bg-blue-100 z-10">
+                        <tr className="border-b border-blue-200">
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Brand</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Barcode</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Supplier</th>

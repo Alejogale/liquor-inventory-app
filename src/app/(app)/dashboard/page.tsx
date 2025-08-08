@@ -1,5 +1,4 @@
 'use client'
-import { useSearchParams, useRouter } from 'next/navigation'
 import { CheckCircle } from 'lucide-react'
 
 import { useState, useEffect } from 'react'
@@ -23,7 +22,6 @@ import QuickBooksIntegration from '@/components/QuickBooksIntegration'
 import {
   Package,
   Users,
-  ShoppingCart,
   Building2,
   ClipboardList
 } from 'lucide-react'
@@ -86,9 +84,9 @@ export default function Dashboard() {
     try {
       setLoading(true)
       console.log('🔍 Starting data fetch...')
-      console.log('🏢 Current organization:', organization?.id)
+      console.log('🏢 Current organization:', organization?.uuid_id)
 
-      if (!organization?.id) {
+      if (!organization?.uuid_id) {
         console.log('⚠️ No organization found, skipping data fetch')
         return
       }
@@ -97,7 +95,7 @@ export default function Dashboard() {
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('*')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', organization.uuid_id)
         .order('name')
 
       if (categoriesError) {
@@ -110,7 +108,7 @@ export default function Dashboard() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', organization.uuid_id)
         .order('name')
 
       if (suppliersError) {
@@ -123,7 +121,7 @@ export default function Dashboard() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', organization.uuid_id)
         .order('display_order')
 
       if (roomsError) {
@@ -137,7 +135,7 @@ export default function Dashboard() {
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', organization.uuid_id)
         .order('brand')
 
       if (inventoryError) {
@@ -200,7 +198,7 @@ export default function Dashboard() {
         .from("categories")
         .delete()
         .eq("id", categoryId)
-        .eq("organization_id", organization?.id)
+        .eq("organization_id", organization?.uuid_id)
       if (error) throw error
       fetchData()
     } catch (error) {
@@ -353,7 +351,7 @@ export default function Dashboard() {
 
             {/* NEW: Import Data Tab */}
             {activeTab === 'import' && (
-              <ImportData onImportComplete={handleImportComplete} />
+              <ImportData onImportComplete={handleImportComplete} organizationId={userProfile?.organization_id} />
             )}
 
             {activeTab === 'categories' && (
@@ -403,7 +401,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
                   <p className="text-slate-600 mt-1">Manage your vendor relationships and contacts</p>
                 </div>
-                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organization?.id} />
+                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organization?.uuid_id} />
               </div>
             )}
 
@@ -413,7 +411,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Room Management</h2>
                   <p className="text-slate-600 mt-1">Configure your venue locations and rooms</p>
                 </div>
-                <RoomManager onUpdate={handleRoomUpdated} organizationId={organization?.id} />
+                <RoomManager onUpdate={handleRoomUpdated} organizationId={organization?.uuid_id} />
               </div>
             )}
 
@@ -425,7 +423,7 @@ export default function Dashboard() {
                 </div>
                 <RoomCountingInterface 
                   userEmail={user?.email || ''} 
-                  organizationId={organization?.id}
+                  organizationId={organization?.uuid_id}
                 />
               </div>
             )}
@@ -436,22 +434,24 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Order Reports</h2>
                   <p className="text-slate-600 mt-1">Generate and manage supplier orders</p>
                 </div>
-                <OrderReport organizationId={organization?.id} />
+                <OrderReport organizationId={organization?.uuid_id} />
               </div>
             )}
 
             {activeTab === 'activity' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Reports & Analytics</h2>
+                  <h2 className="text-2xl font-bold text-slate-800">Activity Dashboard</h2>
                   <p className="text-slate-600 mt-1">View activity logs and performance analytics</p>
                 </div>
                 <ActivityDashboard 
                   userEmail={user?.email || ''} 
-                  organizationId={organization?.id}
+                  organizationId={organization?.uuid_id}
                 />
               </div>
             )}
+
+
 
             {activeTab === 'integrations' && (
               <div className="p-6">
@@ -471,13 +471,14 @@ export default function Dashboard() {
         <AddCategoryModal
           onClose={() => setShowAddCategory(false)}
           onCategoryAdded={handleCategoryAdded}
-          organization={organization}        />
+          organizationId={organization?.uuid_id}
+        />
       )}
 
       {showEditCategory && editingCategory && (
         <EditCategoryModal
           category={editingCategory}
-          organization={organization}
+          organizationId={organization?.uuid_id}
           onClose={() => setShowEditCategory(false)}
           onCategoryUpdated={handleCategoryUpdated}
         />
@@ -488,7 +489,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setShowAddItem(false)}
           onItemAdded={handleItemAdded}
-          organizationId={organization?.id}
+          organizationId={organization?.uuid_id}
         />
       )}
 
@@ -499,7 +500,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setEditingItem(null)}
           onItemUpdated={handleItemUpdated}
-          organizationId={organization?.id}
+          organizationId={organization?.uuid_id}
         />
       )}
     </div>

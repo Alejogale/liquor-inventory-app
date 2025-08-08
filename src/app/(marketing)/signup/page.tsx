@@ -101,27 +101,56 @@ export default function SignupPage() {
 
       console.log('✅ User account created:', authData.user.id)
 
-      // 2. Create user profile
+      // 2. Create user profile directly (skip the check since it's a new user)
       console.log('📝 Creating user profile...')
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: authData.user.id,
-          full_name: formData.fullName,
-          email: formData.email,
-          role: 'owner',
-          job_title: formData.jobTitle || null
-        })
+      console.log('📝 Profile data:', {
+        id: authData.user.id,
+        full_name: formData.fullName,
+        email: formData.email,
+        role: 'owner',
+        job_title: formData.jobTitle || null
+      })
+      
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: formData.fullName,
+            email: formData.email,
+            role: 'owner',
+            job_title: formData.jobTitle || null
+          })
+          .select()
+          .single()
 
-      if (profileError) {
-        console.error('❌ Profile error:', profileError)
-        throw new Error(`Profile error: ${profileError.message}`)
+        if (profileError) {
+          console.error('❌ Profile error:', profileError)
+          console.error('❌ Profile error details:', {
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+            code: profileError.code
+          })
+          throw new Error(`Profile error: ${profileError.message}`)
+        }
+
+        console.log('✅ User profile created successfully:', profileData)
+      } catch (error) {
+        console.error('❌ Profile creation failed:', error)
+        throw error
       }
-
-      console.log('✅ User profile created')
 
       // 3. Create organization
       console.log('📝 Creating organization...')
+      console.log('📝 Organization data:', {
+        Name: formData.organizationName,
+        slug: generateSlug(formData.organizationName),
+        subscription_status: 'trial',
+        subscription_plan: 'free',
+        created_by: authData.user.id
+      })
+      
       const organizationSlug = generateSlug(formData.organizationName)
       
       const { data: orgData, error: orgError } = await supabase
@@ -131,27 +160,46 @@ export default function SignupPage() {
           slug: organizationSlug,
           subscription_status: 'trial',
           subscription_plan: 'free',
-          owner_id: authData.user.id
+          created_by: authData.user.id
         })
         .select()
         .single()
 
       if (orgError) {
         console.error('❌ Organization error:', orgError)
+        console.error('❌ Organization error details:', {
+          message: orgError.message,
+          details: orgError.details,
+          hint: orgError.hint,
+          code: orgError.code
+        })
         throw new Error(`Organization error: ${orgError.message}`)
       }
 
-      console.log('✅ Organization created:', orgData.id)
+      console.log('✅ Organization created:', orgData)
+      console.log('✅ Organization ID:', orgData.id)
+      console.log('✅ Organization UUID ID:', orgData.uuid_id)
 
-      // 4. Update user profile with organization_id
+      // 4. Update user profile with organization_id (use UUID)
       console.log('📝 Updating user profile with organization...')
+      console.log('📝 Update data:', {
+        organization_id: orgData.uuid_id || orgData.id,
+        user_id: authData.user.id
+      })
+      
       const { error: updateError } = await supabase
         .from('user_profiles')
-        .update({ organization_id: orgData.id })
+        .update({ organization_id: orgData.uuid_id || orgData.id })
         .eq('id', authData.user.id)
 
       if (updateError) {
         console.error('❌ Update error:', updateError)
+        console.error('❌ Update error details:', {
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        })
         throw new Error(`Update error: ${updateError.message}`)
       }
 

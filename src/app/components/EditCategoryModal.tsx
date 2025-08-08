@@ -11,12 +11,12 @@ interface Category {
 
 interface EditCategoryModalProps {
   category: Category
-  organization: { id: string }
+  organizationId?: string
   onClose: () => void
   onCategoryUpdated: () => void
 }
 
-export default function EditCategoryModal({ category, organization, onClose, onCategoryUpdated }: EditCategoryModalProps) {
+export default function EditCategoryModal({ category, organizationId, onClose, onCategoryUpdated }: EditCategoryModalProps) {
   const [categoryName, setCategoryName] = useState(category.name)
   const [loading, setLoading] = useState(false)
 
@@ -26,8 +26,23 @@ export default function EditCategoryModal({ category, organization, onClose, onC
 
     setLoading(true)
     try {
-      if (!organization?.id) {
-        console.error("No organization loaded")
+      // Get current organization if not provided
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+
+        currentOrg = profile?.organization_id;
+      }
+
+      if (!currentOrg) {
+        console.error("No organization found")
         setLoading(false)
         return
       }
@@ -38,7 +53,7 @@ export default function EditCategoryModal({ category, organization, onClose, onC
           name: categoryName.trim()
         })
         .eq('id', category.id)
-        .eq('organization_id', organization.id)
+        .eq('organization_id', currentOrg)
 
       if (error) throw error
 
@@ -78,7 +93,7 @@ export default function EditCategoryModal({ category, organization, onClose, onC
           </button>
           <button
             type="submit"
-            disabled={loading || !categoryName.trim() || !organization?.id}
+            disabled={loading || !categoryName.trim() || !organizationId}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Updating...' : 'Update Category'}

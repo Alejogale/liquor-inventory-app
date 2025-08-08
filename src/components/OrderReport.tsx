@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../app/lib/supabase'
 import { sendOrderReport } from '../lib/email-service'
+import { useAuth } from '../lib/auth-context'
 
 interface OrderItem {
   item_id: number
@@ -28,6 +29,7 @@ interface SupplierOrderGroup {
 }
 
 export default function OrderReport() {
+  const { user, organization } = useAuth()
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [supplierGroups, setSupplierGroups] = useState<SupplierOrderGroup[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,42 +40,40 @@ export default function OrderReport() {
   const [emailLoading, setEmailLoading] = useState(false)
 
   useEffect(() => {
-    generateOrderReport()
-  }, [])
+    if (user && organization) {
+      generateOrderReport()
+    }
+  }, [user, organization])
 
   const generateOrderReport = async () => {
     try {
       setLoading(true)
+      console.log('🔄 Starting order report generation...')
       
-      // Get current organization from auth context
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      // Get user profile to find organization
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile?.organization_id) {
-        console.log('No organization found for user')
+      if (!user || !organization) {
+        console.log('❌ No user or organization found')
         return
       }
+
+      const organizationId = organization.uuid_id
+      console.log('✅ Organization ID from auth context:', organizationId)
 
       // Get all inventory items with categories and suppliers
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select('id, brand, category_id, threshold, par_level, supplier_id')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', organizationId)
 
       if (itemsError) throw itemsError
+      
+      console.log('📦 Inventory items found:', itemsData?.length || 0)
+      console.log('📦 Sample items:', itemsData?.slice(0, 3))
 
       // Get categories
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', organizationId)
 
       if (categoriesError) throw categoriesError
 
@@ -81,7 +81,7 @@ export default function OrderReport() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('id, name, email')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', organizationId)
 
       if (suppliersError) throw suppliersError
 
@@ -89,7 +89,7 @@ export default function OrderReport() {
       const { data: countsData, error: countsError } = await supabase
         .from('room_counts')
         .select('inventory_item_id, room_id, count')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', organizationId)
 
       if (countsError) throw countsError
 
@@ -97,7 +97,7 @@ export default function OrderReport() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('id, name')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', organizationId)
 
       if (roomsError) throw roomsError
 
@@ -187,6 +187,10 @@ export default function OrderReport() {
         return a.supplier_name.localeCompare(b.supplier_name)
       })
 
+      console.log('📋 Order needs calculated:', orderNeeds.length)
+      console.log('📋 Sample order needs:', orderNeeds.slice(0, 3))
+      console.log('🏪 Supplier groups:', groups.length)
+      
       setOrderItems(orderNeeds)
       setSupplierGroups(groups)
       setLastGenerated(new Date().toLocaleString())
@@ -374,7 +378,7 @@ export default function OrderReport() {
                     📧 Email {supplier.supplier_name}
                   </button>
                 ) : (
-                  <div className="text-white/40 text-sm">
+                  <div className="text-slate-500 text-sm">
                     Add email in Suppliers tab<br/>to enable direct ordering
                   </div>
                 )}
@@ -383,36 +387,36 @@ export default function OrderReport() {
               {/* Items for this supplier */}
               <div className="space-y-3">
                 {supplier.items.map(item => (
-                  <div key={item.item_id} className="bg-white/5 rounded-lg p-4">
+                  <div key={item.item_id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-white text-lg">{item.brand}</h4>
-                        <p className="text-white/60 text-sm">{item.category_name}</p>
+                        <h4 className="font-semibold text-slate-800 text-lg">{item.brand}</h4>
+                        <p className="text-slate-600 text-sm">{item.category_name}</p>
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
                           <div>
-                            <span className="text-white/60">Current Stock:</span>
-                            <span className="text-red-400 font-bold ml-2">{item.current_stock}</span>
+                            <span className="text-slate-600">Current Stock:</span>
+                            <span className="text-red-600 font-bold ml-2">{item.current_stock}</span>
                           </div>
                           <div>
-                            <span className="text-white/60">Threshold:</span>
-                            <span className="text-white ml-2">{item.threshold}</span>
+                            <span className="text-slate-600">Threshold:</span>
+                            <span className="text-slate-800 ml-2">{item.threshold}</span>
                           </div>
                           <div>
-                            <span className="text-white/60">Par Level:</span>
-                            <span className="text-white ml-2">{item.par_level}</span>
+                            <span className="text-slate-600">Par Level:</span>
+                            <span className="text-slate-800 ml-2">{item.par_level}</span>
                           </div>
                           <div>
-                            <span className="text-white/60">Order:</span>
-                            <span className="text-green-400 font-bold ml-2">{item.needed_quantity} units</span>
+                            <span className="text-slate-600">Order:</span>
+                            <span className="text-green-600 font-bold ml-2">{item.needed_quantity} units</span>
                           </div>
                         </div>
                         
                         {item.rooms_with_stock.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-white/60 text-sm">Current locations: </span>
+                            <span className="text-slate-600 text-sm">Current locations: </span>
                             {item.rooms_with_stock.map((room, idx) => (
-                              <span key={idx} className="text-blue-400 text-sm">
+                              <span key={idx} className="text-blue-600 text-sm">
                                 {room.room_name} ({room.count}){idx < item.rooms_with_stock.length - 1 ? ', ' : ''}
                               </span>
                             ))}
@@ -420,8 +424,8 @@ export default function OrderReport() {
                         )}
                       </div>
                       
-                      <div className="bg-red-600/20 border border-red-500/30 rounded-lg px-3 py-1">
-                        <span className="text-red-400 font-bold">ORDER NOW</span>
+                      <div className="bg-red-100 border border-red-300 rounded-lg px-3 py-1">
+                        <span className="text-red-700 font-bold">ORDER NOW</span>
                       </div>
                     </div>
                   </div>
@@ -435,13 +439,13 @@ export default function OrderReport() {
       {/* Email Modal */}
       {showEmailModal && selectedSupplier && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-md border border-white/20">
-            <h3 className="text-xl font-bold text-white mb-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md border border-slate-200 shadow-xl">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">
               📧 Email Order to {selectedSupplier.supplier_name}
             </h3>
             
             <div className="mb-4">
-              <label className="block text-white/80 text-sm font-medium mb-2">
+              <label className="block text-slate-700 text-sm font-medium mb-2">
                 Send to email address:
               </label>
               <input
@@ -449,12 +453,12 @@ export default function OrderReport() {
                 value={emailAddress}
                 onChange={(e) => setEmailAddress(e.target.value)}
                 placeholder="supplier@example.com"
-                className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60"
+                className="w-full p-3 rounded-lg bg-slate-50 border border-slate-300 text-slate-800 placeholder-slate-500"
                 required
               />
             </div>
             
-            <div className="text-xs text-white/50 bg-white/5 p-3 rounded-lg mb-4">
+            <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg mb-4">
               <strong>Order Summary:</strong><br/>
               • {selectedSupplier.total_items} items to order<br/>
               • {selectedSupplier.total_units} total units needed<br/>

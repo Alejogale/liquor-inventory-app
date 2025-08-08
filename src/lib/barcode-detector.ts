@@ -25,11 +25,12 @@ class BarcodeDetector {
   private initializeGlobalListener() {
     // Global keypress listener
     this.detection.keyListener = (event: KeyboardEvent) => {
-      // Skip if user is typing in input fields
-      const target = event.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true') {
-        return
-      }
+      try {
+        // Skip if user is typing in input fields
+        const target = event.target as HTMLElement
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true') {
+          return
+        }
 
       const currentTime = Date.now()
       const timeDiff = currentTime - this.detection.lastKeystrokeTime
@@ -79,6 +80,10 @@ class BarcodeDetector {
       }
 
       this.detection.lastKeystrokeTime = currentTime
+      } catch (error) {
+        // Silently handle any errors to prevent console spam
+        console.debug('Barcode detector error (handled):', error)
+      }
     }
 
     // Set up timeout to reset scanning state
@@ -111,6 +116,7 @@ class BarcodeDetector {
         listener(barcode)
       } catch (error) {
         console.error('Error in barcode listener:', error)
+        // Don't re-throw the error to prevent console errors
       }
     })
   }

@@ -16,6 +16,7 @@ interface UserProfile {
 
 interface Organization {
   id: string
+  uuid_id: string
   Name: string
   slug: string
   subscription_status: string
@@ -81,12 +82,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔍 Fetching user profile for:', userId)
       
       // Sample profiles in table check
-      const { data: allProfiles } = await supabase.from('profiles').select('*').limit(5)
+      const { data: allProfiles } = await supabase.from('user_profiles').select('*').limit(5)
       console.log('📊 Sample profiles in table:', allProfiles)
 
       // Get user profile
       const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .select('*')
         .eq('id', userId)
         .single()
@@ -110,16 +111,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserProfile(profile)
 
       if (profile.organization_id) {
+        // Use uuid_id instead of id for organization lookup
         const { data: org } = await supabase
           .from('organizations')
           .select('*')
-          .eq('id', profile.organization_id)
+          .eq('uuid_id', profile.organization_id)
           .single()
 
         if (org) {
           console.log('✅ Organization found:', org)
           setOrganization(org)
+        } else {
+          console.log('❌ Organization not found for UUID:', profile.organization_id)
         }
+      } else {
+        console.log('ℹ️ No organization_id in profile')
       }
     } catch (error) {
       console.error('💥 Error in fetchUserProfile:', error)

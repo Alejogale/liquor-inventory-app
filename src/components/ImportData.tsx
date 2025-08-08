@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { supabase } from '@/lib/supabase'  // Add this import
 import {
@@ -16,6 +16,7 @@ import {
   ClipboardList,
   Loader2
 } from 'lucide-react'
+import SupplierCreationModal from './SupplierCreationModal'
 
 interface ImportDataProps {
   onImportComplete?: () => void
@@ -24,11 +25,32 @@ interface ImportDataProps {
 
 export default function ImportData({ onImportComplete, organizationId }: ImportDataProps) {
   const [activeImportType, setActiveImportType] = useState<string>('inventory')
+  
+  // Add debugging for state changes
+  console.log('🔄 ImportData render - activeImportType:', activeImportType)
+  
+  // Re-validate when import type changes
+  useEffect(() => {
+    if (uploadedFile && previewData.length > 0) {
+      console.log('🔄 Re-validating due to import type change to:', activeImportType)
+      const headers = Object.keys(previewData[0] || {})
+      validateCSVData(headers, previewData)
+    } else {
+      // Clear validation errors when no file is uploaded
+      setValidationErrors([])
+    }
+  }, [activeImportType])
+  
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [importResults, setImportResults] = useState<any>(null)
   const [previewData, setPreviewData] = useState<any[]>([])
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [importProgress, setImportProgress] = useState<string>('')
+  const [importErrors, setImportErrors] = useState<string[]>([])
+  const [showSupplierModal, setShowSupplierModal] = useState(false)
+  const [pendingSupplier, setPendingSupplier] = useState<any>(null)
+  const [currentOrg, setCurrentOrg] = useState<string | null>(null)
 
   // Add helper function to get current organization
   const getCurrentOrganization = async () => {
@@ -58,12 +80,11 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import liquor, wine, and beer inventory',
       icon: Package,
       color: 'from-blue-500 to-cyan-500',
-      fields: ['brand', 'size', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode'],
-      requiredFields: ['brand', 'size', 'category_name', 'supplier_name'],
-      example: 'Grey Goose,750ml,Vodka,ABC Liquors,12,3,123456789',
+      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode'],
+      requiredFields: ['brand', 'category_name', 'supplier_name'],
+      example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789',
       dbMapping: {
         'brand': 'brand',
-        'size': 'size', 
         'category_name': 'category_id', // Will lookup category by name
         'supplier_name': 'supplier_id', // Will lookup supplier by name
         'par_level': 'par_level',
@@ -139,7 +160,9 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
     const text = await file.text()
     const lines = text.split('\n').filter(line => line.trim())
     const headers = lines[0].split(',').map(h => h.trim())
-    const preview = lines.slice(1, 6).map(line => {
+    
+    // Parse all data (not just preview)
+    const allData = lines.slice(1).map(line => {
       const values = line.split(',').map(v => v.trim())
       const row: any = {}
       headers.forEach((header, index) => {
@@ -148,20 +171,44 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       return row
     })
     
-    setPreviewData(preview)
-    validateCSVData(headers, preview)
+    // Set preview (first 5 rows) for display
+    const preview = allData.slice(0, 5)
+    setPreviewData(allData) // Store ALL data, not just preview
+    validateCSVData(headers, allData) // Validate ALL data
   }
 
   const validateCSVData = (headers: string[], data: any[]) => {
     const errors: string[] = []
-    const activeType = importTypes.find(type => type.id === activeImportType)
     
-    if (!activeType) return
+    // Fallback to 'inventory' if activeImportType is undefined
+    const currentImportType = activeImportType || 'inventory'
+    const activeType = importTypes.find(type => type.id === currentImportType)
+    
+    console.log('🔍 Validation Debug:', {
+      activeImportType,
+      currentImportType,
+      activeType: activeType?.id,
+      activeTypeObject: activeType,
+      headers,
+      activeTypeRequiredFields: activeType?.requiredFields,
+      allImportTypes: importTypes.map(t => ({ id: t.id, required: t.requiredFields }))
+    })
+    
+    if (!activeType) {
+      console.error('❌ No active import type found for:', currentImportType)
+      return
+    }
 
     // Check required headers
     const missingHeaders = activeType.requiredFields.filter(field => 
       !headers.includes(field)
     )
+    
+    console.log('🔍 Header validation:', {
+      requiredFields: activeType.requiredFields,
+      headers,
+      missingHeaders
+    })
     
     if (missingHeaders.length > 0) {
       errors.push(`Missing required columns: ${missingHeaders.join(', ')}`)
@@ -180,7 +227,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
     }
 
     // Type-specific validations
-    if (activeImportType === 'inventory') {
+    if (currentImportType === 'inventory') {
       // Check if par_level and threshold are numbers
       if (headers.includes('par_level')) {
         const invalidParLevels = data.filter(row => 
@@ -201,7 +248,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       }
     }
 
-    if (activeImportType === 'suppliers') {
+    if (currentImportType === 'suppliers') {
       // Validate email format
       if (headers.includes('email')) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -214,7 +261,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       }
     }
 
-    if (activeImportType === 'rooms') {
+    if (currentImportType === 'rooms') {
       // Check if display_order is a number
       if (headers.includes('display_order')) {
         const invalidOrders = data.filter(row => 
@@ -233,40 +280,306 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
     if (!uploadedFile) return
 
     setIsProcessing(true)
+    setImportProgress('Starting import...')
     try {
       // Get current organization for import
       const currentOrg = await getCurrentOrganization()
+      setCurrentOrg(currentOrg)
+      console.log('🔍 Current organization ID:', currentOrg, 'Type:', typeof currentOrg)
+      
       if (!currentOrg) {
         throw new Error('No organization found for import')
       }
 
-      // Simulate import processing
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      
-      // TODO: When implementing actual imports, use currentOrg for organization_id
-      // Example:
-      // const importData = previewData.map(item => ({
-      //   ...item,
-      //   organization_id: currentOrg
-      // }))
-      
-      setImportResults({
-        success: true,
-        imported: previewData.length,
-        errors: 0,
-        warnings: validationErrors.length > 0 ? 1 : 0
-      })
-      
+      console.log('🚀 Starting import for:', activeImportType, 'with data:', previewData)
+      setImportProgress(`Processing ${activeImportType} import...`)
+
+      let importResults: any = { success: false, imported: 0, errors: 0 }
+
+      // Process based on import type
+      if (activeImportType === 'categories') {
+        // Import categories
+        const categoryData = previewData.map(item => ({
+          name: item.name,
+          organization_id: currentOrg
+        }))
+
+        console.log('📝 Importing categories:', categoryData)
+
+        const { data, error } = await supabase
+          .from('categories')
+          .insert(categoryData)
+          .select()
+
+        if (error) {
+          console.error('❌ Category import error:', error)
+          throw new Error(`Failed to import categories: ${error.message}`)
+        }
+
+        console.log('✅ Categories imported successfully:', data)
+        importResults = {
+          success: true,
+          imported: data?.length || 0,
+          errors: 0
+        }
+
+      } else if (activeImportType === 'suppliers') {
+        // Import suppliers
+        const supplierData = previewData.map(item => ({
+          name: item.name,
+          email: item.email,
+          phone: item.phone || null,
+          contact_person: item.contact_person || null,
+          notes: item.notes || null,
+          organization_id: currentOrg
+        }))
+
+        console.log('📝 Importing suppliers:', supplierData)
+
+        const { data, error } = await supabase
+          .from('suppliers')
+          .insert(supplierData)
+          .select()
+
+        if (error) {
+          console.error('❌ Supplier import error:', error)
+          throw new Error(`Failed to import suppliers: ${error.message}`)
+        }
+
+        console.log('✅ Suppliers imported successfully:', data)
+        importResults = {
+          success: true,
+          imported: data?.length || 0,
+          errors: 0
+        }
+
+      } else if (activeImportType === 'rooms') {
+        // Import rooms
+        const roomData = previewData.map(item => ({
+          name: item.name,
+          type: item.type || null,
+          description: item.description || null,
+          display_order: item.display_order ? parseInt(item.display_order) : null,
+          organization_id: currentOrg
+        }))
+
+        console.log('📝 Importing rooms:', roomData)
+
+        const { data, error } = await supabase
+          .from('rooms')
+          .insert(roomData)
+          .select()
+
+        if (error) {
+          console.error('❌ Room import error:', error)
+          throw new Error(`Failed to import rooms: ${error.message}`)
+        }
+
+        console.log('✅ Rooms imported successfully:', data)
+        importResults = {
+          success: true,
+          imported: data?.length || 0,
+          errors: 0
+        }
+
+      } else if (activeImportType === 'inventory') {
+        // Import inventory items with better error handling
+        console.log('🔄 Processing inventory import with', previewData.length, 'items')
+        setImportProgress('Processing inventory items...')
+        
+        const processedItems = []
+        const failedItems = []
+        
+        for (let index = 0; index < previewData.length; index++) {
+          const item = previewData[index]
+          console.log(`📦 Processing item ${index + 1}/${previewData.length}:`, item.brand)
+          setImportProgress(`Processing item ${index + 1}/${previewData.length}: ${item.brand}`)
+          
+          try {
+            // Look up category by name (create if doesn't exist)
+            let categoryId = null
+            if (item.category_name) {
+              console.log(`🔍 Looking up category: ${item.category_name}`)
+              
+              // First try to find existing category
+              const { data: existingCategory, error: categoryLookupError } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('name', item.category_name)
+                .eq('organization_id', currentOrg)
+                .maybeSingle()
+
+              if (categoryLookupError) {
+                console.error(`❌ Category lookup error for ${item.category_name}:`, categoryLookupError)
+              }
+
+              if (existingCategory) {
+                categoryId = existingCategory.id
+                console.log(`✅ Found existing category: ${item.category_name} (ID: ${categoryId})`)
+              } else {
+                // Create the category automatically
+                console.log(`➕ Creating new category: ${item.category_name}`)
+                const { data: newCategory, error: categoryError } = await supabase
+                  .from('categories')
+                  .insert([{
+                    name: item.category_name,
+                    organization_id: currentOrg
+                  }])
+                  .select('id')
+                  .single()
+
+                if (categoryError) {
+                  console.error(`❌ Failed to create category ${item.category_name}:`, categoryError)
+                  // Try to find it again in case it was created by another process
+                  const { data: retryCategory } = await supabase
+                    .from('categories')
+                    .select('id')
+                    .eq('name', item.category_name)
+                    .eq('organization_id', currentOrg)
+                    .maybeSingle()
+                  
+                  if (retryCategory) {
+                    categoryId = retryCategory.id
+                    console.log(`✅ Found category on retry: ${item.category_name} (ID: ${categoryId})`)
+                  } else {
+                    failedItems.push({
+                      item: item,
+                      error: `Failed to create category: ${item.category_name}`
+                    })
+                    continue
+                  }
+                } else {
+                  categoryId = newCategory.id
+                  console.log(`✅ Created new category: ${item.category_name} (ID: ${categoryId})`)
+                }
+              }
+            }
+
+            // Look up supplier by name
+            let supplierId = null
+            if (item.supplier_name) {
+              console.log(`🔍 Looking up supplier: ${item.supplier_name}`)
+              const { data: existingSupplier, error: supplierLookupError } = await supabase
+                .from('suppliers')
+                .select('id')
+                .eq('name', item.supplier_name)
+                .eq('organization_id', currentOrg)
+                .maybeSingle()
+
+              if (supplierLookupError) {
+                console.error(`❌ Supplier lookup error for ${item.supplier_name}:`, supplierLookupError)
+              }
+
+              if (existingSupplier) {
+                supplierId = existingSupplier.id
+                console.log(`✅ Found existing supplier: ${item.supplier_name}`)
+              } else {
+                // Create supplier automatically with default values
+                console.log(`➕ Creating new supplier: ${item.supplier_name}`)
+                const { data: newSupplier, error: supplierError } = await supabase
+                  .from('suppliers')
+                  .insert([{
+                    name: item.supplier_name,
+                    email: 'imported@example.com',
+                    organization_id: currentOrg
+                  }])
+                  .select('id')
+                  .single()
+
+                if (supplierError) {
+                  console.error(`❌ Failed to create supplier ${item.supplier_name}:`, supplierError)
+                  failedItems.push({
+                    item: item,
+                    error: `Failed to create supplier: ${item.supplier_name}`
+                  })
+                  continue
+                } else {
+                  supplierId = newSupplier.id
+                  console.log(`✅ Created new supplier: ${item.supplier_name}`)
+                }
+              }
+            }
+
+            // Create inventory item
+            const inventoryItem = {
+              brand: item.brand,
+              category_id: categoryId,
+              supplier_id: supplierId,
+              par_level: parseInt(item.par_level) || 0,
+              threshold: parseInt(item.threshold) || 0,
+              barcode: item.barcode || null,
+              organization_id: currentOrg
+            }
+
+            console.log(`📝 Creating inventory item: ${item.brand} with category: ${categoryId}, supplier: ${supplierId}`)
+            
+            // Check if item already exists to avoid duplicates
+            const { data: existingItem } = await supabase
+              .from('inventory_items')
+              .select('id')
+              .eq('brand', item.brand)
+              .eq('organization_id', currentOrg)
+              .maybeSingle()
+
+            if (existingItem) {
+              console.log(`⚠️ Item already exists: ${item.brand}, skipping`)
+              failedItems.push({
+                item: item,
+                error: `Item already exists: ${item.brand}`
+              })
+            } else {
+              const { data: newItem, error: itemError } = await supabase
+                .from('inventory_items')
+                .insert([inventoryItem])
+                .select('id, brand')
+                .single()
+
+              if (itemError) {
+                console.error(`❌ Failed to create inventory item ${item.brand}:`, itemError)
+                failedItems.push({
+                  item: item,
+                  error: `Failed to create item: ${item.brand}`
+                })
+              } else {
+                console.log(`✅ Created inventory item: ${item.brand} (ID: ${newItem.id})`)
+                processedItems.push(newItem)
+              }
+            }
+            
+          } catch (error: any) {
+            console.error(`❌ Error processing item ${item.brand}:`, error)
+            failedItems.push({
+              item: item,
+              error: error.message
+            })
+          }
+        }
+
+        console.log(`✅ Import completed. Success: ${processedItems.length}, Failed: ${failedItems.length}`)
+        importResults = {
+          success: processedItems.length > 0,
+          imported: processedItems.length,
+          errors: failedItems.length,
+          failedItems: failedItems
+        }
+      }
+
+      setImportResults(importResults)
       if (onImportComplete) {
         onImportComplete()
       }
-    } catch (error) {
+
+    } catch (error: any) {
+      console.error('❌ Import failed:', error)
       setImportResults({
         success: false,
-        error: 'Import failed. Please check your file format.'
+        imported: 0,
+        errors: 1,
+        error: error.message
       })
     } finally {
       setIsProcessing(false)
+      setImportProgress('')
     }
   }
 
@@ -292,7 +605,10 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
     setPreviewData([])
     setValidationErrors([])
     setImportResults(null)
+    setImportErrors([])
   }
+
+  // Supplier modal functions removed since we create suppliers automatically
 
   return (
     <div className="p-6">
@@ -310,7 +626,10 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           return (
             <button
               key={type.id}
-              onClick={() => setActiveImportType(type.id)}
+              onClick={() => {
+                console.log('🖱️ Clicked import type:', type.id)
+                setActiveImportType(type.id)
+              }}
               className={`p-6 rounded-xl border transition-all duration-200 text-left ${
                 isActive
                   ? 'bg-blue-50 border-blue-400 shadow-lg'
@@ -402,7 +721,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
                 <div>
                   <h3 className="text-slate-800 font-semibold">{uploadedFile.name}</h3>
                   <p className="text-slate-600 text-sm">
-                    {(uploadedFile.size / 1024).toFixed(1)} KB • {previewData.length} rows
+                    {(uploadedFile.size / 1024).toFixed(1)} KB • {previewData.length} total items
                   </p>
                 </div>
               </div>
@@ -432,7 +751,9 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             {/* Preview Table */}
             {previewData.length > 0 && (
               <div className="mb-6">
-                <h4 className="text-slate-800 font-semibold mb-3">Preview (first 5 rows)</h4>
+                <h4 className="text-slate-800 font-semibold mb-3">
+                  Preview (first 5 rows of {previewData.length} total items)
+                </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -445,7 +766,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
                       </tr>
                     </thead>
                     <tbody>
-                      {previewData.map((row, index) => (
+                      {previewData.slice(0, 5).map((row, index) => (
                         <tr key={index} className="border-b border-blue-100">
                           {Object.values(row).map((value: any, cellIndex) => (
                             <td key={cellIndex} className="text-slate-700 py-2 px-3">
@@ -456,6 +777,39 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
                       ))}
                     </tbody>
                   </table>
+                </div>
+                {previewData.length > 5 && (
+                  <div className="mt-2 text-center text-slate-600 text-sm">
+                    ... and {previewData.length - 5} more items
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Debug Info */}
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+              <h4 className="text-slate-800 font-semibold mb-2">Debug Info</h4>
+              <p className="text-slate-600 text-sm">Active Import Type: {activeImportType}</p>
+              <p className="text-slate-600 text-sm">Validation Errors: {validationErrors.length}</p>
+              <button
+                onClick={() => {
+                  if (previewData.length > 0) {
+                    const headers = Object.keys(previewData[0] || {})
+                    validateCSVData(headers, previewData)
+                  }
+                }}
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded text-sm"
+              >
+                Re-validate
+              </button>
+            </div>
+
+            {/* Import Progress */}
+            {isProcessing && importProgress && (
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                  <span className="text-blue-700 font-medium">{importProgress}</span>
                 </div>
               </div>
             )}
@@ -511,15 +865,43 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           {importResults.success ? (
             <div className="text-green-200 text-sm">
               <p>✅ {importResults.imported} items imported successfully</p>
-              {importResults.warnings > 0 && (
-                <p>⚠️ {importResults.warnings} warnings (check your data)</p>
+              {importResults.errors > 0 && (
+                <p>❌ {importResults.errors} items failed to import</p>
+              )}
+              {importResults.failedItems && importResults.failedItems.length > 0 && (
+                <div className="mt-2">
+                  <p className="font-medium">Failed Items:</p>
+                  <ul className="text-xs space-y-1">
+                    {importResults.failedItems.map((failed: any, index: number) => (
+                      <li key={index} className="text-red-300">
+                        • {failed.item.brand}: {failed.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
           ) : (
-            <p className="text-red-200 text-sm">{importResults.error}</p>
+            <div className="text-red-200 text-sm">
+              <p>{importResults.error}</p>
+              {importResults.failedItems && importResults.failedItems.length > 0 && (
+                <div className="mt-2">
+                  <p className="font-medium">Failed Items:</p>
+                  <ul className="text-xs space-y-1">
+                    {importResults.failedItems.map((failed: any, index: number) => (
+                      <li key={index} className="text-red-300">
+                        • {failed.item.brand}: {failed.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
+
+      {/* Supplier Creation Modal - Removed since we create suppliers automatically */}
     </div>
   )
 }

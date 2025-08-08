@@ -5,12 +5,12 @@ import { supabase } from '@/lib/supabase'
 import Modal from '@/components/Modal'
 
 interface AddCategoryModalProps {
-  organization: { id: string }
+  organizationId?: string
   onClose: () => void
   onCategoryAdded: () => void
 }
 
-export default function AddCategoryModal({ onClose, onCategoryAdded, organization }: AddCategoryModalProps) {
+export default function AddCategoryModal({ onClose, onCategoryAdded, organizationId }: AddCategoryModalProps) {
   const [categoryName, setCategoryName] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -20,12 +20,32 @@ export default function AddCategoryModal({ onClose, onCategoryAdded, organizatio
 
     setLoading(true)
     try {
+      // Get current organization if not provided
+      let currentOrg = organizationId;
+      if (!currentOrg) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+
+        currentOrg = profile?.organization_id;
+      }
+
+      if (!currentOrg) {
+        alert('No organization found for user')
+        return
+      }
+
       const { error } = await supabase
         .from('categories')
         .insert([
           {
             name: categoryName.trim(),
-            organization_id: organization.id
+            organization_id: currentOrg
           }
         ])
 
@@ -70,7 +90,7 @@ export default function AddCategoryModal({ onClose, onCategoryAdded, organizatio
           </button>
           <button
             type="submit"
-            disabled={loading || !categoryName.trim() || !organization?.id}
+            disabled={loading || !categoryName.trim() || !organizationId}
             className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Adding...' : 'Add Category'}

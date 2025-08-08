@@ -208,14 +208,15 @@ export default function RoomCountingInterface({
         organization_id: currentOrg
       }
 
-      console.log('📝 Logging activity:', activityData)
-
+      console.log('📝 Logging activity:', JSON.stringify(activityData))
+      
       const { error } = await supabase
         .from('activity_logs')
         .insert([activityData])
 
       if (error) {
         console.error('❌ Error logging activity:', error)
+        // Don't throw error, just log it so it doesn't break the counting functionality
       } else {
         console.log('✅ Activity logged successfully')
       }
@@ -286,10 +287,14 @@ export default function RoomCountingInterface({
 
   // Set up barcode detection
   useEffect(() => {
-    barcodeDetector.addListener(handleBarcodeDetected)
-    
-    return () => {
-      barcodeDetector.removeListener(handleBarcodeDetected)
+    try {
+      barcodeDetector.addListener(handleBarcodeDetected)
+      
+      return () => {
+        barcodeDetector.removeListener(handleBarcodeDetected)
+      }
+    } catch (error: any) {
+      console.debug('Barcode detector setup error (handled):', error)
     }
   }, [handleBarcodeDetected])
 

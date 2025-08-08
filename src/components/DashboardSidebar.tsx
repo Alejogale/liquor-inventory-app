@@ -16,7 +16,8 @@ import {
   LogOut,
   Home,
   Upload,
-  Settings
+  Settings,
+  BarChart3
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -44,7 +45,7 @@ export default function DashboardSidebar({
     { id: 'rooms', label: 'Rooms', icon: MapPin, description: 'Location setup' },
     { id: 'count', label: 'Count', icon: Building2, description: 'Room counting' },
     { id: 'orders', label: 'Orders', icon: ShoppingCart, description: 'Order reports' },
-    { id: 'activity', label: 'Reports', icon: Activity, description: 'Analytics & logs' },
+    { id: 'activity', label: 'Activity & Reports', icon: Activity, description: 'Analytics, logs & CSV export' },
     { id: 'integrations', label: 'Integrations', icon: Settings, description: 'QuickBooks & more' }
   ]
 

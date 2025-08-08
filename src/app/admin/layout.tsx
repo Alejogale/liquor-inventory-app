@@ -23,8 +23,8 @@ export default function AdminLayout({
       }
 
       try {
-        // Check user profile for admin role
-        if (userProfile?.role === 'admin') {
+        // Check user profile for admin role (admin or owner)
+        if (userProfile?.role === 'admin' || userProfile?.role === 'owner') {
           setIsAdmin(true)
           setLoading(false)
           return

@@ -14,7 +14,10 @@ import {
   CheckCircle,
   AlertCircle,
   Calendar,
-  Database
+  Database,
+  BarChart3,
+  FileText,
+  Building2
 } from 'lucide-react'
 
 interface ActivityLog {
@@ -59,6 +62,15 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
   const [newEmail, setNewEmail] = useState('')
   const [reportSent, setReportSent] = useState(false)
   const [databaseError, setDatabaseError] = useState<string | null>(null)
+  
+  // Enhanced Reports State
+  const [categoryReports, setCategoryReports] = useState<any[]>([])
+  const [reportsLoading, setReportsLoading] = useState(false)
+  const [reportSettings, setReportSettings] = useState({
+    includeBarcodes: true,
+    includeRoomDetails: true,
+    includeSuppliers: true
+  })
 
   // Add helper function to get current organization
   const getCurrentOrganization = async () => {
@@ -84,6 +96,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
   useEffect(() => {
     if (organizationId) {
       fetchActivityLogs()
+      generateEnhancedReports() // Auto-generate reports when component loads
     }
   }, [organizationId])
 
@@ -100,10 +113,12 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         return
       }
 
+      console.log('🔍 Fetching activity logs for organization:', currentOrg)
+      
       const { data, error } = await supabase
         .from('activity_logs')
         .select('*')
-        .eq('organization_id', currentOrg)  // Add organization filter
+        .eq('organization_id', currentOrg)
         .order('created_at', { ascending: false })
         .limit(50) // Get last 50 activities
 
@@ -214,6 +229,166 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       reportDate: new Date().toISOString(),
       generatedBy: userEmail
     }
+  }
+
+  const generateEnhancedReports = async () => {
+    try {
+      setReportsLoading(true)
+      console.log('🔄 Generating comprehensive inventory reports...')
+      
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        console.log('❌ No organization found')
+        return
+      }
+
+      console.log('✅ Organization ID:', currentOrg)
+
+      // Get all inventory items
+      const { data: itemsData, error: itemsError } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .eq('organization_id', currentOrg)
+
+      if (itemsError) throw itemsError
+      
+      console.log('📦 Inventory items found:', itemsData?.length || 0)
+
+      // Get categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('organization_id', currentOrg)
+
+      if (categoriesError) throw categoriesError
+
+      // Get suppliers
+      const { data: suppliersData, error: suppliersError } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('organization_id', currentOrg)
+
+      if (suppliersError) throw suppliersError
+
+      // Get all room counts
+      const { data: countsData, error: countsError } = await supabase
+        .from('room_counts')
+        .select('inventory_item_id, room_id, count')
+        .eq('organization_id', currentOrg)
+
+      if (countsError) throw countsError
+
+      // Get rooms
+      const { data: roomsData, error: roomsError } = await supabase
+        .from('rooms')
+        .select('id, name')
+        .eq('organization_id', currentOrg)
+
+      if (roomsError) throw roomsError
+
+      // Create room lookup
+      const roomLookup = new Map(roomsData?.map(room => [room.id, room.name]) || [])
+
+      // Create counts lookup
+      const countsLookup = new Map()
+      countsData?.forEach(count => {
+        const key = count.inventory_item_id
+        if (!countsLookup.has(key)) {
+          countsLookup.set(key, [])
+        }
+        countsLookup.get(key).push({
+          roomName: roomLookup.get(count.room_id) || 'Unknown Room',
+          count: count.count
+        })
+      })
+
+      // Enrich items with room counts and category/supplier data
+      const itemsWithCounts = itemsData?.map(item => {
+        const roomCounts = countsLookup.get(item.id) || []
+        const totalCount = roomCounts.reduce((sum: number, rc: any) => sum + rc.count, 0)
+        
+        // Find category and supplier data
+        const category = categoriesData?.find(cat => cat.id === item.category_id)
+        const supplier = suppliersData?.find(sup => sup.id === item.supplier_id)
+        
+        return {
+          ...item,
+          categories: category ? { name: category.name } : null,
+          suppliers: supplier ? { name: supplier.name } : null,
+          roomCounts,
+          totalCount
+        }
+      }) || []
+
+      // Group by category
+      const categoryMap = new Map<string, any[]>()
+      itemsWithCounts.forEach((item: any) => {
+        const categoryName = item.categories?.name || 'Uncategorized'
+        if (!categoryMap.has(categoryName)) {
+          categoryMap.set(categoryName, [])
+        }
+        categoryMap.get(categoryName)!.push(item)
+      })
+
+      // Create category reports
+      const reports = Array.from(categoryMap.entries()).map(([categoryName, items]) => ({
+        categoryName,
+        items,
+        totalItems: items.length,
+        totalCount: items.reduce((sum, item: any) => sum + item.totalCount, 0)
+      }))
+
+      // Sort by category name
+      reports.sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+
+      setCategoryReports(reports)
+      console.log('✅ Enhanced reports generated successfully')
+
+    } catch (error) {
+      console.error('❌ Error generating enhanced reports:', error)
+    } finally {
+      setReportsLoading(false)
+    }
+  }
+
+  const exportToCsv = () => {
+    const headers = ['Category', 'Brand', 'Barcode', 'Supplier', 'Par Level', 'Threshold', 'Total Count']
+    
+    if (reportSettings.includeRoomDetails) {
+      headers.push('Room Details')
+    }
+
+    const csvRows = [headers.join(',')]
+
+    categoryReports.forEach(category => {
+      category.items.forEach((item: any) => {
+        const row = [
+          category.categoryName,
+          item.brand,
+          reportSettings.includeBarcodes ? (item.barcode || 'No barcode') : '',
+          reportSettings.includeSuppliers ? (item.suppliers?.name || 'No supplier') : '',
+          item.par_level,
+          item.threshold,
+          item.totalCount
+        ]
+
+        if (reportSettings.includeRoomDetails) {
+          const roomDetails = item.roomCounts.map((rc: any) => `${rc.roomName}(${rc.count})`).join('; ')
+          row.push(roomDetails)
+        }
+
+        csvRows.push(row.join(','))
+      })
+    })
+
+    const csvContent = csvRows.join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `inventory-report-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
   }
 
   const sendReportToManagers = async () => {
@@ -579,6 +754,164 @@ Total: ${item.totalCount} bottles
             </div>
           )}
         </div>
+      </div>
+
+      {/* Enhanced Reports Section */}
+      <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-slate-800 flex items-center">
+            <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+            Enhanced Reports & CSV Export
+          </h3>
+          <div className="flex gap-2">
+            <button
+              onClick={generateEnhancedReports}
+              disabled={reportsLoading}
+              className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span>{reportsLoading ? 'Generating...' : 'Generate Reports'}</span>
+            </button>
+            {categoryReports.length > 0 && (
+              <button
+                onClick={exportToCsv}
+                className="flex items-center space-x-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                <span>Export CSV</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Report Settings */}
+        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+          <h4 className="text-slate-800 font-medium mb-3">Report Settings</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={reportSettings.includeBarcodes}
+                onChange={(e) => setReportSettings(prev => ({ ...prev, includeBarcodes: e.target.checked }))}
+                className="rounded"
+              />
+              <span className="text-sm text-slate-700">Include barcodes</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={reportSettings.includeRoomDetails}
+                onChange={(e) => setReportSettings(prev => ({ ...prev, includeRoomDetails: e.target.checked }))}
+                className="rounded"
+              />
+              <span className="text-sm text-slate-700">Include room details</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={reportSettings.includeSuppliers}
+                onChange={(e) => setReportSettings(prev => ({ ...prev, includeSuppliers: e.target.checked }))}
+                className="rounded"
+              />
+              <span className="text-sm text-slate-700">Include suppliers</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Reports Display */}
+        {categoryReports.length > 0 && (
+          <div className="space-y-4">
+            {categoryReports.map((category) => (
+              <div key={category.categoryName} className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="p-4 bg-slate-50 border-b border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-slate-800 font-medium">{category.categoryName}</h4>
+                      <p className="text-slate-600 text-sm">
+                        {category.totalItems} items • {category.totalCount} total units
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200 bg-slate-50">
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Brand</th>
+                        {reportSettings.includeBarcodes && (
+                          <th className="text-left py-3 px-4 text-slate-700 font-medium">Barcode</th>
+                        )}
+                        {reportSettings.includeSuppliers && (
+                          <th className="text-left py-3 px-4 text-slate-700 font-medium">Supplier</th>
+                        )}
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Par Level</th>
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Threshold</th>
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Total Count</th>
+                        {reportSettings.includeRoomDetails && (
+                          <th className="text-left py-3 px-4 text-slate-700 font-medium">Room Details</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {category.items.map((item: any) => (
+                        <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
+                          <td className="py-3 px-4 text-slate-800 font-medium">{item.brand}</td>
+                          {reportSettings.includeBarcodes && (
+                            <td className="py-3 px-4 text-slate-700">
+                              <span className="bg-slate-100 px-2 py-1 rounded text-sm font-mono">
+                                {item.barcode || 'No barcode'}
+                              </span>
+                            </td>
+                          )}
+                          {reportSettings.includeSuppliers && (
+                            <td className="py-3 px-4 text-slate-700">{item.suppliers?.name || 'No supplier'}</td>
+                          )}
+                          <td className="py-3 px-4 text-slate-700">{item.par_level}</td>
+                          <td className="py-3 px-4 text-slate-700">{item.threshold}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              item.totalCount > 0 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {item.totalCount}
+                            </span>
+                          </td>
+                          {reportSettings.includeRoomDetails && (
+                            <td className="py-3 px-4 text-slate-700">
+                              <div className="text-sm">
+                                {item.roomCounts.length > 0 ? (
+                                  item.roomCounts.map((rc: any, index: number) => (
+                                    <span key={index} className="inline-block bg-slate-100 px-2 py-1 rounded mr-1 mb-1">
+                                      {rc.roomName}: {rc.count}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-gray-500">No room counts</span>
+                                )}
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {categoryReports.length === 0 && !reportsLoading && (
+          <div className="text-center py-8">
+            <BarChart3 className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <p className="text-slate-600">No reports generated yet</p>
+            <p className="text-slate-500 text-sm mt-1">
+              Click "Generate Reports" to create comprehensive inventory reports
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Report Preview */}
