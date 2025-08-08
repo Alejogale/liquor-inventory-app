@@ -116,7 +116,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-slate-800 mb-2">How long is the free trial?</h4>
-                  <p className="text-slate-600 text-sm">We offer a 14-day free trial with full access to all features.</p>
+                  <p className="text-slate-600 text-sm">We offer a free 30-day trial with full access to all features.</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-slate-800 mb-2">Can I cancel my subscription anytime?</h4>

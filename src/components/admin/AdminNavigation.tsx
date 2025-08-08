@@ -27,7 +27,7 @@ export default function AdminNavigation({ activeTab, onTabChange }: AdminNavigat
   ]
 
   return (
-    <div className="bg-white/5 backdrop-blur-md border-b border-white/10">
+    <div className="bg-white border-b border-blue-200 shadow-sm">
       <div className="flex items-center justify-between px-8 py-4">
         <div className="flex space-x-1">
           {tabs.map((tab) => {
@@ -38,8 +38,8 @@ export default function AdminNavigation({ activeTab, onTabChange }: AdminNavigat
                 onClick={() => onTabChange(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                   activeTab === tab.id
-                    ? 'bg-white/10 text-white border border-white/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                    ? 'bg-blue-600 text-white border border-blue-700 shadow-lg'
+                    : 'text-slate-700 hover:text-slate-900 hover:bg-blue-50 border border-transparent'
                 }`}
               >
                 <Icon className="h-4 w-4" />

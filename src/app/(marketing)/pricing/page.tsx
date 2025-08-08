@@ -37,7 +37,7 @@ export default function PricingPage() {
         "Basic barcode scanning",
         "Email reports",
         "Standard support",
-        "14-day free trial"
+        "Free 30-day trial"
       ],
       popular: false,
       color: "from-blue-500 to-cyan-500"
@@ -62,7 +62,7 @@ export default function PricingPage() {
         "Priority support",
         "API access",
         "Team management",
-        "14-day free trial"
+        "Free 30-day trial"
       ],
       popular: true,
       color: "from-purple-500 to-pink-500"
@@ -193,7 +193,7 @@ export default function PricingPage() {
           </h1>
           
           <p className="text-xl text-slate-800/70 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Start with a 14-day free trial. No credit card required.
+            Start free 30-day trial. No credit card required.
             Cancel anytime with no questions asked.
           </p>
 
@@ -381,7 +381,7 @@ export default function PricingPage() {
             
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100">
               <h3 className="text-xl font-semibold text-slate-800 mb-3">Is there a free trial?</h3>
-              <p className="text-slate-600">Yes, all plans come with a 14-day free trial. No credit card required to start.</p>
+              <p className="text-slate-600">Yes, all plans come with a free 30-day trial. No credit card required to start.</p>
             </div>
             
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100">

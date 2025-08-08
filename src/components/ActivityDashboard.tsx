@@ -77,27 +77,50 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
     if (organizationId) return organizationId
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError) {
+        console.log('🔐 Auth error:', authError.message)
+        return null
+      }
+      
+      if (!user) {
+        console.log('👤 No authenticated user found')
+        return null
+      }
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('organization_id')
         .eq('id', user.id)
         .single()
 
+      if (profileError) {
+        console.log('📋 Profile error:', profileError.message)
+        return null
+      }
+
       return profile?.organization_id || null
     } catch (error) {
-      console.error('Error getting organization:', error)
+      console.error('❌ Error getting organization:', error)
       return null
     }
   }
 
   useEffect(() => {
-    if (organizationId) {
-      fetchActivityLogs()
-      generateEnhancedReports() // Auto-generate reports when component loads
+    const initializeDashboard = async () => {
+      // Wait a bit for auth to initialize
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      if (organizationId) {
+        console.log('🔄 Initializing dashboard with organization:', organizationId)
+        await fetchActivityLogs()
+        await generateEnhancedReports() // Auto-generate reports when component loads
+      } else {
+        console.log('⚠️ No organization ID provided, skipping dashboard initialization')
+      }
     }
+
+    initializeDashboard()
   }, [organizationId])
 
   const fetchActivityLogs = async () => {
@@ -108,8 +131,9 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
 
       const currentOrg = await getCurrentOrganization()
       if (!currentOrg) {
-        console.error('No organization found for activity logs')
+        console.log('⚠️ No organization found for activity logs, skipping fetch')
         setActivities([])
+        setLoading(false)
         return
       }
 
@@ -130,6 +154,9 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             error.code === 'PGRST116' || 
             error.message?.includes('does not exist')) {
           setDatabaseError('table_missing')
+        } else if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
+          console.log('🔐 Authentication error, user may not be logged in')
+          setActivities([])
         } else {
           setDatabaseError('generic_error')
         }
@@ -238,7 +265,8 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       
       const currentOrg = await getCurrentOrganization()
       if (!currentOrg) {
-        console.log('❌ No organization found')
+        console.log('⚠️ No organization found, skipping report generation')
+        setReportsLoading(false)
         return
       }
 
@@ -250,7 +278,11 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         .select('*')
         .eq('organization_id', currentOrg)
 
-      if (itemsError) throw itemsError
+      if (itemsError) {
+        console.log('❌ Error fetching inventory items:', itemsError.message)
+        setReportsLoading(false)
+        return
+      }
       
       console.log('📦 Inventory items found:', itemsData?.length || 0)
 
@@ -260,7 +292,11 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         .select('*')
         .eq('organization_id', currentOrg)
 
-      if (categoriesError) throw categoriesError
+      if (categoriesError) {
+        console.log('❌ Error fetching categories:', categoriesError.message)
+        setReportsLoading(false)
+        return
+      }
 
       // Get suppliers
       const { data: suppliersData, error: suppliersError } = await supabase
@@ -268,7 +304,11 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         .select('*')
         .eq('organization_id', currentOrg)
 
-      if (suppliersError) throw suppliersError
+      if (suppliersError) {
+        console.log('❌ Error fetching suppliers:', suppliersError.message)
+        setReportsLoading(false)
+        return
+      }
 
       // Get all room counts
       const { data: countsData, error: countsError } = await supabase
@@ -276,7 +316,11 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         .select('inventory_item_id, room_id, count')
         .eq('organization_id', currentOrg)
 
-      if (countsError) throw countsError
+      if (countsError) {
+        console.log('❌ Error fetching room counts:', countsError.message)
+        setReportsLoading(false)
+        return
+      }
 
       // Get rooms
       const { data: roomsData, error: roomsError } = await supabase
@@ -284,7 +328,11 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         .select('id, name')
         .eq('organization_id', currentOrg)
 
-      if (roomsError) throw roomsError
+      if (roomsError) {
+        console.log('❌ Error fetching rooms:', roomsError.message)
+        setReportsLoading(false)
+        return
+      }
 
       // Create room lookup
       const roomLookup = new Map(roomsData?.map(room => [room.id, room.name]) || [])

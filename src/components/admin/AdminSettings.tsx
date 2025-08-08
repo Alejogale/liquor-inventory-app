@@ -78,29 +78,29 @@ export default function AdminSettings() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Admin Settings</h1>
-        <p className="text-white/60">Configure system settings and maintenance options</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">Admin Settings</h1>
+        <p className="text-slate-600">Configure system settings and maintenance options</p>
       </div>
 
       {/* Save Status */}
       {saveStatus && (
-        <div className="mb-6 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-          <p className="text-blue-200">{saveStatus}</p>
+        <div className="mb-6 p-4 bg-blue-100 border border-blue-300 rounded-lg">
+          <p className="text-blue-700">{saveStatus}</p>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* System Settings */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center space-x-3 mb-6">
-            <Settings className="h-6 w-6 text-blue-400" />
-            <h2 className="text-xl font-semibold text-white">System Settings</h2>
+            <Settings className="h-6 w-6 text-blue-600" />
+            <h2 className="text-xl font-semibold text-slate-800">System Settings</h2>
           </div>
 
           <div className="space-y-6">
             <div>
               <label className="flex items-center justify-between">
-                <span className="text-white font-medium">Maintenance Mode</span>
+                <span className="text-slate-800 font-medium">Maintenance Mode</span>
                 <input
                   type="checkbox"
                   checked={settings.maintenanceMode}
@@ -108,14 +108,14 @@ export default function AdminSettings() {
                   className="toggle-checkbox"
                 />
               </label>
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 Enable to prevent user access during system updates
               </p>
             </div>
 
             <div>
               <label className="flex items-center justify-between">
-                <span className="text-white font-medium">Email Notifications</span>
+                <span className="text-slate-800 font-medium">Email Notifications</span>
                 <input
                   type="checkbox"
                   checked={settings.emailNotifications}
@@ -123,41 +123,41 @@ export default function AdminSettings() {
                   className="toggle-checkbox"
                 />
               </label>
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 Send admin notifications for important events
               </p>
             </div>
 
             <div>
-              <label className="text-white font-medium block mb-2">
+              <label className="text-slate-800 font-medium block mb-2">
                 Data Retention (Days)
               </label>
               <input
                 type="number"
                 value={settings.dataRetentionDays}
                 onChange={(e) => handleSettingChange('dataRetentionDays', parseInt(e.target.value))}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white"
+                className="w-full bg-white border border-blue-200 rounded-lg px-4 py-2 text-slate-800"
                 min="30"
                 max="3650"
               />
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 How long to keep deleted data before permanent removal
               </p>
             </div>
 
             <div>
-              <label className="text-white font-medium block mb-2">
+              <label className="text-slate-800 font-medium block mb-2">
                 Max Users Per Organization
               </label>
               <input
                 type="number"
                 value={settings.maxUsersPerOrg}
                 onChange={(e) => handleSettingChange('maxUsersPerOrg', parseInt(e.target.value))}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white"
+                className="w-full bg-white border border-blue-200 rounded-lg px-4 py-2 text-slate-800"
                 min="1"
                 max="100"
               />
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 Maximum number of users allowed per organization
               </p>
             </div>
@@ -165,51 +165,51 @@ export default function AdminSettings() {
         </div>
 
         {/* Security & Performance */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center space-x-3 mb-6">
-            <Shield className="h-6 w-6 text-green-400" />
-            <h2 className="text-xl font-semibold text-white">Security & Performance</h2>
+            <Shield className="h-6 w-6 text-green-600" />
+            <h2 className="text-xl font-semibold text-slate-800">Security & Performance</h2>
           </div>
 
           <div className="space-y-6">
             <div>
-              <label className="text-white font-medium block mb-2">
+              <label className="text-slate-800 font-medium block mb-2">
                 Backup Frequency
               </label>
               <select
                 value={settings.backupFrequency}
                 onChange={(e) => handleSettingChange('backupFrequency', e.target.value)}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white"
+                className="w-full bg-white border border-blue-200 rounded-lg px-4 py-2 text-slate-800"
               >
                 <option value="hourly">Hourly</option>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
               </select>
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 How frequently to backup system data
               </p>
             </div>
 
             <div>
-              <label className="text-white font-medium block mb-2">
+              <label className="text-slate-800 font-medium block mb-2">
                 API Rate Limit (requests/hour)
               </label>
               <input
                 type="number"
                 value={settings.apiRateLimit}
                 onChange={(e) => handleSettingChange('apiRateLimit', parseInt(e.target.value))}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white"
+                className="w-full bg-white border border-blue-200 rounded-lg px-4 py-2 text-slate-800"
                 min="100"
                 max="10000"
                 step="100"
               />
-              <p className="text-white/60 text-sm mt-1">
+              <p className="text-slate-600 text-sm mt-1">
                 Maximum API requests per hour per user
               </p>
             </div>
 
-            <div className="pt-4 border-t border-white/10">
-              <h3 className="text-white font-medium mb-3">System Actions</h3>
+            <div className="pt-4 border-t border-blue-100">
+              <h3 className="text-slate-800 font-medium mb-3">System Actions</h3>
               <div className="space-y-3">
                 <button
                   onClick={runSystemMaintenance}
@@ -239,24 +239,24 @@ export default function AdminSettings() {
       </div>
 
       {/* Database Health */}
-      <div className="mt-8 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+      <div className="mt-8 bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
         <div className="flex items-center space-x-3 mb-6">
-          <Database className="h-6 w-6 text-purple-400" />
-          <h2 className="text-xl font-semibold text-white">Database Health</h2>
+          <Database className="h-6 w-6 text-purple-600" />
+          <h2 className="text-xl font-semibold text-slate-800">Database Health</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-400 mb-1">Healthy</div>
-            <div className="text-white/60 text-sm">Connection Status</div>
+            <div className="text-2xl font-bold text-green-600 mb-1">Healthy</div>
+            <div className="text-slate-600 text-sm">Connection Status</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-400 mb-1">43ms</div>
-            <div className="text-white/60 text-sm">Average Query Time</div>
+            <div className="text-2xl font-bold text-blue-600 mb-1">43ms</div>
+            <div className="text-slate-600 text-sm">Average Query Time</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">2.1GB</div>
-            <div className="text-white/60 text-sm">Database Size</div>
+            <div className="text-2xl font-bold text-yellow-600 mb-1">2.1GB</div>
+            <div className="text-slate-600 text-sm">Database Size</div>
           </div>
         </div>
       </div>

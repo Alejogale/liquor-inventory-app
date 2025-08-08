@@ -56,6 +56,7 @@ interface InventoryItem {
 export default function Dashboard() {
   const { user, userProfile, organization, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('inventory')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
@@ -246,7 +247,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
       {/* Sidebar Navigation */}
       <DashboardSidebar
         activeTab={activeTab}
@@ -254,10 +255,13 @@ export default function Dashboard() {
         isAdmin={isAdmin}
         userEmail={user?.email || ''}
         onSignOut={handleSignOut}
+        onCollapsedChange={setSidebarCollapsed}
       />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-80 transition-all duration-300 overflow-y-auto h-screen">
+      <div className={`flex-1 transition-all duration-300 overflow-y-auto h-screen ${
+        sidebarCollapsed ? 'ml-20' : 'ml-80'
+      } lg:ml-0`}>
         {/* Top Stats Bar */}
         <div className="p-6 lg:p-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

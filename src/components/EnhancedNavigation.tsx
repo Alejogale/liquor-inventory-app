@@ -210,7 +210,7 @@ export default function EnhancedNavigation({
                   href="/signup" 
                   className="bg-black hover:bg-slate-800 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                 >
-                  Start Free Trial
+                  Start Free 30-Day Trial
                 </Link>
               </>
             ) : (
@@ -319,7 +319,7 @@ export default function EnhancedNavigation({
                     className="block w-full py-3 px-4 text-center bg-black hover:bg-slate-800 text-white rounded-lg font-medium transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Start Free Trial
+                    Start Free 30-Day Trial
                   </Link>
                 </div>
               ) : (

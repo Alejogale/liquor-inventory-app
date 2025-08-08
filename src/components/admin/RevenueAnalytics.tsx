@@ -161,100 +161,100 @@ export default function RevenueAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-8">
+    <div className="p-8 space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Revenue Analytics</h1>
-        <p className="text-white/60">Financial performance and subscription metrics</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">Revenue Analytics</h1>
+        <p className="text-slate-600">Financial performance and subscription metrics</p>
       </div>
 
       {/* Revenue Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Total Revenue</p>
-              <p className="text-2xl font-bold text-white mt-1">{formatCurrency(analytics.totalRevenue)}</p>
-              <p className="text-green-400 text-xs mt-1 flex items-center">
+              <p className="text-slate-600 text-sm font-medium">Total Revenue</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(analytics.totalRevenue)}</p>
+              <p className="text-green-600 text-xs mt-1 flex items-center">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
                 +{analytics.revenueGrowth}% growth
               </p>
             </div>
-            <DollarSign className="h-8 w-8 text-green-400" />
+            <DollarSign className="h-8 w-8 text-green-600" />
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Monthly Recurring Revenue</p>
-              <p className="text-2xl font-bold text-white mt-1">{formatCurrency(analytics.monthlyRecurringRevenue)}</p>
-              <p className="text-blue-400 text-xs mt-1">Current month</p>
+              <p className="text-slate-600 text-sm font-medium">Monthly Recurring Revenue</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(analytics.monthlyRecurringRevenue)}</p>
+              <p className="text-blue-600 text-xs mt-1">Current month</p>
             </div>
-            <TrendingUp className="h-8 w-8 text-blue-400" />
+            <TrendingUp className="h-8 w-8 text-blue-600" />
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Avg Revenue Per User</p>
-              <p className="text-2xl font-bold text-white mt-1">{formatCurrency(analytics.averageRevenuePerUser)}</p>
-              <p className="text-purple-400 text-xs mt-1">Per month</p>
+              <p className="text-slate-600 text-sm font-medium">Avg Revenue Per User</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(analytics.averageRevenuePerUser)}</p>
+              <p className="text-purple-600 text-xs mt-1">Per month</p>
             </div>
-            <Users className="h-8 w-8 text-purple-400" />
+            <Users className="h-8 w-8 text-purple-600" />
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm font-medium">Customer Lifetime Value</p>
-              <p className="text-2xl font-bold text-white mt-1">{formatCurrency(analytics.lifetimeValue)}</p>
-              <p className="text-yellow-400 text-xs mt-1">24-month projection</p>
+              <p className="text-slate-600 text-sm font-medium">Customer Lifetime Value</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{formatCurrency(analytics.lifetimeValue)}</p>
+              <p className="text-yellow-600 text-xs mt-1">24-month projection</p>
             </div>
-            <CreditCard className="h-8 w-8 text-yellow-400" />
+            <CreditCard className="h-8 w-8 text-yellow-600" />
           </div>
         </div>
       </div>
 
       {/* Subscription Tiers */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Starter Plan</h3>
-            <span className="text-green-400 font-bold">$29/mo</span>
+            <h3 className="text-lg font-semibold text-slate-800">Starter Plan</h3>
+            <span className="text-green-600 font-bold">$29/mo</span>
           </div>
-          <p className="text-2xl font-bold text-white">{analytics.subscriptionTiers.starter.count}</p>
-          <p className="text-white/60 text-sm">customers</p>
-          <p className="text-green-400 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.starter.revenue)}/month</p>
+          <p className="text-2xl font-bold text-slate-800">{analytics.subscriptionTiers.starter.count}</p>
+          <p className="text-slate-600 text-sm">customers</p>
+          <p className="text-green-600 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.starter.revenue)}/month</p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Professional Plan</h3>
-            <span className="text-blue-400 font-bold">$79/mo</span>
+            <h3 className="text-lg font-semibold text-slate-800">Professional Plan</h3>
+            <span className="text-blue-600 font-bold">$79/mo</span>
           </div>
-          <p className="text-2xl font-bold text-white">{analytics.subscriptionTiers.professional.count}</p>
-          <p className="text-white/60 text-sm">customers</p>
-          <p className="text-blue-400 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.professional.revenue)}/month</p>
+          <p className="text-2xl font-bold text-slate-800">{analytics.subscriptionTiers.professional.count}</p>
+          <p className="text-slate-600 text-sm">customers</p>
+          <p className="text-blue-600 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.professional.revenue)}/month</p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Enterprise Plan</h3>
-            <span className="text-purple-400 font-bold">$199/mo</span>
+            <h3 className="text-lg font-semibold text-slate-800">Enterprise Plan</h3>
+            <span className="text-purple-600 font-bold">$199/mo</span>
           </div>
-          <p className="text-2xl font-bold text-white">{analytics.subscriptionTiers.enterprise.count}</p>
-          <p className="text-white/60 text-sm">customers</p>
-          <p className="text-purple-400 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.enterprise.revenue)}/month</p>
+          <p className="text-2xl font-bold text-slate-800">{analytics.subscriptionTiers.enterprise.count}</p>
+          <p className="text-slate-600 text-sm">customers</p>
+          <p className="text-purple-600 text-sm mt-2">{formatCurrency(analytics.subscriptionTiers.enterprise.revenue)}/month</p>
         </div>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Monthly Revenue Growth */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Monthly Revenue Growth</h3>
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Monthly Revenue Growth</h3>
           <div className="h-64 flex items-end justify-between space-x-2">
             {analytics.monthlyRevenue.map((data, index) => (
               <div key={data.month} className="flex flex-col items-center">
@@ -265,24 +265,24 @@ export default function RevenueAnalytics() {
                     width: '40px'
                   }}
                 />
-                <span className="text-white/60 text-sm mt-2">{data.month}</span>
-                <span className="text-white text-xs">{formatCurrency(data.revenue)}</span>
+                <span className="text-slate-600 text-sm mt-2">{data.month}</span>
+                <span className="text-slate-800 text-xs">{formatCurrency(data.revenue)}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Revenue by Tier */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Revenue by Subscription Tier</h3>
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Revenue by Subscription Tier</h3>
           <div className="space-y-4">
             {analytics.revenueByTier.map((tier, index) => (
               <div key={tier.tier}>
-                <div className="flex justify-between text-white/80 mb-1">
+                <div className="flex justify-between text-slate-700 mb-1">
                   <span>{tier.tier}</span>
                   <span>{formatCurrency(tier.revenue)} ({tier.percentage.toFixed(1)}%)</span>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-3">
+                <div className="w-full bg-slate-100 rounded-full h-3">
                   <div 
                     className={`h-3 rounded-full ${
                       index === 0 ? 'bg-gradient-to-r from-green-500 to-green-400' :

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Package,
@@ -26,6 +26,7 @@ interface SidebarProps {
   isAdmin: boolean
   userEmail: string
   onSignOut: () => void
+  onCollapsedChange?: (collapsed: boolean) => void
 }
 
 export default function DashboardSidebar({ 
@@ -33,9 +34,15 @@ export default function DashboardSidebar({
   setActiveTab, 
   isAdmin, 
   userEmail, 
-  onSignOut 
+  onSignOut,
+  onCollapsedChange
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+
+  // Notify parent when collapsed state changes
+  useEffect(() => {
+    onCollapsedChange?.(isCollapsed)
+  }, [isCollapsed, onCollapsedChange])
 
   const navigationItems = [
     { id: 'inventory', label: 'Inventory', icon: Package, description: 'Manage items & stock' },
@@ -54,15 +61,16 @@ export default function DashboardSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-2 text-slate-800 shadow-lg"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-blue-50 transition-colors"
+        aria-label="Toggle sidebar menu"
       >
-        {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
+        {isCollapsed ? <Menu className="h-6 w-6" /> : <X className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
       <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
-        isCollapsed ? '-translate-x-full lg:w-20' : 'w-80 lg:w-80'
-      }`}>
+        isCollapsed ? 'w-20' : 'w-80'
+      } lg:relative lg:translate-x-0 lg:col-span-1`}>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-6 border-b border-blue-200">

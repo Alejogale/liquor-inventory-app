@@ -50,7 +50,13 @@ export default function AdminDashboard() {
   const [timeRange, setTimeRange] = useState('30d')
 
   useEffect(() => {
-    fetchAdminMetrics()
+    const initializeAdmin = async () => {
+      // Wait a bit for auth to initialize
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await fetchAdminMetrics()
+    }
+    
+    initializeAdmin()
   }, [timeRange])
 
   const fetchAdminMetrics = async () => {
@@ -66,13 +72,20 @@ export default function AdminDashboard() {
         categoriesResult,
         countsResult
       ] = await Promise.all([
-        supabase.from('profiles').select('*'),
+        supabase.from('user_profiles').select('*'),
         supabase.from('organizations').select('*'),
         supabase.from('inventory_items').select('*'),
         supabase.from('suppliers').select('*'),
         supabase.from('categories').select('*'),
         supabase.from('room_counts').select('*').order('created_at', { ascending: false }).limit(100)
       ])
+
+      // Check for errors in any of the queries
+      const errors = [usersResult.error, orgsResult.error, itemsResult.error, suppliersResult.error, categoriesResult.error, countsResult.error].filter(Boolean)
+      if (errors.length > 0) {
+        console.error('❌ Errors fetching admin metrics:', errors)
+        return
+      }
 
       // Calculate metrics
       const totalUsers = usersResult.data?.length || 0

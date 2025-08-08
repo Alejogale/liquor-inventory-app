@@ -253,7 +253,7 @@ export default function SignupPage() {
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Account</h1>
               <p className="text-slate-600">
-                {selectedPlan ? `Sign up for ${selectedPlan.plan} plan` : 'Start your free trial today'}
+                {selectedPlan ? `Sign up for ${selectedPlan.plan} plan` : 'Start free 30-day trial'}
               </p>
             </div>
 
@@ -372,7 +372,7 @@ export default function SignupPage() {
               >
                 {isLoading 
                   ? (selectedPlan ? 'Creating Account & Setting Up Payment...' : 'Creating Account...') 
-                  : (selectedPlan ? 'Create Account & Continue to Payment' : 'Start Free Trial')
+                  : (selectedPlan ? 'Create Account & Continue to Payment' : 'Start Free 30-Day Trial')
                 }
                 {!isLoading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
               </button>

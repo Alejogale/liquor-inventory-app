@@ -217,53 +217,53 @@ export default function UserAnalytics() {
   if (!analytics) return null
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 mb-1">Total Users</p>
-              <p className="text-2xl font-bold text-white">{analytics.totalUsers.toLocaleString()}</p>
+              <p className="text-sm text-slate-600 mb-1">Total Users</p>
+              <p className="text-2xl font-bold text-slate-800">{analytics.totalUsers.toLocaleString()}</p>
             </div>
-            <div className="bg-blue-500/20 p-3 rounded-lg">
-              <Users className="h-6 w-6 text-blue-400" />
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <Users className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 mb-1">Organizations</p>
-              <p className="text-2xl font-bold text-white">{analytics.totalOrganizations.toLocaleString()}</p>
+              <p className="text-sm text-slate-600 mb-1">Organizations</p>
+              <p className="text-2xl font-bold text-slate-800">{analytics.totalOrganizations.toLocaleString()}</p>
             </div>
-            <div className="bg-purple-500/20 p-3 rounded-lg">
-              <Building className="h-6 w-6 text-purple-400" />
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <Building className="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 mb-1">Active Users (30d)</p>
-              <p className="text-2xl font-bold text-white">{analytics.activeUsers.toLocaleString()}</p>
+              <p className="text-sm text-slate-600 mb-1">Active Users (30d)</p>
+              <p className="text-2xl font-bold text-slate-800">{analytics.activeUsers.toLocaleString()}</p>
             </div>
-            <div className="bg-green-500/20 p-3 rounded-lg">
-              <UserCheck className="h-6 w-6 text-green-400" />
+            <div className="bg-green-100 p-3 rounded-lg">
+              <UserCheck className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 mb-1">New This Month</p>
-              <p className="text-2xl font-bold text-white">{analytics.newUsersThisMonth.toLocaleString()}</p>
+              <p className="text-sm text-slate-600 mb-1">New This Month</p>
+              <p className="text-2xl font-bold text-slate-800">{analytics.newUsersThisMonth.toLocaleString()}</p>
             </div>
-            <div className="bg-orange-500/20 p-3 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-orange-400" />
+            <div className="bg-orange-100 p-3 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-orange-600" />
             </div>
           </div>
         </div>
@@ -272,18 +272,18 @@ export default function UserAnalytics() {
       {/* Charts and Lists */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Users by Organization */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-            <PieChart className="h-5 w-5 mr-2" />
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
+            <PieChart className="h-5 w-5 mr-2 text-blue-600" />
             Users by Organization
           </h3>
           <div className="space-y-3">
             {analytics.usersByOrganization.slice(0, 8).map((org, index) => (
               <div key={`${org.organization_name}-${index}`} className="flex items-center justify-between">
-                <span className="text-white/80 truncate">{org.organization_name}</span>
+                <span className="text-slate-700 truncate">{org.organization_name}</span>
                 <div className="flex items-center space-x-2">
-                  <div className="bg-white/10 rounded-full px-2 py-1">
-                    <span className="text-xs text-white">{org.user_count}</span>
+                  <div className="bg-blue-100 rounded-full px-2 py-1">
+                    <span className="text-xs text-blue-700 font-medium">{org.user_count}</span>
                   </div>
                 </div>
               </div>
@@ -292,23 +292,23 @@ export default function UserAnalytics() {
         </div>
 
         {/* Top Organizations by Activity */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-          <h3 className="text-xl font-semibold text-white mb-4">Top Organizations by Activity</h3>
+        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Top Organizations by Activity</h3>
           <div className="space-y-4">
             {analytics.topOrganizations.map((org, index) => (
-              <div key={`${org.name}-${index}-${org.activity_count}`} className="flex items-center justify-between py-3 border-b border-white/10 last:border-b-0">
+              <div key={`${org.name}-${index}-${org.activity_count}`} className="flex items-center justify-between py-3 border-b border-blue-100 last:border-b-0">
                 <div className="flex items-center space-x-4">
                   <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-10 w-10 flex items-center justify-center text-white font-bold">
                     {index + 1}
                   </div>
                   <div>
-                    <p className="text-white font-medium">{org.name}</p>
-                    <p className="text-white/60 text-sm">{org.user_count} users</p>
+                    <p className="text-slate-800 font-medium">{org.name}</p>
+                    <p className="text-slate-600 text-sm">{org.user_count} users</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-white font-semibold">{org.activity_count}</p>
-                  <p className="text-white/60 text-sm">activities</p>
+                  <p className="text-slate-800 font-semibold">{org.activity_count}</p>
+                  <p className="text-slate-600 text-sm">activities</p>
                 </div>
               </div>
             ))}
@@ -317,21 +317,21 @@ export default function UserAnalytics() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-        <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-          <Activity className="h-5 w-5 mr-2" />
+      <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+        <h3 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
+          <Activity className="h-5 w-5 mr-2 text-blue-600" />
           Recent User Activity
         </h3>
         <div className="space-y-3">
           {analytics.recentActivity.slice(0, 10).map((activity, index) => (
-            <div key={`${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0">
+            <div key={`${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-blue-100 last:border-b-0">
               <div>
-                <p className="text-white/80">{activity.user_email}</p>
-                <p className="text-white/60 text-sm">{activity.organization_name}</p>
+                <p className="text-slate-700">{activity.user_email}</p>
+                <p className="text-slate-600 text-sm">{activity.organization_name}</p>
               </div>
               <div className="text-right">
-                <p className="text-white capitalize">{activity.action_type.replace('_', ' ')}</p>
-                <p className="text-white/60 text-sm">
+                <p className="text-slate-800 capitalize">{activity.action_type.replace('_', ' ')}</p>
+                <p className="text-slate-600 text-sm">
                   {new Date(activity.created_at).toLocaleDateString()}
                 </p>
               </div>

@@ -27,7 +27,7 @@ export default function DataExport() {
 
       switch (dataType) {
         case 'users':
-          const { data: users } = await supabase.from('profiles').select('*')
+          const { data: users } = await supabase.from('user_profiles').select('*')
           data = users || []
           filename = 'users_export.csv'
           break
@@ -73,7 +73,7 @@ export default function DataExport() {
         case 'all_analytics':
           // Export comprehensive analytics report
           const [usersRes, orgsRes, itemsRes, suppliersRes, countsRes] = await Promise.all([
-            supabase.from('profiles').select('*'),
+            supabase.from('user_profiles').select('*'),
             supabase.from('organizations').select('*'),
             supabase.from('inventory_items').select('*'),
             supabase.from('suppliers').select('*'),
@@ -230,14 +230,14 @@ export default function DataExport() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Data Export</h1>
-        <p className="text-white/60">Export your data for analysis, backup, or compliance</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">Data Export</h1>
+        <p className="text-slate-600">Export your data for analysis, backup, or compliance</p>
       </div>
 
       {/* Export Status */}
       {exportStatus && (
-        <div className="mb-6 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-          <p className="text-blue-200">{exportStatus}</p>
+        <div className="mb-6 p-4 bg-blue-100 border border-blue-300 rounded-lg">
+          <p className="text-blue-700">{exportStatus}</p>
         </div>
       )}
 
@@ -248,23 +248,23 @@ export default function DataExport() {
           const isLoading = loading === option.id
 
           return (
-            <div key={option.id} className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div key={option.id} className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <div className={`p-3 rounded-lg bg-gradient-to-r ${option.color}`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
-                {isLoading && <Loader2 className="h-5 w-5 text-white animate-spin" />}
+                {isLoading && <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />}
               </div>
               
-              <h3 className="text-lg font-semibold text-white mb-2">{option.title}</h3>
-              <p className="text-white/60 text-sm mb-4">{option.description}</p>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">{option.title}</h3>
+              <p className="text-slate-600 text-sm mb-4">{option.description}</p>
               
               <button
                 onClick={() => exportData(option.id)}
                 disabled={isLoading}
                 className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
                   isLoading
-                    ? 'bg-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
                 } text-white flex items-center justify-center space-x-2`}
               >
@@ -286,11 +286,11 @@ export default function DataExport() {
       </div>
 
       {/* Export Instructions */}
-      <div className="mt-8 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-        <h3 className="text-lg font-semibold text-white mb-4">Export Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white/80">
+      <div className="mt-8 bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4">Export Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
           <div>
-            <h4 className="font-medium text-white mb-2">CSV Exports</h4>
+            <h4 className="font-medium text-slate-800 mb-2">CSV Exports</h4>
             <ul className="space-y-1 text-sm">
               <li>• Compatible with Excel, Google Sheets, and other tools</li>
               <li>• Includes all available fields for each data type</li>
@@ -299,7 +299,7 @@ export default function DataExport() {
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-white mb-2">JSON Exports</h4>
+            <h4 className="font-medium text-slate-800 mb-2">JSON Exports</h4>
             <ul className="space-y-1 text-sm">
               <li>• Complete data structure preservation</li>
               <li>• Ideal for developers and custom analysis</li>

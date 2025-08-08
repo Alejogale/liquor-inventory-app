@@ -137,7 +137,7 @@ export default function LandingPage() {
                 Sign In
               </Link>
               <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                Start Free Trial
+                Start Free 30-Day Trial
               </Link>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default function LandingPage() {
                 {/* Dynamic Action Section */}
                 <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-8">
                   <Link href="/signup" className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 flex items-center gap-3 group shadow-lg hover:shadow-xl transform hover:scale-105">
-                    Start Free Trial
+                    Start Free 30-Day Trial
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <button className="bg-white/60 backdrop-blur-sm border border-slate-200/50 text-slate-700 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/80 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -423,7 +423,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <Link href="/signup" className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center px-6 py-3 rounded-lg font-medium transition-colors text-sm">
-                Start Free Trial
+                Start Free 30-Day Trial
               </Link>
             </div>
             
@@ -459,7 +459,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <Link href="/signup" className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-lg font-medium transition-colors text-sm">
-                Start Free Trial
+                Start Free 30-Day Trial
               </Link>
             </div>
             
@@ -510,7 +510,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup" className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-colors">
-              Start Free Trial
+              Start Free 30-Day Trial
             </Link>
             <Link href="/contact" className="border border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-colors">
               Schedule Demo
