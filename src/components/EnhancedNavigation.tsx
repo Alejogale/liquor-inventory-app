@@ -168,7 +168,7 @@ export default function EnhancedNavigation({
                         href={dropdownItem.href}
                         className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors"
                       >
-                        {dropdownItem.icon && dropdownItem.icon}
+                        {'icon' in dropdownItem && dropdownItem.icon ? dropdownItem.icon : null}
                         {dropdownItem.label}
                       </Link>
                     ))}
@@ -283,7 +283,7 @@ export default function EnhancedNavigation({
                               className="flex items-center gap-3 py-2 px-4 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
-                              {dropdownItem.icon && dropdownItem.icon}
+                              {'icon' in dropdownItem && dropdownItem.icon ? dropdownItem.icon : null}
                               {dropdownItem.label}
                             </Link>
                           ))}

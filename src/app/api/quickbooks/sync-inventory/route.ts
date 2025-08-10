@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-const QuickBooks = require('node-quickbooks');
+import QuickBooks from 'node-quickbooks';
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         };
 
         await new Promise((resolve, reject) => {
-          qbo.createPurchase(expenseData, (err: any, result: any) => {
+          qbo.createPurchase(expenseData, (err: unknown, result: unknown) => {
             if (err) {
               console.error('Error creating QB expense:', err);
               reject(err);

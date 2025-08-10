@@ -13,6 +13,8 @@ interface InventoryItem {
   barcode?: string
   categories: { name: string } | null
   suppliers: { name: string } | null
+  category_id: string
+  supplier_id: string
 }
 
 interface Room {
