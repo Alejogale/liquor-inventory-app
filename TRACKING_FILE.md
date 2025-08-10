@@ -1,0 +1,2 @@
+
+- Integration prep: Converted CommonJS `require()` to ES module imports for `node-quickbooks` in `src/app/api/quickbooks/company-info/route.ts` and `src/app/api/quickbooks/sync-inventory/route.ts`. Reduced lint errors and aligned with Next.js ESM environment. Next: address TypeScript `any` types and hook dependency warnings, then validate RLS for import flows.
