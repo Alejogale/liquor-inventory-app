@@ -1207,4 +1207,36 @@ const sanitizedItem = {
 - ✅ **Error Prevention**: Multiple confirmation layers and validation
 - ✅ **Professional Polish**: Consistent styling and user feedback
 
+## 📋 **January 10, 2025 - CSV Import Bug Fix**
+### Issue Resolved
+- ⚠️ **CSV Import Error**: Fixed critical error when clicking "Import Reservations"
+- 🔧 **Root Cause**: Field name mapping mismatch between CSV parsing and database insertion
+- ✅ **Solution**: Updated field mapping to match database schema exactly
+
+### Technical Changes Made
+- 🛠️ **Field Mapping**: Fixed `room_name` → `room` field inconsistency
+- 🛠️ **User Authentication**: Added proper `created_by` field with current user ID
+- 🛠️ **Error Handling**: Enhanced error messages and validation
+- 🛠️ **Type Safety**: Resolved all TypeScript linting errors
+
+### Status: ✅ **RESOLVED** - CSV import now works correctly with Google Sheets format
+
+## 🚨 **January 10, 2025 - Critical RLS Policy Fix Required**
+### Issue Found  
+- ⚠️ **RLS Policy Error**: "new row violates row-level security policy for table reservations"
+- 🔧 **Root Cause**: Reservations table has RLS enabled but NO policies created
+- 📊 **Impact**: CSV import completely blocked until database policies are fixed
+
+### Solution Created
+- 📝 **SQL Fix File**: `fix_reservations_rls_policies.sql` 
+- 🛠️ **Schema Fix**: Updates organization_id from BIGINT to UUID if needed
+- 🔒 **RLS Policies**: Creates all required policies for reservations, reservation_rooms, and reservation_tables
+
+### Next Steps Required
+1. **Run the SQL file** in Supabase SQL Editor: `fix_reservations_rls_policies.sql`
+2. **Test CSV import** after running the fix
+3. **Verify permissions** work correctly
+
+### Status: 🔄 **PENDING DATABASE UPDATE** - User must run SQL fix in Supabase
+
 

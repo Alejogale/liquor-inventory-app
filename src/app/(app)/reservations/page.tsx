@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { checkAppAccess, startTrial, AppAccess } from '@/lib/subscription-access'
-import { checkReservationTablesExist, createDefaultRoomsAndTables, getRooms, getTables } from '@/lib/reservation-db'
+import { checkReservationTablesExist, createDefaultRoomsAndTables, getRooms, getTables, ReservationRoom } from '@/lib/reservation-db'
 import { supabase } from '@/lib/supabase'
 import ReservationSidebar from '@/components/ReservationSidebar'
 import { 
@@ -137,6 +137,7 @@ function ReservationContent({ setShowImportPopup }: {
           organization_id: room.organization_id,
           capacity: room.capacity,
           is_active: room.is_active,
+          created_at: room.created_at || new Date().toISOString(),
           isCustom: true // Mark as custom since they're saved in custom_rooms table
         }))
         
@@ -180,10 +181,11 @@ function ReservationContent({ setShowImportPopup }: {
       }
     }
 
-    const handleRoomsChanged = (event: CustomEvent) => {
+    const handleRoomsChanged = (event: Event) => {
       // Use rooms directly from event detail (more efficient than reloading)
       console.log('🔄 Rooms updated from sidebar, using event data...')
-      const updatedRooms = event.detail?.rooms || []
+      const customEvent = event as CustomEvent
+      const updatedRooms = customEvent.detail?.rooms || []
       if (updatedRooms.length >= 0) {
         setRooms(updatedRooms)
       } else {
@@ -191,12 +193,30 @@ function ReservationContent({ setShowImportPopup }: {
       }
     }
 
+    const handleReservationsImported = (event: Event) => {
+      // Refresh reservations when new ones are imported
+      console.log('🔄 Reservations imported, refreshing data...')
+      const customEvent = event as CustomEvent
+      console.log(`📋 Imported ${customEvent.detail?.count} reservations for ${customEvent.detail?.date}`)
+      fetchReservations() // Reload current reservations
+    }
+
+    const handleReservationsCleared = () => {
+      // Refresh reservations when they are cleared
+      console.log('🔄 Reservations cleared, refreshing data...')
+      fetchReservations() // Reload current reservations
+    }
+
     window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('roomsChanged', handleRoomsChanged)
+    window.addEventListener('roomsChanged', handleRoomsChanged as EventListener)
+    window.addEventListener('reservationsImported', handleReservationsImported as EventListener)
+    window.addEventListener('reservationsCleared', handleReservationsCleared as EventListener)
     
     return () => {
       window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('roomsChanged', handleRoomsChanged)
+      window.removeEventListener('roomsChanged', handleRoomsChanged as EventListener)
+      window.removeEventListener('reservationsImported', handleReservationsImported as EventListener)
+      window.removeEventListener('reservationsCleared', handleReservationsCleared as EventListener)
     }
   }, [organization?.id])
 
@@ -221,10 +241,12 @@ function ReservationContent({ setShowImportPopup }: {
       // First time - initialize with default rooms
       console.log('🏠 First time - initializing with default rooms')
       const defaultRooms: ReservationRoom[] = [
-        { id: 'raynor', name: 'Raynor', organization_id: organization.id, is_active: true },
-        { id: 'cov', name: 'Cov', organization_id: organization.id, is_active: true },
-        { id: 'sun', name: 'Sun', organization_id: organization.id, is_active: true },
-        { id: 'pubn', name: 'Pubn', organization_id: organization.id, is_active: true }
+        { id: 'raynor', name: 'Raynor', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
+        { id: 'cov', name: 'Cov', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
+        { id: 'sun', name: 'Sun', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
+        { id: 'pubn', name: 'Pubn', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
+        { id: 'lounge', name: 'Lounge', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
+        { id: 'open', name: 'Open', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() }
       ]
       setRooms(defaultRooms)
     }
@@ -264,7 +286,7 @@ function ReservationContent({ setShowImportPopup }: {
         .eq('organization_id', organization.id)
         .eq('reservation_date', dateStr)
         .eq('service_type', isLunchView ? 'lunch' : 'dinner')
-        .order('reservation_time')
+        .order('reservation_time', { ascending: true })
 
       if (error) {
         console.error('Error fetching reservations:', error)
@@ -279,11 +301,19 @@ function ReservationContent({ setShowImportPopup }: {
   }
 
   function updateCoversCount(reservationData: any[]) {
-    // Initialize covers with all available rooms
+    // Initialize covers with all available rooms using abbreviations
     const newCovers: {[key: string]: number} = { total: 0 }
     
-    // Add each room to covers tracking
+    // Helper function to get room abbreviation (first 3 letters)
+    const getRoomAbbreviation = (roomName: string) => {
+      return roomName.substring(0, 3).toUpperCase()
+    }
+    
+    // Add each room to covers tracking using abbreviations
     rooms.forEach((room: any) => {
+      const abbrev = getRoomAbbreviation(room.name)
+      newCovers[abbrev] = 0
+      // Also keep full name for backward compatibility 
       newCovers[room.name.toUpperCase()] = 0
     })
 
@@ -291,11 +321,22 @@ function ReservationContent({ setShowImportPopup }: {
       if (reservation.status === 'Cancelled') return
       
       const partySize = reservation.party_size || 0
-      newCovers.total += partySize
-      
-      const roomName = reservation.reservation_rooms?.name
-      if (roomName && newCovers[roomName.toUpperCase()] !== undefined) {
-        newCovers[roomName.toUpperCase()] += partySize
+      if (partySize > 0) { // Only count non-zero party sizes
+        newCovers.total += partySize
+        
+        const roomName = reservation.reservation_rooms?.name
+        if (roomName) {
+          const abbrev = getRoomAbbreviation(roomName)
+          const fullName = roomName.toUpperCase()
+          
+          // Update both abbreviation and full name
+          if (newCovers[abbrev] !== undefined) {
+            newCovers[abbrev] += partySize
+          }
+          if (newCovers[fullName] !== undefined) {
+            newCovers[fullName] += partySize
+          }
+        }
       }
     })
 
@@ -435,6 +476,21 @@ function ReservationContent({ setShowImportPopup }: {
             <Trash2 className="h-5 w-5" />
             <span>Clear Left/Cancelled</span>
           </button>
+
+          <button
+            onClick={async () => {
+              if (confirm('⚠️ Clear ALL reservations for today? This cannot be undone!')) {
+                if (!organization?.id) return
+                const today = dayTabs[activeDayIndex].toISOString().split('T')[0]
+                await clearAllReservations(organization.id, today)
+                fetchReservations() // Refresh the display
+              }
+            }}
+            className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+          >
+            <Trash2 className="h-5 w-5" />
+            <span>Clear All</span>
+          </button>
         </div>
       </div>
 
@@ -469,6 +525,7 @@ function ReservationContent({ setShowImportPopup }: {
             ];
             const roomColor = colors[index % colors.length];
             const roomKey = room.name.toUpperCase();
+            const roomAbbrev = room.name.substring(0, 3).toUpperCase();
             return (
               <div
                 key={roomKey}
@@ -483,8 +540,8 @@ function ReservationContent({ setShowImportPopup }: {
                   <div className={`w-10 h-10 ${roomColor.color} rounded-lg mx-auto mb-3 flex items-center justify-center`}>
                     <MapPin className="h-6 w-6 text-white" />
                   </div>
-                  <div className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">{room.name}</div>
-                  <div className="text-2xl font-bold text-slate-800">{covers[roomKey] || 0}</div>
+                  <div className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">{roomAbbrev}</div>
+                  <div className="text-2xl font-bold text-slate-800">{covers[roomAbbrev] || 0}</div>
                 </div>
               </div>
             )
@@ -500,6 +557,7 @@ function ReservationContent({ setShowImportPopup }: {
           activeHighlight={activeHighlight}
           setActiveHighlight={setActiveHighlight}
           onStatusUpdate={updateReservationStatus}
+          rooms={rooms}
         />
       </div>
 
@@ -529,7 +587,8 @@ function ReservationsTable({
   activeFilter, 
   activeHighlight, 
   setActiveHighlight, 
-  onStatusUpdate 
+  onStatusUpdate,
+  rooms 
 }: any) {
   const statusOptions = [
     'Confirmed',
@@ -577,7 +636,7 @@ function ReservationsTable({
       'bg-purple-500 text-white'
     ];
     
-    const roomIndex = rooms.findIndex(room => room.name.toUpperCase() === roomName?.toUpperCase())
+    const roomIndex = rooms.findIndex((room: any) => room.name.toUpperCase() === roomName?.toUpperCase())
     return roomIndex >= 0 ? colors[roomIndex % colors.length] : 'bg-slate-500 text-white'
   }
 
@@ -700,32 +759,39 @@ function TableRow({
       } ${reservation.status === 'Cancelled' ? 'opacity-60 line-through' : ''}`}
     >
       <td className="py-3 px-6 text-slate-900 font-medium">
-        {reservation.reservation_time?.slice(0, 5)}
+        {(() => {
+          if (!reservation.reservation_time) return ''
+          const time = reservation.reservation_time.slice(0, 5)
+          const [hours, minutes] = time.split(':')
+          const hour12 = parseInt(hours) % 12 || 12
+          const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM'
+          return `${hour12}:${minutes} ${ampm}`
+        })()}
       </td>
       <td className="py-3 px-6 text-slate-900">
-        {reservation.member_name}
+        {reservation.member_name === 'Unknown' ? '' : reservation.member_name}
       </td>
       <td className="py-3 px-6 text-slate-700">
-        {reservation.member_number || '-'}
+        {reservation.member_number || ''}
       </td>
       <td className="py-3 px-6 text-slate-900 font-semibold">
-        {reservation.party_size}
+        {reservation.party_size === 0 || (reservation.party_size === 1 && (!reservation.member_name || reservation.member_name === 'Unknown')) ? '' : reservation.party_size}
       </td>
       <td className="py-3 px-6">
         <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
           getRoomBadgeColor(reservation.reservation_rooms?.name)
         }`}>
-          {reservation.reservation_rooms?.name}
+          {reservation.reservation_rooms?.name ? reservation.reservation_rooms.name.substring(0, 3).toUpperCase() : ''}
         </span>
       </td>
       <td className="py-3 px-6 text-slate-700">
-        {reservation.reservation_tables?.table_number || '-'}
+        {reservation.reservation_tables?.table_number || ''}
       </td>
       <td className="py-3 px-6 text-slate-600 text-sm">
-        {reservation.notes || '-'}
+        {reservation.notes || ''}
       </td>
       <td className="py-3 px-6 text-slate-700">
-        {reservation.staff_member || '-'}
+        {reservation.staff_member || ''}
       </td>
       <td className="py-3 px-6">
         <select
@@ -1028,6 +1094,8 @@ export default function ReservationsPage() {
               setShowImportPopup(false)
               // Could trigger refresh here if needed
             }}
+            serviceType="dinner"
+            user={user}
           />
         )}
       </div>
@@ -1056,11 +1124,38 @@ async function clearCancelledReservations() {
   }
 }
 
+async function clearAllReservations(organizationId: string, currentDate: string) {
+  try {
+    const { error } = await supabase
+      .from('reservations')
+      .delete()
+      .eq('organization_id', organizationId)
+      .eq('reservation_date', currentDate)
+    
+    if (error) {
+      console.error('Error clearing all reservations:', error)
+      return false
+    }
+    
+    console.log('All reservations cleared successfully')
+    
+    // Trigger refresh of the reservations list
+    window.dispatchEvent(new CustomEvent('reservationsCleared'))
+    
+    return true
+  } catch (error) {
+    console.error('Error clearing all reservations:', error)
+    return false
+  }
+}
+
 // ImportPopup Component for CSV/Excel Import
-function ImportPopup({ isOpen, onClose, onSuccess }: { 
+function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user }: { 
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+  serviceType?: 'lunch' | 'dinner'
+  user: any
 }) {
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
@@ -1123,28 +1218,100 @@ function ImportPopup({ isOpen, onClose, onSuccess }: {
           return
         }
         
-        // Process each row
+        // Enhanced processing for Google Sheets format
         const reservations = []
         const today = new Date().toISOString().split('T')[0]
         
-        for (const line of dataLines) {
-          const values = line.split(',').map(v => v.trim())
-          if (values.length < 3) continue // Skip incomplete rows
+        // Time conversion helper (handles "05:00 PM" format)
+        const parseTime = (timeStr: string): string => {
+          if (!timeStr || timeStr.trim() === '') return '12:00'
           
-          // Map CSV columns to reservation data
-          // This is a simplified mapping - you can customize based on your CSV format
+          try {
+            // Handle "05:00 PM" format
+            const cleanTime = timeStr.trim().toUpperCase()
+            if (cleanTime.includes('PM') || cleanTime.includes('AM')) {
+              const [time, period] = cleanTime.split(' ')
+              let [hours, minutes] = time.split(':')
+              let hourNum = parseInt(hours)
+              
+              if (period === 'PM' && hourNum !== 12) hourNum += 12
+              if (period === 'AM' && hourNum === 12) hourNum = 0
+              
+              return `${hourNum.toString().padStart(2, '0')}:${minutes || '00'}`
+            }
+            
+            // Handle 24-hour format (existing support)
+            return timeStr
+          } catch (error) {
+            console.warn('Failed to parse time:', timeStr, error)
+            return '12:00'
+          }
+        }
+        
+        // Room name mapping for Google Sheets compatibility
+        const mapRoomName = (roomStr: string): string => {
+          if (!roomStr) return 'Main Dining'
+          
+          const cleanRoom = roomStr.trim()
+          const roomMap: { [key: string]: string } = {
+            'LOUNGE': 'Lounge',
+            'RAYNOR': 'Raynor', 
+            'COV': 'Cov',
+            'SUN': 'Sun',
+            'OPEN': 'Open',
+            'PUBN': 'Pubn'
+          }
+          
+          // Try case-insensitive matching first
+          const upperRoom = cleanRoom.toUpperCase()
+          if (roomMap[upperRoom]) {
+            return roomMap[upperRoom]
+          }
+          
+          // If no mapping found, return the original cleaned room name
+          return cleanRoom
+        }
+        
+        console.log(`📊 Processing ${dataLines.length} reservations from CSV...`)
+        
+        let lastKnownRoom = 'Main Dining' // Default fallback room
+        let sequenceNumber = 0 // To maintain CSV order
+        
+        for (const line of dataLines) {
+          sequenceNumber++ // Increment sequence for each row
+          const values = line.split(',').map(v => v.trim())
+          if (values.length < 1 || !values[0]) continue // Skip only if no time is provided
+          
+          // Enhanced room logic with inheritance
+          let currentRoom = values[4] || '' // Room field from CSV
+          if (currentRoom) {
+            // If room is specified, use it and update lastKnownRoom
+            lastKnownRoom = currentRoom
+          } else {
+            // If no room specified, inherit from lastKnownRoom
+            currentRoom = lastKnownRoom
+          }
+          
+          // Enhanced mapping for Google Sheets format:
+          // TIME | Member | Member # | Covers | Room | Table # | Notes | Staff | Status
+          const mappedRoom = mapRoomName(currentRoom)
+          
           const reservation = {
             organization_id: organization.id,
-            date: today, // Default to today, can be customized
-            time: values[0] || '12:00',
-            member_name: values[1] || 'Unknown',
+            reservation_date: today, // Will add date column support later
+            reservation_time: parseTime(values[0]), // Enhanced time parsing
+            member_name: values[1] || '',
             member_number: values[2] || '',
-            party_size: parseInt(values[3]) || 1,
-            room: values[4] || 'Main Dining',
+            party_size: values[3] ? parseInt(values[3]) || 0 : 0, // Use 0 if empty or invalid, show only actual numbers
+            room_id: null, // Will resolve from room name
+            room: mappedRoom, // Enhanced room mapping with inheritance
+            table_id: null, // Will resolve from table number  
             table_number: values[5] || '',
             notes: values[6] || '',
-            staff: values[7] || '',
-            status: values[8] || 'Confirmed'
+            staff_member: values[7] || '',
+            status: values[8] || 'Waiting to arrive', // Default to more appropriate status
+            service_type: serviceType,
+            created_by: user?.id || null
           }
           
           reservations.push(reservation)
@@ -1156,16 +1323,65 @@ function ImportPopup({ isOpen, onClose, onSuccess }: {
           return
         }
         
-        // Insert reservations into database
+        // Enhanced database insertion with room resolution
+        console.log(`💾 Inserting ${reservations.length} reservations into database...`)
+        
+        // First, get available rooms for room name resolution
+        const { data: roomsData } = await supabase
+          .from('reservation_rooms')
+          .select('id, name')
+          .eq('organization_id', organization.id)
+          .eq('is_active', true)
+        
+        const roomLookup: { [key: string]: string } = {}
+        if (roomsData) {
+          roomsData.forEach(room => {
+            roomLookup[room.name.toLowerCase()] = room.id
+          })
+        }
+        
+        // Process reservations with room resolution
+        const processedReservations = reservations.map(res => {
+          // Find room ID from room name
+          const roomId = roomLookup[res.room.toLowerCase()] || null
+          
+          // Return database-ready reservation
+          return {
+            organization_id: res.organization_id,
+            room_id: roomId,
+            table_id: null, // Will be null for now since we don't have table management yet
+            reservation_date: res.reservation_date,
+            reservation_time: res.reservation_time,
+            member_name: res.member_name,
+            member_number: res.member_number || null,
+            party_size: res.party_size,
+            notes: res.notes || null,
+            staff_member: res.staff_member || null,
+            status: res.status,
+            service_type: res.service_type,
+            created_by: res.created_by,
+            // Let database handle created_at automatically to avoid timestamp conflicts
+          }
+        })
+        
+        // Insert processed reservations
         const { error: insertError } = await supabase
           .from('reservations')
-          .insert(reservations)
+          .insert(processedReservations)
         
         if (insertError) {
           console.error('Error importing reservations:', insertError)
           setError('Error importing reservations: ' + insertError.message)
         } else {
           console.log(`Successfully imported ${reservations.length} reservations`)
+          console.log(`📅 Reservations imported for date: ${today}`)
+          console.log(`🎯 Service type: ${serviceType}`)
+          
+          // Trigger reservations refresh event for the main component to reload data
+          window.dispatchEvent(new CustomEvent('reservationsImported', { 
+            detail: { date: today, count: reservations.length } 
+          }))
+          
           onSuccess()
           onClose()
         }
@@ -1215,13 +1431,18 @@ function ImportPopup({ isOpen, onClose, onSuccess }: {
 
             {/* Expected Format Info */}
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">Expected CSV Format:</h4>
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Expected CSV Format (Google Sheets Compatible):</h4>
+              <p className="text-xs text-blue-600 mb-2 font-mono">
+                TIME, Member, Member #, Covers, Room, Table #, Notes, Staff, Status
+              </p>
               <p className="text-xs text-blue-600 mb-2">
-                time, member_name, member_number, party_size, room, table_number, notes, staff, status
+                <strong>Example:</strong> "05:00 PM, CARD, C0982, 5, LOUNGE, 205, STROLLER, -, Left"
               </p>
-              <p className="text-xs text-blue-600">
-                Example: "14:30, John Doe, 1234, 4, Main Dining, A1, Birthday dinner, Sarah, Confirmed"
-              </p>
+              <div className="text-xs text-blue-600 space-y-1">
+                <p><strong>Supported Rooms:</strong> LOUNGE, RAYNOR, COV, SUN, OPEN, PUBN</p>
+                <p><strong>Time Format:</strong> "05:00 PM" or "17:00" (both supported)</p>
+                <p><strong>Status Options:</strong> Waiting to arrive, Here, Left, Cancelled, etc.</p>
+              </div>
             </div>
 
             {/* File Preview */}
