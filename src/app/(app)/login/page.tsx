@@ -41,8 +41,8 @@ export default function LoginPage() {
 
       console.log('✅ Login successful:', data.user?.email)
       
-      // Redirect to dashboard
-      router.push('/dashboard')
+      // Redirect to app launcher
+      router.push('/apps')
 
     } catch (error: any) {
       console.error('💥 Login error:', error)

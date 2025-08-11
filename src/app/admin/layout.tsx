@@ -45,11 +45,11 @@ export default function AdminLayout({
           }
         }
 
-        // If not admin, redirect to dashboard
-        router.push('/dashboard')
+        // If not admin, redirect to app launcher
+        router.push('/apps')
       } catch (error) {
         console.error('Error checking admin access:', error)
-        router.push('/dashboard')
+        router.push('/apps')
       }
     }
 

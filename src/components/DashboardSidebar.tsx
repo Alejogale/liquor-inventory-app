@@ -116,6 +116,35 @@ export default function DashboardSidebar({
 
           {/* Navigation */}
           <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {/* Back to Apps Link */}
+            <Link
+              href="/apps"
+              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 border border-transparent hover:border-purple-200"
+            >
+              <Home className="h-5 w-5 flex-shrink-0 text-purple-600 group-hover:text-purple-700" />
+              
+              {!isCollapsed && (
+                <div className="ml-3 text-left">
+                  <p className="text-sm font-medium text-purple-700 group-hover:text-purple-800">
+                    Back to Apps
+                  </p>
+                  <p className="text-xs text-purple-600 group-hover:text-purple-700">
+                    App launcher
+                  </p>
+                </div>
+              )}
+
+              {/* Tooltip for collapsed state */}
+              {isCollapsed && (
+                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                  Back to Apps
+                </div>
+              )}
+            </Link>
+
+            {/* Divider */}
+            <div className="border-t border-slate-200 my-3"></div>
+
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isActive = activeTab === item.id
