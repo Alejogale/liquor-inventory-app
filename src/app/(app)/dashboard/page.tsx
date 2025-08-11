@@ -1,5 +1,17 @@
 'use client'
-import { CheckCircle } from 'lucide-react'
+import { 
+  CheckCircle, 
+  Trash2, 
+  Move, 
+  Users, 
+  Tag, 
+  Check, 
+  X, 
+  ChevronDown,
+  Package,
+  Building2,
+  ClipboardList
+} from 'lucide-react'
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
@@ -19,13 +31,6 @@ import DashboardSidebar from '@/components/DashboardSidebar'
 import QuickBooksIntegration from '@/components/QuickBooksIntegration'
 
 
-import {
-  Package,
-  Users,
-  Building2,
-  ClipboardList
-} from 'lucide-react'
-
 interface Category {
   id: string
   name: string
@@ -44,13 +49,16 @@ interface InventoryItem {
   id: string
   brand: string
   size: string
-  category_id: string
-  supplier_id: string
   threshold: number
   par_level: number
   barcode?: string
   categories: { name: string } | null
   suppliers: { name: string } | null
+  category_id: string
+  supplier_id: string
+  organization_id?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export default function Dashboard() {
@@ -73,7 +81,17 @@ export default function Dashboard() {
     totalRooms: 0
   })
 
+  // Add to existing state
+  const [selectedItems, setSelectedItems] = useState(new Set())
+  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [bulkOperation, setBulkOperation] = useState<'delete' | 'move-category' | 'move-supplier' | null>(null)
+  const [targetCategory, setTargetCategory] = useState('')
+  const [targetSupplier, setTargetSupplier] = useState('')
+
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
+
+  // Get the correct organization ID
+  const organizationId = organization?.id || organization?.uuid_id
 
   useEffect(() => {
     if (user && organization) {
@@ -85,18 +103,20 @@ export default function Dashboard() {
     try {
       setLoading(true)
       console.log('🔍 Starting data fetch...')
-      console.log('🏢 Current organization:', organization?.uuid_id)
+      console.log('🏢 Current organization:', organization)
 
-      if (!organization?.uuid_id) {
+      if (!organizationId) {
         console.log('⚠️ No organization found, skipping data fetch')
         return
       }
+
+      console.log('🏢 Using organization ID:', organizationId)
 
       // Fetch categories
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('*')
-        .eq('organization_id', organization.uuid_id)
+        .eq('organization_id', organizationId)
         .order('name')
 
       if (categoriesError) {
@@ -109,7 +129,7 @@ export default function Dashboard() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('organization_id', organization.uuid_id)
+        .eq('organization_id', organizationId)
         .order('name')
 
       if (suppliersError) {
@@ -122,7 +142,7 @@ export default function Dashboard() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
-        .eq('organization_id', organization.uuid_id)
+        .eq('organization_id', organizationId)
         .order('display_order')
 
       if (roomsError) {
@@ -136,7 +156,7 @@ export default function Dashboard() {
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
-        .eq('organization_id', organization.uuid_id)
+        .eq('organization_id', organizationId)
         .order('brand')
 
       if (inventoryError) {
@@ -199,7 +219,7 @@ export default function Dashboard() {
         .from("categories")
         .delete()
         .eq("id", categoryId)
-        .eq("organization_id", organization?.uuid_id)
+        .eq("organization_id", organizationId)
       if (error) throw error
       fetchData()
     } catch (error) {
@@ -235,6 +255,110 @@ export default function Dashboard() {
       await signOut()
     } catch (error) {
       console.error('Error signing out:', error)
+    }
+  }
+
+  // Bulk operations functions
+  const handleSelectAll = () => {
+    const allItemIds = new Set(inventoryItems.map(item => item.id))
+    setSelectedItems(allItemIds)
+  }
+
+  const handleDeselectAll = () => {
+    setSelectedItems(new Set())
+    setShowBulkActions(false)
+    setBulkOperation(null)
+  }
+
+  const handleItemSelect = (itemId: string) => {
+    const newSelected = new Set(selectedItems)
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId)
+    } else {
+      newSelected.add(itemId)
+    }
+    setSelectedItems(newSelected)
+    setShowBulkActions(newSelected.size > 0)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) return
+    
+    if (confirm(`Are you sure you want to delete ${selectedItems.size} selected items? This action cannot be undone.`)) {
+      try {
+        const { error } = await supabase
+          .from('inventory_items')
+          .delete()
+          .in('id', Array.from(selectedItems))
+          .eq('organization_id', organizationId)
+
+        if (error) {
+          console.error('Error deleting items:', error)
+          alert('Error deleting items. Please try again.')
+        } else {
+          console.log(`✅ Successfully deleted ${selectedItems.size} items`)
+          await fetchData() // Refresh data
+          handleDeselectAll()
+          alert(`Successfully deleted ${selectedItems.size} items`)
+        }
+      } catch (error) {
+        console.error('Error in bulk delete:', error)
+        alert('Error deleting items. Please try again.')
+      }
+    }
+  }
+
+  const handleBulkMoveCategory = async () => {
+    if (selectedItems.size === 0 || !targetCategory) return
+    
+    if (confirm(`Move ${selectedItems.size} selected items to the selected category?`)) {
+      try {
+        const { error } = await supabase
+          .from('inventory_items')
+          .update({ category_id: targetCategory })
+          .in('id', Array.from(selectedItems))
+          .eq('organization_id', organizationId)
+
+        if (error) {
+          console.error('Error moving items:', error)
+          alert('Error moving items. Please try again.')
+        } else {
+          console.log(`✅ Successfully moved ${selectedItems.size} items to new category`)
+          await fetchData() // Refresh data
+          handleDeselectAll()
+          alert(`Successfully moved ${selectedItems.size} items to new category`)
+        }
+      } catch (error) {
+        console.error('Error in bulk move:', error)
+        alert('Error moving items. Please try again.')
+      }
+    }
+  }
+
+  const handleBulkMoveSupplier = async () => {
+    if (selectedItems.size === 0 || !targetSupplier) return
+    
+    if (confirm(`Change supplier for ${selectedItems.size} selected items?`)) {
+      try {
+        const { error } = await supabase
+          .from('inventory_items')
+          .update({ supplier_id: targetSupplier })
+          .in('id', Array.from(selectedItems))
+          .eq('organization_id', organizationId)
+
+        if (error) {
+          console.error('Error changing supplier:', error)
+          alert('Error changing supplier. Please try again.')
+        } else {
+          console.log(`✅ Successfully changed supplier for ${selectedItems.size} items`)
+          await fetchData() // Refresh data
+          handleDeselectAll()
+          alert(`Successfully changed supplier for ${selectedItems.size} items`)
+        }
+      } catch (error) {
+        console.error('Error in bulk supplier change:', error)
+        alert('Error changing supplier. Please try again.')
+      }
     }
   }
 
@@ -338,15 +462,178 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <>
+                    {/* Bulk Operations Bar */}
+                    {activeTab === 'inventory' && inventoryItems.length > 0 && (
+                      <div className="mb-6 bg-white rounded-xl border border-slate-200 shadow-sm">
+                        <div className="p-4 border-b border-slate-100">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <button
+                                onClick={selectedItems.size === inventoryItems.length ? handleDeselectAll : handleSelectAll}
+                                className="flex items-center space-x-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
+                              >
+                                <Check className="h-4 w-4" />
+                                <span>
+                                  {selectedItems.size === inventoryItems.length ? 'Deselect All' : 'Select All'}
+                                </span>
+                              </button>
+                              
+                              {selectedItems.size > 0 && (
+                                <span className="text-slate-600 font-medium">
+                                  {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
+                                </span>
+                              )}
+                            </div>
+
+                            {selectedItems.size > 0 && (
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => setBulkOperation('delete')}
+                                  className="flex items-center space-x-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  <span>Delete</span>
+                                </button>
+                                
+                                <button
+                                  onClick={() => setBulkOperation('move-category')}
+                                  className="flex items-center space-x-2 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors"
+                                >
+                                  <Tag className="h-4 w-4" />
+                                  <span>Change Category</span>
+                                </button>
+                                
+                                <button
+                                  onClick={() => setBulkOperation('move-supplier')}
+                                  className="flex items-center space-x-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition-colors"
+                                >
+                                  <Users className="h-4 w-4" />
+                                  <span>Change Supplier</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Bulk Operation Forms */}
+                        {bulkOperation === 'delete' && (
+                          <div className="p-4 bg-red-50 border-l-4 border-red-400">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="text-red-800 font-medium">Delete {selectedItems.size} items</h4>
+                                <p className="text-red-600 text-sm">This action cannot be undone.</p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => setBulkOperation(null)}
+                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleBulkDelete}
+                                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                                >
+                                  Delete Items
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {bulkOperation === 'move-category' && (
+                          <div className="p-4 bg-green-50 border-l-4 border-green-400">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div>
+                                  <h4 className="text-green-800 font-medium">Move {selectedItems.size} items to category</h4>
+                                  <p className="text-green-600 text-sm">Select the target category below.</p>
+                                </div>
+                                <select
+                                  value={targetCategory}
+                                  onChange={(e) => setTargetCategory(e.target.value)}
+                                  className="px-3 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                >
+                                  <option value="">Select category...</option>
+                                  {categories.map((category: any) => (
+                                    <option key={category.id} value={category.id}>
+                                      {category.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => setBulkOperation(null)}
+                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleBulkMoveCategory}
+                                  disabled={!targetCategory}
+                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white rounded-lg transition-colors"
+                                >
+                                  Move Items
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {bulkOperation === 'move-supplier' && (
+                          <div className="p-4 bg-purple-50 border-l-4 border-purple-400">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div>
+                                  <h4 className="text-purple-800 font-medium">Change supplier for {selectedItems.size} items</h4>
+                                  <p className="text-purple-600 text-sm">Select the target supplier below.</p>
+                                </div>
+                                <select
+                                  value={targetSupplier}
+                                  onChange={(e) => setTargetSupplier(e.target.value)}
+                                  className="px-3 py-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                >
+                                  <option value="">Select supplier...</option>
+                                  {suppliers.map((supplier: any) => (
+                                    <option key={supplier.id} value={supplier.id}>
+                                      {supplier.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => setBulkOperation(null)}
+                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleBulkMoveSupplier}
+                                  disabled={!targetSupplier}
+                                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white rounded-lg transition-colors"
+                                >
+                                  Change Supplier
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <p className="text-slate-700 text-sm">
                         🔍 Found <span className="font-semibold text-slate-800">{inventoryItems.length}</span> items organized by category with room counts
                       </p>
                     </div>
                     <InventoryTable
-                      items={inventoryItems}
-                      onEdit={setEditingItem}
+                      items={inventoryItems as any}
+                      organizationId={organizationId}  // 🚨 SECURITY: Pass organizationId
+                      onEdit={(item: any) => setEditingItem(item)}
                       onDelete={handleItemDeleted}
+                      selectedItems={selectedItems}  // Pass selected items
+                      onItemSelect={handleItemSelect}  // Pass selection handler
                     />
                   </>
                 )}
@@ -355,7 +642,7 @@ export default function Dashboard() {
 
             {/* NEW: Import Data Tab */}
             {activeTab === 'import' && (
-              <ImportData onImportComplete={handleImportComplete} organizationId={userProfile?.organization_id} />
+              <ImportData onImportComplete={handleImportComplete} organizationId={organizationId} />
             )}
 
             {activeTab === 'categories' && (
@@ -405,7 +692,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
                   <p className="text-slate-600 mt-1">Manage your vendor relationships and contacts</p>
                 </div>
-                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organization?.uuid_id} />
+                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organizationId} />
               </div>
             )}
 
@@ -415,7 +702,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Room Management</h2>
                   <p className="text-slate-600 mt-1">Configure your venue locations and rooms</p>
                 </div>
-                <RoomManager onUpdate={handleRoomUpdated} organizationId={organization?.uuid_id} />
+                <RoomManager onUpdate={handleRoomUpdated} organizationId={organizationId} />
               </div>
             )}
 
@@ -427,7 +714,7 @@ export default function Dashboard() {
                 </div>
                 <RoomCountingInterface 
                   userEmail={user?.email || ''} 
-                  organizationId={organization?.uuid_id}
+                  organizationId={organizationId}
                 />
               </div>
             )}
@@ -438,7 +725,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-slate-800">Order Reports</h2>
                   <p className="text-slate-600 mt-1">Generate and manage supplier orders</p>
                 </div>
-                <OrderReport organizationId={organization?.uuid_id} />
+                <OrderReport organizationId={organizationId} />
               </div>
             )}
 
@@ -450,7 +737,7 @@ export default function Dashboard() {
                 </div>
                 <ActivityDashboard 
                   userEmail={user?.email || ''} 
-                  organizationId={organization?.uuid_id}
+                  organizationId={organizationId}
                 />
               </div>
             )}
@@ -475,14 +762,14 @@ export default function Dashboard() {
         <AddCategoryModal
           onClose={() => setShowAddCategory(false)}
           onCategoryAdded={handleCategoryAdded}
-          organizationId={organization?.uuid_id}
+          organizationId={organizationId}
         />
       )}
 
       {showEditCategory && editingCategory && (
         <EditCategoryModal
           category={editingCategory}
-          organizationId={organization?.uuid_id}
+          organizationId={organizationId}
           onClose={() => setShowEditCategory(false)}
           onCategoryUpdated={handleCategoryUpdated}
         />
@@ -493,7 +780,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setShowAddItem(false)}
           onItemAdded={handleItemAdded}
-          organizationId={organization?.uuid_id}
+          organizationId={organizationId}
         />
       )}
 
@@ -504,7 +791,7 @@ export default function Dashboard() {
           suppliers={suppliers}
           onClose={() => setEditingItem(null)}
           onItemUpdated={handleItemUpdated}
-          organizationId={organization?.uuid_id}
+          organizationId={organizationId}
         />
       )}
     </div>

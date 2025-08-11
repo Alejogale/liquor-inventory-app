@@ -75,7 +75,7 @@ export default function EnhancedReports() {
         return
       }
 
-      const organizationId = organization.uuid_id
+      const organizationId = organization.id
       console.log('✅ Organization ID:', organizationId)
 
       // Get all inventory items with categories and suppliers

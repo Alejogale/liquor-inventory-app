@@ -87,7 +87,7 @@ export default function RoomCountingInterface({
   
   // Refs for input focus management and auto-save
   const inputRefs = useRef<{ [itemId: string]: HTMLInputElement }>({})
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const saveQueueRef = useRef<{ [itemId: string]: number }>({}) // Offline queue
 
   // Add helper function to get current organization
@@ -220,8 +220,9 @@ export default function RoomCountingInterface({
       } else {
         console.log('✅ Activity logged successfully')
       }
-    } catch (error) {
-      console.error('💥 Error in logActivity:', error)
+    } catch (error: any) {
+      console.error('💥 Error in logActivity:', error?.message || error)
+      // Silently fail to prevent breaking the room counting functionality
     }
   }
 

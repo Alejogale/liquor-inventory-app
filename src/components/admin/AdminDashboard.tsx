@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 import {
   Users,
   Building2,
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('30d')
+  const { isPlatformAdmin, userProfile } = useAuth()
 
   useEffect(() => {
     const initializeAdmin = async () => {
@@ -63,7 +65,43 @@ export default function AdminDashboard() {
     try {
       setLoading(true)
       
-      // Fetch all metrics in parallel
+      // 🚀 SECURITY: Build organization-aware queries
+      const orgId = userProfile?.organization_id
+      const buildSecureQueries = () => {
+        if (isPlatformAdmin()) {
+          // Platform admin gets all data
+          return [
+            supabase.from('user_profiles').select('*'),
+            supabase.from('organizations').select('*'),
+            supabase.from('inventory_items').select('*'),
+            supabase.from('suppliers').select('*'),
+            supabase.from('categories').select('*'),
+            supabase.from('room_counts').select('*').order('created_at', { ascending: false }).limit(100)
+          ]
+        } else if (orgId) {
+          // Organization admin gets only their data
+          return [
+            supabase.from('user_profiles').select('*').eq('organization_id', orgId),
+            supabase.from('organizations').select('*').eq('id', orgId),
+            supabase.from('inventory_items').select('*').eq('organization_id', orgId),
+            supabase.from('suppliers').select('*').eq('organization_id', orgId),
+            supabase.from('categories').select('*').eq('organization_id', orgId),
+            supabase.from('room_counts').select('*').eq('organization_id', orgId).order('created_at', { ascending: false }).limit(100)
+          ]
+        } else {
+          // No access if no organization
+          return [
+            Promise.resolve({ data: [], error: null }),
+            Promise.resolve({ data: [], error: null }),
+            Promise.resolve({ data: [], error: null }),
+            Promise.resolve({ data: [], error: null }),
+            Promise.resolve({ data: [], error: null }),
+            Promise.resolve({ data: [], error: null })
+          ]
+        }
+      }
+      
+      // Fetch all metrics in parallel with security filters
       const [
         usersResult,
         orgsResult,
@@ -71,14 +109,7 @@ export default function AdminDashboard() {
         suppliersResult,
         categoriesResult,
         countsResult
-      ] = await Promise.all([
-        supabase.from('user_profiles').select('*'),
-        supabase.from('organizations').select('*'),
-        supabase.from('inventory_items').select('*'),
-        supabase.from('suppliers').select('*'),
-        supabase.from('categories').select('*'),
-        supabase.from('room_counts').select('*').order('created_at', { ascending: false }).limit(100)
-      ])
+      ] = await Promise.all(buildSecureQueries())
 
       // Check for errors in any of the queries
       const errors = [usersResult.error, orgsResult.error, itemsResult.error, suppliersResult.error, categoriesResult.error, countsResult.error].filter(Boolean)
@@ -218,8 +249,26 @@ export default function AdminDashboard() {
       <div className="p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Admin Analytics Dashboard</h1>
-          <p className="text-slate-600">Business intelligence and performance metrics</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 mb-2">Admin Analytics Dashboard</h1>
+              <p className="text-slate-600">Business intelligence and performance metrics</p>
+            </div>
+            {/* 🚀 NEW: Admin Mode Indicator */}
+            <div className="flex items-center space-x-3">
+              {isPlatformAdmin() ? (
+                <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                  <span className="text-sm font-medium">🌟 Platform Admin</span>
+                  <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">All Organizations</span>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                  <span className="text-sm font-medium">🏢 Organization Admin</span>
+                  <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">Single Org View</span>
+                </div>
+              )}
+            </div>
+          </div>
           
           <div className="flex items-center space-x-4 mt-4">
             <select

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
 import {
   Users,
   Building,
@@ -45,7 +45,7 @@ export default function UserAnalytics() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   
-  const supabase = createClientComponentClient()
+  // Using imported supabase client
 
   useEffect(() => {
     fetchAnalytics()

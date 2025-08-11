@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { ExternalLink, CheckCircle, AlertCircle, Settings } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
   const [isConnected, setIsConnected] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const supabase = createClientComponentClient();
+  // Using imported supabase client
 
   // Add helper function to get current organization
   const getCurrentOrganization = async () => {

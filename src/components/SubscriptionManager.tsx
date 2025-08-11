@@ -33,10 +33,10 @@ export default function SubscriptionManager() {
   const [canceling, setCanceling] = useState(false)
 
   useEffect(() => {
-    if (organization?.uuid_id) {
+    if (organization?.id) {
       fetchSubscription()
     }
-  }, [organization?.uuid_id])
+  }, [organization?.id])
 
   const fetchSubscription = async () => {
     try {
@@ -51,7 +51,7 @@ export default function SubscriptionManager() {
           stripe_subscription_id,
           stripe_price_id
         `)
-        .eq('id', organization?.uuid_id)
+        .eq('id', organization?.id)
         .single()
 
       if (error) throw error

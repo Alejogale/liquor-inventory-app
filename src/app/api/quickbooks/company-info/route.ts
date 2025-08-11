@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import OAuthClient from 'intuit-oauth';
-const QuickBooks = require('node-quickbooks');
+import QuickBooks from 'node-quickbooks';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,8 +39,8 @@ export async function GET(request: NextRequest) {
     );
 
     // Get company info
-    return new Promise((resolve) => {
-      qbo.getCompanyInfo(org.quickbooks_company_id, (err: any, companyInfo: any) => {
+    return new Promise<Response>((resolve) => {
+      qbo.getCompanyInfo(org.quickbooks_company_id, (err: unknown, companyInfo: any) => {
         if (err) {
           console.error('QuickBooks API error:', err);
           resolve(NextResponse.json({ error: 'Failed to fetch company info' }, { status: 500 }));

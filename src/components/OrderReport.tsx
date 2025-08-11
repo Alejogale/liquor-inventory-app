@@ -28,7 +28,11 @@ interface SupplierOrderGroup {
   total_units: number
 }
 
-export default function OrderReport() {
+interface OrderReportProps {
+  organizationId?: string
+}
+
+export default function OrderReport({ organizationId }: OrderReportProps) {
   const { user, organization } = useAuth()
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [supplierGroups, setSupplierGroups] = useState<SupplierOrderGroup[]>([])
@@ -40,29 +44,38 @@ export default function OrderReport() {
   const [emailLoading, setEmailLoading] = useState(false)
 
   useEffect(() => {
-    if (user && organization) {
+    if (user && (organization || organizationId)) {
       generateOrderReport()
     }
-  }, [user, organization])
+  }, [user, organization, organizationId])
 
   const generateOrderReport = async () => {
     try {
       setLoading(true)
       console.log('🔄 Starting order report generation...')
       
-      if (!user || !organization) {
+      if (!user || (!organization && !organizationId)) {
         console.log('❌ No user or organization found')
+        alert('Authentication error: Please log in again')
         return
       }
 
-      const organizationId = organization.uuid_id
-      console.log('✅ Organization ID from auth context:', organizationId)
+      const currentOrganizationId = organizationId || organization?.id
+      if (!currentOrganizationId) {
+        console.error('❌ No organization ID available')
+        alert('Organization error: Please contact support')
+        return
+      }
+      
+      console.log('✅ Organization ID for report:', currentOrganizationId)
+      console.log('🔍 Using organization from:', organizationId ? 'prop' : 'auth context')
+      console.log('👤 Current user:', user.email)
 
       // Get all inventory items with categories and suppliers
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select('id, brand, category_id, threshold, par_level, supplier_id')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', currentOrganizationId)
 
       if (itemsError) throw itemsError
       
@@ -73,7 +86,7 @@ export default function OrderReport() {
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', currentOrganizationId)
 
       if (categoriesError) throw categoriesError
 
@@ -81,7 +94,7 @@ export default function OrderReport() {
       const { data: suppliersData, error: suppliersError } = await supabase
         .from('suppliers')
         .select('id, name, email')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', currentOrganizationId)
 
       if (suppliersError) throw suppliersError
 
@@ -89,7 +102,7 @@ export default function OrderReport() {
       const { data: countsData, error: countsError } = await supabase
         .from('room_counts')
         .select('inventory_item_id, room_id, count')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', currentOrganizationId)
 
       if (countsError) throw countsError
 
@@ -97,7 +110,7 @@ export default function OrderReport() {
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('id, name')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', currentOrganizationId)
 
       if (roomsError) throw roomsError
 
@@ -194,9 +207,28 @@ export default function OrderReport() {
       setOrderItems(orderNeeds)
       setSupplierGroups(groups)
       setLastGenerated(new Date().toLocaleString())
-    } catch (error) {
-      console.error('Error generating order report:', error)
-      alert('Error generating order report')
+    } catch (error: any) {
+      console.error('❌ Error generating order report:', error)
+      
+      // More specific error messages
+      let errorMessage = 'Error generating order report'
+      if (error?.message?.includes('organization_id')) {
+        errorMessage = 'Organization access error: Please check your permissions'
+      } else if (error?.message?.includes('auth')) {
+        errorMessage = 'Authentication error: Please log in again'
+      } else if (error?.code === 'PGRST116') {
+        errorMessage = 'No data found: Please add inventory items first'
+      } else if (error?.message) {
+        errorMessage = `Database error: ${error.message}`
+      }
+      
+      alert(errorMessage)
+      console.error('🔍 Full error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint
+      })
     } finally {
       setLoading(false)
     }

@@ -64,7 +64,13 @@ export default function SupplierManager({
   const fetchSuppliers = async () => {
     try {
       const currentOrg = await getCurrentOrganization();
-      if (!currentOrg) return;
+      if (!currentOrg) {
+        console.error('No organization found for suppliers');
+        setSuppliers([]);
+        return;
+      }
+
+      console.log(`📋 Fetching suppliers for organization: ${currentOrg}`);
 
       const { data, error } = await supabase
         .from('suppliers')
@@ -72,29 +78,84 @@ export default function SupplierManager({
         .eq('organization_id', currentOrg)
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching suppliers:', error);
+        throw error;
+      }
+      
+      console.log(`✅ Loaded ${data?.length || 0} suppliers`);
       setSuppliers(data || []);
     } catch (error) {
       console.error('Error fetching suppliers:', error);
+      setSuppliers([]);
     } finally {
       setLoading(false);
     }
   };
 
   const deleteSupplier = async (supplierId: string) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return
+    if (!confirm('Are you sure? This will permanently delete this supplier and cannot be undone.')) return
 
     try {
+      // Get current organization for security
+      const currentOrg = await getCurrentOrganization()
+      if (!currentOrg) {
+        alert('Error: No organization found')
+        return
+      }
+
+      console.log(`🗑️ Deleting supplier ${supplierId} for organization ${currentOrg}`)
+
+      // First check if supplier exists and belongs to this organization
+      const { data: existingSupplier, error: checkError } = await supabase
+        .from('suppliers')
+        .select('id, name, organization_id')
+        .eq('id', supplierId)
+        .eq('organization_id', currentOrg)
+        .single()
+
+      if (checkError || !existingSupplier) {
+        alert('Error: Supplier not found or access denied')
+        return
+      }
+
+      // Check if supplier is being used by any inventory items
+      const { data: itemsUsingSupplier, error: itemsError } = await supabase
+        .from('inventory_items')
+        .select('id, brand')
+        .eq('supplier_id', supplierId)
+        .eq('organization_id', currentOrg)
+        .limit(5)
+
+      if (itemsError) {
+        console.error('Error checking supplier usage:', itemsError)
+      }
+
+      if (itemsUsingSupplier && itemsUsingSupplier.length > 0) {
+        const itemNames = itemsUsingSupplier.map(item => item.brand).join(', ')
+        if (!confirm(`Warning: This supplier is used by ${itemsUsingSupplier.length} inventory items (${itemNames}${itemsUsingSupplier.length > 5 ? '...' : ''}). Delete anyway?`)) {
+          return
+        }
+      }
+
+      // Delete the supplier
       const { error } = await supabase
         .from('suppliers')
         .delete()
         .eq('id', supplierId)
+        .eq('organization_id', currentOrg) // Extra security check
 
       if (error) throw error
 
+      console.log(`✅ Successfully deleted supplier: ${existingSupplier.name}`)
+      
       await fetchSuppliers()
       onRefresh?.()
+      onUpdate?.()
+      
+      alert(`Supplier "${existingSupplier.name}" has been deleted successfully.`)
     } catch (error: any) {
+      console.error('Delete supplier error:', error)
       alert('Error deleting supplier: ' + error.message)
     }
   }
@@ -278,20 +339,41 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
       }
 
       if (supplier) {
-        // Update existing supplier
+        // Update existing supplier with organization check
+        console.log(`📝 Updating supplier ${supplier.id} for organization ${currentOrg}`)
+        
+        // First verify the supplier belongs to this organization
+        const { data: existingSupplier, error: checkError } = await supabase
+          .from('suppliers')
+          .select('id, organization_id')
+          .eq('id', supplier.id)
+          .eq('organization_id', currentOrg)
+          .single()
+
+        if (checkError || !existingSupplier) {
+          throw new Error('Supplier not found or access denied')
+        }
+
         const { error } = await supabase
           .from('suppliers')
           .update(supplierData)
           .eq('id', supplier.id)
+          .eq('organization_id', currentOrg) // Extra security check
 
         if (error) throw error
+        
+        console.log(`✅ Successfully updated supplier: ${formData.name}`)
       } else {
         // Create new supplier
+        console.log(`➕ Creating new supplier: ${formData.name} for organization ${currentOrg}`)
+        
         const { error } = await supabase
           .from('suppliers')
           .insert([supplierData])
 
         if (error) throw error
+        
+        console.log(`✅ Successfully created supplier: ${formData.name}`)
       }
 
       onSaved()

@@ -13,6 +13,8 @@ interface InventoryItem {
   barcode?: string
   categories: { name: string } | null
   suppliers: { name: string } | null
+  category_id: string
+  supplier_id: string
 }
 
 interface Room {
@@ -35,9 +37,19 @@ interface InventoryTableProps {
   items: InventoryItem[]
   onEdit: (item: InventoryItem) => void
   onDelete: () => void
+  selectedItems?: Set<string>  // ✅ NEW: Selected items from dashboard
+  onItemSelect?: (itemId: string) => void  // ✅ NEW: Selection handler
+  organizationId?: string  // 🚨 SECURITY: Add organizationId prop
 }
 
-export default function InventoryTable({ items, onEdit, onDelete }: InventoryTableProps) {
+export default function InventoryTable({ 
+  items,
+  organizationId,  // 🚨 SECURITY: Accept organizationId prop 
+  onEdit, 
+  onDelete, 
+  selectedItems = new Set(), 
+  onItemSelect 
+}: InventoryTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
@@ -69,6 +81,7 @@ export default function InventoryTable({ items, onEdit, onDelete }: InventoryTab
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('id, name')
+        .eq('organization_id', organizationId)  // 🚨 SECURITY: Filter by organization
         .order('display_order')
 
       if (roomsError) {
@@ -87,6 +100,7 @@ export default function InventoryTable({ items, onEdit, onDelete }: InventoryTab
       const { data: countsData, error: countsError } = await supabase
         .from('room_counts')
         .select('inventory_item_id, room_id, count')
+        .eq('organization_id', organizationId)  // 🚨 SECURITY: Filter by organization
 
       if (countsError) {
         console.error('❌ Error fetching room counts:', countsError)
@@ -290,6 +304,14 @@ export default function InventoryTable({ items, onEdit, onDelete }: InventoryTab
                     <table className="w-full">
                       <thead className="sticky top-0 bg-blue-100 z-10">
                         <tr className="border-b border-blue-200">
+                          {onItemSelect && (
+                            <th className="text-left py-3 px-6 w-12">
+                              <div className="flex items-center justify-center">
+                                {/* Placeholder checkbox for column alignment */}
+                                <div className="w-4 h-4"></div>
+                              </div>
+                            </th>
+                          )}
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Brand</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Barcode</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Supplier</th>
@@ -300,7 +322,21 @@ export default function InventoryTable({ items, onEdit, onDelete }: InventoryTab
                       </thead>
                       <tbody>
                         {categoryItems.map((item) => (
-                          <tr key={item.id} className="border-b border-blue-100 hover:bg-blue-50">
+                          <tr key={item.id} className={`border-b border-blue-100 hover:bg-blue-50 transition-colors ${
+                            selectedItems.has(item.id) ? 'bg-blue-50 ring-1 ring-blue-300' : ''
+                          }`}>
+                            {onItemSelect && (
+                              <td className="py-3 px-6">
+                                <div className="flex items-center justify-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedItems.has(item.id)}
+                                    onChange={() => onItemSelect(item.id)}
+                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                  />
+                                </div>
+                              </td>
+                            )}
                             <td className="py-3 px-6 text-slate-800 font-medium">{item.brand}</td>
                             <td className="py-3 px-6 text-slate-700">
                               <span className="bg-slate-100 px-2 py-1 rounded text-sm font-mono">

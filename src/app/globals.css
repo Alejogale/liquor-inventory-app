@@ -3,6 +3,25 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Design System Colors from DESIGN_SYSTEM.md */
+  --primary-black: #000000;
+  --primary-slate-900: #0f172a;
+  --primary-slate-800: #1e293b;
+  --primary-slate-700: #334155;
+  --primary-slate-600: #475569;
+  --primary-slate-500: #64748b;
+  --primary-slate-300: #cbd5e1;
+  --primary-slate-50: #f8fafc;
+  
+  --accent-blue-600: #2563eb;
+  --accent-blue-500: #3b82f6;
+  --accent-blue-400: #60a5fa;
+  --accent-blue-100: #dbeafe;
+  --accent-blue-50: #eff6ff;
+  
+  --success-green-500: #10b981;
+  --success-green-100: #d1fae5;
 }
 
 @theme inline {
@@ -10,6 +29,25 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Design System Color Tokens */
+  --color-primary-black: var(--primary-black);
+  --color-primary-slate-900: var(--primary-slate-900);
+  --color-primary-slate-800: var(--primary-slate-800);
+  --color-primary-slate-700: var(--primary-slate-700);
+  --color-primary-slate-600: var(--primary-slate-600);
+  --color-primary-slate-500: var(--primary-slate-500);
+  --color-primary-slate-300: var(--primary-slate-300);
+  --color-primary-slate-50: var(--primary-slate-50);
+  
+  --color-accent-blue-600: var(--accent-blue-600);
+  --color-accent-blue-500: var(--accent-blue-500);
+  --color-accent-blue-400: var(--accent-blue-400);
+  --color-accent-blue-100: var(--accent-blue-100);
+  --color-accent-blue-50: var(--accent-blue-50);
+  
+  --color-success-green-500: var(--success-green-500);
+  --color-success-green-100: var(--success-green-100);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,7 +63,36 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Custom scroll animations */
+/* Glassmorphic Effects from Design System */
+.glassmorphic-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glassmorphic-nav {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Float Animation from Design System */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float 3s ease-in-out infinite 1.5s;
+}
+
+/* Existing scroll animations - preserved */
 @keyframes scroll-up {
   0% {
     transform: translateY(0);

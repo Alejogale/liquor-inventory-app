@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 import { 
   Download, 
   FileText, 
@@ -16,6 +17,7 @@ import {
 export default function DataExport() {
   const [loading, setLoading] = useState<string | null>(null)
   const [exportStatus, setExportStatus] = useState<string>('')
+  const { isPlatformAdmin, userProfile } = useAuth()
 
   const exportData = async (dataType: string) => {
     setLoading(dataType)
@@ -27,17 +29,28 @@ export default function DataExport() {
 
       switch (dataType) {
         case 'users':
-          const { data: users } = await supabase.from('user_profiles').select('*')
+          // 🚀 SECURITY: Apply organization filter unless platform admin
+          let usersQuery = supabase.from('user_profiles').select('*')
+          if (!isPlatformAdmin() && userProfile?.organization_id) {
+            usersQuery = usersQuery.eq('organization_id', userProfile.organization_id)
+          }
+          const { data: users } = await usersQuery
           data = users || []
           filename = 'users_export.csv'
           break
         case 'organizations':
-          const { data: orgs } = await supabase.from('organizations').select('*')
+          // 🚀 SECURITY: Apply organization filter unless platform admin
+          let orgsQuery = supabase.from('organizations').select('*')
+          if (!isPlatformAdmin() && userProfile?.organization_id) {
+            orgsQuery = orgsQuery.eq('id', userProfile.organization_id)
+          }
+          const { data: orgs } = await orgsQuery
           data = orgs || []
           filename = 'organizations_export.csv'
           break
         case 'inventory':
-          const { data: items } = await supabase
+          // 🚀 SECURITY: Apply organization filter unless platform admin
+          let itemsQuery = supabase
             .from('inventory_items')
             .select(`
               *,
@@ -45,21 +58,31 @@ export default function DataExport() {
               suppliers (name),
               organizations (name)
             `)
+          if (!isPlatformAdmin() && userProfile?.organization_id) {
+            itemsQuery = itemsQuery.eq('organization_id', userProfile.organization_id)
+          }
+          const { data: items } = await itemsQuery
           data = items || []
           filename = 'inventory_export.csv'
           break
         case 'suppliers':
-          const { data: suppliers } = await supabase
+          // 🚀 SECURITY: Apply organization filter unless platform admin
+          let suppliersQuery = supabase
             .from('suppliers')
             .select(`
               *,
               organizations (name)
             `)
+          if (!isPlatformAdmin() && userProfile?.organization_id) {
+            suppliersQuery = suppliersQuery.eq('organization_id', userProfile.organization_id)
+          }
+          const { data: suppliers } = await suppliersQuery
           data = suppliers || []
           filename = 'suppliers_export.csv'
           break
         case 'room_counts':
-          const { data: counts } = await supabase
+          // 🚀 SECURITY: Apply organization filter unless platform admin
+          let countsQuery = supabase
             .from('room_counts')
             .select(`
               *,
@@ -67,18 +90,48 @@ export default function DataExport() {
               rooms (name),
               organizations (name)
             `)
+          if (!isPlatformAdmin() && userProfile?.organization_id) {
+            countsQuery = countsQuery.eq('organization_id', userProfile.organization_id)
+          }
+          const { data: counts } = await countsQuery
           data = counts || []
           filename = 'room_counts_export.csv'
           break
         case 'all_analytics':
-          // Export comprehensive analytics report
-          const [usersRes, orgsRes, itemsRes, suppliersRes, countsRes] = await Promise.all([
-            supabase.from('user_profiles').select('*'),
-            supabase.from('organizations').select('*'),
-            supabase.from('inventory_items').select('*'),
-            supabase.from('suppliers').select('*'),
-            supabase.from('room_counts').select('*')
-          ])
+          // 🚀 SECURITY: Export comprehensive analytics report with organization filtering
+          const orgId = userProfile?.organization_id
+          const buildFilteredQueries = () => {
+            if (isPlatformAdmin()) {
+              // Platform admin gets all data
+              return [
+                supabase.from('user_profiles').select('*'),
+                supabase.from('organizations').select('*'),
+                supabase.from('inventory_items').select('*'),
+                supabase.from('suppliers').select('*'),
+                supabase.from('room_counts').select('*')
+              ]
+            } else if (orgId) {
+              // Organization admin gets only their data
+              return [
+                supabase.from('user_profiles').select('*').eq('organization_id', orgId),
+                supabase.from('organizations').select('*').eq('id', orgId),
+                supabase.from('inventory_items').select('*').eq('organization_id', orgId),
+                supabase.from('suppliers').select('*').eq('organization_id', orgId),
+                supabase.from('room_counts').select('*').eq('organization_id', orgId)
+              ]
+            } else {
+              // No access if no organization
+              return [
+                Promise.resolve({ data: [] }),
+                Promise.resolve({ data: [] }),
+                Promise.resolve({ data: [] }),
+                Promise.resolve({ data: [] }),
+                Promise.resolve({ data: [] })
+              ]
+            }
+          }
+          
+          const [usersRes, orgsRes, itemsRes, suppliersRes, countsRes] = await Promise.all(buildFilteredQueries())
           
           const analyticsReport = {
             summary: {
@@ -230,8 +283,26 @@ export default function DataExport() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Data Export</h1>
-        <p className="text-slate-600">Export your data for analysis, backup, or compliance</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800 mb-2">Data Export</h1>
+            <p className="text-slate-600">Export your data for analysis, backup, or compliance</p>
+          </div>
+          {/* 🚀 NEW: Admin Mode Indicator */}
+          <div className="flex items-center space-x-3">
+            {isPlatformAdmin() ? (
+              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                <span className="text-sm font-medium">🌟 Platform Admin</span>
+                <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">Export All Data</span>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                <span className="text-sm font-medium">🏢 Organization Admin</span>
+                <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">Export Your Org Only</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Export Status */}
