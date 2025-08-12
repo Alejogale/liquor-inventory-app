@@ -63,8 +63,9 @@ export default function SubscriptionManager() {
         .single()
 
       if (error) {
-        console.error('Supabase error:', error)
-        throw error
+        console.warn('Supabase warning:', error)
+        // ignore in UI; we will show trial state
+        // throw error
       }
 
       setSubscription({
@@ -78,7 +79,7 @@ export default function SubscriptionManager() {
         stripe_price_id: data.stripe_price_id
       })
     } catch (error) {
-      console.error('Error fetching subscription:', error)
+      console.warn('Error fetching subscription (showing trial):', error)
       // Set a default state instead of leaving it null
       setSubscription({
         id: organization?.id || '',
