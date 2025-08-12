@@ -17,6 +17,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import AddCategoryModal from '@/app/components/AddCategoryModal'
 import EditCategoryModal from '@/app/components/EditCategoryModal'
 import AddItemModal from '@/app/components/AddItemModal'
@@ -850,7 +851,7 @@ onItemSelect={handleItemSelect}  // Pass selection handler
   )
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
   return (
     <AppAccessGuard 
       appId="liquor-inventory" 
@@ -861,7 +862,9 @@ export default function Dashboard() {
         </div>
       }
     >
-      <DashboardContent />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <DashboardContent />
+      </Suspense>
     </AppAccessGuard>
   )
 }

@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth-context'
 import { Package, Calendar, Users, CreditCard, Building2, BarChart3, ChevronRight, Settings, Grid3X3 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import AppsSidebar from '@/components/AppsSidebar'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
@@ -60,7 +60,7 @@ const apps: AppTile[] = [
   }
 ]
 
-export default function AppsPage() {
+function AppsPageContent() {
   const { user, userProfile, organization, isPlatformAdmin, signOut, loading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -336,5 +336,13 @@ export default function AppsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AppsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AppsPageContent />
+    </Suspense>
   )
 }

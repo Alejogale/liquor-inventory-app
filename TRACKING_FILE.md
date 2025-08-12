@@ -1393,17 +1393,13 @@ const sanitizedItem = {
   - File: `src/app/(app)/apps/page.tsx`
   - Impact: Clean flow from marketing → login → apps; avoids dead-end state for signed-out users.
 
-## 🐞 Hospitality Hub – End-to-End Bug Analysis To‑Do (Initial)
-- [ ] Marketing nav links audit: ensure all links point to existing routes (`/pricing`, `/contact`, legal pages) and add missing pages or adjust links.
-- [ ] Landing app cards: add real links or CTAs to `/apps` or respective app routes to avoid non-interactive cards.
-- [ ] EnhancedNavigation: replace placeholder routes (`/docs`, `/api`, `/help`, `/community`, `/solutions/*`) or gate behind feature flags; avoid 404s.
-- [ ] DashboardSidebar: verify each tab renders consistently and retains deep‑link support via `?tab=`.
-- [ ] Admin gating: unify admin check with `validateAdminAccess` to avoid duplicate logic across `admin/layout.tsx` and context.
-- [ ] Security-utils: audit API routes/components to consistently use org‑scoped queries; fix any missing `.eq('organization_id', orgId)`.
-- [ ] Reservations: confirm `/reservations` page exists and is properly gated; update Apps grid route if needed.
-- [ ] Subscription redirections: confirm all “Subscribe/Manage Billing” buttons route to `/apps?tab=subscription`.
-- [ ] QuickBooksIntegration: pass and honor `organizationId` prop throughout; verify company-info and sync endpoints return org‑scoped data.
-- [ ] Logging: gate verbose console logs behind `NODE_ENV !== 'production'` across auth-context and dashboard.
-- [ ] Error boundaries: add simple error UI for app pages to avoid blank screens on errors.
+## 🧭 QA/Flow To‑Do (Next Up)
+- [ ] Ensure all `useSearchParams` usages are behind Suspense (`/apps`, `/dashboard`, `/login`).
+- [ ] Verify `/apps?tab=subscription` link works and tab persists on refresh.
+- [ ] Confirm `DashboardSidebar` tab switching doesn’t break deep links and maintains state via URL.
+- [ ] Validate `AppAccessGuard` edge cases: no org, admin bypass, trial start, subscription redirect.
+- [ ] Review `/admin` layout redirect logic for non-admin users (should land on `/apps`).
+- [ ] Smoke-test QuickBooks routes behind auth; ensure safe early exit without envs.
+- [ ] Audit 404s for marketing links now pointing to `#features`, `#apps`, `/about`, `/contact`.
 
 

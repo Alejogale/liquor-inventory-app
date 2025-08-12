@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, ArrowRight, CheckCircle } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginContent() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -251,5 +251,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
