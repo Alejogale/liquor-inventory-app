@@ -173,24 +173,24 @@ export default function PlatformSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-blue-50 transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white/80 backdrop-blur-xl border border-[var(--accent-orange-200)] rounded-lg p-3 text-slate-800 shadow-lg hover:bg-[var(--accent-orange-50)] transition-colors"
         aria-label="Toggle sidebar menu"
       >
         {collapsed ? <Plus className="h-6 w-6" /> : <Settings className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full bg-white/70 backdrop-blur-xl border-r border-[var(--accent-orange-200)] shadow-lg z-40 transition-all duration-300 ${
         collapsed ? 'w-20' : 'w-80'
       } lg:relative lg:translate-x-0 lg:col-span-1 ${
         showMobileMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-blue-200">
+          <div className="p-6 border-b border-[var(--accent-orange-200)]">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${collapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
                   <Globe className="h-6 w-6 text-white" />
                 </div>
                 {!collapsed && (
@@ -204,7 +204,7 @@ export default function PlatformSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => onCollapsedChange(!collapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-[var(--accent-orange-50)] text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Settings className="h-4 w-4" />
               </button>
@@ -212,7 +212,7 @@ export default function PlatformSidebar({
 
             {/* User Info */}
             {!collapsed && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+              <div className="mt-4 p-3 bg-[var(--accent-orange-100)] rounded-lg border border-[var(--accent-orange-200)]">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
@@ -236,14 +236,14 @@ export default function PlatformSidebar({
 
           {/* Navigation Tabs */}
           {!collapsed && (
-            <div className="px-4 py-2 border-b border-blue-200">
-              <div className="flex space-x-1 bg-blue-100 rounded-lg p-1">
+            <div className="px-4 py-2 border-b border-[var(--accent-orange-200)]">
+              <div className="flex space-x-1 bg-[var(--accent-orange-100)] rounded-lg p-1">
                 <button
                   onClick={() => setActiveSection('apps')}
                   className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                     activeSection === 'apps'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-blue-600 hover:text-blue-700'
+                      ? 'bg-white text-[var(--accent-orange-700)] shadow-sm'
+                      : 'text-[var(--accent-orange-600)] hover:text-[var(--accent-orange-700)]'
                   }`}
                 >
                   Apps
@@ -252,8 +252,8 @@ export default function PlatformSidebar({
                   onClick={() => setActiveSection('platform')}
                   className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                     activeSection === 'platform'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-blue-600 hover:text-blue-700'
+                      ? 'bg-white text-[var(--accent-orange-700)] shadow-sm'
+                      : 'text-[var(--accent-orange-600)] hover:text-[var(--accent-orange-700)]'
                   }`}
                 >
                   Platform
