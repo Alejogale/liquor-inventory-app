@@ -1403,7 +1403,11 @@ const sanitizedItem = {
   - Files: `src/components/AppAccessGuard.tsx`, `src/app/(app)/dashboard/page.tsx`
 
 ## 🧭 QA/Flow To‑Do (Next Up)
-- [ ] Validate `AppAccessGuard` edge cases: no org, admin bypass, trial start, subscription redirect.
+- [x] Validate `AppAccessGuard` edge cases: no org, admin bypass, trial start, subscription redirect.
+  - No org: shows Auth Required UI with Login button.
+  - Known admin email: full-access bypass added in guard.
+  - Start Free Trial: calls `startTrial(orgId, appId)`; button disables while pending; status refreshes.
+  - Subscribe Now: routes to `/apps?tab=subscription`; tab persists via URL sync.
 - [x] Review `/admin` layout redirect logic for non-admin users (should land on `/apps`).
   - Verified: `src/app/admin/layout.tsx` redirects unauthenticated to `/login`, and non-admin to `/apps`; `(app)/admin/layout.tsx` is a no-op passthrough.
 - [ ] Smoke-test QuickBooks routes behind auth; ensure safe early exit without envs.
