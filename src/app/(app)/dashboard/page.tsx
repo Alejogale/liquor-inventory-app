@@ -120,6 +120,17 @@ function DashboardContent() {
     }
   }, [searchParams])
 
+  // Keep URL in sync with active tab without adding history entries
+  useEffect(() => {
+    const current = searchParams.get('tab') || 'inventory'
+    if (current !== activeTab) {
+      // Preserve current path
+      const params = new URLSearchParams(Array.from(searchParams.entries()))
+      params.set('tab', activeTab)
+      window.history.replaceState(null, '', `?${params.toString()}`)
+    }
+  }, [activeTab, searchParams])
+
   const fetchData = async () => {
     try {
       setLoading(true)

@@ -76,6 +76,15 @@ function AppsPageContent() {
     }
   }, [searchParams])
 
+  // Keep URL in sync with active tab without adding history entries
+  useEffect(() => {
+    const current = searchParams.get('tab') || 'apps'
+    if (current !== activeTab) {
+      // Ensure we stay on the same path
+      router.replace(`/apps?tab=${activeTab}`)
+    }
+  }, [activeTab, searchParams, router])
+
   // Redirect unauthenticated users to login once auth state is resolved
   useEffect(() => {
     if (!loading && !user) {
