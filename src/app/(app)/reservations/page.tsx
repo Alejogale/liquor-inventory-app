@@ -320,7 +320,7 @@ function ReservationContent({ setShowImportPopup }: {
       {/* Centered Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center space-x-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
             <Calendar className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -371,9 +371,9 @@ function ReservationContent({ setShowImportPopup }: {
         {/* Centered Action Buttons */}
         <div className="flex justify-center flex-wrap gap-4">
           <button
-            onClick={fetchReservations}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
-          >
+              onClick={fetchReservations}
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white rounded-lg hover:opacity-90 transition-colors shadow-lg hover:shadow-xl"
+            >
             <RefreshCw className="h-5 w-5" />
             <span>Refresh</span>
           </button>
@@ -431,7 +431,7 @@ function ReservationContent({ setShowImportPopup }: {
           >
             <div className="text-center">
               <div className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Total Covers</div>
-              <div className="text-4xl font-bold text-purple-600">{covers.total}</div>
+              <div className="text-4xl font-bold text-[var(--accent-orange-600)]">{covers.total}</div>
             </div>
           </div>
 

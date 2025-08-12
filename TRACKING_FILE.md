@@ -237,7 +237,7 @@ liquor-inventory-app/
 - Applied McLaren Papaya orange tokens in `src/app/globals.css` and added `.orange-glass-nav`, `.orange-glass-card`, `.orange-cta` helpers
 - Updated pages: `src/app/page.tsx` (landing), `src/app/(app)/login/page.tsx` (login), `src/app/(platform)/signup/page.tsx` (signup)
 - Updated dashboards: `src/app/(app)/apps/page.tsx`, `src/app/(app)/dashboard/page.tsx`
-- Updated sidebars: `src/components/DashboardSidebar.tsx`, `src/components/AppsSidebar.tsx`
+- Updated sidebars: `src/components/DashboardSidebar.tsx`, `src/components/AppsSidebar.tsx`, `src/components/ReservationSidebar.tsx`
 - Updated table input accents: `src/components/InventoryTable.tsx`
 - Next: modernize remaining modals (`AddItemModal` in both locations), feature components (SupplierManager, RoomManager, RoomCountingInterface, OrderReport, ActivityDashboard, ImportData, QuickBooksIntegration, SubscriptionManager, UserPermissions), and perform final consistency sweep.
 
