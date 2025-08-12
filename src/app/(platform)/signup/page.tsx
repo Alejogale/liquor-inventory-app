@@ -64,7 +64,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--accent-orange-50)] via-white to-[var(--accent-orange-100)]">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 orange-glass-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
