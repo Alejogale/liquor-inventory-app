@@ -52,15 +52,7 @@ export default function SubscriptionManager() {
 
       const { data, error } = await supabase
         .from('organizations')
-        .select(`
-          id,
-          subscription_status,
-          subscription_plan,
-          subscription_period_start,
-          subscription_period_end,
-          stripe_subscription_id,
-          stripe_price_id
-        `)
+        .select('*')
         .eq('id', organization.id)
         .single()
 
@@ -81,8 +73,8 @@ export default function SubscriptionManager() {
         id: data.id,
         status: data.subscription_status || 'trial',
         plan: data.subscription_plan || 'starter',
-        current_period_start: data.subscription_period_start,
-        current_period_end: data.subscription_period_end,
+        current_period_start: data.subscription_period_start || '',
+        current_period_end: data.subscription_period_end || '',
         cancel_at_period_end: false,
         stripe_subscription_id: data.stripe_subscription_id,
         stripe_price_id: data.stripe_price_id
