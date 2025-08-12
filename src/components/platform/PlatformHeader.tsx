@@ -83,14 +83,14 @@ export default function PlatformHeader({
   }
 
   return (
-    <header className="bg-white border-b border-blue-200 shadow-sm sticky top-0 z-30">
+    <header className="bg-white border-b border-[var(--accent-orange-200)] shadow-sm sticky top-0 z-30">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Section - Menu & Organization */}
         <div className="flex items-center space-x-4">
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuToggle}
-            className="lg:hidden p-2 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-[var(--accent-orange-50)] text-slate-600 hover:text-slate-800 transition-colors"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -98,14 +98,14 @@ export default function PlatformHeader({
           {/* Desktop Sidebar Toggle */}
           <button
             onClick={onSidebarToggle}
-            className="hidden lg:block p-2 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+            className="hidden lg:block p-2 rounded-lg hover:bg-[var(--accent-orange-50)] text-slate-600 hover:text-slate-800 transition-colors"
           >
             {sidebarCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
           </button>
 
           {/* Organization Info */}
           <div className="hidden md:flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-lg flex items-center justify-center">
               <Building2 className="h-4 w-4 text-white" />
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function PlatformHeader({
             <input
               type="text"
               placeholder="Search across all apps..."
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[var(--accent-orange-600)] focus:border-transparent"
             />
           </div>
         </div>

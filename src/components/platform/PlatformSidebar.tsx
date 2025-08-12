@@ -292,7 +292,7 @@ export default function PlatformSidebar({
                       >
                         <div className={`p-3 rounded-xl transition-all duration-200 ${
                           isActive
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
+                            ? 'bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] border border-[var(--accent-orange-400)] shadow-lg text-white'
                             : isComingSoon
                             ? 'bg-gray-100 border border-gray-200 text-gray-500'
                             : 'hover:bg-blue-50 border border-transparent'
@@ -336,7 +336,7 @@ export default function PlatformSidebar({
                           {/* Active Indicator */}
                           {isActive && (
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <div className="w-2 h-2 bg-[var(--accent-orange-400)] rounded-full"></div>
                             </div>
                           )}
                         </div>
@@ -377,8 +377,8 @@ export default function PlatformSidebar({
                       >
                         <div className={`p-3 rounded-xl transition-all duration-200 ${
                           isActive
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
-                            : 'hover:bg-blue-50 border border-transparent'
+                            ? 'bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] border border-[var(--accent-orange-400)] shadow-lg text-white'
+                              : 'hover:bg-[var(--accent-orange-50)] border border-transparent'
                         }`}>
                           <div className="flex items-center space-x-3">
                             <Icon className={`h-5 w-5 flex-shrink-0 ${
@@ -404,7 +404,7 @@ export default function PlatformSidebar({
                           {/* Active Indicator */}
                           {isActive && (
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <div className="w-2 h-2 bg-[var(--accent-orange-400)] rounded-full"></div>
                             </div>
                           )}
                         </div>
