@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import { LogOut } from 'lucide-react'
 import {
   Package,
   Calendar,
@@ -55,6 +56,7 @@ interface PlatformSidebarProps {
   onCollapsedChange: (collapsed: boolean) => void
   showMobileMenu: boolean
   onMobileMenuClose: () => void
+  onSignOut: () => void
 }
 
 // App definitions with icons and descriptions
@@ -157,7 +159,8 @@ export default function PlatformSidebar({
   collapsed,
   onCollapsedChange,
   showMobileMenu,
-  onMobileMenuClose
+  onMobileMenuClose,
+  onSignOut
 }: PlatformSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -453,6 +456,19 @@ export default function PlatformSidebar({
                 <span className="ml-3 text-slate-600 text-sm">Back to Home</span>
               )}
             </Link>
+
+            {/* Sign Out */}
+            <button
+              onClick={onSignOut}
+              className={`w-full flex items-center p-3 rounded-xl hover:bg-red-50 transition-colors ${
+                collapsed ? 'justify-center' : ''
+              }`}
+            >
+              <LogOut className="h-5 w-5 text-red-600 flex-shrink-0" />
+              {!collapsed && (
+                <span className="ml-3 text-red-600 text-sm">Sign Out</span>
+              )}
+            </button>
           </div>
         </div>
       </div>

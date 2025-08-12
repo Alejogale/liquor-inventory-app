@@ -71,6 +71,7 @@ export default function PlatformLayout({
           onCollapsedChange={setSidebarCollapsed}
           showMobileMenu={showMobileMenu}
           onMobileMenuClose={() => setShowMobileMenu(false)}
+          onSignOut={signOut}
         />
 
         {/* Main Content Area */}
