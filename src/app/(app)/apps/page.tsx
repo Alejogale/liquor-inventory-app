@@ -27,7 +27,7 @@ const apps: AppTile[] = [
     icon: Package,
     status: 'available',
     route: '/dashboard',
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-[var(--accent-orange-600)] to-[var(--accent-orange-400)]',
     features: ['Inventory Tracking', 'Room Counting', 'Supplier Management', 'Order Reports', 'Analytics']
   },
   {
@@ -78,7 +78,7 @@ export default function AppsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[var(--accent-orange-50)] via-white to-[var(--accent-orange-100)] flex items-center justify-center">
         <div className="text-slate-800 text-xl">Loading...</div>
       </div>
     )
@@ -112,7 +112,7 @@ export default function AppsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--accent-orange-50)] via-white to-[var(--accent-orange-100)] flex relative lg:grid lg:grid-cols-[auto_1fr]">
       {/* Sidebar Navigation */}
       <AppsSidebar
         userEmail={user?.email || ''}
@@ -141,7 +141,7 @@ export default function AppsPage() {
               
               {/* Platform Admin Badge */}
               {isPlatformAdmin() && (
-                <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                <div className="bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white px-4 py-2 rounded-lg flex items-center space-x-2">
                   <span className="text-sm font-medium">🌟 Platform Admin</span>
                 </div>
               )}
@@ -214,7 +214,7 @@ export default function AppsPage() {
                     key={app.id}
                     className={`relative bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 transition-all duration-300 transform hover:-translate-y-1 ${
                       isAvailable 
-                        ? 'cursor-pointer border-blue-200 hover:border-blue-300 hover:shadow-xl' 
+                        ? 'cursor-pointer border-[var(--accent-orange-200)] hover:border-[var(--accent-orange-200)] hover:shadow-xl' 
                         : 'cursor-not-allowed opacity-60 border-slate-200'
                     }`}
                     onClick={() => handleAppClick(app)}
@@ -294,7 +294,7 @@ export default function AppsPage() {
                   <p className="text-slate-600 text-xs">Reservations and member database</p>
                 </div>
                 <div className="text-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <div className="w-10 h-10 bg-[var(--accent-orange-100)] rounded-xl flex items-center justify-center mx-auto mb-3">
                     <CreditCard className="h-5 w-5 text-blue-600" />
                   </div>
                   <h4 className="font-semibold text-slate-800 text-sm">Phase 3: Planned</h4>
