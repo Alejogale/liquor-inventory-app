@@ -375,7 +375,7 @@ export default function ReservationSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-purple-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-[var(--accent-orange-50)] text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -572,7 +572,7 @@ export default function ReservationSidebar({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-purple-200">
+          <div className="p-4 border-t border-[var(--accent-orange-200)]">
             <button
               onClick={onSignOut}
               className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-200 text-red-600 hover:text-red-700"

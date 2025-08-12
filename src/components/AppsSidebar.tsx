@@ -57,7 +57,7 @@ export default function AppsSidebar({
       } lg:relative lg:translate-x-0 lg:col-span-1`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-blue-200">
+          <div className="p-6 border-b border-[var(--accent-orange-200)]">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${isCollapsed ? 'lg:justify-center' : ''}`}>
                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
@@ -74,7 +74,7 @@ export default function AppsSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-[var(--accent-orange-50)] text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -82,7 +82,7 @@ export default function AppsSidebar({
 
             {/* User Info */}
             {!isCollapsed && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+              <div className="mt-4 p-3 bg-[var(--accent-orange-100)] rounded-lg border border-[var(--accent-orange-200)]">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
@@ -113,7 +113,7 @@ export default function AppsSidebar({
 
               {/* Active Indicator */}
               <div className="absolute right-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-[var(--accent-orange-400)] rounded-full"></div>
               </div>
 
               {/* Tooltip for collapsed state */}
