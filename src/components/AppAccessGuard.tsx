@@ -52,6 +52,19 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
         return
       }
       
+      // Known admin user bypass
+      if (isAdminUser) {
+        setAccessStatus({
+          hasAppAccess: true,
+          permissions: ['view', 'create', 'edit', 'delete', 'export', 'admin'],
+          isTrialExpired: false,
+          isSubscriptionActive: true,
+          subscriptionType: 'bundle'
+        })
+        setLoading(false)
+        return
+      }
+
       // Platform admin bypass - skip all subscription checks
       if (isPlatformAdmin()) {
         if (debug) console.log('✅ PLATFORM ADMIN DETECTED - BYPASSING ALL CHECKS!')
