@@ -69,6 +69,7 @@ interface InventoryItem {
 function DashboardContent() {
   const { user, userProfile, organization, signOut } = useAuth()
   const searchParams = useSearchParams()
+  const debug = process.env.NODE_ENV !== 'production'
   const [activeTab, setActiveTab] = useState('inventory')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
@@ -102,12 +103,14 @@ function DashboardContent() {
   useEffect(() => {
     // Admin user can load data even without organization context
     if (user && (organization || isAdmin)) {
-      console.log('🔄 Loading dashboard data...', { 
-        hasUser: !!user, 
-        hasOrg: !!organization, 
-        isAdmin: isAdmin,
-        orgId: organizationId 
-      })
+      if (debug) {
+        console.log('🔄 Loading dashboard data...', { 
+          hasUser: !!user, 
+          hasOrg: !!organization, 
+          isAdmin: isAdmin,
+          orgId: organizationId 
+        })
+      }
       fetchData()
     }
   }, [user, organization, isAdmin])
@@ -134,30 +137,30 @@ function DashboardContent() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      console.log('🔍 Starting data fetch...')
-      console.log('🏢 Current organization:', organization)
+      if (debug) console.log('🔍 Starting data fetch...')
+      if (debug) console.log('🏢 Current organization:', organization)
 
       if (!organizationId) {
-        console.log('⚠️ No organization found, skipping data fetch')
+        if (debug) console.log('⚠️ No organization found, skipping data fetch')
         return
       }
 
-      console.log('🏢 Using organization ID:', organizationId)
+      if (debug) console.log('🏢 Using organization ID:', organizationId)
 
       // Fetch categories
-      console.log('📂 Fetching categories for org:', organizationId)
+      if (debug) console.log('📂 Fetching categories for org:', organizationId)
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('*')
         .eq('organization_id', organizationId)
         .order('name')
 
-      console.log('📂 Categories raw response:', { data: categoriesData, error: categoriesError })
+      if (debug) console.log('📂 Categories raw response:', { data: categoriesData, error: categoriesError })
 
       if (categoriesError) {
         console.error('❌ Categories error:', categoriesError)
       } else {
-        console.log('✅ Categories:', categoriesData?.length, categoriesData)
+        if (debug) console.log('✅ Categories:', categoriesData?.length, categoriesData)
       }
 
       // Fetch suppliers
@@ -170,7 +173,7 @@ function DashboardContent() {
       if (suppliersError) {
         console.error('❌ Suppliers error:', suppliersError)
       } else {
-        console.log('✅ Suppliers:', suppliersData?.length, suppliersData)
+        if (debug) console.log('✅ Suppliers:', suppliersData?.length, suppliersData)
       }
 
       // Fetch rooms for stats
@@ -183,18 +186,18 @@ function DashboardContent() {
       if (roomsError) {
         console.error('❌ Rooms error:', roomsError)
       } else {
-        console.log('✅ Rooms:', roomsData?.length, roomsData)
+        if (debug) console.log('✅ Rooms:', roomsData?.length, roomsData)
       }
 
       // Fetch inventory items
-      console.log('📦 Fetching inventory items for org:', organizationId)
+      if (debug) console.log('📦 Fetching inventory items for org:', organizationId)
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
         .eq('organization_id', organizationId)
         .order('brand')
 
-      console.log('📦 Inventory raw response:', { 
+      if (debug) console.log('📦 Inventory raw response:', { 
         data: inventoryData?.length, 
         error: inventoryError,
         firstItem: inventoryData?.[0] 
@@ -203,7 +206,7 @@ function DashboardContent() {
       if (inventoryError) {
         console.error('❌ Inventory error:', inventoryError)
       } else {
-        console.log('✅ Raw inventory items:', inventoryData?.length, inventoryData)
+        if (debug) console.log('✅ Raw inventory items:', inventoryData?.length, inventoryData)
 
         // Manually add category and supplier names
         const enrichedItems = inventoryData?.map(item => {
@@ -217,7 +220,7 @@ function DashboardContent() {
           }
         })
 
-        console.log('✅ Enriched inventory items:', enrichedItems?.length, enrichedItems)
+        if (debug) console.log('✅ Enriched inventory items:', enrichedItems?.length, enrichedItems)
         setInventoryItems(enrichedItems || [])
       }
 
@@ -232,7 +235,7 @@ function DashboardContent() {
       })
 
     } catch (error) {
-      console.error('💥 Unexpected error:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setLoading(false)
     }

@@ -32,11 +32,12 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
   const [accessStatus, setAccessStatus] = useState<UserAccess | null>(null)
   const [loading, setLoading] = useState(true)
   const [startingTrial, setStartingTrial] = useState(false)
+  const debug = process.env.NODE_ENV !== 'production'
 
   // Check for admin user - but don't early return to avoid hooks error
   const isAdminUser = user?.email === 'alejogaleis@gmail.com'
   
-  if (isAdminUser) {
+  if (isAdminUser && debug) {
     console.log('🚨 ADMIN USER DETECTED - FULL ACCESS GRANTED!')
   }
 
@@ -46,14 +47,14 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
   useEffect(() => {
     async function checkAccess() {
       if (!user) {
-        console.log('❌ No user found')
+        if (debug) console.log('❌ No user found')
         setLoading(false)
         return
       }
       
       // Platform admin bypass - skip all subscription checks
       if (isPlatformAdmin()) {
-        console.log('✅ PLATFORM ADMIN DETECTED - BYPASSING ALL CHECKS!')
+        if (debug) console.log('✅ PLATFORM ADMIN DETECTED - BYPASSING ALL CHECKS!')
         setAccessStatus({
           hasAppAccess: true,
           permissions: ['view', 'create', 'edit', 'delete', 'export', 'admin'],
@@ -66,7 +67,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
       }
       
       if (!organization?.id) {
-        console.log('❌ Missing organization:', {
+        if (debug) console.log('❌ Missing organization:', {
           hasUser: !!user,
           hasOrg: !!organization?.id,
           userEmail: user?.email,
@@ -76,13 +77,13 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
         return
       }
       
-      console.log(`🔐 AppAccessGuard Debug - Checking access for ${appId}`)
-      console.log('👤 User Details:', {
+      if (debug) console.log(`🔐 AppAccessGuard Debug - Checking access for ${appId}`)
+      if (debug) console.log('👤 User Details:', {
         id: user.id,
         email: user.email,
         isPlatformAdmin: isPlatformAdmin()
       })
-      console.log('🏢 Organization Details:', {
+      if (debug) console.log('🏢 Organization Details:', {
         id: organization.id,
         name: organization.Name
       })
@@ -94,7 +95,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
         user.email
       )
       
-      console.log(`📊 Access result for ${appId}:`, access)
+      if (debug) console.log(`📊 Access result for ${appId}:`, access)
       setAccessStatus(access)
       setLoading(false)
     }
@@ -106,7 +107,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
     if (!organization?.id) return
     
     setStartingTrial(true)
-    console.log(`🆓 Starting trial for ${appId}...`)
+    if (debug) console.log(`🆓 Starting trial for ${appId}...`)
     
     const success = await startTrial(organization.id.toString(), appId)
     if (success) {
@@ -123,7 +124,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
   }
 
   const handleSubscribe = () => {
-    console.log('🚀 Redirecting to subscription management...')
+    if (debug) console.log('🚀 Redirecting to subscription management...')
     window.location.href = '/apps?tab=subscription'
   }
 
@@ -149,7 +150,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
   }
 
   if (!user || (!organization && !isAdminUser)) {
-    console.log('🔍 AppAccessGuard Debug:', {
+    if (debug) console.log('🔍 AppAccessGuard Debug:', {
       user: user ? 'exists' : 'null',
       organization: organization ? 'exists' : 'null',
       userEmail: user?.email,

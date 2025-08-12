@@ -1393,10 +1393,16 @@ const sanitizedItem = {
   - File: `src/app/(app)/apps/page.tsx`
   - Impact: Clean flow from marketing → login → apps; avoids dead-end state for signed-out users.
 
+## ✅ 2025-08-12 — Stability and Routing Hygiene
+- [x] Reset Password: wrap page in `<Suspense>` to satisfy `useSearchParams` requirement.
+  - File: `src/app/(auth)/reset-password/page.tsx`
+- [x] Admin route-group: add minimal `(app)/admin/layout.tsx` pass-through to avoid layout ambiguity with `/admin`.
+- [x] Tab URL sync: `/apps` and `/dashboard` keep `?tab=` in URL and persist on refresh/back.
+  - Files: `src/app/(app)/apps/page.tsx`, `src/app/(app)/dashboard/page.tsx`
+- [x] Reduce console noise in prod: gate verbose logs in `AppAccessGuard` and dashboard fetch.
+  - Files: `src/components/AppAccessGuard.tsx`, `src/app/(app)/dashboard/page.tsx`
+
 ## 🧭 QA/Flow To‑Do (Next Up)
-- [ ] Ensure all `useSearchParams` usages are behind Suspense (`/apps`, `/dashboard`, `/login`).
-- [ ] Verify `/apps?tab=subscription` link works and tab persists on refresh.
-- [ ] Confirm `DashboardSidebar` tab switching doesn’t break deep links and maintains state via URL.
 - [ ] Validate `AppAccessGuard` edge cases: no org, admin bypass, trial start, subscription redirect.
 - [ ] Review `/admin` layout redirect logic for non-admin users (should land on `/apps`).
 - [ ] Smoke-test QuickBooks routes behind auth; ensure safe early exit without envs.
