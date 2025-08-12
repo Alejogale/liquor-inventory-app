@@ -14,6 +14,8 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
   const [isConnected, setIsConnected] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [integrationConfigured, setIntegrationConfigured] = useState(true);
+  const [configMessage, setConfigMessage] = useState<string | null>(null);
   // Using imported supabase client
 
   // Add helper function to get current organization
@@ -83,8 +85,14 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
         method: 'GET',
       });
       
-      const { authUrl } = await response.json();
-      window.location.href = authUrl;
+      const data = await response.json();
+      if (!response.ok || data?.configured === false || !data?.authUrl) {
+        setIntegrationConfigured(false);
+        setConfigMessage('QuickBooks integration is not configured on this environment.');
+        setLoading(false);
+        return;
+      }
+      window.location.href = data.authUrl;
     } catch (error) {
       console.error('Error connecting to QuickBooks:', error);
       setLoading(false);
@@ -200,6 +208,11 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
           <p className="text-slate-700 mb-4">
             Connect your QuickBooks Online account to automatically sync inventory purchases and expenses.
           </p>
+          {!integrationConfigured && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-3 mb-4 text-sm">
+              {configMessage || 'QuickBooks credentials are missing. Please add QUICKBOOKS_CLIENT_ID/SECRET and NEXT_PUBLIC_APP_URL.'}
+            </div>
+          )}
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h4 className="font-medium text-blue-700 mb-2">What gets synced:</h4>
@@ -213,7 +226,7 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
 
           <button
             onClick={connectToQuickBooks}
-            disabled={loading}
+            disabled={loading || !integrationConfigured}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Connecting...' : 'Connect to QuickBooks'}
