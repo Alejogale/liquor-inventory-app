@@ -1436,6 +1436,9 @@ const sanitizedItem = {
   - [ ] Add invite deep link flow (accept-invite page) if not already present.
 - Error-handling polish
   - [ ] Add small toasts for: sign out, import complete/error, trial start, invite sent/resend/cancel, cancel subscription, open billing portal.
+    - [x] Subscription actions (upgrade error, cancel, open portal)
+    - [x] Team invites (send/resend/cancel)
+    - [ ] Sign out, import complete/error, trial start
   - [ ] Guard API errors with user-friendly messages throughout.
 - Lint hygiene
   - [ ] Trim unused imports (top offenders: components with large icon sets).

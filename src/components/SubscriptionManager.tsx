@@ -13,6 +13,7 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast'
 
 interface Subscription {
   id: string
@@ -27,6 +28,7 @@ interface Subscription {
 
 export default function SubscriptionManager() {
   const { organization } = useAuth()
+  const { showToast } = useToast()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [upgrading, setUpgrading] = useState(false)
@@ -111,10 +113,12 @@ export default function SubscriptionManager() {
       const { url } = await response.json()
       if (url) {
         window.location.href = url
+      } else {
+        showToast({ variant: 'error', message: 'Unable to start checkout. Please try again.' })
       }
     } catch (error) {
       console.error('Error upgrading subscription:', error)
-      alert('Error upgrading subscription. Please try again.')
+      showToast({ variant: 'error', message: 'Error upgrading subscription. Please try again.' })
     } finally {
       setUpgrading(false)
     }
@@ -137,13 +141,13 @@ export default function SubscriptionManager() {
 
       if (response.ok) {
         await fetchSubscription()
-        alert('Subscription cancelled. You retain access until the end of your current billing period.')
+        showToast({ variant: 'success', message: 'Subscription cancelled. Access remains until period end.' })
       } else {
         throw new Error('Failed to cancel subscription')
       }
     } catch (error) {
       console.error('Error cancelling subscription:', error)
-      alert('Error cancelling subscription. Please try again.')
+      showToast({ variant: 'error', message: 'Error cancelling subscription. Please try again.' })
     } finally {
       setCanceling(false)
     }
@@ -161,7 +165,7 @@ export default function SubscriptionManager() {
 
       const customerId = (org as any)?.stripe_customer_id
       if (!customerId) {
-        alert('Billing portal not available yet. Please contact support or manage via Stripe emails.')
+        showToast({ variant: 'info', message: 'Billing portal not yet available. Contact support if needed.' })
         return
       }
 
@@ -174,11 +178,11 @@ export default function SubscriptionManager() {
       if (json?.url) {
         window.location.href = json.url
       } else {
-        alert('Unable to open billing portal. Please try again later.')
+        showToast({ variant: 'error', message: 'Unable to open billing portal. Try again later.' })
       }
     } catch (e) {
       console.error('Billing portal error', e)
-      alert('Unable to open billing portal. Please try again later.')
+      showToast({ variant: 'error', message: 'Unable to open billing portal. Try again later.' })
     }
   }
 

@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import { UserInvitationService, type InvitationData } from '@/lib/user-invitation'
 import { Users, Mail, Plus, X } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast'
 
 interface OrgMember {
   id: string
@@ -17,6 +18,7 @@ interface OrgMember {
 
 export default function TeamManager() {
   const { user, organization } = useAuth()
+  const { showToast } = useToast()
   const [members, setMembers] = useState<OrgMember[]>([])
   const [pendingInvitations, setPendingInvitations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,15 +66,15 @@ export default function TeamManager() {
       }
       const res = await service.sendInvitation(payload)
       if (!res.success) {
-        alert(res.error || 'Failed to send invitation')
+        showToast({ variant: 'error', message: res.error || 'Failed to send invitation' })
       } else {
-        alert('Invitation sent')
+        showToast({ variant: 'success', message: 'Invitation sent' })
         setForm({ email: '', full_name: '', role: 'staff' })
         await fetchData()
       }
     } catch (e) {
       console.error(e)
-      alert('Failed to send invitation')
+      showToast({ variant: 'error', message: 'Failed to send invitation' })
     } finally {
       setInviting(false)
     }
@@ -82,18 +84,19 @@ export default function TeamManager() {
     const service = new UserInvitationService(organization!.id, user!.id)
     const res = await service.cancelInvitation(id)
     if (!res.success) {
-      alert(res.error || 'Failed to cancel invitation')
+      showToast({ variant: 'error', message: res.error || 'Failed to cancel invitation' })
     }
     await fetchData()
+    showToast({ variant: 'success', message: 'Invitation cancelled' })
   }
 
   const resendInvite = async (id: string) => {
     const service = new UserInvitationService(organization!.id, user!.id)
     const res = await service.resendInvitation(id)
     if (!res.success) {
-      alert(res.error || 'Failed to resend invitation')
+      showToast({ variant: 'error', message: res.error || 'Failed to resend invitation' })
     } else {
-      alert('Invitation resent')
+      showToast({ variant: 'success', message: 'Invitation resent' })
     }
   }
 

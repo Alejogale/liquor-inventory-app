@@ -35,6 +35,7 @@ import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
 import TeamManager from '@/components/TeamManager'
 import AppAccessGuard from '@/components/AppAccessGuard'
+import { useToast } from '@/components/ui/Toast'
 
 
 interface Category {
@@ -71,6 +72,7 @@ function DashboardContent() {
   const { user, userProfile, organization, signOut } = useAuth()
   const searchParams = useSearchParams()
   const debug = process.env.NODE_ENV !== 'production'
+  const { showToast } = useToast()
   const [activeTab, setActiveTab] = useState('inventory')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
@@ -339,16 +341,16 @@ function DashboardContent() {
 
         if (error) {
           console.error('Error deleting items:', error)
-          alert('Error deleting items. Please try again.')
+          showToast({ variant: 'error', message: 'Error deleting items. Please try again.' })
         } else {
           console.log(`✅ Successfully deleted ${selectedItems.size} items`)
           await fetchData() // Refresh data
           handleDeselectAll()
-          alert(`Successfully deleted ${selectedItems.size} items`)
+          showToast({ variant: 'success', message: `Deleted ${selectedItems.size} items` })
         }
       } catch (error) {
         console.error('Error in bulk delete:', error)
-        alert('Error deleting items. Please try again.')
+        showToast({ variant: 'error', message: 'Error deleting items. Please try again.' })
       }
     }
   }
@@ -366,16 +368,16 @@ function DashboardContent() {
 
         if (error) {
           console.error('Error moving items:', error)
-          alert('Error moving items. Please try again.')
+          showToast({ variant: 'error', message: 'Error moving items. Please try again.' })
         } else {
           console.log(`✅ Successfully moved ${selectedItems.size} items to new category`)
           await fetchData() // Refresh data
           handleDeselectAll()
-          alert(`Successfully moved ${selectedItems.size} items to new category`)
+          showToast({ variant: 'success', message: `Moved ${selectedItems.size} items to category` })
         }
       } catch (error) {
         console.error('Error in bulk move:', error)
-        alert('Error moving items. Please try again.')
+        showToast({ variant: 'error', message: 'Error moving items. Please try again.' })
       }
     }
   }
@@ -393,16 +395,16 @@ function DashboardContent() {
 
         if (error) {
           console.error('Error changing supplier:', error)
-          alert('Error changing supplier. Please try again.')
+          showToast({ variant: 'error', message: 'Error changing supplier. Please try again.' })
         } else {
           console.log(`✅ Successfully changed supplier for ${selectedItems.size} items`)
           await fetchData() // Refresh data
           handleDeselectAll()
-          alert(`Successfully changed supplier for ${selectedItems.size} items`)
+          showToast({ variant: 'success', message: `Changed supplier for ${selectedItems.size} items` })
         }
       } catch (error) {
         console.error('Error in bulk supplier change:', error)
-        alert('Error changing supplier. Please try again.')
+        showToast({ variant: 'error', message: 'Error changing supplier. Please try again.' })
       }
     }
   }
