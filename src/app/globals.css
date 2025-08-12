@@ -160,3 +160,28 @@ body {
 .animate-scroll-down {
   animation: scroll-down 20s linear infinite;
 }
+
+/* Theme override: map common Tailwind blue/purple utilities to orange tokens */
+/* This ensures any leftover blue classes render with the orange theme without code changes */
+.bg-blue-50 { background-color: var(--accent-orange-50) !important; }
+.bg-blue-100 { background-color: var(--accent-orange-100) !important; }
+.bg-blue-500 { background-color: var(--accent-orange-500) !important; }
+.bg-blue-600 { background-color: var(--accent-orange-600) !important; }
+.bg-blue-700 { background-color: var(--accent-orange-700) !important; }
+.hover\:bg-blue-50:hover { background-color: var(--accent-orange-50) !important; }
+.text-blue-600 { color: var(--accent-orange-600) !important; }
+.text-blue-700 { color: var(--accent-orange-700) !important; }
+.text-blue-800 { color: var(--accent-orange-700) !important; }
+.border-blue-100 { border-color: var(--accent-orange-100) !important; }
+.border-blue-200 { border-color: var(--accent-orange-200) !important; }
+.border-blue-300 { border-color: var(--accent-orange-200) !important; }
+.border-blue-400 { border-color: var(--accent-orange-400) !important; }
+.ring-blue-500, .focus\:ring-blue-500:focus { --tw-ring-color: var(--accent-orange-600) !important; }
+.from-blue-600 { --tw-gradient-from: var(--accent-orange-600) !important; }
+.to-blue-700 { --tw-gradient-to: var(--accent-orange-700) !important; }
+
+/* Purple to orange for older reservation styles */
+.bg-purple-50 { background-color: var(--accent-orange-50) !important; }
+.bg-purple-100 { background-color: var(--accent-orange-100) !important; }
+.border-purple-200 { border-color: var(--accent-orange-200) !important; }
+.hover\:bg-purple-50:hover { background-color: var(--accent-orange-50) !important; }
