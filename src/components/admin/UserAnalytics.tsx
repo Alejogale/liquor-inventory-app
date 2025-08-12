@@ -96,7 +96,8 @@ export default function UserAnalytics() {
         `)
 
       const orgUserCounts = usersByOrg?.reduce((acc: any, user: any) => {
-        const orgName = user.organizations?.name || 'Unknown'
+        const orgRel = Array.isArray(user.organizations) ? user.organizations[0] : user.organizations
+        const orgName = orgRel?.name || 'Unknown'
         acc[orgName] = (acc[orgName] || 0) + 1
         return acc
       }, {}) || {}
@@ -137,7 +138,8 @@ export default function UserAnalytics() {
         .gte('created_at', thirtyDaysAgo.toISOString())
 
       const orgActivityCounts = activityData?.reduce((acc: any, activity: any) => {
-        const orgName = activity.organizations?.name || 'Unknown'
+        const orgRel = Array.isArray(activity.organizations) ? activity.organizations[0] : activity.organizations
+        const orgName = orgRel?.name || 'Unknown'
         acc[orgName] = (acc[orgName] || 0) + 1
         return acc
       }, {}) || {}
@@ -169,7 +171,7 @@ export default function UserAnalytics() {
         user_email: activity.user_email,
         action_type: activity.action_type,
         created_at: activity.created_at,
-        organization_name: activity.organizations?.name || 'Unknown'
+        organization_name: (Array.isArray(activity.organizations) ? activity.organizations[0] : activity.organizations)?.name || 'Unknown'
       })) || []
 
       setAnalytics({

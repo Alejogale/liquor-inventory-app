@@ -16,6 +16,34 @@ export const sendOrderReport = async (
   const totalItems = orderItems.length
   const totalUnits = orderItems.reduce((sum, item) => sum + item.needed_quantity, 0)
 
+  // Build the items HTML safely without deeply nested template strings
+  const groupedByCategory = orderItems.reduce((groups: Record<string, any[]>, item: any) => {
+    const category = item.category_name || 'Uncategorized'
+    if (!groups[category]) groups[category] = []
+    groups[category].push(item)
+    return groups
+  }, {})
+
+  let itemsHtml = ''
+  for (const [category, items] of Object.entries(groupedByCategory) as [string, any[]][]) {
+    itemsHtml += `<div class="category">${category}</div>`
+    itemsHtml += items.map((item: any) => {
+      const locations = Array.isArray(item.rooms_with_stock) && item.rooms_with_stock.length > 0
+        ? `<br><small>Current locations: ${item.rooms_with_stock.map((r: any) => `${r.room_name} (${r.count})`).join(', ')}</small>`
+        : ''
+      return `
+        <div class="item">
+          <strong>${item.brand}</strong><br>
+          Current Stock: <span class="urgent">${item.current_stock}</span> |
+          Threshold: ${item.threshold} |
+          Par Level: ${item.par_level}<br>
+          <strong class="urgent">Order Quantity: ${item.needed_quantity} units</strong>
+          ${locations}
+        </div>
+      `
+    }).join('')
+  }
+
   const isSupplierSpecific = !!supplierName
   const emailTitle = isSupplierSpecific 
     ? `📋 Order Request - ${supplierName}` 
@@ -75,31 +103,7 @@ export const sendOrderReport = async (
             Preferred delivery time: Business hours
           </div>
         ` : ''}
-        
-        ${Object.entries(
-          orderItems.reduce((groups, item) => {
-            const category = item.category_name
-            if (!groups[category]) groups[category] = []
-            groups[category].push(item)
-            return groups
-          }, {} as Record<string, any[]>)
-        ).map(([category, items]) => `
-          <div class="category">${category}</div>
-          ${items.map(item => `
-            <div class="item">
-              <strong>${item.brand}</strong>
-              <br>
-              Current Stock: <span class="urgent">${item.current_stock}</span> | 
-              Threshold: ${item.threshold} | 
-              Par Level: ${item.par_level}
-              <br>
-              <strong class="urgent">Order Quantity: ${item.needed_quantity} units</strong>
-              ${item.rooms_with_stock && item.rooms_with_stock.length > 0 ? `
-                <br><small>Current locations: ${item.rooms_with_stock.map(r => `${r.room_name} (${r.count})`).join(', ')}</small>
-              ` : ''}
-            </div>
-          `).join('')}
-        `).join('')}
+        ${itemsHtml}
       `}
 
       <div class="footer">

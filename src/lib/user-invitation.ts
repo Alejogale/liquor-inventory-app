@@ -2,7 +2,8 @@
 // Allows managers to invite staff members with specific roles and permissions
 
 import { supabase } from './supabase'
-import { UserRole, PermissionType, AppId } from './permissions'
+import { UserRole, Permission } from './permissions'
+import type { AppId } from './subscription-access'
 
 export interface InvitationData {
   email: string
@@ -11,7 +12,7 @@ export interface InvitationData {
   job_title?: string
   app_permissions?: Array<{
     app_id: AppId
-    permissions: PermissionType[]
+    permissions: Permission[]
   }>
   expires_in_hours?: number
 }
@@ -42,8 +43,9 @@ export class UserInvitationService {
   async sendInvitation(invitationData: InvitationData): Promise<{ success: boolean; error?: string; invitationId?: string }> {
     try {
       // Check if user already exists
-      const { data: existingUser } = await supabase.auth.admin.getUserByEmail(invitationData.email)
-      if (existingUser.user) {
+      const { data: usersPage } = await supabase.auth.admin.listUsers({ page: 1, perPage: 100 })
+      const exists = usersPage?.users?.some(u => u.email?.toLowerCase() === invitationData.email.toLowerCase())
+      if (exists) {
         return { success: false, error: 'User already exists with this email' }
       }
 
@@ -180,7 +182,7 @@ export class UserInvitationService {
   private async createUserPermissions(userId: string, appPermissions: any[]): Promise<void> {
     try {
       const permissionsToInsert = appPermissions.flatMap(appPerm => 
-        appPerm.permissions.map(permission => ({
+        appPerm.permissions.map((permission: Permission) => ({
           user_id: userId,
           app_id: appPerm.app_id,
           permission_type: permission,

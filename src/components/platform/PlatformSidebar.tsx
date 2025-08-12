@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import {
   Package,
   Calendar,
@@ -25,7 +25,7 @@ interface UserProfile {
   id: string
   full_name?: string
   email?: string
-  role?: 'owner' | 'manager' | 'staff' | 'viewer'
+  role?: string
   status?: 'active' | 'suspended' | 'inactive'
   organization_id?: string
   job_title?: string
@@ -160,6 +160,7 @@ export default function PlatformSidebar({
   onMobileMenuClose
 }: PlatformSidebarProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const [activeSection, setActiveSection] = useState<'apps' | 'platform'>('apps')
 
   const canAccessFeature = (roles: string[]) => {
@@ -367,7 +368,7 @@ export default function PlatformSidebar({
 
                 {filteredPlatformNav.map((item) => {
                   const Icon = item.icon
-                  const isActive = router.pathname === item.href
+                  const isActive = pathname === item.href
                   
                   return (
                     <div key={item.id} className="relative">

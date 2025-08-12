@@ -4,7 +4,9 @@ import QuickBooksIntegration from '../../../../components/QuickBooksIntegration'
 export default async function IntegrationsPage() {
   // For demo purposes, we'll assume user is authenticated
   // In production, you'd check authentication properly
-  const user = { id: 'demo-user', email: 'demo@example.com' };
+  // NOTE: For demo purposes, do not pass a fake User object to typed component.
+  // QuickBooksIntegration can derive the user from Supabase auth client.
+  const user = undefined as any;
 
   return (
     <div className="min-h-screen bg-gray-50">

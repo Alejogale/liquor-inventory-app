@@ -61,7 +61,7 @@ const apps: AppTile[] = [
 ]
 
 export default function AppsPage() {
-  const { user, userProfile, organization, isPlatformAdmin, signOut } = useAuth()
+  const { user, userProfile, organization, isPlatformAdmin, signOut, loading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [hoveredApp, setHoveredApp] = useState<string | null>(null)
@@ -76,12 +76,23 @@ export default function AppsPage() {
     }
   }, [searchParams])
 
-  if (!user) {
+  // Redirect unauthenticated users to login once auth state is resolved
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [loading, user, router])
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
         <div className="text-slate-800 text-xl">Loading...</div>
       </div>
     )
+  }
+
+  if (!user) {
+    return null
   }
 
   const handleSignOut = async () => {

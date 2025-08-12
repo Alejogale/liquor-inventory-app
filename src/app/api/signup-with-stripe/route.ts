@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
           employees: employees,
           stripe_session_id: session.id
         },
-        ip_address: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown'
       })
 

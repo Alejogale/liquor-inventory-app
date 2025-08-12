@@ -28,6 +28,23 @@ export async function GET(request: NextRequest) {
     const tokens = authResponse.getJson();
 
     // Save tokens to database
+    // Determine organization to update: try to get the current authenticated user and their profile
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    let targetOrganizationId: string | null = null
+    if (authUser) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', authUser.id)
+        .single()
+      targetOrganizationId = profile?.organization_id || null
+    }
+
+    if (!targetOrganizationId) {
+      console.warn('No organizationId found for QuickBooks callback; aborting token save')
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_org_missing`)
+    }
+
     const { error } = await supabase
       .from('organizations')
       .update({
@@ -37,14 +54,14 @@ export async function GET(request: NextRequest) {
         quickbooks_token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
         quickbooks_connected_at: new Date().toISOString(),
       })
-      .eq('id', user.user_metadata?.organization_id);
+      .eq('id', targetOrganizationId)
 
     if (error) {
-      console.error('Error saving QuickBooks tokens:', error);
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_save_failed`);
+      console.error('Error saving QuickBooks tokens:', error)
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_save_failed`)
     }
 
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=quickbooks_connected`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=quickbooks_connected`)
   } catch (error) {
     console.error('QuickBooks OAuth callback error:', error);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_auth_failed`);

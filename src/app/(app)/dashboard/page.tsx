@@ -656,13 +656,13 @@ function DashboardContent() {
                         🔍 Found <span className="font-semibold text-slate-800">{inventoryItems.length}</span> items organized by category with room counts
                       </p>
                     </div>
-                    <InventoryTable
-                      items={inventoryItems as any}
-                      organizationId={organizationId}  // 🚨 SECURITY: Pass organizationId
-                      onEdit={(item: any) => setEditingItem(item)}
-                      onDelete={handleItemDeleted}
-                      selectedItems={selectedItems}  // Pass selected items
-                      onItemSelect={handleItemSelect}  // Pass selection handler
+                                          <InventoryTable
+                        items={inventoryItems as any}
+                        organizationId={organizationId || undefined}
+                        onEdit={(item: any) => setEditingItem(item)}
+                        onDelete={handleItemDeleted}
+                        selectedItems={selectedItems}
+onItemSelect={handleItemSelect}  // Pass selection handler
                     />
                   </>
                 )}
@@ -670,9 +670,9 @@ function DashboardContent() {
             )}
 
             {/* NEW: Import Data Tab */}
-            {activeTab === 'import' && (
-              <ImportData onImportComplete={handleImportComplete} organizationId={organizationId} />
-            )}
+                          {activeTab === 'import' && (
+                <ImportData onImportComplete={handleImportComplete} organizationId={organizationId || undefined} />
+              )}
 
             {activeTab === 'categories' && (
               <div className="p-6">
@@ -721,7 +721,7 @@ function DashboardContent() {
                   <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
                   <p className="text-slate-600 mt-1">Manage your vendor relationships and contacts</p>
                 </div>
-                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organizationId} />
+                <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organizationId || undefined} />
               </div>
             )}
 
@@ -731,7 +731,7 @@ function DashboardContent() {
                   <h2 className="text-2xl font-bold text-slate-800">Room Management</h2>
                   <p className="text-slate-600 mt-1">Configure your venue locations and rooms</p>
                 </div>
-                <RoomManager onUpdate={handleRoomUpdated} organizationId={organizationId} />
+                <RoomManager onUpdate={handleRoomUpdated} organizationId={organizationId || undefined} />
               </div>
             )}
 
@@ -743,7 +743,7 @@ function DashboardContent() {
                 </div>
                 <RoomCountingInterface 
                   userEmail={user?.email || ''} 
-                  organizationId={organizationId}
+                  organizationId={organizationId || undefined}
                 />
               </div>
             )}
@@ -754,7 +754,7 @@ function DashboardContent() {
                   <h2 className="text-2xl font-bold text-slate-800">Order Reports</h2>
                   <p className="text-slate-600 mt-1">Generate and manage supplier orders</p>
                 </div>
-                <OrderReport organizationId={organizationId} />
+                <OrderReport organizationId={organizationId || undefined} />
               </div>
             )}
 
@@ -766,7 +766,7 @@ function DashboardContent() {
                 </div>
                 <ActivityDashboard 
                   userEmail={user?.email || ''} 
-                  organizationId={organizationId}
+                  organizationId={organizationId || undefined}
                 />
               </div>
             )}
@@ -814,14 +814,14 @@ function DashboardContent() {
         <AddCategoryModal
           onClose={() => setShowAddCategory(false)}
           onCategoryAdded={handleCategoryAdded}
-          organizationId={organizationId}
+          organizationId={organizationId || undefined}
         />
       )}
 
       {showEditCategory && editingCategory && (
         <EditCategoryModal
           category={editingCategory}
-          organizationId={organizationId}
+          organizationId={organizationId || undefined}
           onClose={() => setShowEditCategory(false)}
           onCategoryUpdated={handleCategoryUpdated}
         />
@@ -832,7 +832,7 @@ function DashboardContent() {
           suppliers={suppliers}
           onClose={() => setShowAddItem(false)}
           onItemAdded={handleItemAdded}
-          organizationId={organizationId}
+          organizationId={organizationId || undefined}
         />
       )}
 
@@ -843,7 +843,7 @@ function DashboardContent() {
           suppliers={suppliers}
           onClose={() => setEditingItem(null)}
           onItemUpdated={handleItemUpdated}
-          organizationId={organizationId}
+          organizationId={organizationId || undefined}
         />
       )}
     </div>

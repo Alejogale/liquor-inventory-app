@@ -19,7 +19,7 @@ interface UserProfile {
   id: string
   full_name?: string
   email?: string
-  role?: 'owner' | 'manager' | 'staff' | 'viewer'
+  role?: string
   status?: 'active' | 'suspended' | 'inactive'
   organization_id?: string
   job_title?: string

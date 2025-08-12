@@ -92,6 +92,19 @@ export default function EnhancedReports() {
       
       console.log('📦 Inventory items found:', itemsData?.length || 0)
 
+      // Normalize relational shapes to single objects to satisfy InventoryItem typing
+      const normalizedItems: InventoryItem[] = (itemsData || []).map((raw: any) => ({
+        id: raw.id,
+        brand: raw.brand,
+        category_id: raw.category_id,
+        supplier_id: raw.supplier_id,
+        par_level: raw.par_level,
+        threshold: raw.threshold,
+        barcode: raw.barcode ?? undefined,
+        categories: Array.isArray(raw.categories) ? (raw.categories[0] ?? null) : (raw.categories ?? null),
+        suppliers: Array.isArray(raw.suppliers) ? (raw.suppliers[0] ?? null) : (raw.suppliers ?? null),
+      }))
+
       // Get all room counts
       const { data: countsData, error: countsError } = await supabase
         .from('room_counts')
@@ -125,7 +138,7 @@ export default function EnhancedReports() {
       })
 
       // Enrich items with room counts
-      const itemsWithCounts: InventoryItemWithCounts[] = itemsData?.map(item => {
+      const itemsWithCounts: InventoryItemWithCounts[] = normalizedItems.map(item => {
         const roomCounts = countsLookup.get(item.id) || []
         const totalCount = roomCounts.reduce((sum: number, rc: any) => sum + rc.count, 0)
         

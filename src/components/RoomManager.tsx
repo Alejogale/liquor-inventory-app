@@ -139,7 +139,8 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       onUpdate?.()
     } catch (error) {
       console.error('💥 Error adding room:', error)
-      alert(`Error adding room: ${error.message}`)
+      const message = (error as Error)?.message || 'Unknown error'
+      alert(`Error adding room: ${message}`)
     } finally {
       setSaving(false)
     }
@@ -332,7 +333,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
                     <div>
                       <h4 className="text-slate-800 font-medium">{room.name}</h4>
                       <p className="text-slate-600 text-sm">
-                        Order: {room.display_order} • Created: {new Date(room.created_at).toLocaleDateString()}
+                        Order: {room.display_order} • Created: {room.created_at ? new Date(room.created_at as string).toLocaleDateString() : '—'}
                       </p>
                     </div>
                   )}
