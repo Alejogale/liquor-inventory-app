@@ -424,7 +424,7 @@ function DashboardContent() {
                   <p className="text-slate-600 text-sm font-medium">Total Items</p>
                   <p className="text-2xl font-bold text-slate-800">{stats.totalItems}</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-400)] rounded-xl flex items-center justify-center">
                   <Package className="h-6 w-6 text-white" />
                 </div>
               </div>
@@ -468,7 +468,7 @@ function DashboardContent() {
           </div>
 
           {/* Main Content Area */}
-          <div className="bg-white rounded-xl border border-blue-200 shadow-lg min-h-[600px]">
+          <div className="bg-white rounded-xl border border-[var(--accent-orange-200)] shadow-lg min-h-[600px]">
             {activeTab === 'inventory' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
@@ -478,7 +478,7 @@ function DashboardContent() {
                   </div>
                   <button
                     onClick={() => setShowAddItem(true)}
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+                    className="bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] hover:opacity-90 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
                   >
                     Add Item
                   </button>

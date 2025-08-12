@@ -221,7 +221,7 @@ export default function InventoryTable({
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <Package className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+        <Package className="h-16 w-16 text-[var(--accent-orange-400)] mx-auto mb-4" />
         <p className="text-slate-600 text-lg">No inventory items found</p>
         <p className="text-slate-500 text-sm mt-2">Click &ldquo;Add Item&rdquo; to get started</p>
       </div>
@@ -239,7 +239,7 @@ export default function InventoryTable({
             placeholder="Search by brand, barcode, category, or supplier..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-blue-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
           />
         </div>
         {searchTerm && (

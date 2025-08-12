@@ -84,11 +84,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Glassmorphic Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 orange-glass-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">L</span>
               </div>
               <span className="text-xl font-bold text-slate-900">Liquor Inventory</span>
@@ -116,7 +116,7 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-2xl">L</span>
             </div>
             <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
@@ -204,7 +204,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-black hover:bg-slate-800 text-white py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 group"
+                className="w-full orange-cta hover:opacity-90 text-white py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 group"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">

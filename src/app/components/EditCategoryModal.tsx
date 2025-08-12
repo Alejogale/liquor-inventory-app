@@ -77,7 +77,7 @@ export default function EditCategoryModal({ category, organizationId, onClose, o
             id="categoryName"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            className="w-full px-3 py-2 bg-white border border-blue-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-400"
+            className="w-full px-3 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             placeholder="Enter category name"
             required
           />
@@ -94,7 +94,7 @@ export default function EditCategoryModal({ category, organizationId, onClose, o
           <button
             type="submit"
             disabled={loading || !categoryName.trim() || !organizationId}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Updating...' : 'Update Category'}
           </button>
