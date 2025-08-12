@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js'
 import OAuthClient from 'intuit-oauth';
 
 export async function GET(request: NextRequest) {
@@ -29,10 +29,21 @@ export async function GET(request: NextRequest) {
 
     // Save tokens to database
     // Determine organization to update: try to get the current authenticated user and their profile
-    const { data: { user: authUser } } = await supabase.auth.getUser()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceKey) {
+      console.warn('Missing SUPABASE_SERVICE_ROLE_KEY; cannot save QuickBooks tokens')
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_server_config`)
+    }
+
+    // Create a server-side admin client for secure updates
+    const admin = createClient(supabaseUrl, serviceKey)
+
+    // We still attempt to map the current user to their organization if present via auth cookie (fallback safe)
+    const { data: { user: authUser } } = await admin.auth.getUser()
     let targetOrganizationId: string | null = null
     if (authUser) {
-      const { data: profile } = await supabase
+      const { data: profile } = await admin
         .from('user_profiles')
         .select('organization_id')
         .eq('id', authUser.id)
@@ -45,7 +56,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=quickbooks_org_missing`)
     }
 
-    const { error } = await supabase
+    const { error } = await admin
       .from('organizations')
       .update({
         quickbooks_company_id: realmId,
