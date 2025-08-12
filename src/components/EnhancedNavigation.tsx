@@ -45,19 +45,19 @@ export default function EnhancedNavigation({
       href: '#features',
       dropdown: [
         { label: 'Features', href: '#features', icon: <Zap className="h-4 w-4" /> },
-        { label: 'Industries', href: '#industries', icon: <Building2 className="h-4 w-4" /> },
-        { label: 'Analytics', href: '#analytics', icon: <BarChart3 className="h-4 w-4" /> },
-        { label: 'Integrations', href: '#integrations', icon: <Globe className="h-4 w-4" /> }
+        { label: 'Industries', href: '#features', icon: <Building2 className="h-4 w-4" /> },
+        { label: 'Analytics', href: '#features', icon: <BarChart3 className="h-4 w-4" /> },
+        { label: 'Integrations', href: '#features', icon: <Globe className="h-4 w-4" /> }
       ]
     },
     {
       label: 'Solutions',
-      href: '#solutions',
+      href: '#apps',
       dropdown: [
-        { label: 'Bars & Restaurants', href: '/solutions/bars' },
-        { label: 'Hotels & Resorts', href: '/solutions/hotels' },
-        { label: 'Nightclubs', href: '/solutions/nightclubs' },
-        { label: 'Catering Services', href: '/solutions/catering' }
+        { label: 'Bars & Restaurants', href: '#apps' },
+        { label: 'Hotels & Resorts', href: '#apps' },
+        { label: 'Nightclubs', href: '#apps' },
+        { label: 'Catering Services', href: '#apps' }
       ]
     },
     {
@@ -68,10 +68,8 @@ export default function EnhancedNavigation({
       label: 'Resources',
       href: '#resources',
       dropdown: [
-        { label: 'Documentation', href: '/docs' },
-        { label: 'API Reference', href: '/api' },
-        { label: 'Help Center', href: '/help' },
-        { label: 'Community', href: '/community' }
+        { label: 'About', href: '/about' },
+        { label: 'Contact', href: '/contact' }
       ]
     }
   ]
@@ -216,13 +214,13 @@ export default function EnhancedNavigation({
             ) : (
               <>
                 <Link 
-                  href="/settings" 
+                  href="/apps?tab=subscription" 
                   className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   <Settings className="h-5 w-5 text-slate-600" />
                 </Link>
                 <Link 
-                  href="/help" 
+                  href="/contact" 
                   className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   <HelpCircle className="h-5 w-5 text-slate-600" />
@@ -325,14 +323,14 @@ export default function EnhancedNavigation({
               ) : (
                 <div className="flex gap-2">
                   <Link
-                    href="/settings"
+                    href="/apps?tab=subscription"
                     className="flex-1 py-3 px-4 text-center text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Settings
                   </Link>
                   <Link
-                    href="/help"
+                    href="/contact"
                     className="flex-1 py-3 px-4 text-center text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

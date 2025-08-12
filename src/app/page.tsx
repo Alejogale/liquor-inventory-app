@@ -123,7 +123,7 @@ export default function LandingPage() {
           {/* App Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Liquor Inventory App */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
+            <Link href="/apps" className="block bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
                 <Package className="w-6 h-6 text-blue-600" />
               </div>
@@ -135,10 +135,10 @@ export default function LandingPage() {
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </div>
-            </div>
+            </Link>
 
             {/* Reservation Management App */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
+            <a href="#apps" className="block bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
                 <Calendar className="w-6 h-6 text-purple-600" />
               </div>
@@ -150,10 +150,10 @@ export default function LandingPage() {
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </div>
-            </div>
+            </a>
 
             {/* Member Database App */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
+            <a href="#apps" className="block bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
                 <UserCheck className="w-6 h-6 text-green-600" />
               </div>
@@ -165,10 +165,10 @@ export default function LandingPage() {
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </div>
-            </div>
+            </a>
 
             {/* POS System App */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
+            <a href="#apps" className="block bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
                 <CreditCard className="w-6 h-6 text-orange-600" />
               </div>
@@ -180,7 +180,7 @@ export default function LandingPage() {
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </div>
-            </div>
+            </a>
           </div>
 
           {/* App Integration Benefits */}
@@ -305,10 +305,10 @@ export default function LandingPage() {
             <div>
               <h3 className="font-semibold text-slate-900 mb-4">Apps</h3>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Liquor Inventory</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Reservation Management</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Member Database</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">POS System</a></li>
+                <li><Link href="/apps" className="hover:text-slate-900 transition-colors">Liquor Inventory</Link></li>
+                <li><a href="#apps" className="hover:text-slate-900 transition-colors">Reservation Management</a></li>
+                <li><a href="#apps" className="hover:text-slate-900 transition-colors">Member Database</a></li>
+                <li><a href="#apps" className="hover:text-slate-900 transition-colors">POS System</a></li>
               </ul>
             </div>
             
@@ -317,8 +317,8 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm text-slate-600">
                 <li><Link href="/about" className="hover:text-slate-900 transition-colors">About</Link></li>
                 <li><Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><Link href="/contact" className="hover:text-slate-900 transition-colors">Support</Link></li>
+                <li><a href="#features" className="hover:text-slate-900 transition-colors">Blog</a></li>
               </ul>
             </div>
             
@@ -327,7 +327,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm text-slate-600">
                 <li><Link href="/legal/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</Link></li>
                 <li><Link href="/legal/terms" className="hover:text-slate-900 transition-colors">Terms of Service</Link></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Cookie Policy</a></li>
+                <li><a href="#legal" className="hover:text-slate-900 transition-colors">Cookie Policy</a></li>
               </ul>
             </div>
           </div>
