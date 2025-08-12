@@ -64,9 +64,17 @@ export default function SubscriptionManager() {
         .eq('id', organization.id)
         .single()
 
-      if (error) {
-        console.error('Supabase error:', error)
-        throw error
+      if (error || !data) {
+        console.warn('Subscription fetch warning:', error || 'No data')
+        setSubscription({
+          id: organization.id,
+          status: 'trial',
+          plan: 'starter',
+          current_period_start: '',
+          current_period_end: '',
+          cancel_at_period_end: false,
+        })
+        return
       }
 
       setSubscription({
@@ -80,7 +88,7 @@ export default function SubscriptionManager() {
         stripe_price_id: data.stripe_price_id
       })
     } catch (error) {
-      console.error('Error fetching subscription:', error)
+      console.warn('Error fetching subscription:', error)
       // Set a default state instead of leaving it null
       setSubscription({
         id: organization?.id || '',
