@@ -102,7 +102,9 @@ export default function SubscriptionManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           priceId: getPriceId(newPlan),
-          billingPeriod: 'month'
+          billingPeriod: 'month',
+          organizationId: organization?.id,
+          plan: newPlan
         })
       })
 

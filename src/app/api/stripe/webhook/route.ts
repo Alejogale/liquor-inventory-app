@@ -68,6 +68,10 @@ export async function POST(request: NextRequest) {
             subscription_status: subscription.status,
             subscription_period_start: new Date((subAny.current_period_start as number) * 1000).toISOString(),
             subscription_period_end: new Date((subAny.current_period_end as number) * 1000).toISOString(),
+            // Store Stripe customer id for Billing Portal usage if available
+            stripe_customer_id: (typeof session.customer === 'string' ? session.customer : (session.customer as any)?.id) || (typeof subscription.customer === 'string' ? subscription.customer : (subscription.customer as any)?.id) || null,
+            // Optionally persist chosen plan from metadata
+            subscription_plan: (session.metadata as any)?.plan || null,
           })
           .eq('id', session.metadata?.organization_id as string);
 
@@ -180,6 +184,8 @@ export async function POST(request: NextRequest) {
             subscription_status: subscriptionObj.status,
             subscription_period_start: new Date((subAny.current_period_start as number) * 1000).toISOString(),
             subscription_period_end: new Date((subAny.current_period_end as number) * 1000).toISOString(),
+            // Backfill customer id if not already set
+            stripe_customer_id: (typeof subscriptionObj.customer === 'string' ? subscriptionObj.customer : (subscriptionObj.customer as any)?.id) || null,
           })
           .eq('stripe_subscription_id', subscriptionObj.id);
 

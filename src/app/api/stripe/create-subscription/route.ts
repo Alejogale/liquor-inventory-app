@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     
     console.log('🔄 Creating Stripe subscription session...');
     
-    const { priceId, billingPeriod } = await request.json();
+    const { priceId, billingPeriod, organizationId, plan } = await request.json();
 
     if (!priceId) {
       return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
@@ -26,10 +26,12 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?success=subscription_created`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?success=subscription_created&tab=subscription`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?canceled=true&tab=subscription`,
       metadata: {
         billing_period: billingPeriod,
+        organization_id: organizationId || 'unknown',
+        plan: plan || 'starter',
       },
     });
 
