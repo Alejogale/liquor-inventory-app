@@ -1414,4 +1414,31 @@ const sanitizedItem = {
 - [x] Audit 404s for marketing links now pointing to `#features`, `#apps`, `/about`, `/contact`.
     - Verified: anchors `#apps` and `#features` exist on `/`; `/about` and `/contact` routes exist.
 
+## ✅ 2025-08-12 — Team & Billing Foundations
+- [x] Stripe endpoints: cancel and billing portal
+  - Added: `src/app/api/stripe/cancel-subscription/route.ts`
+  - Added: `src/app/api/stripe/portal-session/route.ts`
+  - Safe guards when Stripe not configured (503), no DB mutation (webhook-driven).
+- [x] Subscription Manager: Manage Billing button + friendlier errors
+  - Updated: `src/components/SubscriptionManager.tsx`
+- [x] Team management UI: list members, invite/resend/cancel pending invites
+  - New: `src/components/TeamManager.tsx`
+  - Wired into: `src/app/(app)/dashboard/page.tsx` under Subscription tab alongside `UserPermissions`.
+
+## Team & Billing – Detailed To‑Do
+- Billing enhancements
+  - [ ] Wire `stripe_customer_id` on `organizations` and set it during checkout/webhook for portal access.
+  - [ ] Add `resume-subscription` endpoint (if needed) to clear `cancel_at_period_end`.
+  - [ ] Expose billing history from Stripe (in UI) or surface last invoice info.
+- Team management
+  - [ ] Add role change controls for existing members (owner/manager only).
+  - [ ] Add remove/deactivate member control with confirmation.
+  - [ ] Add invite deep link flow (accept-invite page) if not already present.
+- Error-handling polish
+  - [ ] Add small toasts for: sign out, import complete/error, trial start, invite sent/resend/cancel, cancel subscription, open billing portal.
+  - [ ] Guard API errors with user-friendly messages throughout.
+- Lint hygiene
+  - [ ] Trim unused imports (top offenders: components with large icon sets).
+  - [ ] Fix React hook dependency warnings in hot paths (dashboard data loads).
+
 

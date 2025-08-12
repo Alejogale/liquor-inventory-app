@@ -135,7 +135,7 @@ export default function SubscriptionManager() {
 
       if (response.ok) {
         await fetchSubscription()
-        alert('Subscription cancelled successfully. You will have access until the end of your current billing period.')
+        alert('Subscription cancelled. You retain access until the end of your current billing period.')
       } else {
         throw new Error('Failed to cancel subscription')
       }
@@ -144,6 +144,39 @@ export default function SubscriptionManager() {
       alert('Error cancelling subscription. Please try again.')
     } finally {
       setCanceling(false)
+    }
+  }
+
+  const openBillingPortal = async () => {
+    try {
+      // In a full implementation we would store stripe_customer_id on the organization
+      // For now, just show a helpful message if not available. If present, redirect.
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('stripe_customer_id')
+        .eq('id', organization!.id)
+        .single()
+
+      const customerId = (org as any)?.stripe_customer_id
+      if (!customerId) {
+        alert('Billing portal not available yet. Please contact support or manage via Stripe emails.')
+        return
+      }
+
+      const res = await fetch('/api/stripe/portal-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId })
+      })
+      const json = await res.json()
+      if (json?.url) {
+        window.location.href = json.url
+      } else {
+        alert('Unable to open billing portal. Please try again later.')
+      }
+    } catch (e) {
+      console.error('Billing portal error', e)
+      alert('Unable to open billing portal. Please try again later.')
     }
   }
 
@@ -281,6 +314,14 @@ export default function SubscriptionManager() {
               <span>{upgrading ? 'Processing...' : 'Upgrade Plan'}</span>
             </button>
           )}
+
+          <button
+            onClick={openBillingPortal}
+            className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-medium"
+          >
+            <CreditCard className="h-4 w-4" />
+            <span>Manage Billing</span>
+          </button>
 
           {subscription?.status !== 'trial' && subscription?.stripe_subscription_id && (
             <button

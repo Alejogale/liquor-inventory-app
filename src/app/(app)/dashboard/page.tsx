@@ -33,6 +33,7 @@ import DashboardSidebar from '@/components/DashboardSidebar'
 import QuickBooksIntegration from '@/components/QuickBooksIntegration'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
+import TeamManager from '@/components/TeamManager'
 import AppAccessGuard from '@/components/AppAccessGuard'
 
 
@@ -814,7 +815,10 @@ onItemSelect={handleItemSelect}  // Pass selection handler
                     <div className="bg-white rounded-xl border border-blue-200 shadow-sm p-6">
                       <h3 className="text-xl font-semibold text-slate-800 mb-4">Team & Permissions</h3>
                       <p className="text-slate-600 mb-6">Manage team member roles and access permissions</p>
-                      <UserPermissions organizationId={organization?.id} />
+                      <div className="space-y-6">
+                        <TeamManager />
+                        <UserPermissions organizationId={organization?.id} />
+                      </div>
                     </div>
                   )}
                 </div>
