@@ -1404,7 +1404,8 @@ const sanitizedItem = {
 
 ## 🧭 QA/Flow To‑Do (Next Up)
 - [ ] Validate `AppAccessGuard` edge cases: no org, admin bypass, trial start, subscription redirect.
-- [ ] Review `/admin` layout redirect logic for non-admin users (should land on `/apps`).
+- [x] Review `/admin` layout redirect logic for non-admin users (should land on `/apps`).
+  - Verified: `src/app/admin/layout.tsx` redirects unauthenticated to `/login`, and non-admin to `/apps`; `(app)/admin/layout.tsx` is a no-op passthrough.
 - [ ] Smoke-test QuickBooks routes behind auth; ensure safe early exit without envs.
 - [ ] Audit 404s for marketing links now pointing to `#features`, `#apps`, `/about`, `/contact`.
 
