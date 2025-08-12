@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import PlatformHeader from './PlatformHeader'
 import PlatformSidebar from './PlatformSidebar'
 import AppSwitcher from './AppSwitcher'
+import { useToast } from '@/components/ui/Toast'
 
 interface PlatformLayoutProps {
   children: React.ReactNode
@@ -20,6 +21,7 @@ export default function PlatformLayout({
 }: PlatformLayoutProps) {
   const { user, userProfile, organization, loading, signOut } = useAuth()
   const router = useRouter()
+  const { showToast } = useToast()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
@@ -54,7 +56,7 @@ export default function PlatformLayout({
         user={user}
         userProfile={userProfile}
         organization={organization}
-        onSignOut={signOut}
+        onSignOut={async () => { try { await signOut(); showToast({ variant: 'success', message: 'Signed out successfully.' }) } catch { showToast({ variant: 'error', message: 'Sign out failed.' }) } }}
         onMenuToggle={() => setShowMobileMenu(!showMobileMenu)}
         sidebarCollapsed={sidebarCollapsed}
         onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -71,7 +73,7 @@ export default function PlatformLayout({
           onCollapsedChange={setSidebarCollapsed}
           showMobileMenu={showMobileMenu}
           onMobileMenuClose={() => setShowMobileMenu(false)}
-          onSignOut={signOut}
+          onSignOut={async () => { try { await signOut(); showToast({ variant: 'success', message: 'Signed out successfully.' }) } catch { showToast({ variant: 'error', message: 'Sign out failed.' }) } }}
         />
 
         {/* Main Content Area */}

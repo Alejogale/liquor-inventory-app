@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { checkUserAppAccess, UserAccess } from '@/lib/permissions'
 import { startTrial, AppId } from '@/lib/subscription-access'
 import { Package, Calendar, Users, CreditCard, Clock, Shield } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast'
 
 interface AppAccessGuardProps {
   children: ReactNode
@@ -33,7 +34,8 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
   const [loading, setLoading] = useState(true)
   const [startingTrial, setStartingTrial] = useState(false)
   const debug = process.env.NODE_ENV !== 'production'
-
+  const { showToast } = useToast()
+  
   // Check for admin user - but don't early return to avoid hooks error
   const isAdminUser = user?.email === 'alejogaleis@gmail.com'
   
@@ -124,6 +126,7 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
     
     const success = await startTrial(organization.id.toString(), appId)
     if (success) {
+      showToast({ variant: 'success', message: 'Trial started successfully.' })
       // Refresh access status
       const access = await checkUserAppAccess(
         user!.id,
@@ -132,6 +135,8 @@ export default function AppAccessGuard({ children, appId, appName, fallback }: A
         user!.email
       )
       setAccessStatus(access)
+    } else {
+      showToast({ variant: 'error', message: 'Failed to start trial. Please try again.' })
     }
     setStartingTrial(false)
   }

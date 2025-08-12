@@ -294,14 +294,17 @@ function DashboardContent() {
   }
 
   const handleImportComplete = () => {
-    fetchData() // Refresh data after import
+    showToast({ variant: 'success', message: 'Import completed successfully.' })
+    fetchData()
   }
 
   const handleSignOut = async () => {
     try {
       await signOut()
+      showToast({ variant: 'success', message: 'Signed out successfully.' })
     } catch (error) {
       console.error('Error signing out:', error)
+      showToast({ variant: 'error', message: 'Sign out failed. Please try again.' })
     }
   }
 
