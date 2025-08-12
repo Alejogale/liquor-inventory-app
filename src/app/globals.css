@@ -22,6 +22,15 @@
   
   --success-green-500: #10b981;
   --success-green-100: #d1fae5;
+
+  /* Add McLaren Papaya Orange tokens */
+  --accent-orange-700: #e65c00;
+  --accent-orange-600: #ff6a00; /* McLaren Papaya-inspired */
+  --accent-orange-500: #ff7a1a;
+  --accent-orange-400: #ff944d;
+  --accent-orange-200: #ffd1b3;
+  --accent-orange-100: #ffe6d5;
+  --accent-orange-50: #fff5ec;
 }
 
 @theme inline {
@@ -48,6 +57,15 @@
   
   --color-success-green-500: var(--success-green-500);
   --color-success-green-100: var(--success-green-100);
+
+  /* Color Tokens for McLaren Papaya Orange */
+  --color-accent-orange-700: var(--accent-orange-700);
+  --color-accent-orange-600: var(--accent-orange-600);
+  --color-accent-orange-500: var(--accent-orange-500);
+  --color-accent-orange-400: var(--accent-orange-400);
+  --color-accent-orange-200: var(--accent-orange-200);
+  --color-accent-orange-100: var(--accent-orange-100);
+  --color-accent-orange-50: var(--accent-orange-50);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -76,6 +94,30 @@ body {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Orange glassmorphic helpers */
+.orange-glass-card {
+  background: rgba(255, 122, 26, 0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(255, 106, 0, 0.25);
+  border: 1px solid rgba(255, 106, 0, 0.15);
+}
+
+.orange-glass-nav {
+  background: rgba(255, 106, 0, 0.06);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 106, 0, 0.15);
+}
+
+/* Orange gradient helpers */
+.orange-gradient {
+  background-image: linear-gradient(135deg, var(--accent-orange-50), #fff, var(--accent-orange-100));
+}
+
+.orange-cta {
+  background-image: linear-gradient(90deg, var(--accent-orange-600), #ff8f3d);
 }
 
 /* Float Animation from Design System */

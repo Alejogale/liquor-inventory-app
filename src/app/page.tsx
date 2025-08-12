@@ -25,11 +25,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Glassmorphic Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 orange-glass-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">H</span>
               </div>
               <span className="text-xl font-bold text-slate-900">Hospitality Hub</span>
@@ -44,7 +44,7 @@ export default function LandingPage() {
               <Link href="/login" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">
                 Sign In
               </Link>
-              <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
+              <Link href="/signup" className="orange-cta hover:opacity-90 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
                 Start Free Trial
               </Link>
             </div>
@@ -57,7 +57,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 bg-[var(--accent-orange-100)] text-[var(--accent-orange-700)] px-4 py-2 rounded-full text-sm font-medium">
               <Star className="w-4 h-4 fill-current" />
               One Platform, Multiple Apps
             </div>
@@ -66,7 +66,7 @@ export default function LandingPage() {
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                 Complete Hospitality
-                <span className="block text-blue-600">Management Platform</span>
+                <span className="block text-[var(--accent-orange-600)]">Management Platform</span>
               </h1>
               <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
                 Everything you need to run your hospitality business. From inventory management to reservations, 
@@ -76,7 +76,7 @@ export default function LandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 group justify-center">
+              <Link href="/signup" className="orange-cta hover:opacity-90 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 group justify-center">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -185,7 +185,7 @@ export default function LandingPage() {
 
           {/* App Integration Benefits */}
           <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 orange-cta text-white px-6 py-3 rounded-full text-sm font-medium">
               <Zap className="w-4 h-4" />
               All apps work together seamlessly
             </div>

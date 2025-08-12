@@ -130,7 +130,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
             value={formData.brand}
             onChange={handleChange}
             placeholder="e.g., Jack Daniel's"
-            className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             required
             autoFocus
           />
@@ -145,7 +145,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
             name="category_id"
             value={formData.category_id}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             required
           >
             <option value="">Select a category</option>
@@ -166,7 +166,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
             name="supplier_id"
             value={formData.supplier_id}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
           >
             <option value="">Select a supplier</option>
             {suppliers.map((supplier) => (
@@ -190,7 +190,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
               onChange={handleChange}
               placeholder="5"
               min="0"
-              className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
               onChange={handleChange}
               placeholder="10"
               min="0"
-              className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             />
           </div>
         </div>
@@ -222,7 +222,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
             value={formData.barcode}
             onChange={handleChange}
             placeholder="Scan or enter barcode"
-            className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 bg-white border border-[var(--accent-orange-200)] rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
           />
         </div>
         
@@ -237,7 +237,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
           <button
             type="submit"
             disabled={loading || !formData.brand.trim() || !formData.category_id}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Updating...' : 'Update Item'}
           </button>

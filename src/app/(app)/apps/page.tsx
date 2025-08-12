@@ -130,7 +130,7 @@ export default function AppsPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -199,7 +199,7 @@ export default function AppsPage() {
           </div>
 
           {/* Content Container */}
-          <div className="bg-white rounded-xl border border-blue-200 shadow-lg p-8">
+          <div className="bg-white rounded-xl border border-[var(--accent-orange-200)] shadow-lg p-8">
             {/* Apps Content */}
             {activeTab === 'apps' && (
               <>

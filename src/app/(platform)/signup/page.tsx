@@ -66,11 +66,11 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 orange-glass-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-[var(--accent-orange-600)] to-[var(--accent-orange-500)] rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">H</span>
               </div>
               <span className="text-xl font-bold text-slate-900">Hospitality Hub</span>
@@ -95,7 +95,7 @@ export default function SignupPage() {
       <section className="pt-24 pb-16 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 bg-[var(--accent-orange-100)] text-[var(--accent-orange-700)] px-4 py-2 rounded-full text-sm font-medium">
               <Star className="w-4 h-4 fill-current" />
               Start Your Free Trial
             </div>
@@ -103,7 +103,7 @@ export default function SignupPage() {
             <div className="space-y-6">
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 Get Started with
-                <span className="block text-blue-600">Hospitality Hub</span>
+                <span className="block text-[var(--accent-orange-600)]">Hospitality Hub</span>
               </h1>
               <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
                 Join hundreds of hospitality businesses already using our platform to streamline operations, 
