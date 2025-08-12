@@ -203,7 +203,7 @@ export default function SubscriptionManager() {
       </div>
 
       {/* Current Subscription */}
-      <div className="bg-white rounded-lg border border-blue-200 p-6">
+      <div className="bg-white rounded-lg border border-[var(--accent-orange-200)] p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <CreditCard className="h-6 w-6 text-blue-600" />
@@ -275,7 +275,7 @@ export default function SubscriptionManager() {
             <button
               onClick={() => handleUpgrade(getNextPlan(subscription?.plan || 'trial'))}
               disabled={upgrading}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="flex items-center space-x-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 hover:opacity-90"
             >
               <ArrowUpRight className="h-4 w-4" />
               <span>{upgrading ? 'Processing...' : 'Upgrade Plan'}</span>
@@ -296,7 +296,7 @@ export default function SubscriptionManager() {
       </div>
 
       {/* Billing History */}
-      <div className="bg-white rounded-lg border border-blue-200 p-6">
+      <div className="bg-white rounded-lg border border-[var(--accent-orange-200)] p-6">
         <h3 className="text-lg font-semibold text-slate-800 mb-4">Billing History</h3>
         <div className="text-center py-8">
           <DollarSign className="h-8 w-8 text-slate-400 mx-auto mb-2" />

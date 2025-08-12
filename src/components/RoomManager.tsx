@@ -271,7 +271,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
             <button
               onClick={addRoom}
               disabled={!newRoomName.trim() || saving}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] disabled:opacity-50 text-white rounded-lg transition-opacity hover:opacity-90"
             >
               <Save className="h-4 w-4" />
               <span>{saving ? 'Adding...' : 'Add'}</span>
@@ -342,7 +342,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => startEdit(room)}
-                      className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 text-[var(--accent-orange-600)] hover:text-[var(--accent-orange-700)] hover:bg-[var(--accent-orange-50)] rounded-lg transition-colors"
                       title="Edit room name"
                     >
                       <Edit2 className="h-4 w-4" />

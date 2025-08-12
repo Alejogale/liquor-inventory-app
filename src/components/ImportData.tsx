@@ -1229,7 +1229,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       </div>
 
       {/* Field Requirements */}
-      <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm mb-6">
+      <div className="bg-white rounded-xl p-6 border border-[var(--accent-orange-200)] shadow-sm mb-6">
         <h3 className="text-slate-800 font-semibold mb-4">
           Required Fields for {importTypes.find(t => t.id === activeImportType)?.title}
         </h3>
@@ -1256,7 +1256,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       </div>
 
       {/* Template Download */}
-      <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm mb-8">
+      <div className="bg-white rounded-xl p-6 border border-[var(--accent-orange-200)] shadow-sm mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-slate-800 font-semibold mb-2">Download Template</h3>
@@ -1275,7 +1275,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       </div>
 
       {/* File Upload Area */}
-      <div className="bg-white rounded-xl border border-blue-200 shadow-sm mb-8">
+      <div className="bg-white rounded-xl border border-[var(--accent-orange-200)] shadow-sm mb-8">
         {!uploadedFile ? (
           <div
             {...getRootProps()}

@@ -610,7 +610,7 @@ Total: ${item.totalCount} bottles
           <button
             onClick={sendReportToManagers}
             disabled={sendingReport}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] disabled:opacity-50 text-white rounded-lg transition-opacity hover:opacity-90"
           >
             {sendingReport ? (
               <>
@@ -808,14 +808,14 @@ Total: ${item.totalCount} bottles
       <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-slate-800 flex items-center">
-            <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+            <BarChart3 className="h-5 w-5 mr-2 text-[var(--accent-orange-600)]" />
             Enhanced Reports & CSV Export
           </h3>
           <div className="flex gap-2">
             <button
               onClick={generateEnhancedReports}
               disabled={reportsLoading}
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] disabled:opacity-50 text-white rounded-lg transition-opacity hover:opacity-90"
             >
               <BarChart3 className="h-4 w-4" />
               <span>{reportsLoading ? 'Generating...' : 'Generate Reports'}</span>

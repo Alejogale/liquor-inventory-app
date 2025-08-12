@@ -364,7 +364,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
           <div className="text-2xl font-bold text-purple-600">{suppliersAffected}</div>
           <div className="text-slate-700">Suppliers Affected</div>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-[var(--accent-orange-50)] border border-[var(--accent-orange-200)] rounded-lg p-4">
           <div className="text-2xl font-bold text-blue-600">
             {supplierGroups.filter(s => s.supplier_email).length}
           </div>
@@ -382,7 +382,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       ) : (
         <div className="space-y-6">
           {supplierGroups.map((supplier, index) => (
-            <div key={`${supplier.supplier_id}-${index}`} className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm">
+            <div key={`${supplier.supplier_id}-${index}`} className="bg-white rounded-xl p-6 border border-[var(--accent-orange-200)] shadow-sm">
               {/* Supplier Header */}
               <div className="flex justify-between items-center mb-4">
                 <div>

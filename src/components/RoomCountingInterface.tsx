@@ -807,7 +807,7 @@ export default function RoomCountingInterface({
             )}
             <button
               onClick={testScanner}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+              className="px-3 py-1 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white rounded text-sm transition-opacity hover:opacity-90"
             >
               Test Scanner
             </button>
@@ -816,7 +816,7 @@ export default function RoomCountingInterface({
       </div>
 
       {/* Room Selection Cards */}
-      <div className="bg-white rounded-lg p-6 border border-blue-200 shadow-sm">
+      <div className="bg-white rounded-lg p-6 border border-[var(--accent-orange-200)] shadow-sm">
         <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
           <Building2 className="h-5 w-5 mr-2 text-blue-500" />
           Select Room for Counting

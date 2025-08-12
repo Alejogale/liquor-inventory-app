@@ -192,7 +192,7 @@ export default function SupplierManager({
           <p className="text-slate-600 mb-6">Add your first supplier to get started with order management.</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+            className="bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] hover:opacity-90 text-white px-6 py-3 rounded-lg font-semibold"
           >
             Add First Supplier
           </button>
@@ -237,7 +237,7 @@ export default function SupplierManager({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setEditingSupplier(supplier)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                    className="bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] hover:opacity-90 text-white px-4 py-2 rounded-lg"
                   >
                     Edit
                   </button>
@@ -401,7 +401,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               placeholder="e.g., Johnson Brothers, Southern Wine & Spirits"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-[var(--accent-orange-200)] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
               required
             />
           </div>
@@ -415,7 +415,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               placeholder="orders@supplier.com"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-[var(--accent-orange-200)] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
               required
             />
           </div>
@@ -429,7 +429,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
               placeholder="(555) 123-4567"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-[var(--accent-orange-200)] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             />
           </div>
 
@@ -442,7 +442,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.contact_person}
               onChange={(e) => setFormData({...formData, contact_person: e.target.value})}
               placeholder="John Smith, Sales Rep"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-[var(--accent-orange-200)] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             />
           </div>
 
@@ -455,7 +455,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
               placeholder="Special instructions, delivery schedules, etc."
               rows={3}
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-[var(--accent-orange-200)] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
             />
           </div>
           
@@ -470,7 +470,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
             <button
               type="submit"
               disabled={loading || !formData.name.trim() || !formData.email.trim()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold disabled:opacity-50"
+              className="flex-1 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] hover:opacity-90 text-white p-3 rounded-lg font-semibold disabled:opacity-50"
             >
               {loading ? 'Saving...' : (supplier ? 'Update' : 'Add Supplier')}
             </button>

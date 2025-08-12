@@ -293,7 +293,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
               setSelectedRole(null)
               setIsEditingRole(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white rounded-lg transition-opacity hover:opacity-90"
           >
             <Plus className="h-4 w-4" />
             New Role
@@ -314,7 +314,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pl-10 pr-4 py-2 border border-[var(--accent-orange-200)] rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange-600)]"
                 />
               </div>
             </div>

@@ -175,7 +175,7 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
             <button
               onClick={syncInventory}
               disabled={loading}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 bg-gradient-to-r from-[var(--accent-orange-600)] to-[var(--accent-orange-700)] text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
             >
               {loading ? 'Syncing...' : 'Sync Inventory Now'}
             </button>
@@ -201,7 +201,7 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
             Connect your QuickBooks Online account to automatically sync inventory purchases and expenses.
           </p>
           
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="bg-[var(--accent-orange-50)] border border-[var(--accent-orange-200)] rounded-lg p-4 mb-6">
             <h4 className="font-medium text-blue-700 mb-2">What gets synced:</h4>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Inventory purchases → QuickBooks expenses</li>

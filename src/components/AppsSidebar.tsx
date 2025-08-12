@@ -202,7 +202,7 @@ export default function AppsSidebar({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-blue-200">
+          <div className="p-4 border-t border-[var(--accent-orange-200)]">
             <button
               onClick={onSignOut}
               className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-200 text-red-600 hover:text-red-700"

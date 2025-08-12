@@ -238,7 +238,7 @@ liquor-inventory-app/
 - Updated pages: `src/app/page.tsx` (landing), `src/app/(app)/login/page.tsx` (login), `src/app/(platform)/signup/page.tsx` (signup)
 - Updated dashboards: `src/app/(app)/apps/page.tsx`, `src/app/(app)/dashboard/page.tsx`
 - Updated sidebars: `src/components/DashboardSidebar.tsx`, `src/components/AppsSidebar.tsx`, `src/components/ReservationSidebar.tsx`
-- Updated table input accents: `src/components/InventoryTable.tsx`
+- Updated table/input accents and CTAs: Inventory (`src/components/InventoryTable.tsx`), Suppliers (`src/components/SupplierManager.tsx`), Rooms (`src/components/RoomManager.tsx`), Counting (`src/components/RoomCountingInterface.tsx`), Orders (`src/components/OrderReport.tsx`), Activity (`src/components/ActivityDashboard.tsx`), Import (`src/components/ImportData.tsx`), QuickBooks (`src/components/QuickBooksIntegration.tsx`), Subscription (`src/components/SubscriptionManager.tsx`), Permissions (`src/components/UserPermissions.tsx`)
 - Next: modernize remaining modals (`AddItemModal` in both locations), feature components (SupplierManager, RoomManager, RoomCountingInterface, OrderReport, ActivityDashboard, ImportData, QuickBooksIntegration, SubscriptionManager, UserPermissions), and perform final consistency sweep.
 
 ### 1.2 Authentication System (Extend Existing)
