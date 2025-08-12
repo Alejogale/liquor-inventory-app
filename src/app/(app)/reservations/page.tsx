@@ -2,94 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { checkAppAccess, startTrial, AppAccess } from '@/lib/subscription-access'
 import { checkReservationTablesExist, createDefaultRoomsAndTables, getRooms, getTables, ReservationRoom } from '@/lib/reservation-db'
 import { supabase } from '@/lib/supabase'
 import ReservationSidebar from '@/components/ReservationSidebar'
+import AppAccessGuard from '@/components/AppAccessGuard'
 import { 
   Calendar, Users, Clock, MapPin, FileText, User, Hash, RefreshCw, 
   UserPlus, Trash2, ToggleLeft, X, Plus, Filter, Palette, Upload 
 } from 'lucide-react'
 
-// Subscription Guard Component
-function ReservationAccessGuard({ children }: { children: React.ReactNode }) {
-  const { user, organization } = useAuth()
-  const [accessStatus, setAccessStatus] = useState<AppAccess | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function checkAccess() {
-      if (!organization?.id || !user) return
-      
-      // Platform admin always has access
-      if (user.email === 'alejogaleis@gmail.com') {
-        setAccessStatus({ hasAccess: true, isTrialExpired: false, isSubscriptionActive: true })
-        setLoading(false)
-        return
-      }
-
-      const access = await checkAppAccess(organization.id.toString(), 'reservation-management')
-      setAccessStatus(access)
-      setLoading(false)
-    }
-
-    checkAccess()
-  }, [organization?.id, user])
-
-  const handleStartTrial = async () => {
-    if (!organization?.id) return
-    
-    const success = await startTrial(organization.id.toString(), 'reservation-management')
-    if (success) {
-      // Refresh access status
-      const access = await checkAppAccess(organization.id.toString(), 'reservation-management')
-      setAccessStatus(access)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-        <div className="text-slate-800 text-xl">Loading...</div>
-      </div>
-    )
-  }
-
-  if (!accessStatus?.hasAccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center">
-          <div className="bg-white rounded-2xl p-8 shadow-xl border border-blue-200">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-6">
-              <Calendar className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Reservation Management</h2>
-            {accessStatus?.isTrialExpired ? (
-              <div>
-                <p className="text-slate-600 mb-6">Your trial has expired. Subscribe to continue using the reservation management system.</p>
-                <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all">
-                  Subscribe Now
-                </button>
-              </div>
-            ) : (
-              <div>
-                <p className="text-slate-600 mb-6">Start your 14-day free trial to access the reservation management system.</p>
-                <button
-                  onClick={handleStartTrial}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all"
-                >
-                  Start Free Trial
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return <>{children}</>
-}
+// Remove old custom access guard - now using unified AppAccessGuard
 
 // Main Reservation Component with all HTML functionality
 function ReservationContent({ setShowImportPopup }: { 
@@ -1068,7 +990,15 @@ export default function ReservationsPage() {
   }
 
   return (
-    <ReservationAccessGuard>
+    <AppAccessGuard 
+      appId="reservation-management" 
+      appName="Reservation Management"
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+          <div className="text-slate-800 text-xl">Loading Reservation Management...</div>
+        </div>
+      }
+    >
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
         {/* Sidebar Navigation */}
         <ReservationSidebar
@@ -1099,7 +1029,7 @@ export default function ReservationsPage() {
           />
         )}
       </div>
-    </ReservationAccessGuard>
+    </AppAccessGuard>
   )
 }
 

@@ -65,11 +65,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const getSession = async () => {
+      console.log('🔄 Initializing auth context...')
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
+        console.log('✅ Session found for user:', session.user.email)
         setUser(session.user)
         await fetchUserProfile(session.user.id)
       } else {
+        console.log('❌ No session found')
         setUser(null)
         setUserProfile(null)
         setOrganization(null)
@@ -80,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔄 Auth state changed:', event, session?.user?.email)
       if (session?.user) {
         setUser(session.user)
         await fetchUserProfile(session.user.id)
@@ -105,6 +109,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // Don't try to fetch profile if no authenticated user
+      if (!authUser) {
+        console.log('ℹ️ No authenticated user found')
+        return
+      }
+
+      // Make sure the userId matches the authenticated user
+      if (authUser.id !== userId) {
+        console.log('⚠️ User ID mismatch, skipping profile fetch')
+        return
+      }
+
       // Get user profile
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
@@ -113,11 +129,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (profileError) {
+        // If it's just "no rows returned" that's normal for new/missing users
+        if (profileError.code === 'PGRST116') {
+          console.log('ℹ️ No user profile found for user:', userId)
+        } else {
+          // For other errors, log but don't crash the app
+          console.log('Profile query error:', profileError.message)
+          console.log('Error code:', profileError.code)
+          
+          // For permission errors or other issues, just return without creating profile
+          if (profileError.code === 'PGRST301' || profileError.message?.includes('permission')) {
+            console.log('❌ Permission denied or access issue - user may need to log in')
+            return
+          }
+          
+          // For other unexpected errors, don't try to create profile
+          console.log('⚠️ Unexpected error fetching profile - skipping profile creation')
+          return
+        }
         console.log('ℹ️ No user profile found, creating one...')
+        
+        // Double-check that profile doesn't exist before creating
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('id', userId)
+          .single()
+        
+        if (existingProfile) {
+          console.log('⚠️ Profile actually exists, refetching...')
+          const { data: refetchedProfile } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', userId)
+            .single()
+          
+          if (refetchedProfile) {
+            setUserProfile(refetchedProfile)
+            
+            if (refetchedProfile.organization_id) {
+              const { data: org } = await supabase
+                .from('organizations')
+                .select('*')
+                .eq('id', refetchedProfile.organization_id)
+                .single()
+              
+              if (org) {
+                setOrganization(org)
+              }
+            }
+            return
+          }
+        }
         
         // Create user profile with actual user data
         const userEmail = authUser?.email || 'user@example.com'
-        const userName = authUser?.user_metadata?.full_name || authUser?.email || 'Dashboard User'
+        const firstName = authUser?.user_metadata?.first_name || ''
+        const lastName = authUser?.user_metadata?.last_name || ''
+        const userName = firstName && lastName ? `${firstName} ${lastName}` : (authUser?.user_metadata?.full_name || authUser?.email || 'Dashboard User')
+        const signupCompleted = authUser?.user_metadata?.signup_completed || false
         
         try {
           const { data: newProfile, error: createError } = await supabase
@@ -126,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               id: userId,
               full_name: userName,
               email: userEmail,
-              role: 'owner',
+              role: signupCompleted ? 'owner' : 'staff', // Users from signup get 'owner', others get 'staff'
               // 🚀 Set platform admin status for your email
               is_platform_admin: userEmail === 'alejogaleis@gmail.com'
             })
@@ -135,76 +205,89 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (createError) {
             console.error('❌ Error creating user profile:', createError)
+            console.error('❌ Error details:', {
+              message: createError.message,
+              code: createError.code,
+              details: createError.details,
+              hint: createError.hint
+            })
             return
           }
 
           console.log('✅ User profile created:', newProfile)
           setUserProfile(newProfile)
 
-          // Check if organization exists
-          const { data: orgData, error: orgError } = await supabase
-            .from('organizations')
-            .select('*')
-            .limit(1)
-            .single()
-
-          if (orgError || !orgData) {
-            console.log('ℹ️ No organization found, creating one...')
+          // Only create organization for users not from signup (they already have one)
+          if (!signupCompleted) {
+            console.log('ℹ️ User not from signup, checking for existing organization...')
             
-            // Create organization with proper UUID slug
-            const timestamp = Date.now()
-            const randomSuffix = Math.random().toString(36).substr(2, 9)
-            const slugSuffix = `${timestamp}-${randomSuffix}`
-            const slug = `default-organization-${slugSuffix}`
-            
-            try {
-              const { data: newOrg, error: createOrgError } = await supabase
-                .from('organizations')
-                .insert({
-                  "Name": 'Default Organization',
-                  slug: slug,
-                  created_by: userId
-                })
-                .select()
-                .single()
+            // Check if organization exists for non-signup users
+            const { data: orgData, error: orgError } = await supabase
+              .from('organizations')
+              .select('*')
+              .limit(1)
+              .single()
 
-              if (createOrgError) {
-                console.error('❌ Error creating organization:', createOrgError)
-                return
+            if (orgError || !orgData) {
+              console.log('ℹ️ No organization found, creating default one...')
+              
+              // Create organization with proper UUID slug
+              const timestamp = Date.now()
+              const randomSuffix = Math.random().toString(36).substr(2, 9)
+              const slugSuffix = `${timestamp}-${randomSuffix}`
+              const slug = `default-organization-${slugSuffix}`
+              
+              try {
+                const { data: newOrg, error: createOrgError } = await supabase
+                  .from('organizations')
+                  .insert({
+                    "Name": 'Default Organization',
+                    slug: slug,
+                    created_by: userId
+                  })
+                  .select()
+                  .single()
+
+                if (createOrgError) {
+                  console.error('❌ Error creating organization:', createOrgError)
+                  return
+                }
+
+                console.log('✅ Default organization created:', newOrg)
+                setOrganization(newOrg)
+
+                // Link user profile to organization
+                const { error: linkError } = await supabase
+                  .from('user_profiles')
+                  .update({ organization_id: newOrg.id })
+                  .eq('id', userId)
+
+                if (linkError) {
+                  console.error('❌ Error linking user to organization:', linkError)
+                } else {
+                  console.log('✅ User linked to default organization')
+                }
+              } catch (orgErr) {
+                console.error('❌ Exception creating organization:', orgErr)
               }
-
-              console.log('✅ Organization created:', newOrg)
-              setOrganization(newOrg)
+            } else {
+              console.log('✅ Found existing organization:', orgData)
+              setOrganization(orgData)
 
               // Link user profile to organization
               const { error: linkError } = await supabase
                 .from('user_profiles')
-                .update({ organization_id: newOrg.id })
+                .update({ organization_id: orgData.id })
                 .eq('id', userId)
 
               if (linkError) {
                 console.error('❌ Error linking user to organization:', linkError)
               } else {
-                console.log('✅ User linked to organization')
+                console.log('✅ User linked to existing organization')
               }
-            } catch (orgErr) {
-              console.error('❌ Exception creating organization:', orgErr)
             }
           } else {
-            console.log('✅ Found existing organization:', orgData)
-            setOrganization(orgData)
-
-            // Link user profile to organization
-            const { error: linkError } = await supabase
-              .from('user_profiles')
-              .update({ organization_id: orgData.id })
-              .eq('id', userId)
-
-            if (linkError) {
-              console.error('❌ Error linking user to organization:', linkError)
-            } else {
-              console.log('✅ User linked to organization')
-            }
+            console.log('ℹ️ User from signup flow, organization should already exist')
           }
         } catch (profileErr) {
           console.error('❌ Exception creating user profile:', profileErr)
@@ -216,21 +299,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserProfile(profile)
 
       if (profile.organization_id) {
+        console.log('🔍 Looking for organization with ID:', profile.organization_id)
         // Use the organization_id directly since it's now a UUID
-        const { data: org } = await supabase
+        const { data: org, error: orgError } = await supabase
           .from('organizations')
           .select('*')
           .eq('id', profile.organization_id)
           .single()
 
-        if (org) {
+        if (orgError) {
+          console.log('❌ Error fetching organization:', orgError)
+        } else if (org) {
           console.log('✅ Organization found:', org)
           setOrganization(org)
         } else {
           console.log('❌ Organization not found for ID:', profile.organization_id)
         }
       } else {
-        console.log('ℹ️ No organization_id in profile')
+        console.log('❌ No organization_id in profile - this is the problem!')
       }
     } catch (error) {
       console.error('💥 Error in fetchUserProfile:', error)
@@ -238,16 +324,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
+    console.log('🚪 Signing out...')
     await supabase.auth.signOut()
     setUser(null)
     setUserProfile(null)
     setOrganization(null)
-    router.push('/')
+    console.log('✅ Sign out complete')
+    router.push('/login')
   }
 
   // 🚀 NEW: Helper functions for hybrid admin system
   const isPlatformAdmin = () => {
-    return userProfile?.is_platform_admin === true || userProfile?.email === 'alejogaleis@gmail.com'
+    // Check multiple sources to ensure admin access works
+    const isAdmin = userProfile?.is_platform_admin === true || 
+                   userProfile?.email === 'alejogaleis@gmail.com' ||
+                   user?.email === 'alejogaleis@gmail.com'
+    
+    if (isAdmin) {
+      console.log('✅ Platform admin detected:', {
+        userProfileEmail: userProfile?.email,
+        userEmail: user?.email,
+        isPlatformAdminFlag: userProfile?.is_platform_admin
+      })
+    }
+    
+    return isAdmin
   }
 
   const canAccessAllOrganizations = () => {

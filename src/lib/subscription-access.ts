@@ -30,13 +30,28 @@ export async function checkAppAccess(organizationId: string, appId: AppId): Prom
     console.log(`🔐 Checking access for org ${organizationId} to app ${appId}`)
     
     // Check for active subscription or trial
-    const { data: subscription, error } = await supabase
+    // First try to find specific app subscription
+    let { data: subscription, error } = await supabase
       .from('app_subscriptions')
       .select('*')
       .eq('organization_id', organizationId)
-      .or(`app_id.eq.${appId},subscription_plan.eq.bundle`)
+      .eq('app_id', appId)
       .in('subscription_status', ['active', 'trial'])
-      .single()
+      .maybeSingle()
+    
+    // If no specific app subscription, check for bundle subscription
+    if (!subscription && !error) {
+      const { data: bundleSubscription, error: bundleError } = await supabase
+        .from('app_subscriptions')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .eq('subscription_plan', 'bundle')
+        .in('subscription_status', ['active', 'trial'])
+        .maybeSingle()
+      
+      subscription = bundleSubscription
+      error = bundleError
+    }
     
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
       console.error('Error checking app access:', error)

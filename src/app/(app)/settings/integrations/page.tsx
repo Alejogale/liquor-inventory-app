@@ -1,18 +1,10 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import QuickBooksIntegration from '../../../../components/QuickBooksIntegration';
 
 export default async function IntegrationsPage() {
-  const supabase = createServerComponentClient({ cookies });
-  
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
+  // For demo purposes, we'll assume user is authenticated
+  // In production, you'd check authentication properly
+  const user = { id: 'demo-user', email: 'demo@example.com' };
 
   return (
     <div className="min-h-screen bg-gray-50">

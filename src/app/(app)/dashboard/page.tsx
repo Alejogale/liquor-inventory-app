@@ -16,6 +16,7 @@ import {
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
+import { useSearchParams } from 'next/navigation'
 import AddCategoryModal from '@/app/components/AddCategoryModal'
 import EditCategoryModal from '@/app/components/EditCategoryModal'
 import AddItemModal from '@/app/components/AddItemModal'
@@ -29,6 +30,9 @@ import ActivityDashboard from '@/components/ActivityDashboard'
 import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import QuickBooksIntegration from '@/components/QuickBooksIntegration'
+import SubscriptionManager from '@/components/SubscriptionManager'
+import UserPermissions from '@/components/UserPermissions'
+import AppAccessGuard from '@/components/AppAccessGuard'
 
 
 interface Category {
@@ -61,8 +65,9 @@ interface InventoryItem {
   updated_at?: string
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const { user, userProfile, organization, signOut } = useAuth()
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState('inventory')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
@@ -82,7 +87,7 @@ export default function Dashboard() {
   })
 
   // Add to existing state
-  const [selectedItems, setSelectedItems] = useState(new Set())
+  const [selectedItems, setSelectedItems] = useState(new Set<string>())
   const [showBulkActions, setShowBulkActions] = useState(false)
   const [bulkOperation, setBulkOperation] = useState<'delete' | 'move-category' | 'move-supplier' | null>(null)
   const [targetCategory, setTargetCategory] = useState('')
@@ -90,14 +95,29 @@ export default function Dashboard() {
 
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
-  // Get the correct organization ID
-  const organizationId = organization?.id || organization?.uuid_id
+  // Get the correct organization ID - for admin, use the known organization ID if context is missing
+  const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : null)
 
   useEffect(() => {
-    if (user && organization) {
+    // Admin user can load data even without organization context
+    if (user && (organization || isAdmin)) {
+      console.log('🔄 Loading dashboard data...', { 
+        hasUser: !!user, 
+        hasOrg: !!organization, 
+        isAdmin: isAdmin,
+        orgId: organizationId 
+      })
       fetchData()
     }
-  }, [user, organization])
+  }, [user, organization, isAdmin])
+
+  // Handle URL parameters for tab navigation
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && ['inventory', 'import', 'categories', 'suppliers', 'rooms', 'count', 'orders', 'activity', 'integrations', 'subscription'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   const fetchData = async () => {
     try {
@@ -113,11 +133,14 @@ export default function Dashboard() {
       console.log('🏢 Using organization ID:', organizationId)
 
       // Fetch categories
+      console.log('📂 Fetching categories for org:', organizationId)
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('*')
         .eq('organization_id', organizationId)
         .order('name')
+
+      console.log('📂 Categories raw response:', { data: categoriesData, error: categoriesError })
 
       if (categoriesError) {
         console.error('❌ Categories error:', categoriesError)
@@ -152,12 +175,18 @@ export default function Dashboard() {
       }
 
       // Fetch inventory items
-      console.log('📦 Fetching inventory items...')
+      console.log('📦 Fetching inventory items for org:', organizationId)
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory_items')
         .select('*')
         .eq('organization_id', organizationId)
         .order('brand')
+
+      console.log('📦 Inventory raw response:', { 
+        data: inventoryData?.length, 
+        error: inventoryError,
+        firstItem: inventoryData?.[0] 
+      })
 
       if (inventoryError) {
         console.error('❌ Inventory error:', inventoryError)
@@ -753,6 +782,29 @@ export default function Dashboard() {
                 <QuickBooksIntegration user={user} />
               </div>
             )}
+
+            {activeTab === 'subscription' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-slate-800">Subscription & Team Management</h2>
+                  <p className="text-slate-600 mt-1">Manage your subscription, team members, and app access</p>
+                </div>
+                
+                {/* Subscription Management */}
+                <div className="space-y-8">
+                  <SubscriptionManager />
+                  
+                  {/* Team & Permissions Management */}
+                  {(userProfile?.role === 'owner' || userProfile?.role === 'manager') && (
+                    <div className="bg-white rounded-xl border border-blue-200 shadow-sm p-6">
+                      <h3 className="text-xl font-semibold text-slate-800 mb-4">Team & Permissions</h3>
+                      <p className="text-slate-600 mb-6">Manage team member roles and access permissions</p>
+                      <UserPermissions organizationId={organization?.id} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -795,5 +847,21 @@ export default function Dashboard() {
         />
       )}
     </div>
+  )
+}
+
+export default function Dashboard() {
+  return (
+    <AppAccessGuard 
+      appId="liquor-inventory" 
+      appName="Liquor Inventory"
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+          <div className="text-slate-800 text-xl">Loading Liquor Inventory...</div>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </AppAccessGuard>
   )
 }

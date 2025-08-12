@@ -35,11 +35,19 @@ export default function SubscriptionManager() {
   useEffect(() => {
     if (organization?.id) {
       fetchSubscription()
+    } else if (organization === null) {
+      // Organization data is loaded but user doesn't have one
+      setLoading(false)
     }
   }, [organization?.id])
 
   const fetchSubscription = async () => {
     try {
+      if (!organization?.id) {
+        console.warn('No organization ID available for subscription fetch')
+        return
+      }
+
       const { data, error } = await supabase
         .from('organizations')
         .select(`
@@ -51,10 +59,13 @@ export default function SubscriptionManager() {
           stripe_subscription_id,
           stripe_price_id
         `)
-        .eq('id', organization?.id)
+        .eq('id', organization.id)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
 
       setSubscription({
         id: data.id,
@@ -68,6 +79,15 @@ export default function SubscriptionManager() {
       })
     } catch (error) {
       console.error('Error fetching subscription:', error)
+      // Set a default state instead of leaving it null
+      setSubscription({
+        id: organization?.id || '',
+        status: 'trial',
+        plan: 'starter',
+        current_period_start: '',
+        current_period_end: '',
+        cancel_at_period_end: false
+      })
     } finally {
       setLoading(false)
     }
@@ -150,6 +170,23 @@ export default function SubscriptionManager() {
     return (
       <div className="text-center py-8">
         <div className="text-slate-600">Loading subscription details...</div>
+      </div>
+    )
+  }
+
+  if (!organization?.id) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="flex items-center space-x-2 mb-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600" />
+          <h3 className="text-lg font-semibold text-yellow-800">Organization Setup Required</h3>
+        </div>
+        <p className="text-yellow-700 mb-4">
+          You need to be part of an organization to manage subscriptions. Please contact your administrator or create an organization.
+        </p>
+        <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors">
+          Contact Support
+        </button>
       </div>
     )
   }

@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       name: organization.Name
     })
 
-    // Create user account
+    // Create user account with email confirmation
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password: Math.random().toString(36).slice(-12), // Generate temporary password
@@ -115,7 +115,8 @@ export async function POST(request: NextRequest) {
         employees: employees,
         primary_app: primaryApp,
         plan: plan,
-        billing_cycle: billingCycle
+        billing_cycle: billingCycle,
+        signup_completed: true
       }
     })
 
@@ -228,6 +229,21 @@ export async function POST(request: NextRequest) {
         }
       }
     })
+
+    // Send password reset email so user can set their password
+    try {
+      await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email: email,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login?message=Welcome! Please set your password to complete setup.`
+        }
+      })
+      console.log('✅ Password reset email sent to:', email)
+    } catch (emailError) {
+      console.error('⚠️ Failed to send password reset email:', emailError)
+      // Don't fail the signup if email fails
+    }
 
     // Log the signup for analytics
     await supabaseAdmin

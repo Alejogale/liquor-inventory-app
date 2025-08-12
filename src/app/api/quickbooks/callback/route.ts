@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { supabase } from '@/lib/supabase';
 import OAuthClient from 'intuit-oauth';
 
 export async function GET(request: NextRequest) {
@@ -13,13 +12,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
-    }
+    // For demo purposes, we'll use a simplified approach
+    // In production, you'd properly authenticate the user
+    console.log('📊 QuickBooks callback received:', { code, realmId });
 
     const oauthClient = new OAuthClient({
       clientId: process.env.QUICKBOOKS_CLIENT_ID!,

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, ArrowLeft, Mail, Lock, ArrowRight } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Eye, EyeOff, ArrowLeft, Mail, Lock, ArrowRight, CheckCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -14,7 +14,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [welcomeMessage, setWelcomeMessage] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Check for welcome message from URL params
+  useEffect(() => {
+    const message = searchParams.get('message')
+    if (message) {
+      setWelcomeMessage(message)
+    }
+  }, [searchParams])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -22,6 +32,7 @@ export default function LoginPage() {
       [e.target.name]: e.target.value
     }))
     setError('') // Clear error when user types
+    setWelcomeMessage('') // Clear welcome message when user types
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -59,10 +70,12 @@ export default function LoginPage() {
     }
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email)
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
       if (error) throw error
       
-      alert('Password reset email sent! Check your inbox.')
+      alert('Password reset email sent! Check your inbox for the reset link.')
     } catch (error: any) {
       setError(error.message || 'Failed to send reset email')
     }
@@ -112,6 +125,15 @@ export default function LoginPage() {
 
           {/* Login Form Card */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
+            {welcomeMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <p className="text-green-700 text-sm">{welcomeMessage}</p>
+                </div>
+              </div>
+            )}
+
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                 <p className="text-red-700 text-sm">{error}</p>

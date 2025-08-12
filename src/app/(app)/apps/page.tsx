@@ -1,10 +1,12 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { Package, Calendar, Users, CreditCard, Building2, BarChart3, ChevronRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Package, Calendar, Users, CreditCard, Building2, BarChart3, ChevronRight, Settings, Grid3X3 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import AppsSidebar from '@/components/AppsSidebar'
+import SubscriptionManager from '@/components/SubscriptionManager'
+import UserPermissions from '@/components/UserPermissions'
 
 interface AppTile {
   id: string
@@ -61,8 +63,18 @@ const apps: AppTile[] = [
 export default function AppsPage() {
   const { user, userProfile, organization, isPlatformAdmin, signOut } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [hoveredApp, setHoveredApp] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [activeTab, setActiveTab] = useState('apps')
+
+  // Handle URL parameters for tab navigation
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && ['apps', 'subscription'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   if (!user) {
     return (
@@ -135,20 +147,62 @@ export default function AppsPage() {
               )}
             </div>
 
-            {/* Welcome Section */}
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Choose Your Application
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Access all your hospitality management tools from one central hub. 
-                Click on any available application to get started.
-              </p>
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 bg-slate-100 rounded-lg p-1 mb-6 max-w-md">
+              <button
+                onClick={() => setActiveTab('apps')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                  activeTab === 'apps'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Grid3X3 className="h-4 w-4" />
+                <span>Apps</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('subscription')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                  activeTab === 'subscription'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Settings className="h-4 w-4" />
+                <span>Team & Billing</span>
+              </button>
             </div>
+
+            {/* Welcome Section */}
+            {activeTab === 'apps' && (
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                  Choose Your Application
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  Access all your hospitality management tools from one central hub. 
+                  Click on any available application to get started.
+                </p>
+              </div>
+            )}
+
+            {activeTab === 'subscription' && (
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                  Team & Billing Management
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  Manage your subscription, invite team members, and control access permissions.
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Apps Grid in White Container */}
+          {/* Content Container */}
           <div className="bg-white rounded-xl border border-blue-200 shadow-lg p-8">
+            {/* Apps Content */}
+            {activeTab === 'apps' && (
+              <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {apps.map((app) => {
                 const Icon = app.icon
@@ -248,6 +302,25 @@ export default function AppsPage() {
                 </div>
               </div>
             </div>
+              </>
+            )}
+
+            {/* Subscription Content */}
+            {activeTab === 'subscription' && (
+              <div className="space-y-8">
+                {/* Subscription Management */}
+                <SubscriptionManager />
+
+                {/* Team & Permissions Management */}
+                {(userProfile?.role === 'owner' || userProfile?.role === 'manager') && (
+                  <div className="bg-slate-50 rounded-xl border border-slate-200 shadow-sm p-6">
+                    <h3 className="text-xl font-semibold text-slate-800 mb-4">Team & Permissions</h3>
+                    <p className="text-slate-600 mb-6">Manage team member roles and access permissions</p>
+                    <UserPermissions organizationId={organization?.id} />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

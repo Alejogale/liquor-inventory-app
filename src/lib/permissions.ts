@@ -1,189 +1,170 @@
-// Permission system for Hospitality Hub Platform
-// Defines roles, permissions, and access control logic
+import { supabase } from './supabase'
+import { checkAppAccess, AppId, isPlatformAdminEmail } from './subscription-access'
 
-export type UserRole = 'owner' | 'manager' | 'staff' | 'viewer'
-export type PermissionType = 'view' | 'create' | 'edit' | 'delete' | 'export' | 'admin'
-export type AppId = 'liquor-inventory' | 'reservation-management' | 'member-database' | 'pos-system'
+export type Permission = 'view' | 'create' | 'edit' | 'delete' | 'export' | 'admin'
+export type UserRole = 'owner' | 'manager' | 'staff' | 'viewer' | 'admin'
 
-// Default role permissions for each app
-export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, Record<AppId, PermissionType[]>> = {
-  owner: {
-    'liquor-inventory': ['view', 'create', 'edit', 'delete', 'export', 'admin'],
-    'reservation-management': ['view', 'create', 'edit', 'delete', 'export', 'admin'],
-    'member-database': ['view', 'create', 'edit', 'delete', 'export', 'admin'],
-    'pos-system': ['view', 'create', 'edit', 'delete', 'export', 'admin']
-  },
-  manager: {
-    'liquor-inventory': ['view', 'create', 'edit', 'delete', 'export'],
-    'reservation-management': ['view', 'create', 'edit', 'delete', 'export'],
-    'member-database': ['view', 'create', 'edit', 'delete', 'export'],
-    'pos-system': ['view', 'create', 'edit', 'delete', 'export']
-  },
-  staff: {
-    'liquor-inventory': ['view', 'create', 'edit'],
-    'reservation-management': ['view', 'create', 'edit'],
-    'member-database': ['view', 'create'],
-    'pos-system': ['view', 'create']
-  },
-  viewer: {
-    'liquor-inventory': ['view'],
-    'reservation-management': ['view'],
-    'member-database': ['view'],
-    'pos-system': ['view']
-  }
+export interface UserAccess {
+  hasAppAccess: boolean
+  permissions: Permission[]
+  isTrialExpired: boolean
+  isSubscriptionActive: boolean
+  trialDaysRemaining?: number
+  subscriptionType?: 'individual' | 'bundle' | 'trial'
+  reason?: string
 }
 
-// Feature-specific permissions
-export const FEATURE_PERMISSIONS = {
-  // User Management
-  'user-management': {
-    'invite-users': ['owner', 'manager'],
-    'edit-user-roles': ['owner', 'manager'],
-    'suspend-users': ['owner', 'manager'],
-    'view-user-activity': ['owner', 'manager']
-  },
-  
-  // Organization Settings
-  'organization-settings': {
-    'view-settings': ['owner', 'manager'],
-    'edit-settings': ['owner'],
-    'billing-management': ['owner'],
-    'subscription-management': ['owner']
-  },
-  
-  // App Management
-  'app-management': {
-    'activate-apps': ['owner', 'manager'],
-    'configure-apps': ['owner', 'manager'],
-    'view-app-analytics': ['owner', 'manager']
-  },
-  
-  // Data Management
-  'data-management': {
-    'export-data': ['owner', 'manager'],
-    'import-data': ['owner', 'manager'],
-    'backup-data': ['owner'],
-    'delete-data': ['owner']
-  }
-}
+/**
+ * Check comprehensive user access for an app (subscription + custom permissions)
+ */
+export async function checkUserAppAccess(
+  userId: string, 
+  organizationId: string, 
+  appId: AppId,
+  userEmail?: string
+): Promise<UserAccess> {
+  try {
+    console.log(`🔐 checkUserAppAccess Debug - Details:`)
+    console.log('  userId:', userId)
+    console.log('  organizationId:', organizationId)
+    console.log('  appId:', appId)
+    console.log('  userEmail:', userEmail)
+    console.log('  isPlatformAdmin check:', isPlatformAdminEmail(userEmail))
+    
+    // Platform admin always has full access
+    if (isPlatformAdminEmail(userEmail)) {
+      console.log('✅ PLATFORM ADMIN ACCESS GRANTED!')
+      return {
+        hasAppAccess: true,
+        permissions: ['view', 'create', 'edit', 'delete', 'export', 'admin'],
+        isTrialExpired: false,
+        isSubscriptionActive: true,
+        subscriptionType: 'bundle'
+      }
+    }
+    
+    console.log('⚠️ NOT PLATFORM ADMIN - continuing with subscription check...')
 
-// Permission checking utilities
-export class PermissionManager {
-  private userRole: UserRole
-  private customPermissions: Array<{
-    appId: AppId
-    permissionType: PermissionType
-    isActive: boolean
-    expiresAt?: Date
-  }>
-
-  constructor(userRole: UserRole, customPermissions: any[] = []) {
-    this.userRole = userRole
-    this.customPermissions = customPermissions.map(p => ({
-      appId: p.app_id as AppId,
-      permissionType: p.permission_type as PermissionType,
-      isActive: p.is_active,
-      expiresAt: p.expires_at ? new Date(p.expires_at) : undefined
-    }))
-  }
-
-  // Check if user has permission for a specific app and action
-  hasPermission(appId: AppId, permissionType: PermissionType): boolean {
-    // Check if permission has expired
-    const customPermission = this.customPermissions.find(p => 
-      p.appId === appId && 
-      p.permissionType === permissionType &&
-      p.isActive &&
-      (!p.expiresAt || p.expiresAt > new Date())
-    )
-
-    if (customPermission) {
-      return true
+    // 1. Check subscription-level access first
+    const subscriptionAccess = await checkAppAccess(organizationId, appId)
+    
+    if (!subscriptionAccess.hasAccess) {
+      return {
+        hasAppAccess: false,
+        permissions: [],
+        isTrialExpired: subscriptionAccess.isTrialExpired,
+        isSubscriptionActive: subscriptionAccess.isSubscriptionActive,
+        trialDaysRemaining: subscriptionAccess.trialDaysRemaining,
+        subscriptionType: subscriptionAccess.subscriptionType,
+        reason: 'No active subscription or trial'
+      }
     }
 
-    // Check default role permissions
-    const rolePermissions = DEFAULT_ROLE_PERMISSIONS[this.userRole]?.[appId] || []
-    return rolePermissions.includes(permissionType)
-  }
+    // 2. Check user-specific permissions
+    const { data: customPermissions, error: permError } = await supabase
+      .from('user_custom_permissions')
+      .select('permission_type')
+      .eq('user_id', userId)
+      .eq('organization_id', organizationId)
+      .eq('app_id', appId)
+      .single()
 
-  // Check if user can access a specific app
-  canAccessApp(appId: AppId): boolean {
-    return this.hasPermission(appId, 'view')
-  }
+    // 3. Get user profile for role-based permissions
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
 
-  // Check if user can perform a specific feature action
-  canPerformFeature(feature: string, action: string): boolean {
-    const featurePermissions = FEATURE_PERMISSIONS[feature as keyof typeof FEATURE_PERMISSIONS]
-    if (!featurePermissions) return false
+    if (profileError || !userProfile) {
+      return {
+        hasAppAccess: false,
+        permissions: [],
+        isTrialExpired: subscriptionAccess.isTrialExpired,
+        isSubscriptionActive: subscriptionAccess.isSubscriptionActive,
+        reason: 'User profile not found'
+      }
+    }
 
-    const allowedRoles = featurePermissions[action as keyof typeof featurePermissions]
-    if (!allowedRoles) return false
+    // 4. Determine permissions based on custom permissions or role
+    let permissions: Permission[] = []
+    
+    if (customPermissions && !permError) {
+      // User has custom permissions for this app
+      permissions = getPermissionsFromType(customPermissions.permission_type)
+    } else {
+      // Use role-based permissions
+      permissions = getPermissionsFromRole(userProfile.role as UserRole)
+    }
 
-    return allowedRoles.includes(this.userRole)
-  }
+    return {
+      hasAppAccess: true,
+      permissions,
+      isTrialExpired: subscriptionAccess.isTrialExpired,
+      isSubscriptionActive: subscriptionAccess.isSubscriptionActive,
+      trialDaysRemaining: subscriptionAccess.trialDaysRemaining,
+      subscriptionType: subscriptionAccess.subscriptionType
+    }
 
-  // Get all permissions for a specific app
-  getAppPermissions(appId: AppId): PermissionType[] {
-    const rolePermissions = DEFAULT_ROLE_PERMISSIONS[this.userRole]?.[appId] || []
-    const customPermissions = this.customPermissions
-      .filter(p => p.appId === appId && p.isActive && (!p.expiresAt || p.expiresAt > new Date()))
-      .map(p => p.permissionType)
-
-    return [...new Set([...rolePermissions, ...customPermissions])]
-  }
-
-  // Get all apps user can access
-  getAccessibleApps(): AppId[] {
-    return Object.values(AppId).filter(appId => this.canAccessApp(appId))
+  } catch (error) {
+    console.error('Error checking user app access:', error)
+    return {
+      hasAppAccess: false,
+      permissions: [],
+      isTrialExpired: true,
+      isSubscriptionActive: false,
+      reason: 'Error checking access'
+    }
   }
 }
 
-// React hook for permissions (to be used with auth context)
-export const usePermissions = (userRole: UserRole, customPermissions: any[] = []) => {
-  const permissionManager = new PermissionManager(userRole, customPermissions)
-  
-  return {
-    hasPermission: (appId: AppId, permissionType: PermissionType) => 
-      permissionManager.hasPermission(appId, permissionType),
-    canAccessApp: (appId: AppId) => 
-      permissionManager.canAccessApp(appId),
-    canPerformFeature: (feature: string, action: string) => 
-      permissionManager.canPerformFeature(feature, action),
-    getAppPermissions: (appId: AppId) => 
-      permissionManager.getAppPermissions(appId),
-    getAccessibleApps: () => 
-      permissionManager.getAccessibleApps()
+/**
+ * Convert permission type to permissions array
+ */
+function getPermissionsFromType(permissionType: string): Permission[] {
+  switch (permissionType) {
+    case 'admin':
+      return ['view', 'create', 'edit', 'delete', 'export', 'admin']
+    case 'edit':
+      return ['view', 'create', 'edit', 'export']
+    case 'create':
+      return ['view', 'create']
+    case 'view':
+      return ['view']
+    default:
+      return ['view']
   }
 }
 
-// Permission guard component
-export const PermissionGuard = ({ 
-  children, 
-  appId, 
-  permissionType, 
-  fallback = null 
-}: {
-  children: React.ReactNode
-  appId: AppId
-  permissionType: PermissionType
-  fallback?: React.ReactNode
-}) => {
-  // This would be used with the auth context
-  // For now, return children (will be implemented with auth context)
-  return <>{children}</>
+/**
+ * Convert user role to permissions array
+ */
+function getPermissionsFromRole(role: UserRole): Permission[] {
+  switch (role) {
+    case 'owner':
+    case 'admin':
+      return ['view', 'create', 'edit', 'delete', 'export', 'admin']
+    case 'manager':
+      return ['view', 'create', 'edit', 'export']
+    case 'staff':
+      return ['view', 'create', 'edit']
+    case 'viewer':
+      return ['view']
+    default:
+      return ['view']
+  }
 }
 
-// App access guard component
-export const AppAccessGuard = ({ 
-  children, 
-  appId, 
-  fallback = null 
-}: {
-  children: React.ReactNode
-  appId: AppId
-  fallback?: React.ReactNode
-}) => {
-  // This would be used with the auth context
-  // For now, return children (will be implemented with auth context)
-  return <>{children}</>
+/**
+ * Check if user has specific permission for an app
+ */
+export async function hasPermission(
+  userId: string,
+  organizationId: string,
+  appId: AppId,
+  permission: Permission,
+  userEmail?: string
+): Promise<boolean> {
+  const access = await checkUserAppAccess(userId, organizationId, appId, userEmail)
+  return access.hasAppAccess && access.permissions.includes(permission)
 }
