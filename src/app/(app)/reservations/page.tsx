@@ -413,10 +413,9 @@ function ReservationContent({ setShowImportPopup }: {
 
           <button
             onClick={async () => {
-              if (confirm('⚠️ Clear ALL reservations for today? This cannot be undone!')) {
+              if (confirm('⚠️ Clear ALL reservations for your organization? This cannot be undone!')) {
                 if (!organization?.id) return
-                const today = dayTabs[activeDayIndex].toISOString().split('T')[0]
-                await clearAllReservations(organization.id, today)
+                await clearAllReservations(organization.id)
                 fetchReservations() // Refresh the display
               }
             }}
@@ -1066,13 +1065,12 @@ async function clearCancelledReservations() {
   }
 }
 
-async function clearAllReservations(organizationId: string, currentDate: string) {
+async function clearAllReservations(organizationId: string) {
   try {
     const { error } = await supabase
       .from('reservations')
       .delete()
       .eq('organization_id', organizationId)
-      .eq('reservation_date', currentDate)
     
     if (error) {
       console.error('Error clearing all reservations:', error)

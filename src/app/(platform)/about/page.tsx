@@ -4,31 +4,56 @@ import { Users, Target, Award, Heart, ArrowRight, Star, Zap, Shield } from 'luci
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">H</span>
-              </div>
-              <span className="text-xl font-bold text-slate-900">Hospitality Hub</span>
+      {/* Glassmorphic Bubble Navigation - Mofin Style */}
+      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl"
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             backdropFilter: 'blur(20px)',
+             WebkitBackdropFilter: 'blur(20px)',
+             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+           }}>
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg"
+                 style={{
+                   background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
+                   boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                 }}>
+              <span className="text-white font-bold text-xs">H</span>
             </div>
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Home</Link>
-              <Link href="/#apps" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Apps</Link>
-              <Link href="/#features" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Features</Link>
-              <Link href="/pricing" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Pricing</Link>
-              <Link href="/contact" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Contact</Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">
-                Sign In
-              </Link>
-              <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
-                Start Free Trial
-              </Link>
-            </div>
+            <span className="font-bold text-gray-900 text-lg">Hospitality Hub</span>
+          </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
+            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
+            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
+            <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
+            <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
+          </div>
+          
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="text-gray-700 hover:text-gray-900 transition-colors font-medium text-sm px-3 py-1.5">
+              Sign In
+            </Link>
+            <Link href="/signup" 
+                  className="px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm text-white"
+                  style={{
+                    background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
+                    boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                  }}>
+              Get Started
+            </Link>
           </div>
         </div>
       </nav>
@@ -51,8 +76,139 @@ export default function AboutPage() {
                 We're passionate about helping hospitality businesses thrive in the digital age. 
                 Our platform brings together everything you need to run your business efficiently, 
                 from inventory management to customer relationships.
+                <span className="block mt-2 text-lg">
+                  <span className="text-orange-600 font-semibold">8+ specialized apps</span> designed specifically for hospitality professionals.
+                </span>
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App Showcase Section */}
+      <section className="py-16 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900">
+              Our Hospitality App Suite
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Comprehensive tools designed specifically for restaurants, bars, hotels, and clubs.
+            </p>
+          </div>
+
+          <div className="relative flex justify-center items-center min-h-[600px]">
+            {/* Main Mockup - Liquor Inventory App */}
+            <div className="relative z-30 transform scale-110">
+              <div className="w-72 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+                   style={{
+                     boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8)'
+                   }}>
+                {/* Phone Header */}
+                <div className="h-6 bg-gray-900 rounded-t-2xl flex items-center justify-center">
+                  <div className="w-16 h-1 bg-gray-700 rounded-full"></div>
+                </div>
+                
+                {/* App Header */}
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
+                  <h3 className="font-bold text-lg">Liquor Inventory</h3>
+                  <p className="text-orange-100 text-sm">Manhattan Club</p>
+                </div>
+                
+                {/* App Content */}
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm text-gray-900">Grey Goose Vodka</div>
+                      <div className="text-xs text-gray-500">1.75L Premium</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900">23 bottles</div>
+                      <div className="text-xs text-orange-600">Low Stock</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm text-gray-900">Macallan 18</div>
+                      <div className="text-xs text-gray-500">750ml Single Malt</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900">8 bottles</div>
+                      <div className="text-xs text-green-600">In Stock</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm text-gray-900">Dom Pérignon</div>
+                      <div className="text-xs text-gray-500">750ml Champagne</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900">3 bottles</div>
+                      <div className="text-xs text-red-600">Critical</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Left Mockup - Reservations App */}
+            <div className="absolute left-0 z-20 transform -rotate-12 translate-x-8 translate-y-4">
+              <div className="w-64 h-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden opacity-80">
+                <div className="h-5 bg-gray-900 rounded-t-xl"></div>
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-3 text-white">
+                  <h3 className="font-bold">Reservations</h3>
+                  <p className="text-blue-100 text-xs">The Capital Grille</p>
+                </div>
+                <div className="p-3 space-y-2">
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Johnson Party (4)</div>
+                    <div className="text-gray-500">7:30 PM - Table 12</div>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Chen Reservation (2)</div>
+                    <div className="text-gray-500">8:00 PM - Table 5</div>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Martinez Group (6)</div>
+                    <div className="text-gray-500">8:30 PM - Table 8</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Mockup - Member Database */}
+            <div className="absolute right-0 z-20 transform rotate-12 -translate-x-8 translate-y-4">
+              <div className="w-64 h-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden opacity-80">
+                <div className="h-5 bg-gray-900 rounded-t-xl"></div>
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 text-white">
+                  <h3 className="font-bold">Member Database</h3>
+                  <p className="text-purple-100 text-xs">Elite Country Club</p>
+                </div>
+                <div className="p-3 space-y-2">
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Sarah Williams</div>
+                    <div className="text-gray-500">Premium Member</div>
+                    <div className="text-green-600 text-xs">Active</div>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Michael Chen</div>
+                    <div className="text-gray-500">Gold Member</div>
+                    <div className="text-green-600 text-xs">Active</div>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded text-xs">
+                    <div className="font-medium">Robert Davis</div>
+                    <div className="text-gray-500">VIP Member</div>
+                    <div className="text-blue-600 text-xs">Premium</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 left-20 w-32 h-32 bg-orange-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-20 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl"></div>
           </div>
         </div>
       </section>

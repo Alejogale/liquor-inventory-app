@@ -111,6 +111,9 @@ export default function LandingPage() {
                       </span>
                     </span>
                   </h1>
+                  <p className="text-xl text-gray-600 font-medium mt-4">
+                    Simple. Reliable. Affordable.
+                  </p>
                 </div>
                 
                 <p className="text-xl text-gray-600 leading-relaxed max-w-xl lg:max-w-none">

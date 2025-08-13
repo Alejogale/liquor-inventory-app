@@ -72,8 +72,9 @@ export default function ContactPage() {
           </div>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</a>
-            <a href="#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</a>
+            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
+            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
+            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
             <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
             <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
           </div>
@@ -124,6 +125,91 @@ export default function ContactPage() {
                 Ready to transform your hospitality business? Our team is here to help you get started 
                 and answer any questions you might have.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mini App Preview Section */}
+      <section className="py-12 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4 mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">
+              See Our Platform in Action
+            </h2>
+            <p className="text-lg text-slate-600">
+              Join 500+ hospitality businesses using our integrated suite.
+            </p>
+          </div>
+
+          <div className="flex justify-center items-center space-x-8">
+            {/* Mini Mockup 1 - Inventory */}
+            <div className="w-48 h-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Inventory</h3>
+                <p className="text-orange-100 text-xs">Real-time tracking</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Premium Vodka</div>
+                  <div className="text-green-600">In Stock: 42</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Single Malt</div>
+                  <div className="text-orange-600">Low: 8</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Champagne</div>
+                  <div className="text-red-600">Critical: 2</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mini Mockup 2 - Reservations */}
+            <div className="w-48 h-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Reservations</h3>
+                <p className="text-blue-100 text-xs">Tonight's bookings</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Table 5 - 7:30 PM</div>
+                  <div className="text-gray-500">Party of 4</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Table 12 - 8:00 PM</div>
+                  <div className="text-gray-500">Party of 2</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">VIP Room - 9:00 PM</div>
+                  <div className="text-purple-600">Corporate</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mini Mockup 3 - Members */}
+            <div className="w-48 h-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Members</h3>
+                <p className="text-purple-100 text-xs">Premium database</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Sarah Chen</div>
+                  <div className="text-green-600">VIP Member</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Mike Rodriguez</div>
+                  <div className="text-blue-600">Gold Member</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Lisa Johnson</div>
+                  <div className="text-purple-600">Premium</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

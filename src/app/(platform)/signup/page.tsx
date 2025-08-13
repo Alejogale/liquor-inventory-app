@@ -128,8 +128,11 @@ export default function SignupPage() {
                 <span className="bg-gradient-to-r from-orange-600 via-orange-500 to-blue-600 bg-clip-text text-transparent">Easy Hospitality Management</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                Join hundreds of hospitality businesses already using our platform to streamline operations, 
+                Join 500+ hospitality businesses already using our platform to streamline operations, 
                 reduce costs, and improve customer experiences.
+                <span className="block mt-2 text-lg">
+                  <span className="text-orange-600 font-semibold">8+ apps coming soon</span> - designed specifically for restaurants, bars, hotels, and clubs.
+                </span>
               </p>
             </div>
 

@@ -29,8 +29,9 @@ export default function PricingPage() {
           </div>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</a>
-            <a href="#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</a>
+            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
+            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
+            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
             <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
             <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
           </div>
@@ -82,6 +83,100 @@ export default function PricingPage() {
                 Pay only for the apps you need. Start with one app and add more as your business grows. 
                 All apps work together seamlessly.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App Preview Section */}
+      <section className="py-12 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4 mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">
+              Each App Designed for Success
+            </h2>
+            <p className="text-lg text-slate-600">
+              Professional tools with real hospitality data and workflows.
+            </p>
+          </div>
+
+          <div className="flex justify-center items-center space-x-6">
+            {/* Inventory App Preview */}
+            <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Liquor Inventory</h3>
+                <p className="text-orange-100 text-xs">Manhattan Club</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Grey Goose</div>
+                  <div className="text-orange-600">Low: 23 bottles</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Macallan 18</div>
+                  <div className="text-green-600">Stock: 8 bottles</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Dom Pérignon</div>
+                  <div className="text-red-600">Critical: 3</div>
+                </div>
+                <div className="bg-orange-100 p-2 rounded text-xs text-center">
+                  <div className="text-orange-600 font-medium">$29/month</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reservations App Preview */}
+            <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Reservations</h3>
+                <p className="text-blue-100 text-xs">The Capital Grille</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">7:30 PM - Table 12</div>
+                  <div className="text-gray-500">Johnson (4)</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">8:00 PM - Table 5</div>
+                  <div className="text-gray-500">Chen (2)</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">8:30 PM - VIP</div>
+                  <div className="text-purple-600">Corporate (6)</div>
+                </div>
+                <div className="bg-yellow-100 p-2 rounded text-xs text-center">
+                  <div className="text-yellow-600 font-medium">Coming Soon</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Members App Preview */}
+            <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+              <div className="h-4 bg-gray-900 rounded-t-xl"></div>
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 text-white">
+                <h3 className="font-bold text-sm">Member Database</h3>
+                <p className="text-purple-100 text-xs">Elite Country Club</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Sarah Williams</div>
+                  <div className="text-green-600">VIP Member</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Michael Chen</div>
+                  <div className="text-blue-600">Gold Member</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-medium">Robert Davis</div>
+                  <div className="text-purple-600">Premium</div>
+                </div>
+                <div className="bg-yellow-100 p-2 rounded text-xs text-center">
+                  <div className="text-yellow-600 font-medium">Coming Soon</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
