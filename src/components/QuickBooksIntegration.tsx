@@ -177,16 +177,16 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
               disabled={loading}
               className="flex-1 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               style={{
-                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 158, 46, 0.35)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 54, 93, 0.25)';
               }}
             >
               {loading ? 'Syncing...' : 'Sync Inventory Now'}
@@ -228,16 +228,16 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
             disabled={loading}
             className="text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             style={{
-              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+              background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+              boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 158, 46, 0.35)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 54, 93, 0.25)';
             }}
           >
             {loading ? 'Connecting...' : 'Connect to QuickBooks'}

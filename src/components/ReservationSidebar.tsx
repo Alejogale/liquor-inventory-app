@@ -346,22 +346,22 @@ export default function ReservationSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-purple-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-purple-50 transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-[#a0aec0]/40 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-[#f7fafc] transition-colors"
         aria-label="Toggle sidebar menu"
       >
         {isCollapsed ? <Menu className="h-6 w-6" /> : <X className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white border-r border-purple-200 shadow-lg z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full bg-white border-r border-[#a0aec0]/40 shadow-lg z-40 transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-80'
       } lg:relative lg:translate-x-0 lg:col-span-1`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-purple-200">
+          <div className="p-6 border-b border-[#a0aec0]/40">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${isCollapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#1a365d] to-[#2d3748] rounded-xl flex items-center justify-center">
                   <Calendar className="h-6 w-6 text-white" />
                 </div>
                 {!isCollapsed && (
@@ -375,7 +375,7 @@ export default function ReservationSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-purple-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-[#f7fafc] text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -383,9 +383,9 @@ export default function ReservationSidebar({
 
             {/* User Info */}
             {!isCollapsed && (
-              <div className="mt-4 p-3 bg-purple-100 rounded-lg border border-purple-200">
+              <div className="mt-4 p-3 bg-[#f7fafc] rounded-lg border border-[#a0aec0]/40">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#22543d] to-[#1a365d] rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
                       {userEmail.charAt(0).toUpperCase()}
                     </span>
@@ -404,16 +404,16 @@ export default function ReservationSidebar({
             {/* Back to Apps */}
             <Link
               href="/apps"
-              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-blue-50 border border-transparent hover:border-blue-200"
+              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-[#f7fafc] border border-transparent hover:border-[#a0aec0]/40"
             >
-              <ArrowLeft className="h-5 w-5 flex-shrink-0 text-blue-600 group-hover:text-blue-700" />
+              <ArrowLeft className="h-5 w-5 flex-shrink-0 text-[#1a365d] group-hover:text-[#2d3748]" />
               
               {!isCollapsed && (
                 <div className="ml-3 text-left">
-                  <p className="text-sm font-medium text-blue-700 group-hover:text-blue-800">
+                  <p className="text-sm font-medium text-[#1a365d] group-hover:text-[#2d3748]">
                     Back to Apps
                   </p>
-                  <p className="text-xs text-blue-600 group-hover:text-blue-700">
+                  <p className="text-xs text-slate-600 group-hover:text-slate-700">
                     App launcher
                   </p>
                 </div>
@@ -430,16 +430,16 @@ export default function ReservationSidebar({
             {/* Import CSV */}
             <button
               onClick={onImportClick}
-              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-green-50 border border-transparent hover:border-green-200"
+              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-[#f7fafc] border border-transparent hover:border-[#a0aec0]/40"
             >
-              <Upload className="h-5 w-5 flex-shrink-0 text-green-600 group-hover:text-green-700" />
+              <Upload className="h-5 w-5 flex-shrink-0 text-[#22543d] group-hover:text-[#1a365d]" />
               
               {!isCollapsed && (
                 <div className="ml-3 text-left">
-                  <p className="text-sm font-medium text-green-700 group-hover:text-green-800">
+                  <p className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
                     Import CSV/Excel
                   </p>
-                  <p className="text-xs text-green-600 group-hover:text-green-700">
+                  <p className="text-xs text-slate-600 group-hover:text-slate-700">
                     Import reservations
                   </p>
                 </div>
@@ -486,7 +486,7 @@ export default function ReservationSidebar({
                   <div className="flex space-x-1">
                     <button
                       onClick={handleAddRoom}
-                      className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                      className="px-2 py-1 text-xs bg-[#22543d] text-white rounded hover:bg-[#1a365d]"
                     >
                       Add
                     </button>
@@ -524,7 +524,7 @@ export default function ReservationSidebar({
                           />
                           <button
                             onClick={() => handleSaveRoom(room.id)}
-                            className="p-1 text-green-600 hover:text-green-700"
+                            className="p-1 text-[#22543d] hover:text-[#1a365d]"
                           >
                             <Save className="h-3 w-3" />
                           </button>
@@ -544,7 +544,7 @@ export default function ReservationSidebar({
                           <div className="opacity-0 group-hover:opacity-100 flex space-x-1">
                             <button
                               onClick={() => handleEditRoom(room)}
-                              className="p-1 text-blue-500 hover:text-blue-600"
+                              className="p-1 text-[#1a365d] hover:text-[#2d3748]"
                             >
                               <Edit3 className="h-3 w-3" />
                             </button>
@@ -572,7 +572,7 @@ export default function ReservationSidebar({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-purple-200">
+          <div className="p-4 border-t border-[#a0aec0]/40">
             <button
               onClick={onSignOut}
               className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-200 text-red-600 hover:text-red-700"

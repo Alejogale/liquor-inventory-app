@@ -64,22 +64,22 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50/20 via-white to-blue-50/20">
-      {/* Glassmorphic Bubble Navigation - Mofin Style */}
+    <div className="min-h-screen bg-gradient-to-br from-[#f7fafc]/60 via-white to-[#edf2f7]/60">
+      {/* Glassmorphic Bubble Navigation - Luxury */}
       <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl"
            style={{
-             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             background: 'linear-gradient(135deg, rgba(247,250,252,0.9) 0%, rgba(237,242,247,0.85) 100%)',
              backdropFilter: 'blur(20px)',
              WebkitBackdropFilter: 'blur(20px)',
-             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+             boxShadow: '0 8px 32px rgba(26, 54, 93, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
            }}>
         <div className="flex items-center gap-8">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-lg"
                  style={{
-                   background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                   boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                   background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)',
+                   boxShadow: '0 4px 12px rgba(214, 158, 46, 0.25)'
                  }}>
               <span className="text-white font-bold text-xs">H</span>
             </div>
@@ -88,11 +88,11 @@ export default function SignupPage() {
           
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
-            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
-            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
-            <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
-            <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
+            <Link href="/" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Home</Link>
+            <Link href="/#apps" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Apps</Link>
+            <Link href="/#features" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Features</Link>
+            <Link href="/pricing" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Pricing</Link>
+            <Link href="/contact" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Contact</Link>
           </div>
           
           {/* CTA Button */}
@@ -104,8 +104,8 @@ export default function SignupPage() {
       </nav>
 
       {/* Background Elements */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-200/20 to-blue-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-blue-200/20 to-orange-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-[#f7fafc]/60 to-[#edf2f7]/60 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-[#edf2f7]/60 to-[#f7fafc]/60 rounded-full mix-blend-multiply filter blur-3xl"></div>
 
       {/* Hero Section */}
       <section className="pt-24 pb-12 relative z-10">
@@ -113,9 +113,9 @@ export default function SignupPage() {
           <div className="text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border backdrop-blur-sm"
                  style={{
-                   background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
-                   borderColor: 'rgba(255, 119, 0, 0.2)',
-                   color: '#ea580c'
+                   background: 'linear-gradient(135deg, rgba(247,250,252,0.8) 0%, rgba(237,242,247,0.7) 100%)',
+                   borderColor: 'rgba(160, 174, 192, 0.35)',
+                   color: '#1a365d'
                  }}>
               <Star className="w-3.5 h-3.5" />
               Start Your Free Trial
@@ -125,19 +125,19 @@ export default function SignupPage() {
               <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
                 Start Your Free Trial
                 <br />
-                <span className="bg-gradient-to-r from-orange-600 via-orange-500 to-blue-600 bg-clip-text text-transparent">Easy Hospitality Management</span>
+                <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)' }}>Easy Hospitality Management</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
                 Join 500+ hospitality businesses already using our platform to streamline operations, 
                 reduce costs, and improve customer experiences.
                 <span className="block mt-2 text-lg">
-                  <span className="text-orange-600 font-semibold">8+ apps coming soon</span> - designed specifically for restaurants, bars, hotels, and clubs.
+                  <span className="text-[#d69e2e] font-semibold">8+ apps coming soon</span> - designed specifically for restaurants, bars, hotels, and clubs.
                 </span>
               </p>
             </div>
 
             <div className="flex justify-center pt-4">
-              <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium text-sm transition-colors">
+              <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#d69e2e] font-medium text-sm transition-colors">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Home
               </Link>
@@ -153,10 +153,10 @@ export default function SignupPage() {
             {/* Signup Form */}
             <div className="rounded-2xl p-8 shadow-2xl border border-white/20 backdrop-blur-xl"
                  style={{
-                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   background: 'linear-gradient(135deg, rgba(247,250,252,0.9) 0%, rgba(237,242,247,0.85) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
-                   boxShadow: '0 25px 50px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                   boxShadow: '0 25px 50px rgba(26, 54, 93, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                  }}>
               <h2 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Create Your Account</h2>
               
@@ -185,7 +185,7 @@ export default function SignupPage() {
                         value={formData.firstName}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                         placeholder="John"
                       />
                     </div>
@@ -200,7 +200,7 @@ export default function SignupPage() {
                         value={formData.lastName}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                         placeholder="Doe"
                       />
                     </div>
@@ -217,7 +217,7 @@ export default function SignupPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all text-sm"
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#1a365d] focus:ring-1 focus:ring-[#1a365d] transition-all text-sm"
                       placeholder="john@company.com"
                     />
                   </div>
@@ -234,7 +234,7 @@ export default function SignupPage() {
                         value={formData.company}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                         placeholder="Your Company"
                       />
                     </div>
@@ -248,7 +248,7 @@ export default function SignupPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                         placeholder="+1 (555) 123-4567"
                       />
                     </div>
@@ -265,7 +265,7 @@ export default function SignupPage() {
                         value={formData.businessType}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                       >
                         <option value="">Select business type</option>
                         <option value="restaurant">Restaurant</option>
@@ -285,7 +285,7 @@ export default function SignupPage() {
                         name="employees"
                         value={formData.employees}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm backdrop-blur-sm"
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#d69e2e] focus:ring-2 focus:ring-[#d69e2e]20 transition-all text-sm backdrop-blur-sm"
                       >
                         <option value="">Select size</option>
                         <option value="1-10">1-10 employees</option>
@@ -306,7 +306,7 @@ export default function SignupPage() {
                       value={formData.primaryApp}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all text-sm"
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:border-[#1a365d] focus:ring-1 focus:ring-[#1a365d] transition-all text-sm"
                     >
                       <option value="">Select primary app</option>
                       <option value="liquor-inventory">Liquor Inventory Management</option>
@@ -355,16 +355,16 @@ export default function SignupPage() {
                     <div className="space-y-3">
                       <div 
                         className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                          formData.plan === 'starter' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                          formData.plan === 'starter' ? 'border-[#1a365d] bg-[#f7fafc]' : 'border-gray-200 hover:border-gray-300'
                         }`} 
                         onClick={() => setFormData({...formData, plan: 'starter'})}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              formData.plan === 'starter' ? 'border-gray-900' : 'border-gray-300'
+                              formData.plan === 'starter' ? 'border-[#1a365d]' : 'border-gray-300'
                             }`}>
-                              {formData.plan === 'starter' && <div className="w-2 h-2 bg-gray-900 rounded-full"></div>}
+                              {formData.plan === 'starter' && <div className="w-2 h-2 bg-[#1a365d] rounded-full"></div>}
                             </div>
                             <div>
                               <h3 className="font-semibold text-gray-900">Starter</h3>
@@ -387,16 +387,16 @@ export default function SignupPage() {
 
                       <div 
                         className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                          formData.plan === 'professional' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                          formData.plan === 'professional' ? 'border-[#1a365d] bg-[#f7fafc]' : 'border-gray-200 hover:border-gray-300'
                         }`} 
                         onClick={() => setFormData({...formData, plan: 'professional'})}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              formData.plan === 'professional' ? 'border-gray-900' : 'border-gray-300'
+                              formData.plan === 'professional' ? 'border-[#1a365d]' : 'border-gray-300'
                             }`}>
-                              {formData.plan === 'professional' && <div className="w-2 h-2 bg-gray-900 rounded-full"></div>}
+                              {formData.plan === 'professional' && <div className="w-2 h-2 bg-[#1a365d] rounded-full"></div>}
                             </div>
                             <div>
                               <h3 className="font-semibold text-gray-900">Professional</h3>
@@ -419,16 +419,16 @@ export default function SignupPage() {
 
                       <div 
                         className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                          formData.plan === 'enterprise' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                          formData.plan === 'enterprise' ? 'border-[#1a365d] bg-[#f7fafc]' : 'border-gray-200 hover:border-gray-300'
                         }`} 
                         onClick={() => setFormData({...formData, plan: 'enterprise'})}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              formData.plan === 'enterprise' ? 'border-gray-900' : 'border-gray-300'
+                              formData.plan === 'enterprise' ? 'border-[#1a365d]' : 'border-gray-300'
                             }`}>
-                              {formData.plan === 'enterprise' && <div className="w-2 h-2 bg-gray-900 rounded-full"></div>}
+                              {formData.plan === 'enterprise' && <div className="w-2 h-2 bg-[#1a365d] rounded-full"></div>}
                             </div>
                             <div>
                               <h3 className="font-semibold text-gray-900">Enterprise</h3>
@@ -486,19 +486,19 @@ export default function SignupPage() {
                     disabled={isSubmitting || !formData.plan}
                     className="w-full text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
                     style={{
-                      background: (isSubmitting || !formData.plan) ? '#9ca3af' : 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                      boxShadow: (isSubmitting || !formData.plan) ? 'none' : '0 8px 24px rgba(255, 119, 0, 0.3)'
+                      background: (isSubmitting || !formData.plan) ? '#9ca3af' : 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                      boxShadow: (isSubmitting || !formData.plan) ? 'none' : '0 8px 24px rgba(26, 54, 93, 0.25)'
                     }}
                     onMouseEnter={(e) => {
                       if (!isSubmitting && formData.plan) {
                         e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.boxShadow = '0 12px 32px rgba(255, 119, 0, 0.4)';
+                        e.currentTarget.style.boxShadow = '0 12px 32px rgba(214, 158, 46, 0.35)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isSubmitting && formData.plan) {
                         e.currentTarget.style.transform = 'translateY(0px)';
-                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 119, 0, 0.3)';
+                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(26, 54, 93, 0.25)';
                       }
                     }}
                   >
@@ -517,7 +517,7 @@ export default function SignupPage() {
 
                   <p className="text-center text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-orange-600 hover:text-orange-700 font-medium transition-colors">
+                    <Link href="/login" className="text-[#1a365d] hover:text-[#2d3748] font-medium transition-colors">
                       Sign in here
                     </Link>
                   </p>
@@ -529,18 +529,18 @@ export default function SignupPage() {
             <div className="space-y-8">
               <div className="rounded-2xl p-8 backdrop-blur-xl border border-white/20"
                    style={{
-                     background: 'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,247,237,0.6) 100%)',
+                     background: 'linear-gradient(135deg, rgba(247,250,252,0.7) 0%, rgba(237,242,247,0.65) 100%)',
                      backdropFilter: 'blur(20px)',
                      WebkitBackdropFilter: 'blur(20px)',
-                     boxShadow: '0 8px 32px rgba(255, 119, 0, 0.05)'
+                     boxShadow: '0 8px 32px rgba(26, 54, 93, 0.08)'
                    }}>
                 <h2 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Why Choose Hospitality Hub?</h2>
                 <div className="space-y-8">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
                          style={{
-                           background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                           boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                           background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)',
+                           boxShadow: '0 4px 12px rgba(214, 158, 46, 0.25)'
                          }}>
                       <Zap className="w-6 h-6 text-white" />
                     </div>
@@ -553,8 +553,8 @@ export default function SignupPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
                          style={{
-                           background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                           boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                           background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                           boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
                          }}>
                       <Shield className="w-6 h-6 text-white" />
                     </div>
@@ -567,8 +567,8 @@ export default function SignupPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
                          style={{
-                           background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                           boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
+                           background: 'linear-gradient(135deg, #22543d 0%, #1a365d 100%)',
+                           boxShadow: '0 4px 12px rgba(34, 85, 61, 0.25)'
                          }}>
                       <Users className="w-6 h-6 text-white" />
                     </div>
@@ -581,8 +581,8 @@ export default function SignupPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
                          style={{
-                           background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
-                           boxShadow: '0 4px 12px rgba(147, 51, 234, 0.3)'
+                           background: 'linear-gradient(135deg, #742a2a 0%, #2d3748 100%)',
+                           boxShadow: '0 4px 12px rgba(116, 42, 42, 0.25)'
                          }}>
                       <Building2 className="w-6 h-6 text-white" />
                     </div>
@@ -597,14 +597,14 @@ export default function SignupPage() {
               {/* Testimonials */}
               <div className="rounded-2xl p-8 backdrop-blur-xl border border-white/20"
                    style={{
-                     background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.7) 100%)',
+                     background: 'linear-gradient(135deg, rgba(247,250,252,0.8) 0%, rgba(237,242,247,0.75) 100%)',
                      backdropFilter: 'blur(20px)',
                      WebkitBackdropFilter: 'blur(20px)',
-                     boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1)'
+                     boxShadow: '0 8px 32px rgba(26, 54, 93, 0.12)'
                    }}>
                 <div className="flex items-center gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-orange-400 fill-current" />
+                    <Star key={i} className="w-5 h-5 text-[#d69e2e] fill-current" />
                   ))}
                 </div>
                 <p className="text-gray-700 text-base mb-6 leading-relaxed font-medium">
@@ -613,7 +613,7 @@ export default function SignupPage() {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
                        style={{
-                         background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)'
+                         background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)'
                        }}>
                     <span className="text-white font-bold text-sm">SJ</span>
                   </div>
@@ -636,7 +636,7 @@ export default function SignupPage() {
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
                      style={{
-                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                       background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)',
                      }}>
                   <span className="text-white font-semibold text-sm">H</span>
                 </div>
@@ -650,29 +650,29 @@ export default function SignupPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Apps</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Liquor Inventory</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Reservation Management</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Member Database</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">POS System</a></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Liquor Inventory</a></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Reservation Management</a></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Member Database</a></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">POS System</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/about" className="hover:text-orange-600 transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-orange-600 transition-colors">Contact</Link></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Blog</a></li>
+                <li><Link href="/about" className="hover:text-[#d69e2e] transition-colors">About</Link></li>
+                <li><Link href="/contact" className="hover:text-[#d69e2e] transition-colors">Contact</Link></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Support</a></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Blog</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/legal/privacy" className="hover:text-orange-600 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/legal/terms" className="hover:text-orange-600 transition-colors">Terms of Service</Link></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Cookie Policy</a></li>
+                <li><Link href="/legal/privacy" className="hover:text-[#d69e2e] transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/legal/terms" className="hover:text-[#d69e2e] transition-colors">Terms of Service</Link></li>
+                <li><a href="#" className="hover:text-[#d69e2e] transition-colors">Cookie Policy</a></li>
               </ul>
             </div>
           </div>

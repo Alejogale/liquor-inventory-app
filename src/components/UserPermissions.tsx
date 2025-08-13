@@ -261,10 +261,10 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
 
   const getPermissionCategoryColor = (category: string) => {
     switch (category) {
-      case 'inventory': return 'bg-blue-100 text-blue-800'
+      case 'inventory': return 'bg-[#f7fafc] text-[#1a365d] border border-[#a0aec0]/40'
       case 'reports': return 'bg-green-100 text-green-800'
-      case 'users': return 'bg-purple-100 text-purple-800'
-      case 'settings': return 'bg-orange-100 text-orange-800'
+      case 'users': return 'bg-[#edf2f7] text-[#2d3748]'
+      case 'settings': return 'bg-[#fffaf0] text-[#92400e]'
       case 'admin': return 'bg-red-100 text-red-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -293,7 +293,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
               setSelectedRole(null)
               setIsEditingRole(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1a365d] text-white rounded-lg hover:bg-[#2d3748] transition-colors"
           >
             <Plus className="h-4 w-4" />
             New Role
@@ -314,7 +314,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1a365d]"
                 />
               </div>
             </div>
@@ -325,14 +325,14 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   key={user.id}
                   className={`p-4 rounded-lg border transition-colors cursor-pointer ${
                     selectedUser?.id === user.id
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-[#1a365d] bg-[#f7fafc]'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                   onClick={() => setSelectedUser(user)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#1a365d] to-[#2d3748] rounded-full flex items-center justify-center text-white font-semibold">
                         {user.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -378,7 +378,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                     <select
                       value={selectedUser.role}
                       onChange={(e) => updateUserRole(selectedUser.id, e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1a365d]"
                     >
                       {roles.map(role => (
                         <option key={role.id} value={role.id}>{role.name}</option>
@@ -433,7 +433,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   key={role.id}
                   className={`p-3 rounded-lg border transition-colors cursor-pointer ${
                     selectedRole?.id === role.id
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-[#1a365d] bg-[#f7fafc]'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                   onClick={() => setSelectedRole(role)}
@@ -444,7 +444,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                       <div className="text-sm text-slate-600">{role.userCount} users</div>
                     </div>
                     {role.isDefault && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-[#f7fafc] text-[#1a365d] text-xs rounded-full border border-[#a0aec0]/40">
                         Default
                       </span>
                     )}
@@ -472,7 +472,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
               </button>
               <button
                 onClick={() => setIsEditingRole(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-[#1a365d] text-white rounded-lg hover:bg-[#2d3748] transition-colors"
               >
                 Save
               </button>
@@ -488,7 +488,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   type="text"
                   value={selectedRole.name}
                   onChange={(e) => setSelectedRole({ ...selectedRole, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1a365d]"
                 />
               </div>
               <div>
@@ -497,7 +497,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                   type="text"
                   value={selectedRole.description}
                   onChange={(e) => setSelectedRole({ ...selectedRole, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1a365d]"
                 />
               </div>
             </div>
@@ -521,7 +521,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
                                 : selectedRole.permissions.filter(p => p !== permission.id)
                               setSelectedRole({ ...selectedRole, permissions: newPermissions })
                             }}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                            className="h-4 w-4 text-[#1a365d] focus:ring-[#1a365d] border-slate-300 rounded"
                           />
                           <div>
                             <div className="font-medium text-slate-800">{permission.name}</div>
