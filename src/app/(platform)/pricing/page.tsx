@@ -6,22 +6,22 @@ import { useState } from 'react'
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-[#f7fafc] via-[#f7fafc] to-[#edf2f7]">
       {/* Glassmorphic Bubble Navigation - Mofin Style */}
       <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl"
            style={{
-             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             background: 'linear-gradient(135deg, rgba(247,250,252,0.9) 0%, rgba(237,242,247,0.85) 100%)',
              backdropFilter: 'blur(20px)',
              WebkitBackdropFilter: 'blur(20px)',
-             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+             boxShadow: '0 8px 32px rgba(26, 54, 93, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
            }}>
         <div className="flex items-center gap-8">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg"
+            <div className="w-7 h-7 bg-gradient-to-br from-[#d69e2e] to-[#b7791f] rounded-lg flex items-center justify-center shadow-lg"
                  style={{
-                   background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                   boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                   background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)',
+                   boxShadow: '0 4px 12px rgba(214, 158, 46, 0.25)'
                  }}>
               <span className="text-white font-bold text-xs">H</span>
             </div>
@@ -29,11 +29,11 @@ export default function PricingPage() {
           </div>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
-            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
-            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
-            <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
-            <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
+            <Link href="/" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Home</Link>
+            <Link href="/#apps" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Apps</Link>
+            <Link href="/#features" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Features</Link>
+            <Link href="/pricing" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Pricing</Link>
+            <Link href="/contact" className="text-gray-700 hover:text-[#d69e2e] transition-colors font-medium text-sm">Contact</Link>
           </div>
           
           {/* CTA Buttons */}
@@ -45,16 +45,16 @@ export default function PricingPage() {
               onClick={() => window.location.href = '/signup'}
               className="px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm text-white"
               style={{
-                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 158, 46, 0.35)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 54, 93, 0.25)';
               }}>
               Get Started
             </button>
@@ -62,14 +62,14 @@ export default function PricingPage() {
         </div>
       </nav>
 
-      {/* Hero Section - Mofin Style with Orange & Blue Tones */}
+      {/* Hero Section - Luxury Tones */}
       <section className="pt-32 pb-20 relative overflow-hidden">
         {/* Subtle Background Elements */}
-        <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-200/20 to-slate-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-slate-200/20 to-orange-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-[#f7fafc]/60 to-[#edf2f7]/60 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-[#edf2f7]/60 to-[#f7fafc]/60 rounded-full mix-blend-multiply filter blur-3xl"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 bg-[#f7fafc] text-[#1a365d] px-4 py-2 rounded-full text-sm font-medium border border-[#a0aec0]/40">
               <Star className="w-4 h-4 fill-current" />
               Flexible App-Based Pricing
             </div>
@@ -77,7 +77,7 @@ export default function PricingPage() {
             <div className="space-y-6">
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 Simple, Affordable Pricing
-                <span className="block text-orange-600">For Every Business Size</span>
+                <span className="block text-[#d69e2e]">For Exclusive Clubs</span>
               </h1>
               <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
                 Pay only for the apps you need. Start with one app and add more as your business grows. 
@@ -104,14 +104,14 @@ export default function PricingPage() {
             {/* Inventory App Preview */}
             <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
               <div className="h-4 bg-gray-900 rounded-t-xl"></div>
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 text-white">
+              <div className="bg-gradient-to-r from-[#1a365d] to-[#2d3748] p-3 text-white">
                 <h3 className="font-bold text-sm">Liquor Inventory</h3>
-                <p className="text-orange-100 text-xs">Manhattan Club</p>
+                <p className="text-[#a0aec0] text-xs">Manhattan Club</p>
               </div>
               <div className="p-3 space-y-2">
                 <div className="bg-gray-50 p-2 rounded text-xs">
                   <div className="font-medium">Grey Goose</div>
-                  <div className="text-orange-600">Low: 23 bottles</div>
+                  <div className="text-[#d69e2e]">Low: 23 bottles</div>
                 </div>
                 <div className="bg-gray-50 p-2 rounded text-xs">
                   <div className="font-medium">Macallan 18</div>
@@ -121,8 +121,8 @@ export default function PricingPage() {
                   <div className="font-medium">Dom Pérignon</div>
                   <div className="text-red-600">Critical: 3</div>
                 </div>
-                <div className="bg-orange-100 p-2 rounded text-xs text-center">
-                  <div className="text-orange-600 font-medium">$29/month</div>
+                <div className="bg-[#f7fafc] p-2 rounded text-xs text-center border border-[#a0aec0]/30">
+                  <div className="text-[#1a365d] font-medium">$29/month</div>
                 </div>
               </div>
             </div>
@@ -130,9 +130,9 @@ export default function PricingPage() {
             {/* Reservations App Preview */}
             <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
               <div className="h-4 bg-gray-900 rounded-t-xl"></div>
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-3 text-white">
+              <div className="bg-gradient-to-r from-[#1a365d] to-[#2d3748] p-3 text-white">
                 <h3 className="font-bold text-sm">Reservations</h3>
-                <p className="text-blue-100 text-xs">The Capital Grille</p>
+                <p className="text-[#a0aec0] text-xs">The Capital Grille</p>
               </div>
               <div className="p-3 space-y-2">
                 <div className="bg-gray-50 p-2 rounded text-xs">
@@ -145,10 +145,10 @@ export default function PricingPage() {
                 </div>
                 <div className="bg-gray-50 p-2 rounded text-xs">
                   <div className="font-medium">8:30 PM - VIP</div>
-                  <div className="text-purple-600">Corporate (6)</div>
+                  <div className="text-[#742a2a]">Corporate (6)</div>
                 </div>
-                <div className="bg-yellow-100 p-2 rounded text-xs text-center">
-                  <div className="text-yellow-600 font-medium">Coming Soon</div>
+                <div className="bg-[#f7fafc] p-2 rounded text-xs text-center border border-[#a0aec0]/30">
+                  <div className="text-[#1a365d] font-medium">Coming Soon</div>
                 </div>
               </div>
             </div>
@@ -156,9 +156,9 @@ export default function PricingPage() {
             {/* Members App Preview */}
             <div className="w-52 h-72 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-300">
               <div className="h-4 bg-gray-900 rounded-t-xl"></div>
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 text-white">
+              <div className="bg-gradient-to-r from-[#22543d] to-[#1a365d] p-3 text-white">
                 <h3 className="font-bold text-sm">Member Database</h3>
-                <p className="text-purple-100 text-xs">Elite Country Club</p>
+                <p className="text-[#a0aec0] text-xs">Elite Country Club</p>
               </div>
               <div className="p-3 space-y-2">
                 <div className="bg-gray-50 p-2 rounded text-xs">
@@ -167,14 +167,14 @@ export default function PricingPage() {
                 </div>
                 <div className="bg-gray-50 p-2 rounded text-xs">
                   <div className="font-medium">Michael Chen</div>
-                  <div className="text-blue-600">Gold Member</div>
+                  <div className="text-[#1a365d]">Gold Member</div>
                 </div>
                 <div className="bg-gray-50 p-2 rounded text-xs">
                   <div className="font-medium">Robert Davis</div>
-                  <div className="text-purple-600">Premium</div>
+                  <div className="text-[#742a2a]">Premium</div>
                 </div>
-                <div className="bg-yellow-100 p-2 rounded text-xs text-center">
-                  <div className="text-yellow-600 font-medium">Coming Soon</div>
+                <div className="bg-[#f7fafc] p-2 rounded text-xs text-center border border-[#a0aec0]/30">
+                  <div className="text-[#1a365d] font-medium">Coming Soon</div>
                 </div>
               </div>
             </div>
@@ -224,20 +224,20 @@ export default function PricingPage() {
                   Multi-location support
                 </li>
               </ul>
-                            <button 
+              <button 
                 onClick={() => window.location.href = '/signup'}
                 className="block w-full text-white text-center px-4 py-3 rounded-xl font-medium transition-all duration-300"
                 style={{
-                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                  background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                  boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 158, 46, 0.35)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 54, 93, 0.25)';
                 }}>
                 Start Free Trial
               </button>
@@ -245,8 +245,8 @@ export default function PricingPage() {
 
             {/* Reservation Management App */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <Building2 className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-[#f7fafc] rounded-xl flex items-center justify-center mb-4 border border-[#a0aec0]/30">
+                <Building2 className="w-6 h-6 text-[#1a365d]" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">Reservation Management</h3>
               <div className="mb-4">
@@ -272,7 +272,7 @@ export default function PricingPage() {
                   Guest notifications
                 </li>
               </ul>
-              <div className="w-full bg-yellow-100 text-yellow-700 text-center px-4 py-3 rounded-xl font-medium">
+              <div className="w-full bg-[#f7fafc] text-[#1a365d] text-center px-4 py-3 rounded-xl font-medium border border-[#a0aec0]/30">
                 Coming Soon
               </div>
             </div>
@@ -306,15 +306,15 @@ export default function PricingPage() {
                   Activity history
                 </li>
               </ul>
-              <div className="w-full bg-yellow-100 text-yellow-700 text-center px-4 py-3 rounded-xl font-medium">
+              <div className="w-full bg-[#f7fafc] text-[#1a365d] text-center px-4 py-3 rounded-xl font-medium border border-[#a0aec0]/30">
                 Coming Soon
               </div>
             </div>
 
             {/* POS System App */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-[#f7fafc] rounded-xl flex items-center justify-center mb-4 border border-[#a0aec0]/30">
+                <Shield className="w-6 h-6 text-[#742a2a]" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">POS System</h3>
               <div className="mb-4">
@@ -386,14 +386,14 @@ export default function PricingPage() {
                   <span className="text-slate-600">Standard Features</span>
                 </li>
               </ul>
-              <Link href="/signup" className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center px-6 py-3 rounded-xl font-medium transition-colors">
+              <Link href="/signup" className="block w-full bg-[#f7fafc] hover:bg-[#edf2f7] text-[#1a365d] text-center px-6 py-3 rounded-xl font-medium transition-colors border border-[#a0aec0]/40">
                 Start Free Trial
               </Link>
             </div>
 
             {/* Professional Plan */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-2 border-slate-500 relative hover:shadow-2xl transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-2 border-[#d69e2e] relative hover:shadow-2xl transition-all duration-300">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1a365d] text-white px-4 py-2 rounded-full text-sm font-medium">
                 Most Popular
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-4">Professional</h3>
@@ -423,20 +423,20 @@ export default function PricingPage() {
                   <span className="text-slate-600">API Access</span>
                 </li>
               </ul>
-                            <button 
+              <button 
                 onClick={() => window.location.href = '/signup'}
                 className="block w-full text-white text-center px-6 py-3 rounded-xl font-medium transition-all duration-300"
                 style={{
-                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                  background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+                  boxShadow: '0 4px 12px rgba(26, 54, 93, 0.25)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 158, 46, 0.35)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 54, 93, 0.25)';
                 }}>
                 Start Free Trial
               </button>
@@ -471,7 +471,7 @@ export default function PricingPage() {
                   <span className="text-slate-600">SLA Guarantee</span>
                 </li>
               </ul>
-              <Link href="/contact" className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center px-6 py-3 rounded-xl font-medium transition-colors">
+              <Link href="/contact" className="block w-full bg-[#f7fafc] hover:bg-[#edf2f7] text-[#1a365d] text-center px-6 py-3 rounded-xl font-medium transition-colors border border-[#a0aec0]/40">
                 Contact Sales
               </Link>
             </div>
@@ -518,7 +518,7 @@ export default function PricingPage() {
       {/* CTA Section */}
       <section className="py-16 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-slate-600 to-slate-700 rounded-2xl p-8 lg:p-12 text-white">
+          <div className="bg-gradient-to-r from-[#1a365d] to-[#2d3748] rounded-2xl p-8 lg:p-12 text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               Ready to Get Started?
             </h2>
@@ -526,7 +526,7 @@ export default function PricingPage() {
               Choose the plan that fits your business and start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-white text-slate-600 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 justify-center group">
+              <Link href="/signup" className="bg-white text-[#1a365d] hover:bg-[#edf2f7] px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 justify-center group">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -544,10 +544,10 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center"
+                <div className="w-8 h-8 bg-gradient-to-br from-[#d69e2e] to-[#b7791f] rounded-lg flex items-center justify-center"
                      style={{
-                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                       boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                       background: 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)',
+                       boxShadow: '0 4px 12px rgba(214, 158, 46, 0.25)'
                      }}>
                   <span className="text-white font-bold text-sm">H</span>
                 </div>

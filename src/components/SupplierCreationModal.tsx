@@ -71,10 +71,10 @@ export default function SupplierCreationModal({
           </button>
         </div>
 
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+        <div className="mb-4 p-3 bg-[#f7fafc] rounded-lg border border-[#a0aec0]/30">
           <div className="flex items-center space-x-2">
-            <AlertCircle className="h-4 w-4 text-blue-600" />
-            <span className="text-sm text-blue-800">
+            <AlertCircle className="h-4 w-4 text-[#1a365d]" />
+            <span className="text-sm text-slate-700">
               Supplier "{supplierName}" not found. Please provide details to create it.
             </span>
           </div>
@@ -102,7 +102,7 @@ export default function SupplierCreationModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="supplier@example.com"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default function SupplierCreationModal({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="555-123-4567"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
             />
           </div>
 
@@ -128,7 +128,7 @@ export default function SupplierCreationModal({
               value={contactPerson}
               onChange={(e) => setContactPerson(e.target.value)}
               placeholder="John Smith"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
             />
           </div>
 
@@ -141,7 +141,7 @@ export default function SupplierCreationModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Additional notes about this supplier..."
               rows={3}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
             />
           </div>
 
@@ -162,7 +162,10 @@ export default function SupplierCreationModal({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors flex items-center justify-center space-x-2"
+              className="flex-1 px-4 py-2 text-white rounded-lg disabled:opacity-50 transition-colors flex items-center justify-center space-x-2"
+              style={{
+                background: 'linear-gradient(135deg, #1a365d 0%, #2d3748 100%)',
+              }}
             >
               {loading ? (
                 <>

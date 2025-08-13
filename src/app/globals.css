@@ -22,6 +22,22 @@
   
   --success-green-500: #10b981;
   --success-green-100: #d1fae5;
+  
+  /* Luxury Palette */
+  --luxury-navy: #1a365d;        /* Deep Navy - Trust, stability */
+  --luxury-gold: #d69e2e;        /* Warm Gold - Luxury, premium */
+  --luxury-cream: #f7fafc;       /* Cream/Off-White - Sophisticated */
+  --luxury-charcoal: #2d3748;    /* Charcoal Gray - Professional */
+
+  /* Accent Colors */
+  --luxury-forest: #22543d;      /* Forest Green - Country club heritage */
+  --luxury-burgundy: #742a2a;    /* Burgundy - Premium, exclusive */
+  --luxury-silver: #a0aec0;      /* Silver - Refined, elegant */
+
+  /* Gradient Replacements */
+  --luxury-primary-gradient: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  --luxury-accent-gradient: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+  --luxury-subtle-gradient: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
 }
 
 @theme inline {
@@ -65,17 +81,17 @@ body {
 
 /* Glassmorphic Effects from Design System */
 .glassmorphic-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--luxury-subtle-gradient);
   backdrop-filter: blur(12px);
   border-radius: 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(26, 54, 93, 0.15);
+  border: 1px solid rgba(160, 174, 192, 0.35);
 }
 
 .glassmorphic-nav {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(247, 250, 252, 0.9) 0%, rgba(237, 242, 247, 0.85) 100%);
   backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(160, 174, 192, 0.35);
 }
 
 /* Float Animation from Design System */

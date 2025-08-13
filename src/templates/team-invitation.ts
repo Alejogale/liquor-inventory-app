@@ -40,7 +40,7 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         .header {
-          background: linear-gradient(135deg, #ff7700 0%, #ff4500 100%);
+          background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
           padding: 40px 30px;
           text-align: center;
         }
@@ -64,7 +64,7 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
           font-size: 16px;
         }
         .organization-card {
-          background: #f8fafc;
+          background: #f7fafc;
           border: 1px solid #e2e8f0;
           border-radius: 12px;
           padding: 24px;
@@ -95,8 +95,8 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
           font-size: 14px;
         }
         .custom-message {
-          background: #fef3e2;
-          border: 1px solid #fed7aa;
+          background: #fffaf0;
+          border: 1px solid #f6e05e;
           border-radius: 8px;
           padding: 16px;
           margin: 20px 0;
@@ -105,7 +105,7 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
         }
         .cta-button {
           display: inline-block;
-          background: linear-gradient(135deg, #ff7700 0%, #ff4500 100%);
+          background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
           color: white;
           text-decoration: none;
           padding: 16px 32px;
@@ -113,7 +113,7 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
           font-weight: 600;
           font-size: 16px;
           margin: 24px 0;
-          box-shadow: 0 4px 12px rgba(255, 119, 0, 0.3);
+          box-shadow: 0 4px 12px rgba(214, 158, 46, 0.25);
           transition: transform 0.2s;
         }
         .cta-button:hover {
@@ -131,12 +131,12 @@ export function generateInvitationEmail(data: InvitationEmailData): { subject: s
           margin: 0;
         }
         .footer a {
-          color: #ff7700;
+          color: #1a365d;
           text-decoration: none;
         }
         .reminder-notice {
-          background: #fef3e2;
-          border: 1px solid #fed7aa;
+          background: #fffaf0;
+          border: 1px solid #f6e05e;
           border-radius: 8px;
           padding: 12px 16px;
           margin: 16px 0;

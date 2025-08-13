@@ -64,7 +64,7 @@ const APPS = [
     name: 'Liquor Inventory',
     description: 'Complete inventory management',
     icon: Package,
-    color: 'from-blue-500 to-blue-600',
+    color: 'from-[#1a365d] to-[#2d3748]',
     href: '/apps/liquor-inventory',
     status: 'active'
   },
@@ -73,7 +73,7 @@ const APPS = [
     name: 'Reservation Management',
     description: 'Table reservations & guest management',
     icon: Calendar,
-    color: 'from-green-500 to-green-600',
+    color: 'from-[#22543d] to-[#1a365d]',
     href: '/apps/reservation-management',
     status: 'active'
   },
@@ -82,7 +82,7 @@ const APPS = [
     name: 'Member Database',
     description: 'Member management & search',
     icon: Users,
-    color: 'from-purple-500 to-purple-600',
+    color: 'from-[#22543d] to-[#1a365d]',
     href: '/apps/member-database',
     status: 'active'
   },
@@ -91,7 +91,7 @@ const APPS = [
     name: 'POS System',
     description: 'Point of sale integration',
     icon: CreditCard,
-    color: 'from-orange-500 to-orange-600',
+    color: 'from-[#742a2a] to-[#2d3748]',
     href: '/apps/pos-system',
     status: 'coming-soon'
   }
@@ -173,24 +173,24 @@ export default function PlatformSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => onCollapsedChange(!collapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-blue-50 transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-[#a0aec0]/40 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-[#f7fafc] transition-colors"
         aria-label="Toggle sidebar menu"
       >
         {collapsed ? <Plus className="h-6 w-6" /> : <Settings className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full bg-white border-r border-[#a0aec0]/40 shadow-lg z-40 transition-all duration-300 ${
         collapsed ? 'w-20' : 'w-80'
       } lg:relative lg:translate-x-0 lg:col-span-1 ${
         showMobileMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-blue-200">
+          <div className="p-6 border-b border-[#a0aec0]/40">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${collapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#1a365d] to-[#2d3748] rounded-xl flex items-center justify-center">
                   <Globe className="h-6 w-6 text-white" />
                 </div>
                 {!collapsed && (
@@ -204,7 +204,7 @@ export default function PlatformSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => onCollapsedChange(!collapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-[#f7fafc] text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Settings className="h-4 w-4" />
               </button>
@@ -212,9 +212,9 @@ export default function PlatformSidebar({
 
             {/* User Info */}
             {!collapsed && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+              <div className="mt-4 p-3 bg-[#f7fafc] rounded-lg border border-[#a0aec0]/40">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#22543d] to-[#1a365d] rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
                       {userProfile?.full_name?.charAt(0)?.toUpperCase() || 
                        userProfile?.email?.charAt(0)?.toUpperCase() || 
@@ -236,14 +236,14 @@ export default function PlatformSidebar({
 
           {/* Navigation Tabs */}
           {!collapsed && (
-            <div className="px-4 py-2 border-b border-blue-200">
-              <div className="flex space-x-1 bg-blue-100 rounded-lg p-1">
+            <div className="px-4 py-2 border-b border-[#a0aec0]/40">
+              <div className="flex space-x-1 bg-[#f7fafc] rounded-lg p-1">
                 <button
                   onClick={() => setActiveSection('apps')}
                   className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                     activeSection === 'apps'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-blue-600 hover:text-blue-700'
+                      ? 'bg-white text-[#1a365d] shadow-sm border border-[#a0aec0]/40'
+                      : 'text-[#1a365d] hover:text-[#2d3748]'
                   }`}
                 >
                   Apps
@@ -252,8 +252,8 @@ export default function PlatformSidebar({
                   onClick={() => setActiveSection('platform')}
                   className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                     activeSection === 'platform'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-blue-600 hover:text-blue-700'
+                      ? 'bg-white text-[#1a365d] shadow-sm border border-[#a0aec0]/40'
+                      : 'text-[#1a365d] hover:text-[#2d3748]'
                   }`}
                 >
                   Platform
@@ -292,10 +292,10 @@ export default function PlatformSidebar({
                       >
                         <div className={`p-3 rounded-xl transition-all duration-200 ${
                           isActive
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
+                            ? 'bg-gradient-to-r from-[#1a365d] to-[#2d3748] border border-[#a0aec0]/40 shadow-lg text-white'
                             : isComingSoon
                             ? 'bg-gray-100 border border-gray-200 text-gray-500'
-                            : 'hover:bg-blue-50 border border-transparent'
+                            : 'hover:bg-[#f7fafc] border border-transparent'
                         }`}>
                           <div className="flex items-center space-x-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
@@ -319,7 +319,7 @@ export default function PlatformSidebar({
                                     {app.name}
                                   </p>
                                   {isComingSoon && (
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#fef3c7] text-[#92400e]">
                                       Soon
                                     </span>
                                   )}
@@ -336,7 +336,7 @@ export default function PlatformSidebar({
                           {/* Active Indicator */}
                           {isActive && (
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <div className="w-2 h-2 bg-[#d69e2e] rounded-full"></div>
                             </div>
                           )}
                         </div>
@@ -377,8 +377,8 @@ export default function PlatformSidebar({
                       >
                         <div className={`p-3 rounded-xl transition-all duration-200 ${
                           isActive
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
-                            : 'hover:bg-blue-50 border border-transparent'
+                            ? 'bg-gradient-to-r from-[#1a365d] to-[#2d3748] border border-[#a0aec0]/40 shadow-lg text-white'
+                            : 'hover:bg-[#f7fafc] border border-transparent'
                         }`}>
                           <div className="flex items-center space-x-3">
                             <Icon className={`h-5 w-5 flex-shrink-0 ${
@@ -404,7 +404,7 @@ export default function PlatformSidebar({
                           {/* Active Indicator */}
                           {isActive && (
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <div className="w-2 h-2 bg-[#d69e2e] rounded-full"></div>
                             </div>
                           )}
                         </div>
@@ -424,12 +424,12 @@ export default function PlatformSidebar({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-blue-200 space-y-2">
+          <div className="p-4 border-t border-[#a0aec0]/40 space-y-2">
             {/* Admin Button (if owner/manager) */}
             {(userProfile?.role === 'owner' || userProfile?.role === 'manager') && (
               <Link
                 href="/admin"
-                className={`w-full flex items-center p-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 border border-yellow-400 hover:from-yellow-600 hover:to-orange-600 transition-all text-white ${
+                className={`w-full flex items-center p-3 rounded-xl bg-gradient-to-r from-[#d69e2e] to-[#b7791f] border border-[#f6e05e]/60 hover:from-[#b7791f] hover:to-[#975a16] transition-all text-white ${
                   collapsed ? 'justify-center' : ''
                 }`}
               >
@@ -443,7 +443,7 @@ export default function PlatformSidebar({
             {/* Home Button */}
             <Link
               href="/"
-              className={`w-full flex items-center p-3 rounded-xl hover:bg-blue-50 transition-colors ${
+              className={`w-full flex items-center p-3 rounded-xl hover:bg-[#f7fafc] transition-colors ${
                 collapsed ? 'justify-center' : ''
               }`}
             >

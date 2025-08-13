@@ -1703,4 +1703,20 @@ const sanitizedItem = {
 
 ### Status: ✅ **COMPLETED** - Clear All now properly deletes all reservations from database
 
+## 2025-08-13 — Luxury Palette Visual Refresh (Non-breaking UI update)
+- Updated global color system with luxury tokens in `src/app/globals.css` (navy, gold, cream, charcoal; subtle/accent gradients). Glassmorphic utilities now use luxury palette.
+- Restyled pages to luxury theme (structure/logic unchanged):
+  - `src/app/(platform)/pricing/page.tsx`
+  - `src/app/(platform)/signup/page.tsx`
+  - `src/app/page.tsx`
+- Updated platform components to replace orange/blue accents with navy/gold:
+  - `src/components/platform/PlatformSidebar.tsx` (tabs, borders, gradients)
+  - `src/components/QuickBooksIntegration.tsx` (CTA gradients/hover)
+  - `src/components/SupplierCreationModal.tsx` (alerts, focus rings, submit)
+  - `src/components/ReservationSidebar.tsx` (headers, buttons, links)
+  - `src/components/UserPermissions.tsx` (focus rings, selection, badges)
+  - `src/templates/team-invitation.ts` (email header/CTA colors)
+- Preserved all component props, TypeScript types, logic, routing, and responsive behavior.
+- Build status: passes compile; ESLint warns remain unrelated to styling. One API route type error pre-existed (team invitations handler) and is unchanged by this update.
+
 
