@@ -197,24 +197,30 @@ export default function SubscriptionManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Subscription Management</h2>
-          <p className="text-slate-600">Manage your subscription and billing</p>
+          <h2 className="text-2xl font-bold text-gray-900">Subscription Management</h2>
+          <p className="text-gray-600">Manage your subscription and billing</p>
         </div>
       </div>
 
       {/* Current Subscription */}
-      <div className="bg-white rounded-lg border border-blue-200 p-6">
+      <div className="rounded-2xl p-8 border border-white/20 backdrop-blur-xl"
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             backdropFilter: 'blur(20px)',
+             WebkitBackdropFilter: 'blur(20px)',
+             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.05)'
+           }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <CreditCard className="h-6 w-6 text-blue-600" />
+            <CreditCard className="h-6 w-6 text-orange-600" />
             <div>
-              <h3 className="text-lg font-semibold text-slate-800">Current Plan</h3>
-              <p className="text-slate-600">{planDetails.name} Plan</p>
+              <h3 className="text-lg font-semibold text-gray-900">Current Plan</h3>
+              <p className="text-gray-600">{planDetails.name} Plan</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-slate-800">{planDetails.price}</div>
-            <div className="text-sm text-slate-600">
+            <div className="text-2xl font-bold text-gray-900">{planDetails.price}</div>
+            <div className="text-sm text-gray-600">
               {subscription?.status === 'trial' ? 'Trial period' : 'Monthly billing'}
             </div>
           </div>
@@ -222,10 +228,10 @@ export default function SubscriptionManager() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-slate-500" />
+            <Calendar className="h-4 w-4 text-gray-500" />
             <div>
-              <div className="text-sm font-medium text-slate-800">Billing Period</div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm font-medium text-gray-900">Billing Period</div>
+              <div className="text-sm text-gray-600">
                 {subscription?.current_period_start && subscription?.current_period_end
                   ? `${new Date(subscription.current_period_start).toLocaleDateString()} - ${new Date(subscription.current_period_end).toLocaleDateString()}`
                   : 'N/A'
@@ -237,16 +243,16 @@ export default function SubscriptionManager() {
           <div className="flex items-center space-x-2">
             <CheckCircle className="h-4 w-4 text-green-500" />
             <div>
-              <div className="text-sm font-medium text-slate-800">Status</div>
-              <div className="text-sm text-slate-600 capitalize">{subscription?.status || 'Active'}</div>
+              <div className="text-sm font-medium text-gray-900">Status</div>
+              <div className="text-sm text-gray-600 capitalize">{subscription?.status || 'Active'}</div>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            <DollarSign className="h-4 w-4 text-slate-500" />
+            <DollarSign className="h-4 w-4 text-gray-500" />
             <div>
-              <div className="text-sm font-medium text-slate-800">Next Billing</div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm font-medium text-gray-900">Next Billing</div>
+              <div className="text-sm text-gray-600">
                 {subscription?.current_period_end
                   ? new Date(subscription.current_period_end).toLocaleDateString()
                   : 'N/A'
@@ -258,12 +264,12 @@ export default function SubscriptionManager() {
 
         {/* Plan Features */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-slate-800 mb-3">Current Plan Features:</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-3">Current Plan Features:</h4>
           <ul className="space-y-2">
             {planDetails.features.map((feature, index) => (
               <li key={index} className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-slate-600">{feature}</span>
+                <span className="text-sm text-gray-600">{feature}</span>
               </li>
             ))}
           </ul>
@@ -275,7 +281,19 @@ export default function SubscriptionManager() {
             <button
               onClick={() => handleUpgrade(getNextPlan(subscription?.plan || 'trial'))}
               disabled={upgrading}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="flex items-center space-x-2 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+              }}
             >
               <ArrowUpRight className="h-4 w-4" />
               <span>{upgrading ? 'Processing...' : 'Upgrade Plan'}</span>
@@ -286,7 +304,7 @@ export default function SubscriptionManager() {
             <button
               onClick={handleCancel}
               disabled={canceling}
-              className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium disabled:opacity-50 transition-all duration-300"
             >
               <X className="h-4 w-4" />
               <span>{canceling ? 'Processing...' : 'Cancel Subscription'}</span>
@@ -296,11 +314,17 @@ export default function SubscriptionManager() {
       </div>
 
       {/* Billing History */}
-      <div className="bg-white rounded-lg border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">Billing History</h3>
+      <div className="rounded-2xl p-8 border border-white/20 backdrop-blur-xl"
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             backdropFilter: 'blur(20px)',
+             WebkitBackdropFilter: 'blur(20px)',
+             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.05)'
+           }}>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Billing History</h3>
         <div className="text-center py-8">
-          <DollarSign className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-          <p className="text-slate-600">Billing history will be available here</p>
+          <DollarSign className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-gray-600">Billing history will be available here</p>
         </div>
       </div>
     </div>

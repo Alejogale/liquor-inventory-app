@@ -63,28 +63,38 @@ export default function DashboardSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-blue-50 transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-slate-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-slate-50 transition-colors"
         aria-label="Toggle sidebar menu"
       >
         {isCollapsed ? <Menu className="h-6 w-6" /> : <X className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full border-r border-white/20 shadow-2xl z-40 transition-all duration-300 backdrop-blur-xl ${
         isCollapsed ? 'w-20' : 'w-80'
-      } lg:relative lg:translate-x-0 lg:col-span-1`}>
+      } lg:relative lg:translate-x-0 lg:col-span-1`}
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             backdropFilter: 'blur(20px)',
+             WebkitBackdropFilter: 'blur(20px)',
+             boxShadow: '0 25px 50px rgba(255, 119, 0, 0.1)'
+           }}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-blue-200">
+          <div className="p-6 border-b border-orange-100/50">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${isCollapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
-                  <Package className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                       boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
+                     }}>
+                  <Package className="h-7 w-7 text-white" />
                 </div>
                 {!isCollapsed && (
                   <div>
-                    <h1 className="text-xl font-bold text-slate-800">LiquorTrack</h1>
-                    <p className="text-slate-600 text-sm">Inventory System</p>
+                    <h1 className="text-xl font-bold text-gray-900">LiquorTrack</h1>
+                    <p className="text-gray-600 text-sm">Inventory System</p>
                   </div>
                 )}
               </div>
@@ -92,7 +102,7 @@ export default function DashboardSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-slate-50 text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -100,16 +110,22 @@ export default function DashboardSidebar({
 
             {/* User Info */}
             {!isCollapsed && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+              <div className="mt-6 p-4 rounded-2xl border border-white/30 backdrop-blur-sm"
+                   style={{
+                     background: 'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,247,237,0.5) 100%)'
+                   }}>
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                       style={{
+                         background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+                       }}>
+                    <span className="text-white font-bold text-sm">
                       {userEmail.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-slate-800 font-medium text-sm truncate">{userEmail}</p>
-                    <p className="text-slate-600 text-xs">Dashboard User</p>
+                    <p className="text-gray-900 font-semibold text-sm truncate">{userEmail}</p>
+                    <p className="text-gray-600 text-xs">Dashboard User</p>
                   </div>
                 </div>
               </div>
@@ -121,7 +137,7 @@ export default function DashboardSidebar({
             {/* Back to Apps Link */}
             <Link
               href="/apps"
-              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 border border-transparent hover:border-purple-200"
+              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-slate-50 border border-transparent hover:border-purple-200"
             >
               <Home className="h-5 w-5 flex-shrink-0 text-purple-600 group-hover:text-purple-700" />
               
@@ -155,25 +171,41 @@ export default function DashboardSidebar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 ${
+                  className={`w-full group relative flex items-center p-3 rounded-xl transition-all duration-300 border ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white'
-                      : 'hover:bg-blue-50 border border-transparent'
+                      ? 'text-white shadow-lg border-white/20'
+                      : 'border-transparent backdrop-blur-sm'
                   }`}
+                  style={isActive ? {
+                    background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                    boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
+                  } : {
+                    background: 'rgba(255,255,255,0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+                    }
+                  }}
                 >
                   <Icon className={`h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-white' : 'text-slate-700 group-hover:text-slate-900'
+                    isActive ? 'text-white' : 'text-gray-700 group-hover:text-gray-900'
                   }`} />
                   
                   {!isCollapsed && (
                     <div className="ml-3 text-left">
-                      <p className={`text-sm font-medium ${
-                        isActive ? 'text-white' : 'text-slate-800 group-hover:text-slate-900'
+                      <p className={`text-sm font-semibold ${
+                        isActive ? 'text-white' : 'text-gray-800 group-hover:text-gray-900'
                       }`}>
                         {item.label}
                       </p>
                       <p className={`text-xs ${
-                        isActive ? 'text-white/90' : 'text-slate-700 group-hover:text-slate-800'
+                        isActive ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-700'
                       }`}>
                         {item.description}
                       </p>
@@ -183,7 +215,7 @@ export default function DashboardSidebar({
                   {/* Active Indicator */}
                   {isActive && (
                     <div className="absolute right-3">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-white/80 rounded-full shadow-sm"></div>
                     </div>
                   )}
 
@@ -199,18 +231,30 @@ export default function DashboardSidebar({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-blue-200 space-y-2">
+          <div className="p-4 border-t border-orange-100/50 space-y-3">
             {/* Admin Button */}
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`w-full flex items-center p-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 border border-yellow-400 hover:from-yellow-600 hover:to-orange-600 transition-all text-white ${
+                className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 text-white shadow-lg ${
                   isCollapsed ? 'justify-center' : ''
                 }`}
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
+                  boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.3)';
+                }}
               >
                 <Crown className="h-5 w-5 text-white flex-shrink-0" />
                 {!isCollapsed && (
-                  <span className="ml-3 text-white font-medium text-sm">Admin Dashboard</span>
+                  <span className="ml-3 text-white font-semibold text-sm">Admin Dashboard</span>
                 )}
               </Link>
             )}
@@ -218,26 +262,44 @@ export default function DashboardSidebar({
             {/* Home Button */}
             <Link
               href="/"
-              className={`w-full flex items-center p-3 rounded-xl hover:bg-blue-50 transition-colors ${
+              className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 ${
                 isCollapsed ? 'justify-center' : ''
               }`}
+              style={{
+                background: 'rgba(255,255,255,0.5)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.7)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+              }}
             >
-              <Home className="h-5 w-5 text-slate-600 flex-shrink-0" />
+              <Home className="h-5 w-5 text-gray-600 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 text-slate-600 text-sm">Back to Home</span>
+                <span className="ml-3 text-gray-700 text-sm font-medium">Back to Home</span>
               )}
             </Link>
 
             {/* Sign Out Button */}
             <button
               onClick={onSignOut}
-              className={`w-full flex items-center p-3 rounded-xl hover:bg-red-50 border border-transparent hover:border-red-200 transition-all ${
+              className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-red-200 ${
                 isCollapsed ? 'justify-center' : ''
               }`}
+              style={{
+                background: 'linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(254, 226, 226, 0.6) 100%)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(254, 226, 226, 0.7) 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(254, 226, 226, 0.6) 100%)';
+              }}
             >
               <LogOut className="h-5 w-5 text-red-500 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 text-red-500 text-sm">Sign Out</span>
+                <span className="ml-3 text-red-600 text-sm font-medium">Sign Out</span>
               )}
             </button>
           </div>

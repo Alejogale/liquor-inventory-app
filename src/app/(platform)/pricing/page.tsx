@@ -1,51 +1,82 @@
+'use client'
+
 import Link from 'next/link'
 import { Check, Star, Zap, Shield, Users, Building2, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">H</span>
-              </div>
-              <span className="text-xl font-bold text-slate-900">Hospitality Hub</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100">
+      {/* Glassmorphic Bubble Navigation - Mofin Style */}
+      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl"
+           style={{
+             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+             backdropFilter: 'blur(20px)',
+             WebkitBackdropFilter: 'blur(20px)',
+             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+           }}>
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg"
+                 style={{
+                   background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
+                   boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                 }}>
+              <span className="text-white font-bold text-xs">H</span>
             </div>
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Home</Link>
-              <Link href="/#apps" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Apps</Link>
-              <Link href="/#features" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Features</Link>
-              <Link href="/pricing" className="text-blue-600 font-medium">Pricing</Link>
-              <Link href="/contact" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">Contact</Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="text-slate-700 hover:text-slate-900 transition-colors font-medium">
-                Sign In
-              </Link>
-              <Link href="/signup" className="bg-black hover:bg-slate-800 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
-                Start Free Trial
-              </Link>
-            </div>
+            <span className="font-bold text-gray-900 text-lg">Hospitality Hub</span>
+          </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <a href="#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</a>
+            <a href="#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</a>
+            <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
+            <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
+          </div>
+          
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="text-gray-700 hover:text-gray-900 transition-colors font-medium text-sm px-3 py-1.5">
+              Sign In
+            </Link>
+            <button 
+              onClick={() => window.location.href = '/signup'}
+              className="px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm text-white"
+              style={{
+                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
+                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+              }}>
+              Get Started
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 relative">
+      {/* Hero Section - Mofin Style with Orange & Blue Tones */}
+      <section className="pt-32 pb-20 relative overflow-hidden">
+        {/* Subtle Background Elements */}
+        <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-200/20 to-slate-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-slate-200/20 to-orange-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
               <Star className="w-4 h-4 fill-current" />
               Flexible App-Based Pricing
             </div>
             
             <div className="space-y-6">
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-                Choose Your Apps,
-                <span className="block text-blue-600">Scale Your Business</span>
+                Simple, Affordable Pricing
+                <span className="block text-orange-600">For Every Business Size</span>
               </h1>
               <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
                 Pay only for the apps you need. Start with one app and add more as your business grows. 
@@ -71,8 +102,8 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Liquor Inventory App */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-slate-600" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">Liquor Inventory</h3>
               <div className="mb-4">
@@ -98,9 +129,23 @@ export default function PricingPage() {
                   Multi-location support
                 </li>
               </ul>
-              <Link href="/signup" className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-xl font-medium transition-colors">
+                            <button 
+                onClick={() => window.location.href = '/signup'}
+                className="block w-full text-white text-center px-4 py-3 rounded-xl font-medium transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                }}>
                 Start Free Trial
-              </Link>
+              </button>
             </div>
 
             {/* Reservation Management App */}
@@ -252,8 +297,8 @@ export default function PricingPage() {
             </div>
 
             {/* Professional Plan */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-2 border-blue-500 relative hover:shadow-2xl transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-2 border-slate-500 relative hover:shadow-2xl transition-all duration-300">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-600 text-white px-4 py-2 rounded-full text-sm font-medium">
                 Most Popular
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-4">Professional</h3>
@@ -283,9 +328,23 @@ export default function PricingPage() {
                   <span className="text-slate-600">API Access</span>
                 </li>
               </ul>
-              <Link href="/signup" className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-xl font-medium transition-colors">
+                            <button 
+                onClick={() => window.location.href = '/signup'}
+                className="block w-full text-white text-center px-6 py-3 rounded-xl font-medium transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                }}>
                 Start Free Trial
-              </Link>
+              </button>
             </div>
 
             {/* Enterprise Plan */}
@@ -364,7 +423,7 @@ export default function PricingPage() {
       {/* CTA Section */}
       <section className="py-16 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 lg:p-12 text-white">
+          <div className="bg-gradient-to-r from-slate-600 to-slate-700 rounded-2xl p-8 lg:p-12 text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               Ready to Get Started?
             </h2>
@@ -372,7 +431,7 @@ export default function PricingPage() {
               Choose the plan that fits your business and start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 justify-center group">
+              <Link href="/signup" className="bg-white text-slate-600 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 justify-center group">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -390,7 +449,11 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center"
+                     style={{
+                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
+                       boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                     }}>
                   <span className="text-white font-bold text-sm">H</span>
                 </div>
                 <span className="text-lg font-bold text-slate-900">Hospitality Hub</span>

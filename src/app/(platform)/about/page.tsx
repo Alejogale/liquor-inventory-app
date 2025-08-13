@@ -44,8 +44,8 @@ export default function AboutPage() {
             
             <div className="space-y-6">
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-                Our Mission to
-                <span className="block text-blue-600">Transform Hospitality</span>
+                About Hospitality Hub
+                <span className="block text-blue-600">Easy, Reliable Software for Hospitality</span>
               </h1>
               <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
                 We're passionate about helping hospitality businesses thrive in the digital age. 

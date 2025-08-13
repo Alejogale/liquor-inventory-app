@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { generateInvitationEmail } from '@/templates/team-invitation'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { type, to, subject, html, data } = body
+    const { template, to, subject, html, data } = body
     
     if (!to) {
       return NextResponse.json(
@@ -14,20 +15,23 @@ export async function POST(request: NextRequest) {
 
     let emailSubject = subject
     let emailHtml = html
+    let emailText = ''
 
-    if (type === 'team_invitation') {
-      // Generate team invitation email
-      const { organization_name, inviter_name, role, app_access = [], custom_message, invitation_id } = data || {}
-      
-      emailSubject = `You're invited to join ${organization_name} on Hospitality Hub`
-      emailHtml = generateInvitationEmailHtml({
-        organizationName: organization_name,
-        inviterName: inviter_name,
-        role,
-        appAccess: app_access,
-        customMessage: custom_message,
-        invitationId: invitation_id
+    if (template === 'team-invitation') {
+      // Generate team invitation email using template
+      const invitationEmail = generateInvitationEmail({
+        organizationName: data.organizationName,
+        inviterName: data.inviterName,
+        role: data.role,
+        inviteUrl: data.inviteUrl,
+        customMessage: data.customMessage,
+        expiresAt: data.expiresAt,
+        isReminder: data.isReminder || false
       })
+      
+      emailSubject = invitationEmail.subject
+      emailHtml = invitationEmail.html
+      emailText = invitationEmail.text
     }
     
     // For demo purposes, we'll simulate email sending
@@ -35,11 +39,11 @@ export async function POST(request: NextRequest) {
     
     console.log('📧 Email would be sent to:', to)
     console.log('Subject:', emailSubject)
-    console.log('Email type:', type || 'standard')
-    if (type === 'team_invitation') {
-      console.log('Organization:', data?.organization_name)
+    console.log('Template:', template || 'standard')
+    if (template === 'team-invitation') {
+      console.log('Organization:', data?.organizationName)
       console.log('Role:', data?.role)
-      console.log('App Access:', data?.app_access)
+      console.log('Invite URL:', data?.inviteUrl)
     }
     
     // Simulate API delay

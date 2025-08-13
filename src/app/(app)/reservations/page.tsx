@@ -341,7 +341,7 @@ function ReservationContent({ setShowImportPopup }: {
             onClick={() => setIsLunchView(!isLunchView)}
             className="flex items-center space-x-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
           >
-            <ToggleLeft className={`h-5 w-5 ${isLunchView ? 'text-orange-500' : 'text-blue-500'}`} />
+            <ToggleLeft className={`h-5 w-5 ${isLunchView ? 'text-orange-500' : 'text-slate-500'}`} />
             <span className="font-medium">Switch to {isLunchView ? 'Dinner' : 'Lunch'}</span>
           </button>
         </div>
@@ -372,7 +372,19 @@ function ReservationContent({ setShowImportPopup }: {
         <div className="flex justify-center flex-wrap gap-4">
           <button
             onClick={fetchReservations}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 px-6 py-3 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+        style={{
+          background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+          boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+        }}
           >
             <RefreshCw className="h-5 w-5" />
             <span>Refresh</span>
@@ -539,7 +551,7 @@ function ReservationsTable({
       case 'here': return 'text-green-700 bg-green-100'
       case 'left': return 'text-red-700 bg-red-100'
       case 'cancelled': return 'text-red-700 bg-red-100'
-      case 'no dessert': return 'text-blue-700 bg-blue-100'
+      case 'no dessert': return 'text-slate-700 bg-slate-100'
       case 'received dessert': return 'text-orange-700 bg-orange-100'
       case 'menus open': return 'text-purple-700 bg-purple-100'
       case 'ordered': return 'text-teal-700 bg-teal-100'
@@ -590,7 +602,7 @@ function ReservationsTable({
                       : ''
                   } ${
                     highlightIndex === 0 ? 'bg-slate-200' :
-                    highlightIndex === 1 ? 'bg-blue-200' :
+                    highlightIndex === 1 ? 'bg-slate-200' :
                     highlightIndex === 2 ? 'bg-orange-200' :
                     'bg-teal-200'
                   }`}
@@ -666,7 +678,7 @@ function TableRow({
   const getHighlightClass = () => {
     if (!isHighlighted || activeHighlight === 0) return ''
     switch (activeHighlight) {
-      case 1: return 'bg-blue-100'
+      case 1: return 'bg-slate-100'
       case 2: return 'bg-orange-100'  
       case 3: return 'bg-teal-100'
       default: return ''
@@ -975,7 +987,7 @@ export default function ReservationsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+              <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="text-slate-800 text-xl">Loading...</div>
       </div>
     )
@@ -994,12 +1006,12 @@ export default function ReservationsPage() {
       appId="reservation-management" 
       appName="Reservation Management"
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
           <div className="text-slate-800 text-xl">Loading Reservation Management...</div>
         </div>
       }
     >
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
         {/* Sidebar Navigation */}
         <ReservationSidebar
           userEmail={user?.email || ''}
@@ -1360,15 +1372,15 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
             </div>
 
             {/* Expected Format Info */}
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">Expected CSV Format (Google Sheets Compatible):</h4>
-              <p className="text-xs text-blue-600 mb-2 font-mono">
+            <div className="bg-slate-50 p-4 rounded-lg">
+                              <h4 className="text-sm font-medium text-slate-800 mb-2">Expected CSV Format (Google Sheets Compatible):</h4>
+                              <p className="text-xs text-slate-600 mb-2 font-mono">
                 TIME, Member, Member #, Covers, Room, Table #, Notes, Staff, Status
               </p>
-              <p className="text-xs text-blue-600 mb-2">
+                              <p className="text-xs text-slate-600 mb-2">
                 <strong>Example:</strong> "05:00 PM, CARD, C0982, 5, LOUNGE, 205, STROLLER, -, Left"
               </p>
-              <div className="text-xs text-blue-600 space-y-1">
+                              <div className="text-xs text-slate-600 space-y-1">
                 <p><strong>Supported Rooms:</strong> LOUNGE, RAYNOR, COV, SUN, OPEN, PUBN</p>
                 <p><strong>Time Format:</strong> "05:00 PM" or "17:00" (both supported)</p>
                 <p><strong>Status Options:</strong> Waiting to arrive, Here, Left, Cancelled, etc.</p>

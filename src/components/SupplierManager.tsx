@@ -192,7 +192,19 @@ export default function SupplierManager({
           <p className="text-slate-600 mb-6">Add your first supplier to get started with order management.</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+            className="text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300"
+            style={{
+              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+            }}
           >
             Add First Supplier
           </button>
@@ -200,7 +212,7 @@ export default function SupplierManager({
       ) : (
         <div className="grid gap-4">
           {suppliers.map(supplier => (
-            <div key={supplier.id} className="bg-white rounded-lg p-6 border border-blue-200 shadow-sm">
+            <div key={supplier.id} className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-slate-800 mb-2">{supplier.name}</h3>
@@ -237,7 +249,19 @@ export default function SupplierManager({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setEditingSupplier(supplier)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                    className="text-white px-4 py-2 rounded-lg transition-all duration-300"
+                    style={{
+                      background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                      boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                    }}
                   >
                     Edit
                   </button>
@@ -401,7 +425,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               placeholder="e.g., Johnson Brothers, Southern Wine & Spirits"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
               required
             />
           </div>
@@ -415,7 +439,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               placeholder="orders@supplier.com"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
               required
             />
           </div>
@@ -429,7 +453,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
               placeholder="(555) 123-4567"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
             />
           </div>
 
@@ -442,7 +466,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               value={formData.contact_person}
               onChange={(e) => setFormData({...formData, contact_person: e.target.value})}
               placeholder="John Smith, Sales Rep"
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
             />
           </div>
 
@@ -455,7 +479,7 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
               placeholder="Special instructions, delivery schedules, etc."
               rows={3}
-              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
             />
           </div>
           
@@ -470,7 +494,19 @@ function SupplierModal({ supplier, onClose, onSaved, organizationId }: SupplierM
             <button
               type="submit"
               disabled={loading || !formData.name.trim() || !formData.email.trim()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold disabled:opacity-50"
+              className="flex-1 text-white p-3 rounded-lg font-semibold disabled:opacity-50 transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+              }}
             >
               {loading ? 'Saving...' : (supplier ? 'Update' : 'Add Supplier')}
             </button>

@@ -135,8 +135,8 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
     <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <ExternalLink className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+            <ExternalLink className="w-5 h-5 text-slate-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-slate-800">QuickBooks Integration</h3>
@@ -175,7 +175,19 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
             <button
               onClick={syncInventory}
               disabled={loading}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+              }}
             >
               {loading ? 'Syncing...' : 'Sync Inventory Now'}
             </button>
@@ -201,9 +213,9 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
             Connect your QuickBooks Online account to automatically sync inventory purchases and expenses.
           </p>
           
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h4 className="font-medium text-blue-700 mb-2">What gets synced:</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+            <h4 className="font-medium text-slate-700 mb-2">What gets synced:</h4>
+            <ul className="text-sm text-slate-800 space-y-1">
               <li>• Inventory purchases → QuickBooks expenses</li>
               <li>• Supplier bills → Vendor payments tracking</li>
               <li>• Inventory values → Balance sheet updates</li>
@@ -214,7 +226,19 @@ export default function QuickBooksIntegration({ user, organizationId }: QuickBoo
           <button
             onClick={connectToQuickBooks}
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            style={{
+              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+            }}
           >
             {loading ? 'Connecting...' : 'Connect to QuickBooks'}
           </button>

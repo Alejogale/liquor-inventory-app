@@ -239,7 +239,7 @@ export default function InventoryTable({
             placeholder="Search by brand, barcode, category, or supplier..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-blue-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
           />
         </div>
         {searchTerm && (
@@ -273,11 +273,11 @@ export default function InventoryTable({
           const isExpanded = expandedCategories.has(categoryName)
           
           return (
-            <div key={categoryName} className="bg-white rounded-lg border border-blue-200 shadow-sm">
+            <div key={categoryName} className="bg-white rounded-lg border border-slate-200 shadow-sm">
               {/* Category Header */}
               <button
                 onClick={() => toggleCategory(categoryName)}
-                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-blue-50 transition-colors rounded-lg"
+                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors rounded-lg"
               >
                 <div className="flex items-center space-x-3">
                   {isExpanded ? (
@@ -286,7 +286,7 @@ export default function InventoryTable({
                     <ChevronRight className="h-5 w-5 text-slate-600" />
                   )}
                   <h3 className="text-lg font-semibold text-slate-800">{categoryName}</h3>
-                  <span className="bg-blue-100 text-slate-700 px-3 py-1 rounded-full text-sm">
+                  <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm">
                     {categoryItems.length} items
                   </span>
                 </div>
@@ -294,16 +294,16 @@ export default function InventoryTable({
 
                             {/* Category Items Table */}
               {isExpanded && (
-                <div className="border-t border-blue-200">
+                <div className="border-t border-slate-200">
                   {categoryItems.length > 5 && (
-                    <div className="px-6 py-2 bg-blue-50 text-blue-700 text-sm font-medium">
+                    <div className="px-6 py-2 bg-slate-50 text-slate-700 text-sm font-medium">
                       📜 {categoryItems.length} items - Scroll to see all
                     </div>
                   )}
                   <div className={`overflow-x-auto ${categoryItems.length > 5 ? 'max-h-96 overflow-y-auto' : ''}`}>
                     <table className="w-full">
-                      <thead className="sticky top-0 bg-blue-100 z-10">
-                        <tr className="border-b border-blue-200">
+                      <thead className="sticky top-0 bg-slate-100 z-10">
+                        <tr className="border-b border-slate-200">
                           {onItemSelect && (
                             <th className="text-left py-3 px-6 w-12">
                               <div className="flex items-center justify-center">
@@ -322,8 +322,8 @@ export default function InventoryTable({
                       </thead>
                       <tbody>
                         {categoryItems.map((item) => (
-                          <tr key={item.id} className={`border-b border-blue-100 hover:bg-blue-50 transition-colors ${
-                            selectedItems.has(item.id) ? 'bg-blue-50 ring-1 ring-blue-300' : ''
+                          <tr key={item.id} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${
+                            selectedItems.has(item.id) ? 'bg-slate-50 ring-1 ring-slate-300' : ''
                           }`}>
                             {onItemSelect && (
                               <td className="py-3 px-6">
@@ -332,7 +332,7 @@ export default function InventoryTable({
                                     type="checkbox"
                                     checked={selectedItems.has(item.id)}
                                     onChange={() => onItemSelect(item.id)}
-                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                    className="rounded border-slate-300 text-slate-600 focus:ring-slate-500 cursor-pointer"
                                   />
                                 </div>
                               </td>
@@ -360,7 +360,7 @@ export default function InventoryTable({
                               <div className="flex items-center space-x-2">
                                 <span className={`px-2 py-1 rounded text-sm font-medium ${
                                   item.totalCount > 0 
-                                    ? 'bg-blue-100 text-blue-700' 
+                                    ? 'bg-slate-100 text-slate-700' 
                                     : 'bg-gray-100 text-gray-600'
                                 }`}>
                                   Total: {item.totalCount}
@@ -379,7 +379,7 @@ export default function InventoryTable({
                               <div className="flex items-center justify-end space-x-2">
                                 <button
                                   onClick={() => onEdit(item)}
-                                  className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                                  className="p-2 text-slate-600 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
                                   title="Edit item"
                                 >
                                   <Edit className="h-4 w-4" />
@@ -411,7 +411,7 @@ export default function InventoryTable({
         <div className="flex justify-center space-x-4 pt-4">
           <button
             onClick={() => setExpandedCategories(new Set(sortedCategories))}
-            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
           >
             Expand All Categories
           </button>

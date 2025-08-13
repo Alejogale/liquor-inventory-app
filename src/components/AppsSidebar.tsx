@@ -45,22 +45,22 @@ export default function AppsSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-blue-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-blue-50 transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-slate-200 rounded-lg p-3 text-slate-800 shadow-lg hover:bg-slate-50 transition-colors"
         aria-label="Toggle sidebar menu"
       >
         {isCollapsed ? <Menu className="h-6 w-6" /> : <X className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-white border-r border-blue-200 shadow-lg z-40 transition-all duration-300 ${
+      <div className={`fixed left-0 top-0 h-full bg-white border-r border-slate-200 shadow-lg z-40 transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-80'
       } lg:relative lg:translate-x-0 lg:col-span-1`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-blue-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex items-center justify-between">
               <div className={`flex items-center space-x-3 ${isCollapsed ? 'lg:justify-center' : ''}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-600 rounded-xl flex items-center justify-center">
                   <Grid3X3 className="h-6 w-6 text-white" />
                 </div>
                 {!isCollapsed && (
@@ -74,7 +74,7 @@ export default function AppsSidebar({
               {/* Desktop Collapse Button */}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:block p-1 rounded-lg hover:bg-blue-50 text-slate-600 hover:text-slate-800 transition-colors"
+                className="hidden lg:block p-1 rounded-lg hover:bg-slate-50 text-slate-600 hover:text-slate-800 transition-colors"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -82,7 +82,7 @@ export default function AppsSidebar({
 
             {/* User Info */}
             {!isCollapsed && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+              <div className="mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
@@ -101,7 +101,7 @@ export default function AppsSidebar({
           {/* Navigation */}
           <div className="flex-1 p-4 space-y-2 overflow-y-auto">
             {/* Current Page Indicator */}
-            <div className="w-full group relative flex items-center p-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-400 shadow-lg text-white">
+            <div className="w-full group relative flex items-center p-3 rounded-xl bg-gradient-to-r from-slate-600 to-slate-700 border border-slate-400 shadow-lg text-white">
               <Home className="h-5 w-5 flex-shrink-0 text-white" />
               
               {!isCollapsed && (
@@ -113,7 +113,7 @@ export default function AppsSidebar({
 
               {/* Active Indicator */}
               <div className="absolute right-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
               </div>
 
               {/* Tooltip for collapsed state */}
@@ -202,7 +202,7 @@ export default function AppsSidebar({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-blue-200">
+          <div className="p-4 border-t border-slate-200">
             <button
               onClick={onSignOut}
               className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-200 text-red-600 hover:text-red-700"

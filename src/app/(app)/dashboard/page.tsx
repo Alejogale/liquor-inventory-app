@@ -393,14 +393,14 @@ function DashboardContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-        <div className="text-slate-800 text-xl">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-800 text-xl">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative lg:grid lg:grid-cols-[auto_1fr]">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50/20 via-white to-slate-50/20 flex relative lg:grid lg:grid-cols-[auto_1fr]">
       {/* Sidebar Navigation */}
       <DashboardSidebar
         activeTab={activeTab}
@@ -418,67 +418,125 @@ function DashboardContent() {
         {/* Top Stats Bar */}
         <div className="p-6 lg:p-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   backdropFilter: 'blur(20px)',
+                   WebkitBackdropFilter: 'blur(20px)',
+                   boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1)'
+                 }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Total Items</p>
-                  <p className="text-2xl font-bold text-slate-800">{stats.totalItems}</p>
+                  <p className="text-gray-600 text-sm font-medium mb-2">Total Items</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalItems}</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                  <Package className="h-6 w-6 text-white" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                       boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
+                     }}>
+                  <Package className="h-7 w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   backdropFilter: 'blur(20px)',
+                   WebkitBackdropFilter: 'blur(20px)',
+                   boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
+                 }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Categories</p>
-                  <p className="text-2xl font-bold text-slate-800">{stats.totalCategories}</p>
+                  <p className="text-gray-600 text-sm font-medium mb-2">Categories</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalCategories}</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                  <ClipboardList className="h-6 w-6 text-white" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                       boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
+                     }}>
+                  <ClipboardList className="h-7 w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   backdropFilter: 'blur(20px)',
+                   WebkitBackdropFilter: 'blur(20px)',
+                   boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
+                 }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Suppliers</p>
-                  <p className="text-2xl font-bold text-slate-800">{stats.totalSuppliers}</p>
+                  <p className="text-gray-600 text-sm font-medium mb-2">Suppliers</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalSuppliers}</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                       boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
+                     }}>
+                  <Users className="h-7 w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   backdropFilter: 'blur(20px)',
+                   WebkitBackdropFilter: 'blur(20px)',
+                   boxShadow: '0 8px 32px rgba(147, 51, 234, 0.1)'
+                 }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Rooms</p>
-                  <p className="text-2xl font-bold text-slate-800">{stats.totalRooms}</p>
+                  <p className="text-gray-600 text-sm font-medium mb-2">Rooms</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalRooms}</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-white" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
+                       boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)'
+                     }}>
+                  <Building2 className="h-7 w-7 text-white" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Content Area */}
-          <div className="bg-white rounded-xl border border-blue-200 shadow-lg min-h-[600px]">
+          <div className="rounded-2xl border border-white/20 shadow-2xl min-h-[600px] backdrop-blur-xl"
+               style={{
+                 background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                 backdropFilter: 'blur(20px)',
+                 WebkitBackdropFilter: 'blur(20px)',
+                 boxShadow: '0 25px 50px rgba(255, 119, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+               }}>
             {activeTab === 'inventory' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Inventory Management</h2>
-                    <p className="text-slate-600 mt-1">Manage your liquor inventory items and stock levels</p>
+                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Inventory Management</h2>
+                    <p className="text-gray-600 mt-1">Manage your liquor inventory items and stock levels</p>
                   </div>
                   <button
                     onClick={() => setShowAddItem(true)}
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+                    className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                      boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0px)';
+                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
+                    }}
                   >
                     Add Item
                   </button>
@@ -486,20 +544,34 @@ function DashboardContent() {
                 
                 {loading ? (
                   <div className="text-center py-12">
-                    <div className="w-8 h-8 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-slate-600">Loading inventory...</p>
+                    <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-700 rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading inventory...</p>
                   </div>
                 ) : (
                   <>
                     {/* Bulk Operations Bar */}
                     {activeTab === 'inventory' && inventoryItems.length > 0 && (
-                      <div className="mb-6 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <div className="p-4 border-b border-slate-100">
+                      <div className="mb-8 rounded-2xl border border-white/20 backdrop-blur-xl shadow-lg"
+                           style={{
+                             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                             backdropFilter: 'blur(20px)',
+                             WebkitBackdropFilter: 'blur(20px)'
+                           }}>
+                        <div className="p-6 border-b border-orange-100/50">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
                               <button
                                 onClick={selectedItems.size === inventoryItems.length ? handleDeselectAll : handleSelectAll}
-                                className="flex items-center space-x-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
+                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30"
+                                style={{
+                                  background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.7) 100%)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)';
+                                }}
                               >
                                 <Check className="h-4 w-4" />
                                 <span>
@@ -508,7 +580,7 @@ function DashboardContent() {
                               </button>
                               
                               {selectedItems.size > 0 && (
-                                <span className="text-slate-600 font-medium">
+                                <span className="text-gray-600 font-medium">
                                   {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
                                 </span>
                               )}
@@ -518,7 +590,16 @@ function DashboardContent() {
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => setBulkOperation('delete')}
-                                  className="flex items-center space-x-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
+                                  className="flex items-center space-x-2 px-4 py-2 text-red-700 rounded-xl transition-all duration-300 backdrop-blur-sm border border-red-200"
+                                  style={{
+                                    background: 'linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(254, 226, 226, 0.6) 100%)'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(254, 226, 226, 0.7) 100%)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(254, 226, 226, 0.6) 100%)';
+                                  }}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                   <span>Delete</span>
@@ -526,7 +607,16 @@ function DashboardContent() {
                                 
                                 <button
                                   onClick={() => setBulkOperation('move-category')}
-                                  className="flex items-center space-x-2 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors"
+                                  className="flex items-center space-x-2 px-4 py-2 text-green-700 rounded-xl transition-all duration-300 backdrop-blur-sm border border-green-200"
+                                  style={{
+                                    background: 'linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(220, 252, 231, 0.6) 100%)'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 253, 244, 0.9) 0%, rgba(220, 252, 231, 0.7) 100%)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(220, 252, 231, 0.6) 100%)';
+                                  }}
                                 >
                                   <Tag className="h-4 w-4" />
                                   <span>Change Category</span>
@@ -534,7 +624,16 @@ function DashboardContent() {
                                 
                                 <button
                                   onClick={() => setBulkOperation('move-supplier')}
-                                  className="flex items-center space-x-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition-colors"
+                                  className="flex items-center space-x-2 px-4 py-2 text-slate-700 rounded-xl transition-all duration-300 backdrop-blur-sm border border-slate-200"
+                                  style={{
+                                    background: 'linear-gradient(135deg, rgba(239, 246, 255, 0.8) 0%, rgba(219, 234, 254, 0.6) 100%)'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.7) 100%)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 246, 255, 0.8) 0%, rgba(219, 234, 254, 0.6) 100%)';
+                                  }}
                                 >
                                   <Users className="h-4 w-4" />
                                   <span>Change Supplier</span>
@@ -555,7 +654,7 @@ function DashboardContent() {
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => setBulkOperation(null)}
-                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                  className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                                 >
                                   Cancel
                                 </button>
@@ -594,7 +693,7 @@ function DashboardContent() {
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => setBulkOperation(null)}
-                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                  className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                                 >
                                   Cancel
                                 </button>
@@ -634,14 +733,26 @@ function DashboardContent() {
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => setBulkOperation(null)}
-                                  className="px-3 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+                                  className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                                 >
                                   Cancel
                                 </button>
                                 <button
                                   onClick={handleBulkMoveSupplier}
                                   disabled={!targetSupplier}
-                                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white rounded-lg transition-colors"
+                                  className="px-4 py-2 text-white rounded-lg disabled:bg-slate-300 transition-all duration-300"
+        style={{
+          background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+          boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+        }}
                                 >
                                   Change Supplier
                                 </button>
@@ -651,9 +762,9 @@ function DashboardContent() {
                         )}
                       </div>
                     )}
-                    <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <p className="text-slate-700 text-sm">
-                        🔍 Found <span className="font-semibold text-slate-800">{inventoryItems.length}</span> items organized by category with room counts
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-gray-700 text-sm">
+                        🔍 Found <span className="font-semibold text-gray-900">{inventoryItems.length}</span> items organized by category with room counts
                       </p>
                     </div>
                     <InventoryTable
@@ -678,34 +789,79 @@ function DashboardContent() {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Categories</h2>
-                    <p className="text-slate-600 mt-1">Organize your inventory into categories</p>
+                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Categories</h2>
+                    <p className="text-gray-600 mt-1">Organize your inventory into categories</p>
                   </div>
                   <button
                     onClick={() => setShowAddCategory(true)}
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl font-semibold"
+                    className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium"
+                    style={{
+                      background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                      boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0px)';
+                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
+                    }}
                   >
                     Add Category
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categories.map((category) => (
-                    <div key={category.id} className="bg-white hover:bg-blue-50 shadow-lg rounded-xl p-6 border border-blue-200 hover:border-blue-300 transition-all">
-                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-4">
-                        <ClipboardList className="h-6 w-6 text-white" />
+                    <div key={category.id} className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                         style={{
+                           background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
+                           backdropFilter: 'blur(10px)',
+                           WebkitBackdropFilter: 'blur(10px)'
+                         }}>
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+                           style={{
+                             background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                             boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
+                           }}>
+                        <ClipboardList className="h-7 w-7 text-white" />
                       </div>
-                      <h3 className="text-slate-800 font-semibold text-lg">{category.name}</h3>
-                      <p className="text-slate-600 text-sm mt-1">Product category</p>
-                      <div className="flex space-x-2 mt-3">
+                      <h3 className="text-gray-900 font-bold text-xl mb-2">{category.name}</h3>
+                      <p className="text-gray-600 text-sm mb-4">Product category</p>
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEditCategory(category)}
-                          className="flex-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
+                          className="flex-1 px-4 py-2 text-white text-sm rounded-xl transition-all duration-300 font-medium"
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                            boxShadow: '0 2px 8px rgba(107, 114, 128, 0.3)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(107, 114, 128, 0.4)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0px)';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(107, 114, 128, 0.3)';
+                          }}
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteCategory(category.id)}
-                          className="flex-1 px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                          className="flex-1 px-4 py-2 text-white text-sm rounded-xl transition-all duration-300 font-medium"
+                          style={{
+                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0px)';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.3)';
+                          }}
                         >
                           Delete
                         </button>
@@ -718,8 +874,8 @@ function DashboardContent() {
             {activeTab === 'suppliers' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Supplier Management</h2>
-                  <p className="text-slate-600 mt-1">Manage your vendor relationships and contacts</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Supplier Management</h2>
+                  <p className="text-gray-600 mt-1">Manage your vendor relationships and contacts</p>
                 </div>
                 <SupplierManager suppliers={suppliers} onUpdate={fetchData} organizationId={organizationId} />
               </div>
@@ -728,8 +884,8 @@ function DashboardContent() {
             {activeTab === 'rooms' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Room Management</h2>
-                  <p className="text-slate-600 mt-1">Configure your venue locations and rooms</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Room Management</h2>
+                  <p className="text-gray-600 mt-1">Configure your venue locations and rooms</p>
                 </div>
                 <RoomManager onUpdate={handleRoomUpdated} organizationId={organizationId} />
               </div>
@@ -738,8 +894,8 @@ function DashboardContent() {
             {activeTab === 'count' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Room Counting</h2>
-                  <p className="text-slate-600 mt-1">Perform inventory counts by room or location</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Room Counting</h2>
+                  <p className="text-gray-600 mt-1">Perform inventory counts by room or location</p>
                 </div>
                 <RoomCountingInterface 
                   userEmail={user?.email || ''} 
@@ -751,8 +907,8 @@ function DashboardContent() {
             {activeTab === 'orders' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Order Reports</h2>
-                  <p className="text-slate-600 mt-1">Generate and manage supplier orders</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Order Reports</h2>
+                  <p className="text-gray-600 mt-1">Generate and manage supplier orders</p>
                 </div>
                 <OrderReport organizationId={organizationId} />
               </div>
@@ -761,8 +917,8 @@ function DashboardContent() {
             {activeTab === 'activity' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Activity Dashboard</h2>
-                  <p className="text-slate-600 mt-1">View activity logs and performance analytics</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Activity Dashboard</h2>
+                  <p className="text-gray-600 mt-1">View activity logs and performance analytics</p>
                 </div>
                 <ActivityDashboard 
                   userEmail={user?.email || ''} 
@@ -776,8 +932,8 @@ function DashboardContent() {
             {activeTab === 'integrations' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Integrations</h2>
-                  <p className="text-slate-600 mt-1">Connect with QuickBooks and other business tools</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Integrations</h2>
+                  <p className="text-gray-600 mt-1">Connect with QuickBooks and other business tools</p>
                 </div>
                 <QuickBooksIntegration user={user} />
               </div>
@@ -786,8 +942,8 @@ function DashboardContent() {
             {activeTab === 'subscription' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">Subscription & Team Management</h2>
-                  <p className="text-slate-600 mt-1">Manage your subscription, team members, and app access</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Subscription & Team Management</h2>
+                  <p className="text-gray-600 mt-1">Manage your subscription, team members, and app access</p>
                 </div>
                 
                 {/* Subscription Management */}
@@ -796,9 +952,9 @@ function DashboardContent() {
                   
                   {/* Team & Permissions Management */}
                   {(userProfile?.role === 'owner' || userProfile?.role === 'manager') && (
-                    <div className="bg-white rounded-xl border border-blue-200 shadow-sm p-6">
-                      <h3 className="text-xl font-semibold text-slate-800 mb-4">Team & Permissions</h3>
-                      <p className="text-slate-600 mb-6">Manage team member roles and access permissions</p>
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Team & Permissions</h3>
+                      <p className="text-gray-600 mb-6">Manage team member roles and access permissions</p>
                       <UserPermissions organizationId={organization?.id} />
                     </div>
                   )}
@@ -856,8 +1012,8 @@ export default function Dashboard() {
       appId="liquor-inventory" 
       appName="Liquor Inventory"
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-          <div className="text-slate-800 text-xl">Loading Liquor Inventory...</div>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-800 text-xl">Loading Liquor Inventory...</div>
         </div>
       }
     >
