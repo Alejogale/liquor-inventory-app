@@ -308,7 +308,7 @@ export default function UserPermissions({ organizationId }: { organizationId?: s
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-slate-800">Users</h3>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted" />
                 <input
                   type="text"
                   placeholder="Search users..."

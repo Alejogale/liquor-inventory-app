@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitality Hub - Instagram Ad Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f1f3f4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #424242;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .mockup-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            aspect-ratio: 1/1.2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mockup-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .mockup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #424242 0%, #050505 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 6px 20px rgba(66, 66, 66, 0.3);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .mockup-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .mockup-subtitle {
+            font-size: 14px;
+            color: #9e9e9e;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .visual-mockup {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-mockup {
+            width: 120px;
+            height: 200px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .phone-screen {
+            background: white;
+            border-radius: 8px;
+            height: 100%;
+            padding: 12px;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .scan-btn {
+            background: linear-gradient(135deg, #fc5000 0%, #e04500 100%);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 8px;
+            font-weight: 600;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 12px;
+            font-weight: bold;
+            color: #fc5000;
+        }
+
+        .stat-label {
+            font-size: 6px;
+            color: #9e9e9e;
+        }
+
+        .mini-table {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .table-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 8px;
+            color: #9e9e9e;
+            margin-bottom: 4px;
+        }
+
+        .table-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .dashboard-mockup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(252, 80, 0, 0.1);
+        }
+
+        .card-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fc5000;
+            margin-bottom: 4px;
+        }
+
+        .card-label {
+            font-size: 10px;
+            color: #9e9e9e;
+        }
+
+        .chart-mockup {
+            height: 80px;
+            display: flex;
+            align-items: end;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #fc5000, #ff6b35);
+            border-radius: 4px 4px 0 0;
+            min-height: 10px;
+        }
+
+        .bar-1 { height: 60%; }
+        .bar-2 { height: 80%; }
+        .bar-3 { height: 40%; }
+        .bar-4 { height: 90%; }
+        .bar-5 { height: 70%; }
+
+        .comparison-mockup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .before-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 12px;
+            border: 2px dashed #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .after-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            border-radius: 12px;
+            padding: 12px;
+            border: 2px solid #fc5000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .box-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .before-title {
+            color: #64748b;
+        }
+
+        .after-title {
+            color: #fc5000;
+        }
+
+        .feature-list {
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        .before-list {
+            color: #9e9e9e;
+        }
+
+        .after-list {
+            color: #424242;
+        }
+
+        .testimonial-mockup {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 3px solid #fc5000;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: #424242;
+            font-size: 12px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #fc5000;
+            font-size: 10px;
+        }
+
+        .testimonial-role {
+            color: #9e9e9e;
+            font-size: 8px;
+        }
+
+        .benefit-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .benefit-badge {
+            background: linear-gradient(135deg, rgba(252, 80, 0, 0.1) 0%, rgba(252, 80, 0, 0.05) 100%);
+            color: #fc5000;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 10px;
+            font-weight: 600;
+            border: 1px solid rgba(252, 80, 0, 0.2);
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #fc5000 0%, #e04500 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(252, 80, 0, 0.3);
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(252, 80, 0, 0.4);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(252, 80, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fc5000;
+            margin-bottom: 2px;
+        }
+
+        .stat-desc {
+            font-size: 8px;
+            color: #9e9e9e;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .floating-icon {
+            width: 24px;
+            height: 24px;
+            background: #fc5000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(252, 80, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                padding: 10px;
+            }
+            
+            .mockup-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mockup 1: Mobile App Showcase -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Manage Inventory On-The-Go</h2>
+            <p class="mockup-subtitle">Scan barcodes, add items, and track inventory from anywhere</p>
+            
+            <div class="visual-mockup">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="app-header">
+                            <div class="app-title">Quick Add</div>
+                            <button class="scan-btn">Scan</button>
+                        </div>
+                        
+                        <div class="quick-stats">
+                            <div class="stat-box">
+                                <div class="stat-number">247</div>
+                                <div class="stat-label">Items</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Low Stock</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mini-table">
+                            <div class="table-row">
+                                <span>Grey Goose</span>
+                                <span>+15</span>
+                            </div>
+                            <div class="table-row">
+                                <span>Patron</span>
+                                <span>-8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-badges">
+                <span class="benefit-badge">📱 Mobile App</span>
+                <span class="benefit-badge">📊 Real-time</span>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">Download App</button>
+            </div>
+        </div>
+
+        <!-- Mockup 2: Dashboard Overview -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Complete Business Overview</h2>
+            <p class="mockup-subtitle">Real-time insights across all your operations</p>
+            
+            <div class="visual-mockup">
+                <div class="dashboard-mockup">
+                    <div class="dashboard-card">
+                        <div class="card-number">1,247</div>
+                        <div class="card-label">Total Items</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">23</div>
+                        <div class="card-label">Categories</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">12</div>
+                        <div class="card-label">Suppliers</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">$8,450</div>
+                        <div class="card-label">Monthly Savings</div>
+                    </div>
+                </div>
+                
+                <div class="chart-mockup">
+                    <div class="chart-bar bar-1"></div>
+                    <div class="chart-bar bar-2"></div>
+                    <div class="chart-bar bar-3"></div>
+                    <div class="chart-bar bar-4"></div>
+                    <div class="chart-bar bar-5"></div>
+                </div>
+            </div>
+            
+            <div class="benefit-badges">
+                <span class="benefit-badge">📈 Analytics</span>
+                <span class="benefit-badge">💰 ROI Focused</span>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">Start Free Trial</button>
+            </div>
+        </div>
+
+        <!-- Mockup 3: Before/After Comparison -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Transform Your Operations</h2>
+            <p class="mockup-subtitle">See the difference professional software makes</p>
+            
+            <div class="visual-mockup">
+                <div class="comparison-mockup">
+                    <div class="before-box">
+                        <div class="box-title before-title">❌ Before</div>
+                        <ul class="feature-list before-list">
+                            <li>Spreadsheet chaos</li>
+                            <li>No real-time updates</li>
+                            <li>Wasted time & money</li>
+                            <li>Lost inventory</li>
+                        </ul>
+                    </div>
+                    <div class="after-box">
+                        <div class="box-title after-title">✅ After</div>
+                        <ul class="feature-list after-list">
+                            <li>Automated tracking</li>
+                            <li>Real-time sync</li>
+                            <li>Save 5+ hours weekly</li>
+                            <li>Never lose inventory</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-badges">
+                <span class="benefit-badge">⚡ 5 Min Setup</span>
+                <span class="benefit-badge">🔄 Auto Sync</span>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">See Your Savings</button>
+            </div>
+        </div>
+
+        <!-- Mockup 4: Customer Testimonial -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Trusted by Professionals</h2>
+            <p class="mockup-subtitle">Join hundreds of successful businesses</p>
+            
+            <div class="visual-mockup">
+                <div class="testimonial-mockup">
+                    <div class="testimonial-text">
+                        "Hospitality Hub saved us 8 hours per week and reduced our waste by 40%. The ROI was immediate."
+                    </div>
+                    <div class="testimonial-author">Sarah Johnson</div>
+                    <div class="testimonial-role">Bar Manager, The Grand Hotel</div>
+                </div>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-desc">Venues</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">4.9★</div>
+                    <div class="stat-desc">Rating</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-desc">Support</div>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">Join 500+ Customers</button>
+            </div>
+        </div>
+
+        <!-- Mockup 5: Feature Highlight -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Professional Inventory Management</h2>
+            <p class="mockup-subtitle">Barcode scanning, alerts, and analytics</p>
+            
+            <div class="visual-mockup">
+                <div class="floating-elements">
+                    <div class="floating-icon">📱</div>
+                    <div class="floating-icon">📊</div>
+                </div>
+                
+                <div class="dashboard-mockup">
+                    <div class="dashboard-card">
+                        <div class="card-number">45</div>
+                        <div class="card-label">In Stock</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">12</div>
+                        <div class="card-label">Low Stock</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">8</div>
+                        <div class="card-label">Out of Stock</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-number">$2,450</div>
+                        <div class="card-label">Monthly Value</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-badges">
+                <span class="benefit-badge">📱 Barcode Scan</span>
+                <span class="benefit-badge">🔔 Auto Alerts</span>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">Try Free for 30 Days</button>
+            </div>
+        </div>
+
+        <!-- Mockup 6: ROI & Savings -->
+        <div class="mockup-card">
+            <div class="mockup-header">
+                <div class="logo">H</div>
+                <div class="brand-name">Hospitality Hub</div>
+            </div>
+            
+            <h2 class="mockup-title">Stop Losing Money</h2>
+            <p class="mockup-subtitle">Real-time tracking = higher profits</p>
+            
+            <div class="visual-mockup">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">$12,450</div>
+                        <div class="stat-desc">Monthly Savings</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">23%</div>
+                        <div class="stat-desc">Waste Reduction</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5.2hrs</div>
+                        <div class="stat-desc">Time Saved/Week</div>
+                    </div>
+                </div>
+                
+                <div class="chart-mockup">
+                    <div class="chart-bar bar-1"></div>
+                    <div class="chart-bar bar-2"></div>
+                    <div class="chart-bar bar-3"></div>
+                    <div class="chart-bar bar-4"></div>
+                    <div class="chart-bar bar-5"></div>
+                </div>
+            </div>
+            
+            <div class="benefit-badges">
+                <span class="benefit-badge">💰 Save Money</span>
+                <span class="benefit-badge">⏰ Save Time</span>
+            </div>
+            
+            <div class="cta-section">
+                <button class="cta-button">Calculate Your Savings</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

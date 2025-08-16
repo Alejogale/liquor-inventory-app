@@ -10,14 +10,16 @@ import {
   Save, 
   X,
   Building2,
-  CheckCircle
+  CheckCircle,
+  RefreshCw
 } from 'lucide-react'
 
 interface Room {
   id: string
   name: string
-  display_order?: number
   organization_id?: string
+  is_active?: boolean
+  capacity?: number
   created_at?: string
 }
 
@@ -37,6 +39,36 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
 
   useEffect(() => {
     fetchRooms()
+    
+    // Listen for reservation import events to refresh rooms
+    const handleReservationsImported = () => {
+      console.log('🔄 Refreshing rooms after reservation import...')
+      fetchRooms()
+    }
+    
+    // Listen for specific room import events
+    const handleRoomsImported = (event: CustomEvent) => {
+      console.log('🔄 Refreshing rooms after room import:', event.detail)
+      fetchRooms()
+    }
+    
+    // Listen for force refresh events
+    const handleForceRoomRefresh = () => {
+      console.log('🔄 Force room refresh triggered in RoomManager...')
+      setTimeout(() => {
+        fetchRooms()
+      }, 300) // Small delay to ensure database is updated
+    }
+    
+    window.addEventListener('reservationsImported', handleReservationsImported)
+    window.addEventListener('roomsImported', handleRoomsImported)
+    window.addEventListener('forceRoomRefresh', handleForceRoomRefresh)
+    
+    return () => {
+      window.removeEventListener('reservationsImported', handleReservationsImported)
+      window.removeEventListener('roomsImported', handleRoomsImported)
+      window.removeEventListener('forceRoomRefresh', handleForceRoomRefresh)
+    }
   }, [])
 
   const fetchRooms = async () => {
@@ -65,10 +97,10 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       }
 
       const { data, error } = await supabase
-        .from('rooms')
+        .from('reservation_rooms')
         .select('*')
         .eq('organization_id', currentOrg)
-        .order('display_order')
+        .order('created_at', { ascending: true })
 
       if (error) {
         console.error('❌ Error fetching rooms:', error)
@@ -90,8 +122,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
     try {
       console.log('🏠 Adding room:', newRoomName.trim())
       
-      // Calculate next display order
-      const maxOrder = Math.max(...rooms.map(r => r.display_order || 0), 0)
+      // No need to calculate display order for reservation_rooms
       
       // Use organizationId prop if available, otherwise fetch from database
       let currentOrg = organizationId;
@@ -115,14 +146,15 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
 
       const insertData = {
         name: newRoomName.trim(),
-        display_order: maxOrder + 1,
-        organization_id: currentOrg
+        organization_id: currentOrg,
+        is_active: true,
+        capacity: 50 // Default capacity
       }
       
       console.log('📝 Insert data:', insertData)
       
       const { data, error } = await supabase
-        .from('rooms')
+        .from('reservation_rooms')
         .insert([insertData])
         .select()
 
@@ -153,7 +185,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       console.log('✏️ Updating room:', id, name)
       
       const { error } = await supabase
-        .from('rooms')
+        .from('reservation_rooms')
         .update({ name: name.trim() })
         .eq('id', id)
 
@@ -192,7 +224,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
 
       // Delete the room
       const { error } = await supabase
-        .from('rooms')
+        .from('reservation_rooms')
         .delete()
         .eq('id', id)
 
@@ -245,13 +277,25 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
           <h3 className="text-lg font-semibold text-slate-800">Room Management</h3>
           <p className="text-slate-600 text-sm">Customize locations for inventory counting</p>
         </div>
-        <button
-          onClick={() => setShowAddRoom(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Room</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              console.log('🔄 Manual room refresh triggered...')
+              fetchRooms()
+            }}
+            className="flex items-center space-x-2 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={() => setShowAddRoom(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Room</span>
+          </button>
+        </div>
       </div>
 
       {/* Add Room Form */}

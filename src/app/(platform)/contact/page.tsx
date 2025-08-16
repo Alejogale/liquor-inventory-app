@@ -49,79 +49,56 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100">
-      {/* Glassmorphic Bubble Navigation - Mofin Style */}
-      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl"
-           style={{
-             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-             backdropFilter: 'blur(20px)',
-             WebkitBackdropFilter: 'blur(20px)',
-             boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
-           }}>
-        <div className="flex items-center gap-8">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg"
-                 style={{
-                   background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                   boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-                 }}>
-              <span className="text-white font-bold text-xs">H</span>
+    <div className="min-h-screen bg-white">
+      {/* Clean Modern Navigation */}
+      <nav className="nav-modern">
+        <div className="container-max">
+          <div className="flex items-center justify-between py-4">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-sm">H</span>
+              </div>
+              <span className="text-headline text-primary">Hospitality Hub</span>
             </div>
-            <span className="font-bold text-gray-900 text-lg">Hospitality Hub</span>
-          </div>
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Home</Link>
-            <Link href="/#apps" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Apps</Link>
-            <Link href="/#features" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Features</Link>
-            <Link href="/pricing" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Pricing</Link>
-            <Link href="/contact" className="text-gray-700 hover:text-orange-600 transition-colors font-medium text-sm">Contact</Link>
-          </div>
-          
-          {/* CTA Buttons */}
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-gray-700 hover:text-gray-900 transition-colors font-medium text-sm px-3 py-1.5">
-              Sign In
-            </Link>
-            <Link href="/signup" 
-                  className="px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm text-white"
-                  style={{
-                    background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 50%, #e65100 100%)',
-                    boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
-                  }}>
-              Get Started
-            </Link>
+            
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/" className="text-muted hover:text-primary transition-colors font-medium">Home</Link>
+              <Link href="/#apps" className="text-muted hover:text-primary transition-colors font-medium">Apps</Link>
+              <Link href="/#features" className="text-muted hover:text-primary transition-colors font-medium">Features</Link>
+              <Link href="/pricing" className="text-muted hover:text-primary transition-colors font-medium">Pricing</Link>
+              <Link href="/contact" className="text-accent font-medium">Contact</Link>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="text-muted hover:text-primary transition-colors font-medium">
+                Sign In
+              </Link>
+              <Link href="/signup" className="button-primary">
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Mofin Style with Orange & Blue Tones */}
-      <section className="pt-32 pb-20 relative overflow-hidden">
-        {/* Subtle Background Elements */}
-        <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-200/20 to-slate-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-slate-200/20 to-orange-200/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section - Modern Minimalist */}
+      <section className="section-spacing bg-surface">
+        <div className="container-max">
           <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
-              <MessageSquare className="w-4 h-4" />
-              Get in Touch
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-stone-gray">
+              <div className="w-2 h-2 bg-accent rounded-full"></div>
+              <span className="text-caption text-secondary">Get in Touch</span>
             </div>
             
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+              <h1 className="text-display text-primary leading-tight">
                 Contact Hospitality Hub
-                <span className="block text-orange-600">Get Expert Help & Support</span>
+                <span className="block text-accent">Get Expert Help & Support</span>
               </h1>
-              <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto">
+              <p className="text-body text-muted leading-relaxed max-w-3xl mx-auto">
                 Ready to transform your hospitality business? Our team is here to help you get started 
                 and answer any questions you might have.
               </p>
@@ -137,9 +114,6 @@ export default function ContactPage() {
             <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">
               See Our Platform in Action
             </h2>
-            <p className="text-lg text-slate-600">
-              Join 500+ hospitality businesses using our integrated suite.
-            </p>
           </div>
 
           <div className="flex justify-center items-center space-x-8">
@@ -229,7 +203,7 @@ export default function ContactPage() {
                     <Check className="w-8 h-8 text-green-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">Message Sent!</h3>
-                  <p className="text-slate-600">Thank you for contacting us. We'll get back to you within 24 hours.</p>
+                  <p className="text-slate-600">Thank you for contacting us. We'll respond within 24 hours via email.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -398,10 +372,10 @@ export default function ContactPage() {
                     <Phone className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Call Us</h3>
-                    <p className="text-slate-600 mb-2">Mon-Fri, 9AM-6PM EST</p>
-                    <a href="tel:+1-555-123-4567" className="text-slate-600 hover:text-slate-700 font-medium">
-                      +1 (555) 123-4567
+                    <h3 className="font-semibold text-slate-900 mb-1">Email Us Instead</h3>
+                    <p className="text-slate-600 mb-2">24/7 Support - We respond within 24 hours</p>
+                    <a href="mailto:hello@hospitalityhub.com" className="text-slate-600 hover:text-slate-700 font-medium">
+                      hello@hospitalityhub.com
                     </a>
                   </div>
                 </div>
@@ -411,13 +385,11 @@ export default function ContactPage() {
                     <MapPin className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Visit Us</h3>
-                    <p className="text-slate-600 mb-2">Schedule an in-person meeting</p>
-                    <p className="text-slate-600">
-                      123 Business Ave<br />
-                      Suite 100<br />
-                      New York, NY 10001
-                    </p>
+                    <h3 className="font-semibold text-slate-900 mb-1">Send Us an Email</h3>
+                    <p className="text-slate-600 mb-2">Prefer email communication for all inquiries</p>
+                    <a href="mailto:hello@hospitalityhub.com" className="text-slate-600 hover:text-slate-700 font-medium">
+                      hello@hospitalityhub.com
+                    </a>
                   </div>
                 </div>
 
@@ -426,12 +398,12 @@ export default function ContactPage() {
                     <Clock className="w-6 h-6 text-orange-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Support Hours</h3>
-                    <p className="text-slate-600 mb-2">We're here when you need us</p>
+                    <h3 className="font-semibold text-slate-900 mb-1">Support Response</h3>
+                    <p className="text-slate-600 mb-2">24/7 email support available</p>
                     <p className="text-slate-600">
-                      Monday - Friday: 9AM - 6PM EST<br />
-                      Saturday: 10AM - 4PM EST<br />
-                      Sunday: Closed
+                      We respond to all emails within 24 hours<br />
+                      Emergency support available<br />
+                      Email us anytime at hello@hospitalityhub.com
                     </p>
                   </div>
                 </div>

@@ -4,7 +4,8 @@ import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabaseClient = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -56,7 +57,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabaseClient = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -135,7 +137,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabaseClient = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {

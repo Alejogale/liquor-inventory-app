@@ -430,19 +430,19 @@ export default function AboutPage() {
       {/* CTA Section */}
       <section className="py-16 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 lg:p-12 text-white">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+          <div className="card-elevated bg-white">
+            <h2 className="text-headline text-accent mb-4">
               Ready to Join Our Mission?
             </h2>
-            <p className="text-xl mb-8 opacity-90">
+            <p className="text-body text-primary mb-8">
               Start your journey with Hospitality Hub and transform your business today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:shadow-xl flex items-center gap-2 justify-center group">
+              <Link href="/signup" className="button-primary px-8 py-4 text-lg font-semibold flex items-center gap-2 justify-center group">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/contact" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 flex items-center gap-2 justify-center">
+              <Link href="/contact" className="button-secondary px-8 py-4 text-lg font-semibold flex items-center gap-2 justify-center">
                 Contact Us
               </Link>
             </div>

@@ -237,19 +237,7 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
           <button
             type="submit"
             disabled={loading || !formData.brand.trim() || !formData.category_id}
-            className="flex-1 px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-            style={{
-              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
-            }}
+            className="button-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Updating...' : 'Update Item'}
           </button>

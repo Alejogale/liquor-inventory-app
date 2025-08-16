@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { Package, Calendar, Users, CreditCard, Building2, BarChart3, ChevronRight, Settings, Grid3X3, Plus, TrendingUp, AlertTriangle, CheckCircle, Clock, DollarSign, ArrowUpRight, Eye, Edit, Trash2, Zap, Tag } from 'lucide-react'
+import { Package, Calendar, Users, CreditCard, Building2, BarChart3, ChevronRight, Settings, Grid3X3, Plus, TrendingUp, AlertTriangle, CheckCircle, Clock, DollarSign, ArrowUpRight, Eye, Edit, Trash2, Zap, Tag, Crown } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import AppsSidebar from '@/components/AppsSidebar'
@@ -86,13 +86,24 @@ const apps: AppTile[] = [
     features: ['Member Profiles', 'Family Tracking', 'Sub-100ms Search', 'History Tracking', 'Reservation Links']
   },
   {
-    id: 'pos-system',
-    name: 'POS System',
-    description: 'Point-of-sale system integrated with inventory and member data',
+    id: 'consumption-sheet',
+    name: 'Consumption Sheet',
+    description: 'Real-time event consumption tracking with multi-window support',
     icon: CreditCard,
-    status: 'planned',
+    status: 'available',
+    route: '/consumption-sheet',
     color: 'from-purple-500 to-pink-500',
-    features: ['Payment Processing', 'Inventory Integration', 'Member Billing', 'Reporting', 'Multi-Location']
+    features: ['Real-time Tracking', 'Multi-Window Support', 'Automated Reports', 'Manager Emails', 'Google Sheets']
+  },
+  {
+    id: 'guest-manager',
+    name: 'Guest Manager',
+    description: 'Country club guest management with billing and export functionality',
+    icon: Crown,
+    status: 'available',
+    route: '/guest-manager',
+    color: 'from-indigo-500 to-purple-500',
+    features: ['Guest Tracking', 'Country Club Management', 'Purchase Tracking', 'CSV Export', 'Billing Reports']
   }
 ]
 
@@ -119,7 +130,9 @@ export default function AppsPage() {
     totalMembers: 0,
     activeMembers: 0,
     recentActivity: 0,
-    totalActivity: 0
+    totalActivity: 0,
+    totalConsumptionToday: 0,
+    activeEvents: 0
   })
 
   // Get the correct organization ID
@@ -324,7 +337,9 @@ export default function AppsPage() {
         totalMembers: membersData?.length || 0,
         activeMembers,
         recentActivity: totalActivity,
-        totalActivity
+        totalActivity,
+        totalConsumptionToday: 0, // TODO: Implement consumption tracking integration
+        activeEvents: 0 // TODO: Implement active events tracking
       })
 
     } catch (error) {
@@ -370,7 +385,7 @@ export default function AppsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50/20 via-white to-blue-50/20 flex relative lg:grid lg:grid-cols-[auto_1fr]">
+    <div className="min-h-screen bg-white flex relative lg:grid lg:grid-cols-[auto_1fr]">
       {/* Sidebar Navigation */}
       <AppsSidebar
         userEmail={user?.email || ''}
@@ -388,61 +403,43 @@ export default function AppsPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-md">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Hospitality Platform</h1>
-                  <p className="text-gray-600">{organization?.Name || 'Welcome'}</p>
+                  <h1 className="text-headline text-primary">Hospitality Platform</h1>
+                  <p className="text-body text-muted">{organization?.Name || 'Welcome'}</p>
                 </div>
               </div>
               
               {/* Platform Admin Badge */}
               {isPlatformAdmin() && (
-                <div className="px-4 py-2 rounded-full flex items-center space-x-2 border backdrop-blur-sm"
-                     style={{
-                       background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                       borderColor: 'rgba(255, 119, 0, 0.3)',
-                       boxShadow: '0 4px 12px rgba(255, 119, 0, 0.2)'
-                     }}>
-                  <span className="text-sm font-medium text-white">🌟 Platform Admin</span>
+                <div className="px-4 py-2 rounded-full flex items-center space-x-2 bg-accent border border-accent/20 shadow-md">
+                  <span className="text-caption font-medium text-white">🌟 Platform Admin</span>
                 </div>
               )}
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex space-x-1 rounded-2xl p-1 mb-8 max-w-md backdrop-blur-xl border border-white/20"
-                 style={{
-                   background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
-                   backdropFilter: 'blur(20px)',
-                   WebkitBackdropFilter: 'blur(20px)'
-                 }}>
+            <div className="flex space-x-1 rounded-lg p-1 mb-8 max-w-md bg-surface border border-stone-gray">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`flex-1 py-3 px-4 rounded-md text-caption font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                   activeTab === 'dashboard'
-                    ? 'text-white shadow-lg'
-                    : 'text-gray-700 hover:text-gray-900'
+                    ? 'button-primary'
+                    : 'text-muted hover:text-primary'
                 }`}
-                style={activeTab === 'dashboard' ? {
-                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-                } : {}}
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Dashboard</span>
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`flex-1 py-3 px-4 rounded-md text-caption font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                   activeTab === 'subscription'
-                    ? 'text-white shadow-lg'
-                    : 'text-gray-700 hover:text-gray-900'
+                    ? 'button-primary'
+                    : 'text-muted hover:text-primary'
                 }`}
-                style={activeTab === 'subscription' ? {
-                  background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-                } : {}}
               >
                 <Settings className="h-4 w-4" />
                 <span>Team & Billing</span>
@@ -452,10 +449,10 @@ export default function AppsPage() {
             {/* Welcome Section */}
             {activeTab === 'dashboard' && (
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+                <h2 className="text-headline text-primary mb-4">
                   Welcome to Your Command Center
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-body text-muted max-w-2xl mx-auto leading-relaxed">
                   Monitor all your hospitality operations from one unified dashboard. 
                   Get insights, manage inventory, and track reservations in real-time.
                 </p>
@@ -464,10 +461,10 @@ export default function AppsPage() {
 
             {activeTab === 'subscription' && (
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+                <h2 className="text-headline text-primary mb-4">
                   Team & Billing Management
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-body text-muted max-w-2xl mx-auto leading-relaxed">
                   Manage your subscription, invite team members, and control access permissions.
                 </p>
               </div>
@@ -475,129 +472,123 @@ export default function AppsPage() {
           </div>
 
           {/* Content Container */}
-          <div className="rounded-2xl border border-white/20 shadow-2xl p-8 backdrop-blur-xl"
-               style={{
-                 background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                 backdropFilter: 'blur(20px)',
-                 WebkitBackdropFilter: 'blur(20px)',
-                 boxShadow: '0 25px 50px rgba(255, 119, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
-               }}>
+          <div className="card-elevated">
             
             {/* Dashboard Content */}
             {activeTab === 'dashboard' && (
               <>
                 {/* Quick Actions - Moved to Top */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                  <h3 className="text-title text-primary mb-4">Quick Actions</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                     <button
                       onClick={() => router.push('/dashboard?tab=inventory')}
-                      className="p-4 rounded-xl border border-orange-200 bg-orange-50/50 hover:bg-orange-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
                           <Plus className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-orange-700 text-sm">Add Item</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Add Item</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/reservations')}
-                      className="p-4 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
                           <Calendar className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-blue-700 text-sm">New Booking</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">New Booking</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/dashboard?tab=count')}
-                      className="p-4 rounded-xl border border-green-200 bg-green-50/50 hover:bg-green-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
                           <CheckCircle className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-green-700 text-sm">Room Count</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Room Count</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/dashboard?tab=orders')}
-                      className="p-4 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-orange-800 flex items-center justify-center">
                           <DollarSign className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-purple-700 text-sm">Order Report</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Order Report</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/dashboard?tab=categories')}
-                      className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-800 flex items-center justify-center">
                           <Tag className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-indigo-700 text-sm">Categories</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Categories</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/dashboard?tab=suppliers')}
-                      className="p-4 rounded-xl border border-teal-200 bg-teal-50/50 hover:bg-teal-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-teal-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center">
                           <Users className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-teal-700 text-sm">Suppliers</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Suppliers</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => router.push('/dashboard?tab=rooms')}
-                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100/50 transition-all duration-200 text-center group"
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-slate-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
                           <Building2 className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-slate-700 text-sm">Rooms</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Rooms</p>
                         </div>
                       </div>
                     </button>
                     
                     <button
-                      onClick={() => router.push('/dashboard?tab=activity')}
-                      className="p-4 rounded-xl border border-pink-200 bg-pink-50/50 hover:bg-pink-100/50 transition-all duration-200 text-center group"
+                      onClick={() => router.push('/consumption-sheet')}
+                      className="card group hover:shadow-md transition-all duration-200 text-center"
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center">
-                          <BarChart3 className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-600 to-pink-800 flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 group-hover:text-pink-700 text-sm">Analytics</p>
+                          <p className="font-medium text-primary group-hover:text-accent text-caption">Consumption</p>
                         </div>
                       </div>
                     </button>
@@ -606,45 +597,25 @@ export default function AppsPage() {
 
                 {/* Overview Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Total Items</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalItems}</p>
+                        <p className="text-caption text-muted mb-1">Total Items</p>
+                        <p className="text-headline text-primary">{stats.totalItems}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                             boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md">
                         <Package className="h-5 w-5 text-white" />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(239, 68, 68, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Low Stock</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.lowStockItems}</p>
+                        <p className="text-caption text-muted mb-1">Low Stock</p>
+                        <p className="text-headline text-primary">{stats.lowStockItems}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                             boxShadow: '0 8px 24px rgba(239, 68, 68, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center shadow-md">
                         <AlertTriangle className="h-5 w-5 text-white" />
                       </div>
                     </div>
@@ -652,90 +623,50 @@ export default function AppsPage() {
                   
 
                   
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Active Members</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.activeMembers}</p>
+                        <p className="text-caption text-muted mb-1">Active Members</p>
+                        <p className="text-headline text-primary">{stats.activeMembers}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                             boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center shadow-md">
                         <Users className="h-5 w-5 text-white" />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Total Covers</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalCovers}</p>
-                        <p className="text-xs text-gray-500 mt-1">Your Organization</p>
+                        <p className="text-caption text-muted mb-1">Total Covers</p>
+                        <p className="text-headline text-primary">{stats.totalCovers}</p>
+                        <p className="text-xs text-muted mt-1">Your Organization</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                             boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-charcoal flex items-center justify-center shadow-md">
                         <Users className="h-5 w-5 text-white" />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(147, 51, 234, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Total Activity</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalActivity}</p>
+                        <p className="text-caption text-muted mb-1">Total Activity</p>
+                        <p className="text-headline text-primary">{stats.totalActivity}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
-                             boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-slate-gray flex items-center justify-center shadow-md">
                         <TrendingUp className="h-5 w-5 text-white" />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(107, 114, 128, 0.1)'
-                       }}>
+                  <div className="card hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-xs font-medium mb-1">Total Rooms</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalRooms}</p>
+                        <p className="text-caption text-muted mb-1">Total Rooms</p>
+                        <p className="text-headline text-primary">{stats.totalRooms}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                           style={{
-                             background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                             boxShadow: '0 8px 24px rgba(107, 114, 128, 0.3)'
-                           }}>
+                      <div className="w-10 h-10 rounded-lg bg-slate-gray flex items-center justify-center shadow-md">
                         <Building2 className="h-5 w-5 text-white" />
                       </div>
                     </div>
@@ -746,41 +677,20 @@ export default function AppsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   
                   {/* Liquor Inventory Section */}
-                  <div className="rounded-2xl border border-white/20 backdrop-blur-xl shadow-lg p-6"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)'
-                       }}>
+                  <div className="card-elevated">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
-                             style={{
-                               background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                               boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
-                             }}>
+                        <div className="w-12 h-12 rounded-lg bg-accent flex items-center justify-center shadow-md">
                           <Package className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">Liquor Inventory</h3>
-                          <p className="text-gray-600 text-sm">Manage your stock levels</p>
+                          <h3 className="text-title text-primary">Liquor Inventory</h3>
+                          <p className="text-caption text-muted">Manage your stock levels</p>
                         </div>
                       </div>
                       <button
                         onClick={() => router.push('/dashboard')}
-                        className="px-4 py-2 text-white text-sm rounded-xl transition-all duration-300 font-medium"
-                        style={{
-                          background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                          boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
-                        }}
+                        className="button-primary"
                       >
                         View All
                       </button>
@@ -788,16 +698,16 @@ export default function AppsPage() {
                     
                     {loading ? (
                       <div className="text-center py-8">
-                        <div className="w-6 h-6 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin mx-auto mb-2"></div>
-                        <p className="text-gray-600 text-sm">Loading inventory...</p>
+                        <div className="w-6 h-6 border-2 border-stone-gray border-t-accent rounded-full animate-spin mx-auto mb-2"></div>
+                        <p className="text-caption text-muted">Loading inventory...</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {inventoryItems.slice(0, 5).map((item) => (
-                          <div key={item.id} className="flex items-center justify-between p-3 rounded-xl border border-orange-100 bg-orange-50/50">
+                          <div key={item.id} className="flex items-center justify-between p-3 rounded-lg border border-stone-gray bg-surface">
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{item.brand}</p>
-                              <p className="text-sm text-gray-600">{item.size} • {item.categories?.name || 'Uncategorized'}</p>
+                              <p className="font-medium text-primary">{item.brand}</p>
+                              <p className="text-caption text-muted">{item.size} • {item.categories?.name || 'Uncategorized'}</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -811,8 +721,8 @@ export default function AppsPage() {
                           </div>
                         ))}
                         {inventoryItems.length === 0 && (
-                          <div className="text-center py-8 text-gray-500">
-                            <Package className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                          <div className="text-center py-8 text-muted">
+                            <Package className="w-8 h-8 mx-auto mb-2 text-stone-gray" />
                             <p>No inventory items found</p>
                           </div>
                         )}
@@ -821,41 +731,20 @@ export default function AppsPage() {
                   </div>
 
                   {/* Reservations Section */}
-                  <div className="rounded-2xl border border-white/20 backdrop-blur-xl shadow-lg p-6"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(239,246,255,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)'
-                       }}>
+                  <div className="card-elevated">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
-                             style={{
-                               background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                               boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
-                             }}>
-                          <Calendar className="h-6 w-6 text-white" />
-                        </div>
+                                              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center shadow-md">
+                        <Calendar className="h-6 w-6 text-white" />
+                      </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">Reservations</h3>
-                          <p className="text-gray-600 text-sm">Today's bookings</p>
+                          <h3 className="text-title text-primary">Reservations</h3>
+                          <p className="text-caption text-muted">Today's bookings</p>
                         </div>
                       </div>
                       <button
                         onClick={() => router.push('/reservations')}
-                        className="px-4 py-2 text-white text-sm rounded-xl transition-all duration-300 font-medium"
-                        style={{
-                          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
-                        }}
+                        className="button-secondary"
                       >
                         View All
                       </button>
@@ -864,10 +753,10 @@ export default function AppsPage() {
                     <div className="space-y-3">
                       {reservations.length > 0 ? (
                         reservations.slice(0, 5).map((reservation) => (
-                          <div key={reservation.id} className="flex items-center justify-between p-3 rounded-xl border border-blue-100 bg-blue-50/50">
+                          <div key={reservation.id} className="flex items-center justify-between p-3 rounded-lg border border-stone-gray bg-surface">
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{reservation.member_name}</p>
-                              <p className="text-sm text-gray-600">{reservation.reservation_time} • {reservation.party_size} people</p>
+                              <p className="font-medium text-primary">{reservation.member_name}</p>
+                              <p className="text-caption text-muted">{reservation.reservation_time} • {reservation.party_size} people</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <select
@@ -890,12 +779,12 @@ export default function AppsPage() {
                                     console.error('Error updating reservation:', error)
                                   }
                                 }}
-                                className={`px-2 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-blue-500 cursor-pointer ${
+                                className={`px-2 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-accent cursor-pointer ${
                                   reservation.status === 'Here' || reservation.status === 'Ordered'
                                     ? 'bg-green-100 text-green-700' 
                                     : reservation.status === 'Waiting to arrive'
                                     ? 'bg-yellow-100 text-yellow-700'
-                                    : 'bg-gray-100 text-gray-700'
+                                    : 'bg-surface text-muted'
                                 }`}
                               >
                                 <option value="Waiting to arrive">Waiting to arrive</option>
@@ -912,8 +801,8 @@ export default function AppsPage() {
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <Calendar className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <div className="text-center py-8 text-muted">
+                          <Calendar className="w-8 h-8 mx-auto mb-2 text-stone-gray" />
                           <p>No reservations found</p>
                         </div>
                       )}
@@ -921,24 +810,15 @@ export default function AppsPage() {
                   </div>
 
                   {/* Member Database Section */}
-                  <div className="rounded-2xl border border-white/20 backdrop-blur-xl shadow-lg p-6"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,253,244,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)'
-                       }}>
+                  <div className="card-elevated">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
-                             style={{
-                               background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                               boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
-                             }}>
-                          <Users className="h-6 w-6 text-white" />
-                        </div>
+                                              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-md">
+                        <Users className="h-6 w-6 text-white" />
+                      </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">Member Database</h3>
-                          <p className="text-gray-600 text-sm">Active members</p>
+                          <h3 className="text-title text-primary">Member Database</h3>
+                          <p className="text-caption text-muted">Active members</p>
                         </div>
                       </div>
                       <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">
@@ -949,10 +829,10 @@ export default function AppsPage() {
                     <div className="space-y-3">
                       {members.length > 0 ? (
                         members.slice(0, 5).map((member) => (
-                          <div key={member.id} className="flex items-center justify-between p-3 rounded-xl border border-green-100 bg-green-50/50">
+                          <div key={member.id} className="flex items-center justify-between p-3 rounded-lg border border-stone-gray bg-surface">
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{member.full_name}</p>
-                              <p className="text-sm text-gray-600">{member.membership_type || 'Standard'} • {member.member_number}</p>
+                              <p className="font-medium text-primary">{member.full_name}</p>
+                              <p className="text-caption text-muted">{member.membership_type || 'Standard'} • {member.member_number}</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -968,8 +848,8 @@ export default function AppsPage() {
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <div className="text-center py-8 text-muted">
+                          <Users className="w-8 h-8 mx-auto mb-2 text-stone-gray" />
                           <p>No members found</p>
                         </div>
                       )}
@@ -980,10 +860,10 @@ export default function AppsPage() {
                 </div>
 
                 {/* App Status Section */}
-                <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="mt-8 pt-8 border-t border-stone-gray">
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">App Status & Development</h3>
-                    <p className="text-gray-600">Track our progress as we build the complete platform</p>
+                    <h3 className="text-headline text-primary mb-3">App Status & Development</h3>
+                    <p className="text-body text-muted">Track our progress as we build the complete platform</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {apps.map((app) => {
@@ -993,14 +873,9 @@ export default function AppsPage() {
                       return (
                         <div
                           key={app.id}
-                          className={`relative rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 ${
-                            isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+                          className={`relative card-elevated transition-all duration-200 ${
+                            isAvailable ? 'cursor-pointer hover:shadow-xl' : 'cursor-not-allowed opacity-60'
                           }`}
-                          style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
-                            backdropFilter: 'blur(10px)',
-                            WebkitBackdropFilter: 'blur(10px)'
-                          }}
                           onClick={() => handleAppClick(app)}
                         >
                           {/* Status Badge */}
@@ -1009,42 +884,41 @@ export default function AppsPage() {
                           </div>
 
                           {/* App Icon */}
-                          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-transform duration-300"
-                               style={{
-                                 background: app.id === 'liquor-inventory' ? 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)' :
-                                           app.id === 'reservation-system' ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' :
-                                           app.id === 'member-database' ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' :
-                                           'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
-                                 boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
-                               }}>
+                          <div className={`w-16 h-16 rounded-lg flex items-center justify-center mb-6 shadow-md transition-transform duration-200 ${
+                                 app.id === 'liquor-inventory' ? 'bg-gradient-to-br from-blue-600 to-blue-800' :
+                                 app.id === 'reservation-system' ? 'bg-gradient-to-br from-green-600 to-green-800' :
+                                 app.id === 'member-database' ? 'bg-gradient-to-br from-purple-600 to-purple-800' :
+                                 app.id === 'consumption-sheet' ? 'bg-gradient-to-br from-pink-600 to-pink-800' :
+                                 'bg-gradient-to-br from-gray-600 to-gray-800'
+                               }`}>
                             <Icon className="h-8 w-8 text-white" />
                           </div>
 
                           {/* App Info */}
                           <div className="mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center tracking-tight">
+                            <h3 className="text-title text-primary mb-2 flex items-center">
                               {app.name}
                               {isAvailable && (
-                                <ChevronRight className="ml-2 h-4 w-4 text-gray-400" />
+                                <ChevronRight className="ml-2 h-4 w-4 text-muted" />
                               )}
                             </h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">
+                            <p className="text-caption text-muted leading-relaxed">
                               {app.description}
                             </p>
                           </div>
 
                           {/* Features List */}
                           <div className="space-y-2">
-                            <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wider">Key Features</h4>
+                            <h4 className="text-xs font-medium text-secondary uppercase tracking-wider">Key Features</h4>
                             <div className="grid grid-cols-1 gap-1">
                               {app.features.slice(0, 3).map((feature, index) => (
-                                <div key={index} className="flex items-center text-xs text-gray-600">
-                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2 flex-shrink-0"></div>
+                                <div key={index} className="flex items-center text-xs text-muted">
+                                  <div className="w-1.5 h-1.5 bg-slate-gray rounded-full mr-2 flex-shrink-0"></div>
                                   {feature}
                                 </div>
                               ))}
                               {app.features.length > 3 && (
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-xs text-muted mt-1">
                                   +{app.features.length - 3} more features
                                 </div>
                               )}
@@ -1054,19 +928,7 @@ export default function AppsPage() {
                           {/* Launch Button */}
                           {isAvailable && (
                             <div className="mt-6">
-                              <div className="px-6 py-3 rounded-xl font-medium text-sm text-center transition-all duration-300 text-white cursor-pointer"
-                                   style={{
-                                     background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                                     boxShadow: '0 4px 15px rgba(255, 119, 0, 0.4)'
-                                   }}
-                                   onMouseEnter={(e) => {
-                                     e.currentTarget.style.transform = 'translateY(-1px)';
-                                     e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.5)';
-                                   }}
-                                   onMouseLeave={(e) => {
-                                     e.currentTarget.style.transform = 'translateY(0px)';
-                                     e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.4)';
-                                   }}>
+                              <div className="button-primary w-full text-center cursor-pointer">
                                 Launch Application
                               </div>
                             </div>
@@ -1095,15 +957,9 @@ export default function AppsPage() {
 
                 {/* Advanced Permissions (for power users) */}
                 {userProfile?.role === 'owner' && (
-                  <div className="rounded-2xl p-8 border border-white/20 backdrop-blur-xl"
-                       style={{
-                         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                         backdropFilter: 'blur(20px)',
-                         WebkitBackdropFilter: 'blur(20px)',
-                         boxShadow: '0 8px 32px rgba(255, 119, 0, 0.05)'
-                       }}>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Advanced Permissions</h3>
-                    <p className="text-gray-600 mb-6">Fine-tune user roles and access permissions</p>
+                  <div className="card-elevated">
+                    <h3 className="text-title text-primary mb-4">Advanced Permissions</h3>
+                    <p className="text-body text-muted mb-6">Fine-tune user roles and access permissions</p>
                     <UserPermissions organizationId={organization?.id} />
                   </div>
                 )}

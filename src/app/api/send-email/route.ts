@@ -1,150 +1,127 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateInvitationEmail } from '@/templates/team-invitation'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createRouteHandlerClient({ cookies })
+    
+    // Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
-    const { template, to, subject, html, data } = body
-    
-    if (!to) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required field: to' },
-        { status: 400 }
-      )
-    }
+    const { to, subject, clubName, clubLocation, contactPerson, guestData, totalGuests, totalRevenue } = body
 
-    let emailSubject = subject
-    let emailHtml = html
-    let emailText = ''
+    // Generate HTML email content
+    const htmlContent = generateClubReportEmail({
+      clubName,
+      clubLocation,
+      contactPerson,
+      guestData,
+      totalGuests,
+      totalRevenue
+    })
 
-    if (template === 'team-invitation') {
-      // Generate team invitation email using template
-      const invitationEmail = generateInvitationEmail({
-        organizationName: data.organizationName,
-        inviterName: data.inviterName,
-        role: data.role,
-        inviteUrl: data.inviteUrl,
-        customMessage: data.customMessage,
-        expiresAt: data.expiresAt,
-        isReminder: data.isReminder || false
-      })
-      
-      emailSubject = invitationEmail.subject
-      emailHtml = invitationEmail.html
-      emailText = invitationEmail.text
-    }
-    
-    // For demo purposes, we'll simulate email sending
-    // In production, you'd integrate with SendGrid, Mailgun, or similar
-    
-    console.log('📧 Email would be sent to:', to)
-    console.log('Subject:', emailSubject)
-    console.log('Template:', template || 'standard')
-    if (template === 'team-invitation') {
-      console.log('Organization:', data?.organizationName)
-      console.log('Role:', data?.role)
-      console.log('Invite URL:', data?.inviteUrl)
-    }
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // For now, return success (in production, integrate real email service)
+    // For now, we'll use a simple email service
+    // In production, you'd integrate with SendGrid, AWS SES, or similar
+    console.log('Email would be sent to:', to)
+    console.log('Subject:', subject)
+    console.log('HTML Content:', htmlContent)
+
+    // TODO: Integrate with actual email service
+    // Example with SendGrid:
+    // const sgMail = require('@sendgrid/mail')
+    // sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+    // await sgMail.send({
+    //   to,
+    //   from: 'your-verified-sender@domain.com',
+    //   subject,
+    //   html: htmlContent
+    // })
+
     return NextResponse.json({ 
       success: true, 
-      message: 'Email sent successfully',
-      demo: true
+      message: 'Email report generated successfully',
+      to,
+      subject,
+      totalGuests,
+      totalRevenue
     })
-    
+
   } catch (error) {
-    console.error('Email API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to send email' },
-      { status: 500 }
-    )
+    console.error('Error sending email:', error)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }
 
-function generateInvitationEmailHtml({
-  organizationName,
-  inviterName,
-  role,
-  appAccess,
-  customMessage,
-  invitationId
-}: {
-  organizationName: string
-  inviterName: string
-  role: string
-  appAccess: string[]
-  customMessage?: string
-  invitationId: string
-}) {
-  const appNames = {
-    'liquor-inventory': 'Liquor Inventory',
-    'reservation-management': 'Reservation System',
-    'member-database': 'Member Database',
-    'pos-system': 'POS System'
-  }
-
-  const accessList = appAccess.map(appId => appNames[appId as keyof typeof appNames] || appId).join(', ')
+function generateClubReportEmail({ 
+  clubName, 
+  clubLocation, 
+  contactPerson, 
+  guestData, 
+  totalGuests, 
+  totalRevenue 
+}: any) {
+  const guestRows = guestData.map((guest: any) => `
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">${guest.guest_name}</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">${guest.member_number}</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">${new Date(guest.visit_date).toLocaleDateString()}</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">$${guest.total_amount?.toFixed(2) || '0.00'}</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">${guest.status}</td>
+    </tr>
+  `).join('')
 
   return `
     <!DOCTYPE html>
     <html>
     <head>
-      <meta charset="utf-8">
-      <title>Team Invitation - Hospitality Hub</title>
       <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #334155; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
-        .content { background: white; padding: 30px; border: 1px solid #e2e8f0; }
-        .footer { background: #f8fafc; padding: 20px; border-radius: 0 0 12px 12px; text-align: center; font-size: 14px; color: #64748b; }
-        .btn { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-        .app-list { background: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0; }
-        .role-badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .summary { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #007bff; color: white; padding: 12px; text-align: left; }
+        td { padding: 8px; border: 1px solid #ddd; }
+        .total { font-weight: bold; background: #f8f9fa; }
       </style>
     </head>
     <body>
-      <div class="container">
-        <div class="header">
-          <h1>🎉 You're Invited!</h1>
-          <p>Join ${organizationName} on Hospitality Hub</p>
-        </div>
-        
-        <div class="content">
-          <p>Hi there!</p>
-          
-          <p><strong>${inviterName}</strong> has invited you to join <strong>${organizationName}</strong> on Hospitality Hub as a <span class="role-badge">${role.charAt(0).toUpperCase() + role.slice(1)}</span>.</p>
-          
-          ${customMessage ? `
-            <div style="background: #fefce8; border-left: 4px solid #facc15; padding: 15px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0; font-style: italic;">"${customMessage}"</p>
-            </div>
-          ` : ''}
-          
-          <p>You'll have access to the following apps:</p>
-          <div class="app-list">
-            <strong>📱 Your App Access:</strong><br>
-            ${accessList || 'No specific app access granted yet'}
-          </div>
-          
-          <p>Hospitality Hub is a comprehensive platform designed specifically for hospitality businesses to manage inventory, reservations, customer relationships, and more - all in one place.</p>
-          
-          <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/accept-invitation?token=${invitationId}" class="btn">
-              Accept Invitation
-            </a>
-          </div>
-          
-          <p style="font-size: 14px; color: #64748b;">This invitation will expire in 7 days. If you have any questions, please contact ${inviterName} or reply to this email.</p>
-        </div>
-        
-        <div class="footer">
-          <p>© 2024 Hospitality Hub. Made with ❤️ for the hospitality industry.</p>
-          <p style="font-size: 12px;">If you don't want to receive these emails, you can safely ignore this invitation.</p>
-        </div>
+      <div class="header">
+        <h1>Guest Report - ${clubName}</h1>
+        <p><strong>Location:</strong> ${clubLocation}</p>
+        <p><strong>Contact:</strong> ${contactPerson}</p>
+        <p><strong>Report Date:</strong> ${new Date().toLocaleDateString()}</p>
+      </div>
+
+      <div class="summary">
+        <h2>Summary</h2>
+        <p><strong>Total Guests:</strong> ${totalGuests}</p>
+        <p><strong>Total Revenue:</strong> $${totalRevenue.toFixed(2)}</p>
+      </div>
+
+      <h2>Guest Details</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Guest Name</th>
+            <th>Member Number</th>
+            <th>Visit Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${guestRows}
+        </tbody>
+      </table>
+
+      <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <p><strong>Note:</strong> This report contains all guest visits for ${clubName}. 
+        For detailed purchase information, please contact the management team.</p>
       </div>
     </body>
     </html>

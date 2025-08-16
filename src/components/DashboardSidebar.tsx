@@ -18,7 +18,8 @@ import {
   Upload,
   Settings,
   BarChart3,
-  CreditCard
+  CreditCard,
+  Mail
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -55,7 +56,8 @@ export default function DashboardSidebar({
     { id: 'orders', label: 'Orders', icon: ShoppingCart, description: 'Order reports' },
     { id: 'activity', label: 'Activity & Reports', icon: Activity, description: 'Analytics, logs & CSV export' },
     { id: 'integrations', label: 'Integrations', icon: Settings, description: 'QuickBooks & more' },
-    { id: 'subscription', label: 'Team & Billing', icon: CreditCard, description: 'Manage subscription & team' }
+    { id: 'subscription', label: 'Team & Billing', icon: CreditCard, description: 'Manage subscription & team' },
+    ...(isAdmin ? [{ id: 'email-testing', label: 'Email Testing', icon: Mail, description: 'Test email templates' }] : [])
   ]
 
   return (
@@ -173,39 +175,23 @@ export default function DashboardSidebar({
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full group relative flex items-center p-3 rounded-xl transition-all duration-300 border ${
                     isActive
-                      ? 'text-white shadow-lg border-white/20'
-                      : 'border-transparent backdrop-blur-sm'
+                      ? 'button-primary border-accent/20'
+                      : 'border-transparent bg-surface hover:bg-white/50'
                   }`}
-                  style={isActive ? {
-                    background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                    boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
-                  } : {
-                    background: 'rgba(255,255,255,0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
-                    }
-                  }}
                 >
                   <Icon className={`h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-white' : 'text-gray-700 group-hover:text-gray-900'
+                    isActive ? 'text-white' : 'text-secondary group-hover:text-primary'
                   }`} />
                   
                   {!isCollapsed && (
                     <div className="ml-3 text-left">
                       <p className={`text-sm font-semibold ${
-                        isActive ? 'text-white' : 'text-gray-800 group-hover:text-gray-900'
+                        isActive ? 'text-white' : 'text-primary group-hover:text-primary'
                       }`}>
                         {item.label}
                       </p>
                       <p className={`text-xs ${
-                        isActive ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-700'
+                        isActive ? 'text-white/90' : 'text-muted group-hover:text-secondary'
                       }`}>
                         {item.description}
                       </p>

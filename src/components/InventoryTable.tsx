@@ -221,9 +221,9 @@ export default function InventoryTable({
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <Package className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-        <p className="text-slate-600 text-lg">No inventory items found</p>
-        <p className="text-slate-500 text-sm mt-2">Click &ldquo;Add Item&rdquo; to get started</p>
+        <Package className="h-16 w-16 text-muted mx-auto mb-4" />
+        <p className="text-secondary text-body">No inventory items found</p>
+        <p className="text-muted text-caption mt-2">Click &ldquo;Add Item&rdquo; to get started</p>
       </div>
     )
   }
@@ -233,7 +233,7 @@ export default function InventoryTable({
       {/* Search Bar */}
       <div className="flex items-center space-x-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted" />
           <input
             type="text"
             placeholder="Search by brand, barcode, category, or supplier..."

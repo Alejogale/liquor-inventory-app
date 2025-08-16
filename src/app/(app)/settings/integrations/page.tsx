@@ -26,7 +26,7 @@ export default async function IntegrationsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 text-sm font-medium">$</span>
+                <span className="text-muted text-sm font-medium">$</span>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Stripe Integration</h3>
@@ -38,7 +38,7 @@ export default async function IntegrationsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 text-sm font-medium">@</span>
+                <span className="text-muted text-sm font-medium">@</span>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Email Integration</h3>

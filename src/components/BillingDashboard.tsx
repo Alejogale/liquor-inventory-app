@@ -173,15 +173,11 @@ export default function BillingDashboard() {
           <button
             key={id}
             onClick={() => setActiveTab(id as any)}
-            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+            className={`flex-1 py-3 px-4 rounded-xl text-caption font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
               activeTab === id
-                ? 'text-white shadow-lg'
-                : 'text-gray-700 hover:text-gray-900'
+                ? 'button-primary'
+                : 'text-secondary hover:text-primary'
             }`}
-            style={activeTab === id ? {
-              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-            } : {}}
           >
             <Icon className="h-4 w-4" />
             <span>{label}</span>
@@ -391,9 +387,9 @@ export default function BillingDashboard() {
           
           {invoices.length === 0 ? (
             <div className="text-center py-12">
-              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No invoices yet</h4>
-              <p className="text-gray-600">Your billing history will appear here</p>
+              <CreditCard className="h-12 w-12 text-muted mx-auto mb-4" />
+              <h4 className="text-title text-primary mb-2">No invoices yet</h4>
+              <p className="text-muted">Your billing history will appear here</p>
             </div>
           ) : (
             <div className="space-y-4">

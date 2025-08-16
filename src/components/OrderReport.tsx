@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '../app/lib/supabase'
-import { sendOrderReport } from '../lib/email-service'
+// Email service is now called via API route
 import { useAuth } from '../lib/auth-context'
 
 interface OrderItem {
@@ -279,13 +279,30 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
 
     setEmailLoading(true)
     try {
-      // Create supplier-specific report
-      const result = await sendOrderReport(
-        emailAddress, 
-        selectedSupplier.items, 
-        'Morris County Golf Club',
-        selectedSupplier.supplier_name
-      )
+      // Prepare report data
+      const reportData = {
+        totalItems: selectedSupplier.items.length,
+        totalValue: selectedSupplier.items.reduce((sum, item) => sum + (item.current_stock * 0), 0), // Placeholder for value calculation
+        supplierName: selectedSupplier.supplier_name,
+        items: selectedSupplier.items
+      }
+
+      // Send email via API route
+      const response = await fetch('/api/send-order-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: emailAddress,
+          organizationName: organization?.name || 'Morris County Golf Club',
+          reportData,
+          reportDate: new Date().toLocaleDateString(),
+          reportUrl: window.location.href
+        })
+      })
+
+      const result = await response.json()
       
       if (result.success) {
         alert(`Order report sent to ${selectedSupplier.supplier_name} successfully!`)
@@ -293,9 +310,10 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         setSelectedSupplier(null)
         setEmailAddress('')
       } else {
-        alert('Failed to send email: ' + result.error)
+        alert('Failed to send email: ' + (result.error || 'Unknown error'))
       }
     } catch (error) {
+      console.error('Error sending email:', error)
       alert('Failed to send email')
     } finally {
       setEmailLoading(false)

@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Country Club Guest Management - Track guest members, purchases, and billing from other clubs">
+    <meta name="keywords" content="country club, guest management, member tracking, billing, hospitality">
+    <title>Country Club Guest Manager</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f1f3f4 100%);
+            color: #424242;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Global cursor tracking gradient */
+        .cursor-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(252, 80, 0, 0.03) 0%,
+                rgba(252, 80, 0, 0.01) 30%,
+                transparent 70%
+            );
+            transition: background 0.1s ease;
+        }
+
+        /* Ensure content is above gradient */
+        .container, nav, section {
+            position: relative;
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .nav-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.3);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #9e9e9e;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #3b82f6;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Main App Interface */
+        .app-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 1rem;
+        }
+
+        .app-subtitle {
+            font-size: 1.125rem;
+            color: #9e9e9e;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.02) 0%, 
+                rgba(30, 64, 175, 0.02) 50%,
+                rgba(59, 130, 246, 0.01) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .dashboard-card:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #9e9e9e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Guest Entry Form */
+        .guest-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #424242;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 2px solid #e4e4e4;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e4e4e4;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .purchase-items {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .purchase-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e4e4e4;
+        }
+
+        .purchase-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .remove-item {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .add-item-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.125rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Guest List */
+        .guest-list {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .clear-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #dc2626;
+        }
+
+        .guest-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .guest-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #424242;
+            border-bottom: 2px solid #e4e4e4;
+        }
+
+        .guest-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .guest-table tr:hover {
+            background: rgba(59, 130, 246, 0.02);
+        }
+
+        .guest-name {
+            font-weight: 600;
+            color: #424242;
+        }
+
+        .guest-club {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        .guest-total {
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .guest-status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-billed {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .purchase-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .guest-table {
+                font-size: 0.875rem;
+            }
+
+            .guest-table th,
+            .guest-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        /* Club Management */
+        .clubs-section {
+            margin-bottom: 2rem;
+        }
+
+        .clubs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .clubs-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .add-club-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .add-club-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .club-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .club-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .club-name {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 0.5rem;
+        }
+
+        .club-location {
+            font-size: 0.875rem;
+            color: #9e9e9e;
+        }
+
+        .club-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .club-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #2563eb;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .club-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .club-detail {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .detail-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #9e9e9e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .club-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-inactive {
+            background: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .close {
+            color: #9e9e9e;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #424242;
+        }
+
+        .modal-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .cancel-btn {
+            background: #f3f4f6;
+            color: #424242;
+            border: 1px solid #e4e4e4;
+        }
+
+        .cancel-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Global cursor gradient -->
+    <div class="cursor-gradient"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-modern">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <div class="logo">🏌️</div>
+                    <span class="brand-name">Guest Manager</span>
+                </div>
+                
+                <div class="nav-links">
+                    <a href="#dashboard" class="nav-link">Dashboard</a>
+                    <a href="#guests" class="nav-link">Guests</a>
+                    <a href="#clubs" class="nav-link">Clubs</a>
+                    <a href="#billing" class="nav-link">Billing</a>
+                    <a href="#settings" class="nav-link">Settings</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <div class="container">
+            <!-- App Header -->
+            <div class="app-header fade-in">
+                <h1 class="app-title">Country Club Guest Manager</h1>
+                <p class="app-subtitle">
+                    Track guest members from other clubs, their purchases, and manage billing efficiently
+                </p>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="dashboard-grid fade-in">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">👥</div>
+                        <div class="card-title">Today's Guests</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="todayGuests">0</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="todayRevenue">$0</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">🏢</div>
+                        <div class="card-title">Participating Clubs</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalClubs">12</div>
+                            <div class="stat-label">Clubs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="monthlyGuests">47</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest Entry Form -->
+            <div class="guest-form fade-in">
+                <h2 class="form-title">Add New Guest</h2>
+                <form id="guestForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Guest Name</label>
+                            <input type="text" class="form-input" id="guestName" placeholder="Enter guest name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Member Number</label>
+                            <input type="text" class="form-input" id="memberNumber" placeholder="Member #" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Home Club</label>
+                            <select class="form-select" id="homeClub" required>
+                                <option value="">Select club</option>
+                                <option value="Pine Valley Golf Club">Pine Valley Golf Club</option>
+                                <option value="Augusta National">Augusta National</option>
+                                <option value="Pebble Beach">Pebble Beach</option>
+                                <option value="St. Andrews">St. Andrews</option>
+                                <option value="Whistling Straits">Whistling Straits</option>
+                                <option value="TPC Sawgrass">TPC Sawgrass</option>
+                                <option value="Bethpage Black">Bethpage Black</option>
+                                <option value="Oakmont Country Club">Oakmont Country Club</option>
+                                <option value="Winged Foot">Winged Foot</option>
+                                <option value="Merion Golf Club">Merion Golf Club</option>
+                                <option value="Shinnecock Hills">Shinnecock Hills</option>
+                                <option value="Royal County Down">Royal County Down</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-input" id="visitDate" required>
+                        </div>
+                    </div>
+
+                    <div class="purchase-items">
+                        <h3 style="margin-bottom: 1rem; color: #424242;">Purchase Items</h3>
+                        <div id="purchaseItems">
+                            <div class="purchase-item">
+                                <input type="text" class="form-input" placeholder="Item description" value="Grey Goose Martini">
+                                <input type="number" class="form-input" placeholder="Qty" value="2" min="1">
+                                <input type="number" class="form-input" placeholder="Price" value="18.00" min="0" step="0.01">
+                                <button type="button" class="remove-item">×</button>
+                            </div>
+                            <div class="purchase-item">
+                                <input type="text" class="form-input" placeholder="Item description" value="Wagyu Burger">
+                                <input type="number" class="form-input" placeholder="Qty" value="1" min="1">
+                                <input type="number" class="form-input" placeholder="Price" value="32.00" min="0" step="0.01">
+                                <button type="button" class="remove-item">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-item-btn" id="addItemBtn">+ Add Item</button>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Add Guest & Calculate Total</button>
+                </form>
+            </div>
+
+            <!-- Club Management -->
+            <div class="clubs-section fade-in">
+                <div class="clubs-header">
+                    <h2 class="clubs-title">Participating Country Clubs</h2>
+                    <button class="add-club-btn" id="addClubBtn">+ Add New Club</button>
+                </div>
+
+                <div class="clubs-grid" id="clubsGrid">
+                    <div class="club-card">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">Pine Valley Golf Club</div>
+                                <div class="club-location">Pine Valley, NJ</div>
+                            </div>
+                            <div class="club-actions">
+                                <button class="club-action-btn edit-btn" data-club-id="1">Edit</button>
+                                <button class="club-action-btn delete-btn" data-club-id="1">Delete</button>
+                            </div>
+                        </div>
+                        <div class="club-details">
+                            <div class="club-detail">
+                                <div class="detail-value">23</div>
+                                <div class="detail-label">Guests This Month</div>
+                            </div>
+                            <div class="club-detail">
+                                <div class="detail-value">$1,247</div>
+                                <div class="detail-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <span class="club-status status-active">Active</span>
+                    </div>
+
+                    <div class="club-card">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">Augusta National</div>
+                                <div class="club-location">Augusta, GA</div>
+                            </div>
+                            <div class="club-actions">
+                                <button class="club-action-btn edit-btn" data-club-id="2">Edit</button>
+                                <button class="club-action-btn delete-btn" data-club-id="2">Delete</button>
+                            </div>
+                        </div>
+                        <div class="club-details">
+                            <div class="club-detail">
+                                <div class="detail-value">18</div>
+                                <div class="detail-label">Guests This Month</div>
+                            </div>
+                            <div class="club-detail">
+                                <div class="detail-value">$892</div>
+                                <div class="detail-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <span class="club-status status-active">Active</span>
+                    </div>
+
+                    <div class="club-card">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">Pebble Beach</div>
+                                <div class="club-location">Pebble Beach, CA</div>
+                            </div>
+                            <div class="club-actions">
+                                <button class="club-action-btn edit-btn" data-club-id="3">Edit</button>
+                                <button class="club-action-btn delete-btn" data-club-id="3">Delete</button>
+                            </div>
+                        </div>
+                        <div class="club-details">
+                            <div class="club-detail">
+                                <div class="detail-value">31</div>
+                                <div class="detail-label">Guests This Month</div>
+                            </div>
+                            <div class="club-detail">
+                                <div class="detail-value">$1,856</div>
+                                <div class="detail-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <span class="club-status status-active">Active</span>
+                    </div>
+
+                    <div class="club-card">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">St. Andrews</div>
+                                <div class="club-location">St. Andrews, Scotland</div>
+                            </div>
+                            <div class="club-actions">
+                                <button class="club-action-btn edit-btn" data-club-id="4">Edit</button>
+                                <button class="club-action-btn delete-btn" data-club-id="4">Delete</button>
+                            </div>
+                        </div>
+                        <div class="club-details">
+                            <div class="club-detail">
+                                <div class="detail-value">12</div>
+                                <div class="detail-label">Guests This Month</div>
+                            </div>
+                            <div class="club-detail">
+                                <div class="detail-value">$634</div>
+                                <div class="detail-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <span class="club-status status-inactive">Inactive</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest List -->
+            <div class="guest-list fade-in">
+                <div class="list-header">
+                    <h2 class="list-title">Today's Guests</h2>
+                    <div class="list-actions">
+                        <button class="action-btn export-btn" id="exportBtn">Export CSV</button>
+                        <button class="action-btn clear-btn" id="clearBtn">Clear All</button>
+                    </div>
+                </div>
+
+                <table class="guest-table">
+                    <thead>
+                        <tr>
+                            <th>Guest Name</th>
+                            <th>Member #</th>
+                            <th>Home Club</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guestTableBody">
+                        <tr>
+                            <td class="guest-name">John Smith</td>
+                            <td>PV-2024-001</td>
+                            <td class="guest-club">Pine Valley Golf Club</td>
+                            <td>3 items</td>
+                            <td class="guest-total">$68.00</td>
+                            <td><span class="guest-status status-active">Active</span></td>
+                            <td>
+                                <button class="action-btn" style="background: #3b82f6; color: white; font-size: 0.75rem;">Bill</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="guest-name">Sarah Johnson</td>
+                            <td>AN-2024-045</td>
+                            <td class="guest-club">Augusta National</td>
+                            <td>2 items</td>
+                            <td class="guest-total">$42.50</td>
+                            <td><span class="guest-status status-billed">Billed</span></td>
+                            <td>
+                                <button class="action-btn" style="background: #9e9e9e; color: white; font-size: 0.75rem;">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="guest-name">Mike Davis</td>
+                            <td>PB-2024-123</td>
+                            <td class="guest-club">Pebble Beach</td>
+                            <td>5 items</td>
+                            <td class="guest-total">$127.80</td>
+                            <td><span class="guest-status status-active">Active</span></td>
+                            <td>
+                                <button class="action-btn" style="background: #3b82f6; color: white; font-size: 0.75rem;">Bill</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Club Modal -->
+    <div id="clubModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Club</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <form id="clubForm" class="modal-form">
+                <div class="form-group">
+                    <label class="form-label">Club Name</label>
+                    <input type="text" class="form-input" id="modalClubName" placeholder="Enter club name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="modalClubLocation" placeholder="City, State/Country" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Person</label>
+                    <input type="text" class="form-input" id="modalContactPerson" placeholder="Contact name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Email</label>
+                    <input type="email" class="form-input" id="modalContactEmail" placeholder="contact@club.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" id="modalPhoneNumber" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="modalStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-input" id="modalNotes" placeholder="Additional notes about this club" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn cancel-btn" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="modal-btn save-btn" id="saveClubBtn">Save Club</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global cursor tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            const cursorGradient = document.querySelector('.cursor-gradient');
+            
+            document.addEventListener('mousemove', function(e) {
+                cursorGradient.style.setProperty('--mouse-x', e.clientX + 'px');
+                cursorGradient.style.setProperty('--mouse-y', e.clientY + 'px');
+            });
+
+            // Set today's date
+            document.getElementById('visitDate').valueAsDate = new Date();
+
+            // Add item functionality
+            document.getElementById('addItemBtn').addEventListener('click', function() {
+                const purchaseItems = document.getElementById('purchaseItems');
+                const newItem = document.createElement('div');
+                newItem.className = 'purchase-item';
+                newItem.innerHTML = `
+                    <input type="text" class="form-input" placeholder="Item description">
+                    <input type="number" class="form-input" placeholder="Qty" value="1" min="1">
+                    <input type="number" class="form-input" placeholder="Price" value="0.00" min="0" step="0.01">
+                    <button type="button" class="remove-item">×</button>
+                `;
+                purchaseItems.appendChild(newItem);
+            });
+
+            // Remove item functionality
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-item')) {
+                    e.target.closest('.purchase-item').remove();
+                }
+            });
+
+            // Form submission
+            document.getElementById('guestForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const guestName = document.getElementById('guestName').value;
+                const memberNumber = document.getElementById('memberNumber').value;
+                const homeClub = document.getElementById('homeClub').value;
+                const visitDate = document.getElementById('visitDate').value;
+
+                // Calculate total
+                let total = 0;
+                const items = document.querySelectorAll('.purchase-item');
+                items.forEach(item => {
+                    const qty = parseFloat(item.querySelector('input[type="number"]:nth-child(2)').value) || 0;
+                    const price = parseFloat(item.querySelector('input[type="number"]:nth-child(3)').value) || 0;
+                    total += qty * price;
+                });
+
+                // Add to table
+                const tableBody = document.getElementById('guestTableBody');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="guest-name">${guestName}</td>
+                    <td>${memberNumber}</td>
+                    <td class="guest-club">${homeClub}</td>
+                    <td>${items.length} items</td>
+                    <td class="guest-total">$${total.toFixed(2)}</td>
+                    <td><span class="guest-status status-active">Active</span></td>
+                    <td>
+                        <button class="action-btn" style="background: #3b82f6; color: white; font-size: 0.75rem;">Bill</button>
+                    </td>
+                `;
+                tableBody.insertBefore(newRow, tableBody.firstChild);
+
+                // Update dashboard
+                updateDashboard();
+
+                // Reset form
+                document.getElementById('guestForm').reset();
+                document.getElementById('visitDate').valueAsDate = new Date();
+                
+                // Clear purchase items except first one
+                const purchaseItems = document.getElementById('purchaseItems');
+                while (purchaseItems.children.length > 1) {
+                    purchaseItems.removeChild(purchaseItems.lastChild);
+                }
+                purchaseItems.firstElementChild.querySelectorAll('input').forEach(input => {
+                    if (input.type === 'number') {
+                        input.value = input.placeholder === 'Qty' ? '1' : '0.00';
+                    } else {
+                        input.value = '';
+                    }
+                });
+
+                // Show success message
+                alert('Guest added successfully!');
+            });
+
+            function updateDashboard() {
+                const activeGuests = document.querySelectorAll('.status-active').length;
+                const totalRevenue = Array.from(document.querySelectorAll('.guest-total'))
+                    .reduce((sum, el) => sum + parseFloat(el.textContent.replace('$', '')), 0);
+                
+                document.getElementById('todayGuests').textContent = activeGuests;
+                document.getElementById('todayRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            }
+
+            // Export functionality
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                const rows = document.querySelectorAll('#guestTableBody tr');
+                let csv = 'Guest Name,Member Number,Home Club,Items,Total,Status\n';
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = Array.from(cells).slice(0, 6).map(cell => cell.textContent);
+                    csv += rowData.join(',') + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'guest-list.csv';
+                a.click();
+            });
+
+            // Clear all functionality
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all guests?')) {
+                    document.getElementById('guestTableBody').innerHTML = '';
+                    updateDashboard();
+                }
+            });
+
+            // Initialize dashboard
+            updateDashboard();
+
+            // Club Management
+            const clubModal = document.getElementById('clubModal');
+            const addClubBtn = document.getElementById('addClubBtn');
+            const closeModal = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const clubForm = document.getElementById('clubForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const clubsGrid = document.getElementById('clubsGrid');
+
+            let editingClubId = null;
+            let clubsData = [
+                {
+                    id: 1,
+                    name: 'Pine Valley Golf Club',
+                    location: 'Pine Valley, NJ',
+                    contactPerson: 'John Manager',
+                    contactEmail: 'manager@pinevalley.com',
+                    phoneNumber: '+1 (555) 123-4567',
+                    status: 'active',
+                    notes: 'Premium reciprocal club',
+                    monthlyGuests: 23,
+                    totalRevenue: 1247
+                },
+                {
+                    id: 2,
+                    name: 'Augusta National',
+                    location: 'Augusta, GA',
+                    contactPerson: 'Sarah Director',
+                    contactEmail: 'director@augusta.com',
+                    phoneNumber: '+1 (555) 234-5678',
+                    status: 'active',
+                    notes: 'Masters tournament host',
+                    monthlyGuests: 18,
+                    totalRevenue: 892
+                },
+                {
+                    id: 3,
+                    name: 'Pebble Beach',
+                    location: 'Pebble Beach, CA',
+                    contactPerson: 'Mike Coordinator',
+                    contactEmail: 'coordinator@pebblebeach.com',
+                    phoneNumber: '+1 (555) 345-6789',
+                    status: 'active',
+                    notes: 'Pacific coast views',
+                    monthlyGuests: 31,
+                    totalRevenue: 1856
+                },
+                {
+                    id: 4,
+                    name: 'St. Andrews',
+                    location: 'St. Andrews, Scotland',
+                    contactPerson: 'Emma Secretary',
+                    contactEmail: 'secretary@standrews.com',
+                    phoneNumber: '+44 20 1234 5678',
+                    status: 'inactive',
+                    notes: 'Home of golf',
+                    monthlyGuests: 12,
+                    totalRevenue: 634
+                }
+            ];
+
+            // Open modal for adding new club
+            addClubBtn.addEventListener('click', function() {
+                editingClubId = null;
+                modalTitle.textContent = 'Add New Club';
+                clubForm.reset();
+                clubModal.style.display = 'block';
+            });
+
+            // Close modal
+            function closeClubModal() {
+                clubModal.style.display = 'none';
+                editingClubId = null;
+                clubForm.reset();
+            }
+
+            closeModal.addEventListener('click', closeClubModal);
+            cancelBtn.addEventListener('click', closeClubModal);
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === clubModal) {
+                    closeClubModal();
+                }
+            });
+
+            // Edit club functionality
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('edit-btn')) {
+                    const clubId = parseInt(e.target.getAttribute('data-club-id'));
+                    const club = clubsData.find(c => c.id === clubId);
+                    
+                    if (club) {
+                        editingClubId = clubId;
+                        modalTitle.textContent = 'Edit Club';
+                        
+                        // Populate form with club data
+                        document.getElementById('modalClubName').value = club.name;
+                        document.getElementById('modalClubLocation').value = club.location;
+                        document.getElementById('modalContactPerson').value = club.contactPerson;
+                        document.getElementById('modalContactEmail').value = club.contactEmail;
+                        document.getElementById('modalPhoneNumber').value = club.phoneNumber;
+                        document.getElementById('modalStatus').value = club.status;
+                        document.getElementById('modalNotes').value = club.notes;
+                        
+                        clubModal.style.display = 'block';
+                    }
+                }
+            });
+
+            // Delete club functionality
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn')) {
+                    const clubId = parseInt(e.target.getAttribute('data-club-id'));
+                    const club = clubsData.find(c => c.id === clubId);
+                    
+                    if (club && confirm(`Are you sure you want to delete ${club.name}?`)) {
+                        clubsData = clubsData.filter(c => c.id !== clubId);
+                        renderClubs();
+                        updateClubDropdown();
+                    }
+                }
+            });
+
+            // Save club (add or edit)
+            clubForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const clubData = {
+                    name: document.getElementById('modalClubName').value,
+                    location: document.getElementById('modalClubLocation').value,
+                    contactPerson: document.getElementById('modalContactPerson').value,
+                    contactEmail: document.getElementById('modalContactEmail').value,
+                    phoneNumber: document.getElementById('modalPhoneNumber').value,
+                    status: document.getElementById('modalStatus').value,
+                    notes: document.getElementById('modalNotes').value,
+                    monthlyGuests: 0,
+                    totalRevenue: 0
+                };
+
+                if (editingClubId) {
+                    // Edit existing club
+                    const index = clubsData.findIndex(c => c.id === editingClubId);
+                    if (index !== -1) {
+                        clubsData[index] = { ...clubsData[index], ...clubData };
+                    }
+                } else {
+                    // Add new club
+                    const newId = Math.max(...clubsData.map(c => c.id), 0) + 1;
+                    clubsData.push({ ...clubData, id: newId });
+                }
+
+                renderClubs();
+                updateClubDropdown();
+                closeClubModal();
+                
+                alert(editingClubId ? 'Club updated successfully!' : 'Club added successfully!');
+            });
+
+            // Render clubs grid
+            function renderClubs() {
+                clubsGrid.innerHTML = clubsData.map(club => `
+                    <div class="club-card">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">${club.name}</div>
+                                <div class="club-location">${club.location}</div>
+                            </div>
+                            <div class="club-actions">
+                                <button class="club-action-btn edit-btn" data-club-id="${club.id}">Edit</button>
+                                <button class="club-action-btn delete-btn" data-club-id="${club.id}">Delete</button>
+                            </div>
+                        </div>
+                        <div class="club-details">
+                            <div class="club-detail">
+                                <div class="detail-value">${club.monthlyGuests}</div>
+                                <div class="detail-label">Guests This Month</div>
+                            </div>
+                            <div class="club-detail">
+                                <div class="detail-value">$${club.totalRevenue}</div>
+                                <div class="detail-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <span class="club-status status-${club.status}">${club.status === 'active' ? 'Active' : 'Inactive'}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Update club dropdown in guest form
+            function updateClubDropdown() {
+                const homeClubSelect = document.getElementById('homeClub');
+                const currentValue = homeClubSelect.value;
+                
+                // Clear existing options except the first one
+                homeClubSelect.innerHTML = '<option value="">Select club</option>';
+                
+                // Add active clubs only
+                clubsData.filter(club => club.status === 'active').forEach(club => {
+                    const option = document.createElement('option');
+                    option.value = club.name;
+                    option.textContent = club.name;
+                    homeClubSelect.appendChild(option);
+                });
+                
+                // Restore previous selection if it still exists
+                if (currentValue && clubsData.some(club => club.name === currentValue && club.status === 'active')) {
+                    homeClubSelect.value = currentValue;
+                }
+            }
+
+            // Initialize clubs
+            renderClubs();
+            updateClubDropdown();
+        });
+    </script>
+</body>
+</html>

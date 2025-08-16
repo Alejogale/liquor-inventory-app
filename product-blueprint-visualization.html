@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Spend & Trending Platform - Complete Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #0D1F2D;
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #0D1F2D 0%, #1a2f3d 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(13, 31, 45, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 200, 150, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #0D1F2D;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1E40AF;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #0D1F2D;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #1E40AF;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(30, 64, 175, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 200, 150, 0.15);
+        }
+
+        .feature-card h4 {
+            color: #0D1F2D;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-card li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .feature-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #1E40AF;
+            font-weight: bold;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tech-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-item strong {
+            color: #0D1F2D;
+            font-weight: 600;
+        }
+
+        .flow-diagram {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 200, 150, 0.2);
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .flow-step-number {
+            background: #1E40AF;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .cost-table th,
+        .cost-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cost-table th {
+            background: #0D1F2D;
+            color: white;
+            font-weight: 600;
+        }
+
+        .cost-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .phase-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .phase {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #00C896;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .phase-badge {
+            background: #1E40AF;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .data-model {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            background: #1E40AF;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .icon:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Mockup Styles */
+        .mockup-container {
+            margin: 20px 0;
+        }
+
+        .mockup-overview {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .mockup-overview h3 {
+            color: #0D1F2D;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .mockup-description {
+            color: #64748B;
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .logo-section {
+            margin-bottom: 40px;
+        }
+
+        .logo-display {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .logo-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-symbol {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-primary {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0D1F2D;
+        }
+
+        .logo-secondary {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1E40AF;
+        }
+
+        .logo-variants {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .logo-variant, .logo-variant-dark {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .logo-variant {
+            background: white;
+            color: #0D1F2D;
+            border: 2px solid #E2E8F0;
+        }
+
+        .logo-variant-dark {
+            background: #0D1F2D;
+            color: white;
+        }
+
+        .logo-symbol-small {
+            width: 30px;
+            height: 30px;
+            background: #1E40AF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .mockup-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .mockup-header h4 {
+            color: #0D1F2D;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .mockup-badge {
+            background: #1E40AF;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .mockup-features {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .feature-tag {
+            background: #F1F5F9;
+            color: #1E40AF;
+            padding: 8px 14px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        /* Phone Mockup */
+        .phone-mockup {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-screen {
+            width: 300px;
+            height: 580px;
+            background: #F8FAFC;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 8px solid #0D1F2D;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-mini {
+            width: 35px;
+            height: 35px;
+            background: #1E40AF;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .header-content h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0D1F2D;
+            margin: 0;
+        }
+
+        .header-content p {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin: 0;
+        }
+
+        .notification-bell {
+            font-size: 1.2rem;
+        }
+
+        .spending-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-header h6 {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin: 0;
+        }
+
+        .amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0D1F2D;
+        }
+
+        .spending-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-icon {
+            width: 35px;
+            height: 35px;
+            background: #F1F5F9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .category-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-info span:first-child {
+            font-size: 0.9rem;
+            color: #0D1F2D;
+        }
+
+        .category-amount {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1E40AF;
+        }
+
+        .trending-section {
+            margin-bottom: 20px;
+        }
+
+        .deals-section {
+            margin-bottom: 80px;
+        }
+
+        .trending-section h6, .deals-section h6 {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin-bottom: 12px;
+        }
+
+        .trending-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .trending-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .trending-icon {
+            font-size: 1.2rem;
+        }
+
+        .trending-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trending-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0D1F2D;
+        }
+
+        .trending-desc {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        .deals-carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .deal-card {
+            min-width: 150px;
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            border-radius: 12px;
+            padding: 18px;
+            color: white;
+            position: relative;
+            z-index: 3;
+        }
+
+        .deal-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 5;
+        }
+
+        .deal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .deal-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .deal-desc {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            font-size: 1.3rem;
+            padding: 8px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: #1E40AF;
+            color: white;
+        }
+
+        /* Desktop Mockup */
+        .desktop-mockup {
+            display: flex;
+            justify-content: center;
+        }
+
+        .desktop-screen {
+            width: 100%;
+            max-width: 650px;
+            height: 450px;
+            background: #F8FAFC;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 3px solid #E2E8F0;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .desktop-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E2E8F0;
+            position: relative;
+            z-index: 5;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0D1F2D;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            position: relative;
+            z-index: 6;
+        }
+
+        .btn-secondary, .btn-primary {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #64748B;
+        }
+
+        .btn-primary {
+            background: #1E40AF;
+            color: white;
+        }
+
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h6 {
+            font-size: 0.8rem;
+            color: #64748B;
+            margin: 0 0 8px 0;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0D1F2D;
+            display: block;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .stat-change.positive {
+            color: #059669;
+        }
+
+        .stat-change.negative {
+            color: #DC2626;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .chart-section h6 {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin: 0 0 15px 0;
+        }
+
+        .chart-mockup {
+            height: 120px;
+            display: flex;
+            align-items: end;
+            gap: 10px;
+            padding: 15px 0;
+        }
+
+        .chart-line {
+            flex: 1;
+            background: linear-gradient(to top, #1E40AF, #3B82F6);
+            border-radius: 3px;
+            min-height: 20px;
+        }
+
+        .chart-line:nth-child(1) { height: 30%; }
+        .chart-line:nth-child(2) { height: 45%; }
+        .chart-line:nth-child(3) { height: 60%; }
+        .chart-line:nth-child(4) { height: 80%; }
+        .chart-line:nth-child(5) { height: 65%; }
+        .chart-line:nth-child(6) { height: 90%; }
+        .chart-line:nth-child(7) { height: 75%; }
+
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .recent-activity h6 {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin: 0 0 15px 0;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #F8FAFC;
+        }
+
+        .activity-icon {
+            font-size: 1.1rem;
+        }
+
+        .activity-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-title {
+            font-size: 0.9rem;
+            color: #0D1F2D;
+            font-weight: 500;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        /* Additional Mockups */
+        .additional-mockups {
+            margin-top: 50px;
+        }
+
+        .additional-mockups h3 {
+            color: #0D1F2D;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .mockup-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .mini-mockup {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(30, 64, 175, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mini-mockup:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .mini-header h5 {
+            color: #0D1F2D;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .mini-badge {
+            background: #F1F5F9;
+            color: #1E40AF;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .mini-screen {
+            background: #F8FAFC;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Spending Analytics Mini */
+        .mini-chart {
+            display: flex;
+            align-items: end;
+            gap: 6px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #1E40AF, #3B82F6);
+            border-radius: 3px;
+            min-height: 10px;
+        }
+
+        .mini-stats {
+            text-align: center;
+        }
+
+        .mini-stat {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0D1F2D;
+        }
+
+        .mini-label {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        /* Deal Creation Mini */
+        .mini-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-label {
+            font-size: 0.7rem;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        .field-input {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            color: #0D1F2D;
+        }
+
+        /* Trending Map Mini */
+        .mini-map {
+            position: relative;
+            height: 80px;
+            background: linear-gradient(135deg, #E8F4F8, #F1F5F9);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .map-pin {
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            z-index: 3;
+        }
+
+        .map-pin:nth-child(1) { top: 20%; left: 20%; }
+        .map-pin:nth-child(2) { top: 30%; right: 25%; }
+        .map-pin:nth-child(3) { bottom: 25%; left: 30%; }
+        .map-pin:nth-child(4) { bottom: 20%; right: 20%; }
+
+        .map-pin.active {
+            opacity: 1;
+            transform: scale(1.2);
+            z-index: 4;
+        }
+
+        .map-legend {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .map-legend span {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        /* Cashback Wallet Mini */
+        .wallet-balance {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .balance-amount {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1E40AF;
+        }
+
+        .balance-label {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        .wallet-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .wallet-action {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .wallet-action:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .phone-screen {
+                width: 250px;
+                height: 500px;
+            }
+
+            .desktop-screen {
+                height: 350px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mockup-mini-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mockup-features {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Smart Spend & Trending Platform</h1>
+            <p>Complete Product Blueprint: Consumer App + Business Portal + Monetization</p>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Core Idea</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                A comprehensive platform that combines <span class="highlight">consumer spending insights</span> with 
+                <span class="highlight">trending discovery</span> and <span class="highlight">business monetization</span>. 
+                Users track spending, discover trending places/products, and earn rewards while businesses reach targeted audiences with deals.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Consumer App Features</h2>
+            
+            <h3>Onboarding & Setup</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Secure Authentication</h4>
+                    <ul>
+                        <li>Email/password login</li>
+                        <li>OAuth integration</li>
+                        <li>Two-factor authentication</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Bank Integration</h4>
+                    <ul>
+                        <li>Plaid/Finicity connection</li>
+                        <li>Secure account linking</li>
+                        <li>Real-time transaction sync</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Personalization</h4>
+                    <ul>
+                        <li>Interest selection</li>
+                        <li>Privacy level settings</li>
+                        <li>Location preferences</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Core Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Home Feed</h4>
+                    <ul>
+                        <li>Spending snapshot cards</li>
+                        <li>Trending places/products</li>
+                        <li>Deals & cashback offers</li>
+                        <li>Challenges & goals</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Explore & Discovery</h4>
+                    <ul>
+                        <li>Local merchant map</li>
+                        <li>Online deals listing</li>
+                        <li>Smart filtering system</li>
+                        <li>Real-time availability</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Rewards System</h4>
+                    <ul>
+                        <li>Auto cashback triggers</li>
+                        <li>QR code redemption</li>
+                        <li>Promo code system</li>
+                        <li>Points accumulation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Business Portal</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Business Setup</h4>
+                    <ul>
+                        <li>Business verification</li>
+                        <li>Ownership confirmation</li>
+                        <li>Plan selection</li>
+                        <li>Payment integration</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Deal Management</h4>
+                    <ul>
+                        <li>Create custom offers</li>
+                        <li>Target audience selection</li>
+                        <li>Budget management</li>
+                        <li>Cashback incentives</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Analytics & Insights</h4>
+                    <ul>
+                        <li>Performance tracking</li>
+                        <li>Redemption analytics</li>
+                        <li>Revenue generation</li>
+                        <li>Trending impact</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Trending System</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Offline Merchants</h4>
+                    <ul>
+                        <li>Anonymized transaction aggregation</li>
+                        <li>Partner offer engagement</li>
+                        <li>Public popularity metrics</li>
+                        <li>Geographic weighting</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Online Merchants</h4>
+                    <ul>
+                        <li>E-commerce spend patterns</li>
+                        <li>Merchant name normalization</li>
+                        <li>Category relevance scoring</li>
+                        <li>Cross-platform aggregation</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Privacy & Safety</h4>
+                    <ul>
+                        <li>K-anonymity protection</li>
+                        <li>Differential privacy</li>
+                        <li>Minimum threshold requirements</li>
+                        <li>No raw dollar amounts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>User Flows</h2>
+            
+            <div class="flow-diagram">
+                <h3>Consumer Flow</h3>
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div>Sign up → Connect bank account → Select interests</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div>Home feed loads → Browse insights, deals, trending</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div>Click deal → Auto cashback OR scan QR/enter code</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div>Dashboard → Track spending, goals, redeemed deals</div>
+                </div>
+            </div>
+
+            <div class="flow-diagram">
+                <h3>Business Flow</h3>
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div>Sign up → Verify business → Choose plan</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div>Create deal → Select audience → Set budget & cashback</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div>Pay subscription/CPC → Deal goes live</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div>Dashboard → Monitor performance → Adjust strategy</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Tech Stack</h2>
+            
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <strong>Frontend:</strong> Next.js + React Native/Expo
+                </div>
+                <div class="tech-item">
+                    <strong>UI/Design:</strong> TailwindCSS + shadcn/ui + Framer Motion
+                </div>
+                <div class="tech-item">
+                    <strong>Backend:</strong> Supabase (Postgres, Auth, RLS)
+                </div>
+                <div class="tech-item">
+                    <strong>Payments:</strong> Stripe (subscriptions, cashback)
+                </div>
+                <div class="tech-item">
+                    <strong>Banking:</strong> Plaid/Finicity integration
+                </div>
+                <div class="tech-item">
+                    <strong>Maps:</strong> Mapbox/OpenStreetMap
+                </div>
+                <div class="tech-item">
+                    <strong>AI:</strong> OpenAI/Claude embeddings
+                </div>
+                <div class="tech-item">
+                    <strong>Analytics:</strong> PostHog/GrowthBook
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Data Model</h2>
+            
+            <div class="data-model">
+                users(id, email, role, created_at)<br>
+                profiles(user_id, interests[], home_zip, privacy_level)<br>
+                linked_accounts(id, user_id, plaid_item_id, institution, status)<br>
+                transactions(id, user_id, account_id, date, amount, merchant, mcc, category)<br>
+                insights(id, user_id, summary_json, created_at)<br>
+                offers(id, business_id, title, desc, media_url, start_at, end_at, geojson, categories[], budget_cents, cashback_amount, status)<br>
+                offer_targets(offer_id, category_filters[], radius_km, zip_filters[], online_only)<br>
+                redemptions(id, user_id, offer_id, method, status, created_at)<br>
+                businesses(id, name, address, owner_user_id, plan, stripe_customer_id)<br>
+                trending_snapshots(id, area_hash, window_start, window_end, rank_json)
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Monetization & Cashback Flow</h2>
+            
+            <div class="flow-diagram">
+                <h3>Cashback Process</h3>
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div>Merchant funds cashback (e.g., $1 on $10 purchase)</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div>Auto-triggered via card link OR QR/Promo code redemption</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div>App credits user wallet instantly or next-day</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div>Revenue: subscription + CPC/CPA + optional commission</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>MVP Launch Plan</h2>
+            
+            <div class="phase-timeline">
+                <div class="phase">
+                    <div class="phase-header">
+                        <span class="phase-badge">Phase 0 - MVP</span>
+                        <span style="color: #666;">4-6 weeks</span>
+                    </div>
+                    <ul>
+                        <li>Core feed with v0 trending (partner offers + public data)</li>
+                        <li>Basic deals + redemption via QR or promo code</li>
+                        <li>Connect Plaid sandbox for spend tracking</li>
+                        <li>Mobile app + landing page for waitlist</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-header">
+                        <span class="phase-badge">Phase 1 - Live Transactions</span>
+                        <span style="color: #666;">6-8 weeks</span>
+                    </div>
+                    <ul>
+                        <li>v1 trending with anonymized aggregated spend</li>
+                        <li>Auto cashback triggered via linked card</li>
+                        <li>Business portal live with subscription/CPC deals</li>
+                    </ul>
+                </div>
+                
+                <div class="phase">
+                    <div class="phase-header">
+                        <span class="phase-badge">Phase 2 - Growth & AI</span>
+                        <span style="color: #666;">8-12 weeks</span>
+                    </div>
+                    <ul>
+                        <li>AI-based predictive spend insights</li>
+                        <li>Personalized deal recommendations</li>
+                        <li>Online + local feed fully integrated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Cost Breakdown</h2>
+            
+            <table class="cost-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Free/Low-Cost Option</th>
+                        <th>Start Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Supabase</td>
+                        <td>Free tier</td>
+                        <td>$0-25/mo</td>
+                    </tr>
+                    <tr>
+                        <td>Vercel</td>
+                        <td>Hobby tier</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Expo/React Native</td>
+                        <td>Free</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Plaid</td>
+                        <td>Sandbox</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Stripe</td>
+                        <td>No monthly; processing fees</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Mapbox/OSM</td>
+                        <td>Free tier</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Notifications</td>
+                        <td>OneSignal free</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Analytics</td>
+                        <td>PostHog free</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Domain/Email</td>
+                        <td>Basic hosting</td>
+                        <td>$12-20</td>
+                    </tr>
+                    <tr>
+                        <td>Legal templates</td>
+                        <td>Basic templates</td>
+                        <td>$0-300</td>
+                    </tr>
+                    <tr style="font-weight: bold; background: #f8fafc;">
+                        <td colspan="2">Total MVP cash burn:</td>
+                        <td>$20-320/mo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>Design System</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Color Palette</h4>
+                    <ul>
+                        <li>Deep Navy: #0D1F2D</li>
+                        <li>Trust Blue: #1E40AF</li>
+                        <li>Soft Gray: #F8FAFC</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>Typography</h4>
+                    <ul>
+                        <li>Primary: Inter</li>
+                        <li>Code: Monaco/Menlo</li>
+                        <li>Clean, readable hierarchy</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>UI Elements</h4>
+                    <ul>
+                        <li>Glassmorphic cards</li>
+                        <li>Rounded corners (2xl)</li>
+                        <li>Subtle shadows</li>
+                        <li>Micro-interactions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon"></span>App Mockups & Visual Design</h2>
+            
+            <div class="mockup-container">
+                <div class="logo-section">
+                    <h3>Brand Identity</h3>
+                    <div class="logo-display">
+                        <div class="logo-card">
+                            <div class="logo-symbol">
+                                <div class="logo-icon">$</div>
+                            </div>
+                            <div class="logo-text">
+                                <span class="logo-primary">Smart</span>
+                                <span class="logo-secondary">Spend</span>
+                            </div>
+                        </div>
+                        <div class="logo-variants">
+                            <div class="logo-variant">
+                                <div class="logo-symbol-small">$</div>
+                                <span>SmartSpend</span>
+                            </div>
+                            <div class="logo-variant-dark">
+                                <div class="logo-symbol-small">$</div>
+                                <span>SmartSpend</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mockup-overview">
+                    <h3>User Interface Mockups</h3>
+                    <p class="mockup-description">Interactive prototypes showcasing the consumer app and business portal interfaces with real-world data and user flows.</p>
+                </div>
+
+                <div class="mockup-grid">
+                    <div class="mockup-card">
+                        <div class="mockup-header">
+                            <h4>Consumer App - Home Dashboard</h4>
+                            <div class="mockup-badge">Mobile</div>
+                        </div>
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <div class="app-header">
+                                    <div class="logo-mini">$</div>
+                                    <div class="header-content">
+                                        <h5>Good morning, Alex</h5>
+                                        <p>Here's your spending overview</p>
+                                    </div>
+                                    <div class="notification-bell">🔔</div>
+                                </div>
+                                
+                                <div class="spending-card">
+                                    <div class="card-header">
+                                        <h6>This Week's Spending</h6>
+                                        <span class="amount">$847.32</span>
+                                    </div>
+                                    <div class="spending-breakdown">
+                                        <div class="category-item">
+                                            <div class="category-icon">🍕</div>
+                                            <div class="category-info">
+                                                <span>Food & Dining</span>
+                                                <span class="category-amount">$234.50</span>
+                                            </div>
+                                        </div>
+                                        <div class="category-item">
+                                            <div class="category-icon">🛒</div>
+                                            <div class="category-info">
+                                                <span>Shopping</span>
+                                                <span class="category-amount">$189.75</span>
+                                            </div>
+                                        </div>
+                                        <div class="category-item">
+                                            <div class="category-icon">⛽</div>
+                                            <div class="category-info">
+                                                <span>Transport</span>
+                                                <span class="category-amount">$85.20</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="trending-section">
+                                    <h6>Trending Near You</h6>
+                                    <div class="trending-items">
+                                        <div class="trending-item">
+                                            <div class="trending-icon">🔥</div>
+                                            <div class="trending-info">
+                                                <span class="trending-name">Blue Bottle Coffee</span>
+                                                <span class="trending-desc">Hot tonight • 0.3mi away</span>
+                                            </div>
+                                        </div>
+                                        <div class="trending-item">
+                                            <div class="trending-icon">🔥</div>
+                                            <div class="trending-info">
+                                                <span class="trending-name">Whole Foods Market</span>
+                                                <span class="trending-desc">Busy now • 0.8mi away</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="deals-section">
+                                    <h6>Deals & Cashback</h6>
+                                    <div class="deals-carousel">
+                                        <div class="deal-card">
+                                            <div class="deal-badge">15% OFF</div>
+                                            <div class="deal-content">
+                                                <span class="deal-title">Starbucks</span>
+                                                <span class="deal-desc">Any coffee drink</span>
+                                            </div>
+                                        </div>
+                                        <div class="deal-card">
+                                            <div class="deal-badge">$5 CASHBACK</div>
+                                            <div class="deal-content">
+                                                <span class="deal-title">Target</span>
+                                                <span class="deal-desc">Spend $50+</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bottom-nav">
+                                    <div class="nav-item active">🏠</div>
+                                    <div class="nav-item">🔍</div>
+                                    <div class="nav-item">📊</div>
+                                    <div class="nav-item">👤</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mockup-features">
+                            <div class="feature-tag">Spending Tracking</div>
+                            <div class="feature-tag">Trending Discovery</div>
+                            <div class="feature-tag">Deals & Cashback</div>
+                        </div>
+                    </div>
+
+                    <div class="mockup-card">
+                        <div class="mockup-header">
+                            <h4>Business Portal - Analytics Dashboard</h4>
+                            <div class="mockup-badge">Desktop</div>
+                        </div>
+                        <div class="desktop-mockup">
+                            <div class="desktop-screen">
+                                <div class="desktop-header">
+                                    <div class="logo-mini">$</div>
+                                    <span class="header-title">Business Dashboard</span>
+                                    <div class="header-actions">
+                                        <button class="btn-secondary">Settings</button>
+                                        <button class="btn-primary">Create Deal</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="dashboard-content">
+                                    <div class="stats-grid">
+                                        <div class="stat-card">
+                                            <h6>Total Views</h6>
+                                            <span class="stat-number">2,847</span>
+                                            <span class="stat-change positive">+12.5%</span>
+                                        </div>
+                                        <div class="stat-card">
+                                            <h6>Redemptions</h6>
+                                            <span class="stat-number">156</span>
+                                            <span class="stat-change positive">+8.3%</span>
+                                        </div>
+                                        <div class="stat-card">
+                                            <h6>Revenue Generated</h6>
+                                            <span class="stat-number">$3,240</span>
+                                            <span class="stat-change positive">+15.2%</span>
+                                        </div>
+                                        <div class="stat-card">
+                                            <h6>Conversion Rate</h6>
+                                            <span class="stat-number">5.5%</span>
+                                            <span class="stat-change negative">-2.1%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="chart-section">
+                                        <h6>Performance Over Time</h6>
+                                        <div class="chart-mockup">
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                            <div class="chart-line"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="recent-activity">
+                                        <h6>Recent Activity</h6>
+                                        <div class="activity-list">
+                                            <div class="activity-item">
+                                                <div class="activity-icon">✅</div>
+                                                <div class="activity-content">
+                                                    <span class="activity-title">Deal redeemed at Starbucks</span>
+                                                    <span class="activity-time">2 minutes ago</span>
+                                                </div>
+                                            </div>
+                                            <div class="activity-item">
+                                                <div class="activity-icon">👁️</div>
+                                                <div class="activity-content">
+                                                    <span class="activity-title">25 new views on "Coffee Deal"</span>
+                                                    <span class="activity-time">15 minutes ago</span>
+                                                </div>
+                                            </div>
+                                            <div class="activity-item">
+                                                <div class="activity-icon">💰</div>
+                                                <div class="activity-content">
+                                                    <span class="activity-title">$12.50 cashback paid</span>
+                                                    <span class="activity-time">1 hour ago</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mockup-features">
+                            <div class="feature-tag">Analytics</div>
+                            <div class="feature-tag">Performance Tracking</div>
+                            <div class="feature-tag">Deal Management</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="additional-mockups">
+                    <h3>Additional Interface Views</h3>
+                    <div class="mockup-mini-grid">
+                        <div class="mini-mockup">
+                            <div class="mini-header">
+                                <h5>Spending Analytics</h5>
+                                <div class="mini-badge">Mobile</div>
+                            </div>
+                            <div class="mini-screen">
+                                <div class="mini-chart">
+                                    <div class="chart-bar" style="height: 60%"></div>
+                                    <div class="chart-bar" style="height: 80%"></div>
+                                    <div class="chart-bar" style="height: 45%"></div>
+                                    <div class="chart-bar" style="height: 90%"></div>
+                                    <div class="chart-bar" style="height: 70%"></div>
+                                </div>
+                                <div class="mini-stats">
+                                    <span class="mini-stat">$2,847</span>
+                                    <span class="mini-label">This Month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mini-mockup">
+                            <div class="mini-header">
+                                <h5>Deal Creation</h5>
+                                <div class="mini-badge">Desktop</div>
+                            </div>
+                            <div class="mini-screen">
+                                <div class="mini-form">
+                                    <div class="form-field">
+                                        <span class="field-label">Deal Title</span>
+                                        <div class="field-input">20% Off Coffee</div>
+                                    </div>
+                                    <div class="form-field">
+                                        <span class="field-label">Target Audience</span>
+                                        <div class="field-input">Coffee Lovers</div>
+                                    </div>
+                                    <div class="form-field">
+                                        <span class="field-label">Budget</span>
+                                        <div class="field-input">$500</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mini-mockup">
+                            <div class="mini-header">
+                                <h5>Trending Map</h5>
+                                <div class="mini-badge">Mobile</div>
+                            </div>
+                            <div class="mini-screen">
+                                <div class="mini-map">
+                                    <div class="map-pin active">🔥</div>
+                                    <div class="map-pin">🔥</div>
+                                    <div class="map-pin">🔥</div>
+                                    <div class="map-pin">🔥</div>
+                                </div>
+                                <div class="map-legend">
+                                    <span>Hot Spots Nearby</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mini-mockup">
+                            <div class="mini-header">
+                                <h5>Cashback Wallet</h5>
+                                <div class="mini-badge">Mobile</div>
+                            </div>
+                            <div class="mini-screen">
+                                <div class="wallet-balance">
+                                    <span class="balance-amount">$47.85</span>
+                                    <span class="balance-label">Available Cashback</span>
+                                </div>
+                                <div class="wallet-actions">
+                                    <div class="wallet-action">💳</div>
+                                    <div class="wallet-action">🏦</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scrolling and interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Add hover effects for feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.borderColor = '#1E40AF';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.borderColor = 'rgba(30, 64, 175, 0.2)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

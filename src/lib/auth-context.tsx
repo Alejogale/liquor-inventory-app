@@ -38,6 +38,7 @@ interface AuthContextType {
   userProfile: UserProfile | null
   organization: Organization | null
   loading: boolean
+  ready: boolean  // NEW: Indicates when auth and org are fully loaded
   signOut: () => Promise<void>
   // 🚀 NEW: Helper functions for hybrid admin system
   isPlatformAdmin: () => boolean
@@ -50,6 +51,7 @@ const AuthContext = createContext<AuthContextType>({
   userProfile: null,
   organization: null,
   loading: true,
+  ready: false,
   signOut: async () => {},
   isPlatformAdmin: () => false,
   canAccessAllOrganizations: () => false,
@@ -61,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [loading, setLoading] = useState(true)
+  const [ready, setReady] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -78,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setOrganization(null)
       }
       setLoading(false)
+      setReady(true)
     }
 
     getSession()
@@ -93,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setOrganization(null)
       }
       setLoading(false)
+      setReady(true)
     })
 
     return () => subscription.unsubscribe()
@@ -369,9 +374,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{ 
       user, 
       userProfile, 
-      organization, 
-      loading, 
-      signOut,
+              organization, 
+        loading, 
+        ready,
+        signOut,
       isPlatformAdmin,
       canAccessAllOrganizations,
       getAccessibleOrganizationIds

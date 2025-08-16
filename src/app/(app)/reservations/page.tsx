@@ -41,39 +41,67 @@ function ReservationContent({ setShowImportPopup }: {
   const loadCompleteRoomState = async (): Promise<ReservationRoom[]> => {
     if (typeof window === 'undefined') return []
     
-    // First try database
+    // Always check database first for latest rooms
+    let dbRooms: any[] = []
     try {
-      const { data: dbRooms, error } = await supabase
-        .from('custom_rooms')
+      const { data, error } = await supabase
+        .from('reservation_rooms')
         .select('*')
         .eq('organization_id', organization?.id)
         .eq('is_active', true)
-        .order('name')
+        .order('created_at', { ascending: true })
       
-      if (!error && dbRooms && dbRooms.length > 0) {
-        console.log('✅ Loaded complete room state from database')
-        
-        const roomState: ReservationRoom[] = dbRooms.map(room => ({
-          id: room.id,
-          name: room.name,
-          organization_id: room.organization_id,
-          capacity: room.capacity,
-          is_active: room.is_active,
-          created_at: room.created_at || new Date().toISOString(),
-          isCustom: true // Mark as custom since they're saved in custom_rooms table
-        }))
-        
-        // Update localStorage with database data
-        localStorage.setItem(getCompleteRoomStateKey(), JSON.stringify(roomState))
-        return roomState
+      if (!error && data) {
+        dbRooms = data
+        console.log('✅ Loaded rooms from reservation_rooms database:', dbRooms.length)
       }
     } catch (error) {
-      console.log('Failed to load from database, using localStorage')
+      console.log('Failed to load from database')
     }
     
-    // Fallback to localStorage
+    // Get localStorage rooms as fallback
     const stored = localStorage.getItem(getCompleteRoomStateKey())
-    return stored ? JSON.parse(stored) : []
+    const localStorageRooms: ReservationRoom[] = stored ? JSON.parse(stored) : []
+    
+    // Merge database rooms with localStorage rooms
+    const mergedRooms: ReservationRoom[] = []
+    const seenNames = new Set<string>()
+    
+        // Add database rooms first (these are the most up-to-date)
+    dbRooms.forEach(room => {
+      const roomState: ReservationRoom = {
+        id: room.id,
+        name: room.name,
+        organization_id: room.organization_id,
+        capacity: room.capacity,
+        is_active: room.is_active,
+        created_at: room.created_at || new Date().toISOString()
+      }
+      mergedRooms.push(roomState)
+      seenNames.add(room.name.toLowerCase())
+    })
+    
+    // If database is empty, clear localStorage completely
+    if (dbRooms.length === 0) {
+      console.log('🗑️  Database is empty, clearing localStorage room state')
+      localStorage.removeItem(getCompleteRoomStateKey())
+      return []
+    }
+    
+    // Add localStorage rooms that aren't in database (only if database has rooms)
+    localStorageRooms.forEach(room => {
+      if (!seenNames.has(room.name.toLowerCase())) {
+        mergedRooms.push(room)
+        seenNames.add(room.name.toLowerCase())
+      }
+    })
+    
+    console.log('🔄 Merged room state:', mergedRooms.length, 'total rooms')
+    console.log('📋 Room names:', mergedRooms.map(r => r.name))
+    
+    // Update localStorage with merged data
+    localStorage.setItem(getCompleteRoomStateKey(), JSON.stringify(mergedRooms))
+    return mergedRooms
   }
 
   // Get dates for 5-day rolling calendar
@@ -121,24 +149,62 @@ function ReservationContent({ setShowImportPopup }: {
       const customEvent = event as CustomEvent
       console.log(`📋 Imported ${customEvent.detail?.count} reservations for ${customEvent.detail?.date}`)
       fetchReservations() // Reload current reservations
+      
+      // Also refresh room state to pick up any newly created rooms
+      setTimeout(async () => {
+        console.log('🔄 Refreshing room state after import...')
+        const updatedRooms = await loadCompleteRoomState()
+        setRooms(updatedRooms)
+      }, 1000) // Small delay to ensure database is updated
+    }
+    
+    const handleForceRoomRefresh = () => {
+      // Force refresh room state
+      console.log('🔄 Force room refresh triggered...')
+      setTimeout(async () => {
+        console.log('🔄 Force refreshing room state...')
+        const updatedRooms = await loadCompleteRoomState()
+        setRooms(updatedRooms)
+        console.log('✅ Force room refresh completed:', updatedRooms.length, 'rooms')
+      }, 200) // Shorter delay for force refresh
     }
 
     const handleReservationsCleared = () => {
       // Refresh reservations when they are cleared
       console.log('🔄 Reservations cleared, refreshing data...')
       fetchReservations() // Reload current reservations
+      
+      // Immediately clear room state and force refresh
+      console.log('🔄 Immediately clearing room state...')
+      setRooms([]) // Clear rooms immediately
+      
+      // Also refresh room state from database to ensure consistency
+      setTimeout(async () => {
+        console.log('🔄 Refreshing room state after clear...')
+        try {
+          const updatedRooms = await loadCompleteRoomState()
+          setRooms(updatedRooms)
+          console.log('✅ Room state refreshed after clear:', updatedRooms.length, 'rooms')
+        } catch (error) {
+          console.error('❌ Error refreshing room state after clear:', error)
+          // If there's an error, ensure rooms are cleared
+          setRooms([])
+        }
+      }, 500) // Small delay to ensure database is updated
     }
 
     window.addEventListener('storage', handleStorageChange)
     window.addEventListener('roomsChanged', handleRoomsChanged as EventListener)
     window.addEventListener('reservationsImported', handleReservationsImported as EventListener)
     window.addEventListener('reservationsCleared', handleReservationsCleared as EventListener)
+    window.addEventListener('forceRoomRefresh', handleForceRoomRefresh as EventListener)
     
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('roomsChanged', handleRoomsChanged as EventListener)
       window.removeEventListener('reservationsImported', handleReservationsImported as EventListener)
       window.removeEventListener('reservationsCleared', handleReservationsCleared as EventListener)
+      window.removeEventListener('forceRoomRefresh', handleForceRoomRefresh as EventListener)
     }
   }, [organization?.id])
 
@@ -160,17 +226,10 @@ function ReservationContent({ setShowImportPopup }: {
       console.log('📱 Loaded saved room state:', savedRoomState)
       setRooms(savedRoomState)
     } else {
-      // First time - initialize with default rooms
-      console.log('🏠 First time - initializing with default rooms')
-      const defaultRooms: ReservationRoom[] = [
-        { id: 'raynor', name: 'Raynor', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
-        { id: 'cov', name: 'Cov', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
-        { id: 'sun', name: 'Sun', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
-        { id: 'pubn', name: 'Pubn', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
-        { id: 'lounge', name: 'Lounge', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() },
-        { id: 'open', name: 'Open', organization_id: organization.id, is_active: true, created_at: new Date().toISOString() }
-      ]
-      setRooms(defaultRooms)
+      // First time - start with empty room list
+      console.log('🏠 First time - starting with empty room list')
+      setRooms([])
+      localStorage.setItem(getCompleteRoomStateKey(), JSON.stringify([]))
     }
 
     // Check if tables exist for reservation functionality
@@ -180,10 +239,9 @@ function ReservationContent({ setShowImportPopup }: {
     if (tablesExist.rooms && tablesExist.tables && tablesExist.reservations) {
       setTablesReady(true)
     } else {
-      // Try to create default setup
-      console.log('🏗️ Creating default setup...')
-      const created = await createDefaultRoomsAndTables(organization.id.toString())
-      setTablesReady(created || true) // Continue even if creation fails
+      // Tables don't exist, but we'll continue without creating default data
+      console.log('📊 Tables not found, but continuing with empty state')
+      setTablesReady(true) // Continue with empty state
     }
     
     setLoading(false)
@@ -339,10 +397,10 @@ function ReservationContent({ setShowImportPopup }: {
           {/* Service Type Toggle */}
           <button
             onClick={() => setIsLunchView(!isLunchView)}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="button-secondary flex items-center space-x-2"
           >
-            <ToggleLeft className={`h-5 w-5 ${isLunchView ? 'text-orange-500' : 'text-slate-500'}`} />
-            <span className="font-medium">Switch to {isLunchView ? 'Dinner' : 'Lunch'}</span>
+            <ToggleLeft className={`h-5 w-5 ${isLunchView ? 'text-accent' : 'text-primary'}`} />
+            <span className="font-medium text-primary">Switch to {isLunchView ? 'Dinner' : 'Lunch'}</span>
           </button>
         </div>
 
@@ -354,8 +412,8 @@ function ReservationContent({ setShowImportPopup }: {
               onClick={() => setActiveDayIndex(index)}
               className={`flex-shrink-0 px-6 py-3 rounded-lg font-medium transition-all ${
                 activeDayIndex === index
-                  ? 'bg-purple-600 text-white shadow-lg transform scale-105'
-                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 hover:border-purple-300'
+                  ? 'button-primary shadow-lg transform scale-105'
+                  : 'button-secondary hover:border-accent'
               }`}
             >
               <div className="text-sm font-semibold">
@@ -413,13 +471,23 @@ function ReservationContent({ setShowImportPopup }: {
 
           <button
             onClick={async () => {
-              if (confirm('⚠️ Clear ALL reservations for your organization? This cannot be undone!')) {
+              if (confirm('⚠️ Clear ALL reservations and rooms for your organization? This cannot be undone!')) {
                 if (!organization?.id) return
-                await clearAllReservations(organization.id)
+                setLoading(true)
+                const success = await clearAllReservations(organization.id)
+                if (success) {
+                  // Force immediate UI update
+                  setRooms([])
+                  console.log('✅ All data cleared successfully')
+                } else {
+                  console.error('❌ Failed to clear all data')
+                }
                 fetchReservations() // Refresh the display
+                setLoading(false)
               }
             }}
-            className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+            disabled={loading}
+            className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl disabled:opacity-50"
           >
             <Trash2 className="h-5 w-5" />
             <span>Clear All</span>
@@ -1067,24 +1135,42 @@ async function clearCancelledReservations() {
 
 async function clearAllReservations(organizationId: string) {
   try {
-    const { error } = await supabase
+    // Clear all reservations
+    const { error: reservationsError } = await supabase
       .from('reservations')
       .delete()
       .eq('organization_id', organizationId)
     
-    if (error) {
-      console.error('Error clearing all reservations:', error)
+    if (reservationsError) {
+      console.error('Error clearing all reservations:', reservationsError)
       return false
     }
     
-    console.log('All reservations cleared successfully')
+    // Clear all rooms
+    const { error: roomsError } = await supabase
+      .from('reservation_rooms')
+      .delete()
+      .eq('organization_id', organizationId)
     
-    // Trigger refresh of the reservations list
+    if (roomsError) {
+      console.error('Error clearing all rooms:', roomsError)
+      return false
+    }
+    
+    console.log('All reservations and rooms cleared successfully')
+    
+    // Clear localStorage room state
+    if (typeof window !== 'undefined') {
+      const roomStateKey = `complete_room_state_${organizationId}`
+      localStorage.removeItem(roomStateKey)
+    }
+    
+    // Trigger refresh of the reservations list and room state
     window.dispatchEvent(new CustomEvent('reservationsCleared'))
     
     return true
   } catch (error) {
-    console.error('Error clearing all reservations:', error)
+    console.error('Error clearing all data:', error)
     return false
   }
 }
@@ -1263,7 +1349,7 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
           return
         }
         
-        // Enhanced database insertion with room resolution
+        // Enhanced database insertion with automatic room matching and creation
         console.log(`💾 Inserting ${reservations.length} reservations into database...`)
         
         // First, get available rooms for room name resolution
@@ -1274,19 +1360,105 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
           .eq('is_active', true)
         
         const roomLookup: { [key: string]: string } = {}
+        const roomNameLookup: { [key: string]: string } = {}
         if (roomsData) {
           roomsData.forEach(room => {
             roomLookup[room.name.toLowerCase()] = room.id
+            roomNameLookup[room.name.toLowerCase()] = room.name
           })
         }
+
+        // Function to find or create room based on first 3 characters
+        const findOrCreateRoom = async (csvRoomName: string): Promise<string | null> => {
+          if (!csvRoomName) return null
+          
+          const cleanRoomName = csvRoomName.trim()
+          const firstThree = cleanRoomName.substring(0, 3).toLowerCase()
+          
+          console.log(`🔍 Looking for room matching first 3 chars: "${firstThree}" from "${cleanRoomName}"`)
+          
+          // First, try exact match
+          if (roomLookup[cleanRoomName.toLowerCase()]) {
+            console.log(`✅ Exact match found: ${cleanRoomName}`)
+            return roomLookup[cleanRoomName.toLowerCase()]
+          }
+          
+          // Then, try first 3 character match
+          for (const [existingRoomName, roomId] of Object.entries(roomLookup)) {
+            const existingFirstThree = existingRoomName.substring(0, 3).toLowerCase()
+            if (existingFirstThree === firstThree) {
+              console.log(`✅ First 3 chars match found: "${existingRoomName}" matches "${cleanRoomName}"`)
+              return roomId
+            }
+          }
+          
+          // If no match found, create new room
+          console.log(`🆕 No match found, creating new room: ${cleanRoomName}`)
+          console.log(`🏢 Organization ID: ${organization?.id}`)
+          
+          let orgId = organization?.id
+          
+          if (!orgId) {
+            console.log('🔄 Organization not available, fetching from user profile...')
+            try {
+              const { data: { user } } = await supabase.auth.getUser()
+              if (user) {
+                const { data: profile } = await supabase
+                  .from('user_profiles')
+                  .select('organization_id')
+                  .eq('id', user.id)
+                  .single()
+                orgId = profile?.organization_id
+                console.log(`🏢 Got organization ID from profile: ${orgId}`)
+              }
+            } catch (error) {
+              console.error('❌ Error fetching organization from profile:', error)
+            }
+          }
+          
+          if (!orgId) {
+            console.error('❌ No organization ID available for room creation')
+            return null
+          }
+          
+          try {
+            const { data: newRoom, error } = await supabase
+              .from('reservation_rooms')
+              .insert({
+                name: cleanRoomName,
+                organization_id: orgId,
+                is_active: true,
+                capacity: 50 // Default capacity
+              })
+              .select('id')
+              .single()
+            
+            if (error) {
+              console.error('❌ Error creating room:', error)
+              return null
+            }
+            
+            console.log(`✅ Created new room: ${cleanRoomName} with ID: ${newRoom.id}`)
+            
+            // Update our lookups
+            roomLookup[cleanRoomName.toLowerCase()] = newRoom.id
+            roomNameLookup[cleanRoomName.toLowerCase()] = cleanRoomName
+            
+            return newRoom.id
+          } catch (error) {
+            console.error('❌ Error creating room:', error)
+            return null
+          }
+        }
         
-        // Process reservations with room resolution
-        const processedReservations = reservations.map(res => {
-          // Find room ID from room name
-          const roomId = roomLookup[res.room.toLowerCase()] || null
+        // Process reservations with automatic room matching and creation
+        const processedReservations: any[] = []
+        for (const res of reservations) {
+          // Find or create room ID from room name
+          const roomId = await findOrCreateRoom(res.room)
           
           // Return database-ready reservation
-          return {
+          processedReservations.push({
             organization_id: res.organization_id,
             room_id: roomId,
             table_id: null, // Will be null for now since we don't have table management yet
@@ -1301,8 +1473,8 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
             service_type: res.service_type,
             created_by: res.created_by,
             // Let database handle created_at automatically to avoid timestamp conflicts
-          }
-        })
+          })
+        }
         
         // Insert processed reservations
         const { error: insertError } = await supabase
@@ -1317,10 +1489,46 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
           console.log(`📅 Reservations imported for date: ${today}`)
           console.log(`🎯 Service type: ${serviceType}`)
           
+          // Show success message with room creation info
+          const createdRooms = Object.keys(roomNameLookup).filter(name => 
+            !roomsData?.some(existing => existing.name.toLowerCase() === name)
+          )
+          
+          if (createdRooms.length > 0) {
+            console.log(`🏗️ Created new rooms: ${createdRooms.join(', ')}`)
+            alert(`✅ Successfully imported ${reservations.length} reservations!\n\n🏗️ New rooms created: ${createdRooms.join(', ')}`)
+          } else {
+            alert(`✅ Successfully imported ${reservations.length} reservations!`)
+          }
+          
+          // Trigger multiple refresh events to ensure all components update
+          console.log('🔄 Triggering comprehensive refresh events...')
+          
           // Trigger reservations refresh event for the main component to reload data
           window.dispatchEvent(new CustomEvent('reservationsImported', { 
             detail: { date: today, count: reservations.length } 
           }))
+          
+          // Trigger room refresh events
+          if (createdRooms.length > 0) {
+            console.log('🔄 Triggering room refresh events...')
+            window.dispatchEvent(new CustomEvent('roomsImported', { 
+              detail: { createdRooms } 
+            }))
+            
+            // Also trigger a general room state change
+            window.dispatchEvent(new CustomEvent('roomStateChanged', { 
+              detail: { action: 'import', rooms: createdRooms } 
+            }))
+          }
+          
+          // Force immediate refresh by triggering multiple events
+          setTimeout(() => {
+            console.log('🔄 Force triggering room refresh events...')
+            window.dispatchEvent(new CustomEvent('forceRoomRefresh', { 
+              detail: { timestamp: Date.now() } 
+            }))
+          }, 500)
           
           onSuccess()
           onClose()
@@ -1334,7 +1542,7 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
     } finally {
       setLoading(false)
     }
-  }
+  } // Close handleImport function
 
   if (!isOpen) return null
 
@@ -1379,7 +1587,8 @@ function ImportPopup({ isOpen, onClose, onSuccess, serviceType = 'dinner', user 
                 <strong>Example:</strong> "05:00 PM, CARD, C0982, 5, LOUNGE, 205, STROLLER, -, Left"
               </p>
                               <div className="text-xs text-slate-600 space-y-1">
-                <p><strong>Supported Rooms:</strong> LOUNGE, RAYNOR, COV, SUN, OPEN, PUBN</p>
+                <p><strong>Room Matching:</strong> Automatically matches first 3 characters or creates new rooms</p>
+                <p><strong>Example:</strong> "LOU" matches "LOUNGE", "RAY" matches "RAYNOR"</p>
                 <p><strong>Time Format:</strong> "05:00 PM" or "17:00" (both supported)</p>
                 <p><strong>Status Options:</strong> Waiting to arrive, Here, Left, Cancelled, etc.</p>
               </div>

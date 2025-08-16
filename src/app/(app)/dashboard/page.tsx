@@ -15,6 +15,7 @@ import {
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { useOrganizationData } from '@/lib/use-data-loading'
 import { supabase } from '@/lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import AddCategoryModal from '@/app/components/AddCategoryModal'
@@ -31,6 +32,7 @@ import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import QuickBooksIntegration from '@/components/QuickBooksIntegration'
 import SubscriptionManager from '@/components/SubscriptionManager'
+import EmailTester from '@/components/EmailTester'
 import UserPermissions from '@/components/UserPermissions'
 import AppAccessGuard from '@/components/AppAccessGuard'
 
@@ -96,7 +98,7 @@ function DashboardContent() {
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
   // Get the correct organization ID - for admin, use the known organization ID if context is missing
-  const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : null)
+  const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : undefined)
 
   useEffect(() => {
     // Admin user can load data even without organization context
@@ -959,6 +961,16 @@ function DashboardContent() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'email-testing' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Email System Testing</h2>
+                  <p className="text-gray-600 mt-1">Test all email templates with consistent design</p>
+                </div>
+                <EmailTester />
               </div>
             )}
           </div>

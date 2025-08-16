@@ -5,7 +5,8 @@ import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseClient = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Check for existing pending invitation
     const { data: existingInvitation } = await supabaseClient
-      .from('user_invitations')
+      .from('team_invitations')
       .select('id')
       .eq('email', email)
       .eq('organization_id', userProfile.organization_id)
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     expiresAt.setDate(expiresAt.getDate() + 7) // Expires in 7 days
 
     const { data: invitation, error: inviteError } = await supabaseClient
-      .from('user_invitations')
+      .from('team_invitations')
       .insert({
         organization_id: userProfile.organization_id,
         email,
@@ -73,7 +74,6 @@ export async function POST(request: NextRequest) {
         app_access: appAccess || [],
         invited_by: user.id,
         expires_at: expiresAt.toISOString(),
-        custom_message: customMessage,
         status: 'pending'
       })
       .select()
@@ -136,7 +136,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabaseClient = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -156,7 +157,7 @@ export async function GET(request: NextRequest) {
 
     // Get all invitations for the organization
     const { data: invitations, error } = await supabaseClient
-      .from('user_invitations')
+      .from('team_invitations')
       .select(`
         id,
         email,
@@ -165,7 +166,6 @@ export async function GET(request: NextRequest) {
         status,
         expires_at,
         created_at,
-        custom_message,
         invited_by,
         user_profiles!invited_by(full_name, email)
       `)
