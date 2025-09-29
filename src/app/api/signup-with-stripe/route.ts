@@ -13,11 +13,11 @@ const supabaseAdmin = createClient(
   }
 )
 
-// Stripe price IDs mapping
+// Stripe price IDs mapping - Production
 const STRIPE_PRICE_IDS = {
   pro: {
-    monthly: 'price_1SCW6jGp6QH8POrP1X7faANK', // $10/month
-    annual: 'price_1SCW89Gp6QH8POrP7dPZ5dED'   // $100/year
+    monthly: 'price_1SCYw0Gp6QH8POrPhYVYuxy3', // $10/month
+    annual: 'price_1SCYwZGp6QH8POrPL5QTUwv9'   // $100/year
   }
 }
 

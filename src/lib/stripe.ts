@@ -24,10 +24,8 @@ export const STRIPE_PRODUCT_IDS = {
   pro_annual: 'prod_T8qd22OvVC3sxX',  // Annual subscription product
 } as const;
 
-// NOTE: You'll need to get the specific PRICE IDs for each product from Stripe Dashboard
-// Products can have multiple prices (different currencies, billing intervals, etc.)
-// For checkout, we need the price IDs, not product IDs
+// Production Price IDs for checkout
 export const STRIPE_PRICE_IDS = {
-  pro_monthly: 'price_1SCW6jGp6QH8POrP1X7faANK', // PLACEHOLDER - Update with actual price ID for monthly
-  pro_annual: 'price_1SCW89Gp6QH8POrP7dPZ5dED',  // PLACEHOLDER - Update with actual price ID for annual
+  pro_monthly: 'price_1SCYw0Gp6QH8POrPhYVYuxy3', // $10/month
+  pro_annual: 'price_1SCYwZGp6QH8POrPL5QTUwv9',  // $100/year
 } as const;
