@@ -160,7 +160,7 @@ export default function SubscriptionManager() {
     const plans = {
       trial: { name: 'Trial', price: '$0', features: ['Basic inventory management', 'Up to 100 items', 'Email support'] },
       starter: { name: 'Starter', price: '$29/month', features: ['Basic inventory management', 'Up to 500 items', 'Email support', 'Basic reporting'] },
-      professional: { name: 'Professional', price: '$79/month', features: ['Advanced inventory management', 'Unlimited items', 'Priority support', 'Advanced reporting', 'QuickBooks integration'] },
+      professional: { name: 'Professional', price: '$79/month', features: ['Advanced inventory management', 'Unlimited items', 'Priority support', 'Advanced reporting', 'Third-party integrations'] },
       enterprise: { name: 'Enterprise', price: '$199/month', features: ['Everything in Professional', 'Custom integrations', 'Dedicated support', 'Custom reporting', 'API access'] }
     }
     return plans[plan as keyof typeof plans] || plans.trial
@@ -275,41 +275,16 @@ export default function SubscriptionManager() {
           </ul>
         </div>
 
-        {/* Actions */}
-        <div className="flex space-x-4">
-          {subscription?.plan !== 'enterprise' && (
-            <button
-              onClick={() => handleUpgrade(getNextPlan(subscription?.plan || 'trial'))}
-              disabled={upgrading}
-              className="flex items-center space-x-2 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
-              }}
-            >
-              <ArrowUpRight className="h-4 w-4" />
-              <span>{upgrading ? 'Processing...' : 'Upgrade Plan'}</span>
-            </button>
-          )}
-
-          {subscription?.status !== 'trial' && subscription?.stripe_subscription_id && (
-            <button
-              onClick={handleCancel}
-              disabled={canceling}
-              className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium disabled:opacity-50 transition-all duration-300"
-            >
-              <X className="h-4 w-4" />
-              <span>{canceling ? 'Processing...' : 'Cancel Subscription'}</span>
-            </button>
-          )}
+        {/* Status */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg">
+            <CheckCircle className="h-4 w-4" />
+            <span>Active Subscription</span>
+          </div>
+          
+          <div className="text-sm text-gray-600">
+            <span>Payment processing will be available soon</span>
+          </div>
         </div>
       </div>
 

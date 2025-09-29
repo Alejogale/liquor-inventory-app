@@ -39,8 +39,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail(email)
-    if (existingUser.user) {
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
+    const existingUser = existingUsers.users.find(user => user.email === email)
+    if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409 }
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
           business_type: businessType,
           employees: employees
         },
-        ip_address: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown'
       })
 

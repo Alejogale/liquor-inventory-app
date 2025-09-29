@@ -2,19 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, Star, Zap, Shield, Users, Building2, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Check, Star, Package, Home, Heart, Briefcase, ArrowRight, Lock, Mail, User, Building } from 'lucide-react'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    company: '',
-    phone: '',
-    businessType: '',
-    employees: '',
-    primaryApp: '',
-    plan: '',
+    organization: '',
+    useCase: 'personal',
+    plan: 'pro',
     billingCycle: 'monthly'
   })
 
@@ -26,12 +23,19 @@ export default function SignupPage() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch('/api/signup-with-stripe', {
+      const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          businessType: formData.useCase,
+          company: formData.organization,
+          primaryApp: 'liquor-inventory',
+          plan: 'pro',
+          billingCycle: formData.billingCycle
+        }),
       })
 
       const result = await response.json()
@@ -41,13 +45,7 @@ export default function SignupPage() {
       }
 
       console.log('✅ Account created successfully:', result)
-      
-      // Redirect to Stripe checkout
-      if (result.stripe_url) {
-        window.location.href = result.stripe_url
-      } else {
-        setIsSubmitted(true)
-      }
+      setIsSubmitted(true)
     } catch (error) {
       console.error('❌ Signup error:', error)
       alert(error instanceof Error ? error.message : 'Failed to create account. Please try again.')
@@ -63,523 +61,410 @@ export default function SignupPage() {
     })
   }
 
+  const useCases = [
+    {
+      id: 'personal',
+      title: 'Personal Use',
+      description: 'Organize your home, pantry, garage, or closet',
+      icon: Home,
+      color: 'from-orange-500 to-red-500'
+    },
+    {
+      id: 'hobby',
+      title: 'Hobby & Collectibles',
+      description: 'Track craft supplies, sports equipment, books, games',
+      icon: Heart,
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 'business',
+      title: 'Small Business',
+      description: 'Manage retail inventory, home-based business, side hustles',
+      icon: Briefcase,
+      color: 'from-blue-500 to-indigo-500'
+    }
+  ]
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Clean Modern Navigation */}
-      <nav className="nav-modern">
-        <div className="container-max">
-          <div className="flex items-center justify-between py-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-sm">H</span>
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
+                <Package className="w-5 h-5 text-white" />
               </div>
-              <span className="text-headline text-primary">Hospitality Hub</span>
-            </div>
+              <span className="text-xl font-bold text-gray-900">Easy Inventory</span>
+            </Link>
             
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-muted hover:text-primary transition-colors font-medium">Home</Link>
-              <Link href="/#apps" className="text-muted hover:text-primary transition-colors font-medium">Apps</Link>
-              <Link href="/#features" className="text-muted hover:text-primary transition-colors font-medium">Features</Link>
-              <Link href="/pricing" className="text-muted hover:text-primary transition-colors font-medium">Pricing</Link>
-              <Link href="/contact" className="text-muted hover:text-primary transition-colors font-medium">Contact</Link>
-            </div>
-            
-            {/* CTA Button */}
-            <Link href="/login" className="text-muted hover:text-primary transition-colors font-medium">
-              Sign In
+            {/* Back to Home */}
+            <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
             </Link>
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Hero Section */}
-      <section className="section-spacing bg-white">
-        <div className="container-max">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-stone-gray">
-              <Star className="w-4 h-4 text-accent" />
-              <span className="text-caption text-secondary">Start Your Free Trial</span>
-            </div>
-            
-            {/* Main Headline */}
-            <div className="space-y-6">
-              <h1 className="text-display text-primary">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          
+          {/* Left Side - Benefits */}
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
                 Start Your Free Trial
-                <span className="block text-secondary">Easy Hospitality Management</span>
               </h1>
-              <p className="text-body text-muted max-w-3xl mx-auto leading-relaxed">
-                Join 500+ hospitality businesses already using our platform to streamline operations, 
-                reduce costs, and improve customer experiences.
-                <span className="block mt-2 text-lg">
-                  <span className="text-accent font-semibold">8+ apps coming soon</span> - designed specifically for restaurants, bars, hotels, and clubs.
-                </span>
+              <p className="text-xl text-gray-600 mb-8">
+                Join thousands of people who are organizing their lives with Easy Inventory.
               </p>
             </div>
 
-            <div className="flex justify-center pt-4">
-              <Link href="/" className="inline-flex items-center gap-2 text-muted hover:text-accent font-medium text-caption transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Home
-              </Link>
+            {/* Benefits List */}
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">30-day free trial</h3>
+                  <p className="text-gray-600">No credit card required. Cancel anytime.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Setup in 5 minutes</h3>
+                  <p className="text-gray-600">Get started immediately with our intuitive interface.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Perfect for everyone</h3>
+                  <p className="text-gray-600">Whether you're organizing your home or running a business.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Mobile-first design</h3>
+                  <p className="text-gray-600">Count inventory on your phone, manage on any device.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Proof */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-gray-600">4.9/5 stars</span>
+              </div>
+              <p className="text-gray-700 italic mb-4">
+                "Finally, I can keep track of everything in my house! My pantry is perfectly organized and I never run out of essentials."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">SM</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Sarah M.</p>
+                  <p className="text-sm text-gray-600">Home Organizer</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Signup Form Section */}
-      <section className="py-16 bg-surface">
-        <div className="container-max">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Signup Form */}
-            <div className="card-elevated">
-              <h2 className="text-headline text-primary mb-8">Create Your Account</h2>
-              
-              {isSubmitted ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-accent" />
-                  </div>
-                  <h3 className="text-title text-primary mb-2">Welcome to Hospitality Hub!</h3>
-                  <p className="text-body text-muted mb-6">Your account has been created successfully. Check your email for next steps.</p>
-                  <Link href="/login" className="button-primary">
-                    Sign In to Your Account
-                  </Link>
+          {/* Right Side - Signup Form */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8">
+            {isSubmitted ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Check className="w-8 h-8 text-green-600" />
                 </div>
-              ) : (
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Easy Inventory!</h3>
+                <p className="text-gray-600 mb-8">
+                  Your account has been created successfully. You can now start organizing everything you own!
+                </p>
+                <Link 
+                  href="/login" 
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center"
+                >
+                  Sign In to Your Account
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Your Account</h2>
+                
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="firstName" className="block text-caption text-secondary mb-2">
-                        First Name *
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        First Name
                       </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        required
-                        className="input-modern"
-                        placeholder="John"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="lastName" className="block text-caption text-secondary mb-2">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                        className="input-modern"
-                        placeholder="Doe"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-caption text-secondary mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="input-modern"
-                      placeholder="john@company.com"
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="company" className="block text-caption text-secondary mb-2">
-                        Company Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="company"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleChange}
-                        required
-                        className="input-modern"
-                        placeholder="Your Company"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="block text-caption text-secondary mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="input-modern"
-                        placeholder="+1 (555) 123-4567"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="businessType" className="block text-caption text-secondary mb-2">
-                        Business Type *
-                      </label>
-                      <select
-                        id="businessType"
-                        name="businessType"
-                        value={formData.businessType}
-                        onChange={handleChange}
-                        required
-                        className="input-modern"
-                      >
-                        <option value="">Select business type</option>
-                        <option value="restaurant">Restaurant</option>
-                        <option value="bar">Bar/Nightclub</option>
-                        <option value="hotel">Hotel/Resort</option>
-                        <option value="country-club">Country Club</option>
-                        <option value="catering">Catering</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor="employees" className="block text-caption text-secondary mb-2">
-                        Number of Employees
-                      </label>
-                      <select
-                        id="employees"
-                        name="employees"
-                        value={formData.employees}
-                        onChange={handleChange}
-                        className="input-modern"
-                      >
-                        <option value="">Select size</option>
-                        <option value="1-10">1-10 employees</option>
-                        <option value="11-50">11-50 employees</option>
-                        <option value="51-200">51-200 employees</option>
-                        <option value="200+">200+ employees</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="primaryApp" className="block text-caption text-secondary mb-2">
-                      Which app are you most interested in? *
-                    </label>
-                    <select
-                      id="primaryApp"
-                      name="primaryApp"
-                      value={formData.primaryApp}
-                      onChange={handleChange}
-                      required
-                      className="input-modern"
-                    >
-                      <option value="">Select primary app</option>
-                      <option value="liquor-inventory">Liquor Inventory Management</option>
-                      <option value="consumption-sheet">Consumption Sheet</option>
-                      <option value="reservations">Reservation Management</option>
-                      <option value="members">Member Database</option>
-                      <option value="all">All Apps (Complete Platform)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-caption text-secondary mb-3">
-                      Choose Your Plan *
-                    </label>
-                    
-                    {/* Billing Cycle Toggle */}
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="bg-surface rounded-lg p-1 flex border border-stone-gray">
-                        <button
-                          type="button"
-                          onClick={() => setFormData({...formData, billingCycle: 'monthly'})}
-                          className={`px-4 py-2 rounded-md text-caption font-medium transition-colors ${
-                            formData.billingCycle === 'monthly' 
-                              ? 'bg-white text-primary shadow-sm border border-stone-gray' 
-                              : 'text-muted hover:text-primary'
-                          }`}
-                        >
-                          Monthly
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFormData({...formData, billingCycle: 'annual'})}
-                          className={`px-4 py-2 rounded-md text-caption font-medium transition-colors ${
-                            formData.billingCycle === 'annual' 
-                              ? 'bg-white text-primary shadow-sm border border-stone-gray' 
-                              : 'text-muted hover:text-primary'
-                          }`}
-                        >
-                          Annual
-                          <span className="ml-1 text-xs bg-accent/10 text-accent px-1.5 py-0.5 rounded-full">Save 30%</span>
-                        </button>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          placeholder="John"
+                        />
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                          placeholder="Doe"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                    {/* Compact Plan Selection */}
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Organization/Project Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Organization/Project Name
+                    </label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        name="organization"
+                        value={formData.organization}
+                        onChange={handleChange}
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                        placeholder="My Home, My Business, etc."
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      This could be your home, business name, or project name
+                    </p>
+                  </div>
+
+                  {/* Use Case Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                      How will you use Easy Inventory?
+                    </label>
                     <div className="space-y-3">
-                      <div 
-                        className={`card cursor-pointer transition-all ${
-                          formData.plan === 'individual' ? 'border-primary bg-surface' : 'hover:border-slate-gray'
-                        }`} 
-                        onClick={() => setFormData({...formData, plan: 'individual'})}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              formData.plan === 'individual' ? 'border-primary' : 'border-stone-gray'
-                            }`}>
-                              {formData.plan === 'individual' && <div className="w-2 h-2 bg-primary rounded-full"></div>}
+                      {useCases.map((useCase) => {
+                        const Icon = useCase.icon
+                        return (
+                          <label
+                            key={useCase.id}
+                            className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                              formData.useCase === useCase.id
+                                ? 'border-orange-500 bg-orange-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="useCase"
+                              value={useCase.id}
+                              checked={formData.useCase === useCase.id}
+                              onChange={handleChange}
+                              className="sr-only"
+                            />
+                            <div className={`w-10 h-10 bg-gradient-to-br ${useCase.color} rounded-lg flex items-center justify-center mr-4`}>
+                              <Icon className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <h3 className="text-title text-primary">Individual App</h3>
-                              <p className="text-caption text-muted">Start with one app, upgrade anytime</p>
+                              <h3 className="font-semibold text-gray-900">{useCase.title}</h3>
+                              <p className="text-sm text-gray-600">{useCase.description}</p>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-body font-bold text-primary">
-                              {formData.billingCycle === 'monthly' ? '$29-79' : '$243-663'}
-                              <span className="text-caption font-normal text-muted">
-                                /{formData.billingCycle === 'monthly' ? 'month' : 'year'}
-                              </span>
-                            </p>
-                            <p className="text-caption text-muted">
-                              {formData.billingCycle === 'monthly' ? 'Per app pricing' : 'Save 30% annually'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div 
-                        className={`card cursor-pointer transition-all ${
-                          formData.plan === 'platform' ? 'border-accent bg-accent/5' : 'hover:border-slate-gray'
-                        }`} 
-                        onClick={() => setFormData({...formData, plan: 'platform'})}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              formData.plan === 'platform' ? 'border-accent' : 'border-stone-gray'
-                            }`}>
-                              {formData.plan === 'platform' && <div className="w-2 h-2 bg-accent rounded-full"></div>}
-                            </div>
-                            <div>
-                              <h3 className="text-title text-primary">All Apps Platform</h3>
-                              <p className="text-caption text-muted">Complete access to all current & future apps</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-body font-bold text-primary">
-                              {formData.billingCycle === 'monthly' ? '$999' : '$8,388'}
-                              <span className="text-caption font-normal text-muted">
-                                /{formData.billingCycle === 'monthly' ? 'month' : 'year'}
-                              </span>
-                            </p>
-                            {formData.billingCycle === 'annual' && (
-                              <p className="text-caption text-accent">Save $6,000/year</p>
+                            {formData.useCase === useCase.id && (
+                              <div className="absolute top-2 right-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                                <Check className="w-4 h-4 text-white" />
+                              </div>
                             )}
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Plan Selection */}
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-gray-900 mb-2">Easy Inventory Pro</h3>
+                      <p className="text-sm text-gray-600 mb-4">Everything you need to stay organized</p>
+                      
+                      {/* Billing Cycle Selection */}
+                      <div className="space-y-3">
+                        <label className={`relative flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.billingCycle === 'monthly'
+                            ? 'border-orange-500 bg-orange-100'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}>
+                          <input
+                            type="radio"
+                            name="billingCycle"
+                            value="monthly"
+                            checked={formData.billingCycle === 'monthly'}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center justify-between w-full">
+                            <div>
+                              <div className="font-medium text-gray-900">Monthly Plan</div>
+                              <div className="text-sm text-gray-600">Pay monthly, cancel anytime</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-gray-900">$10</div>
+                              <div className="text-sm text-gray-600">/month</div>
+                            </div>
                           </div>
-                        </div>
+                          {formData.billingCycle === 'monthly' && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </label>
+                        
+                        <label className={`relative flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          formData.billingCycle === 'annual'
+                            ? 'border-orange-500 bg-orange-100'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}>
+                          <input
+                            type="radio"
+                            name="billingCycle"
+                            value="annual"
+                            checked={formData.billingCycle === 'annual'}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center justify-between w-full">
+                            <div>
+                              <div className="font-medium text-gray-900">Annual Plan</div>
+                              <div className="text-sm text-gray-600">Save $20 per year</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-gray-900">$100</div>
+                              <div className="text-sm text-gray-600">/year</div>
+                              <div className="text-xs text-green-600 font-medium">Save $20</div>
+                            </div>
+                          </div>
+                          {formData.billingCycle === 'annual' && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </label>
                       </div>
                     </div>
-
-                    {formData.plan && (
-                      <input
-                        type="hidden"
-                        name="plan"
-                        value={formData.plan}
-                      />
-                    )}
-                    {formData.billingCycle && (
-                      <input
-                        type="hidden"
-                        name="billingCycle"
-                        value={formData.billingCycle}
-                      />
-                    )}
-                  </div>
-
-                  <div className="card bg-surface">
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                      <div className="text-caption text-muted">
-                        <p className="text-title text-primary mb-2">What's included in your free trial:</p>
-                        <ul className="space-y-1">
-                          <li>• 30-day free trial with full access</li>
-                          <li>• No credit card required</li>
-                          <li>• Cancel anytime</li>
-                          <li>• Full customer support</li>
-                        </ul>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Unlimited items</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Multi-location</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Team access</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Mobile app</span>
                       </div>
                     </div>
+                    <p className="text-sm text-orange-700 font-medium">
+                      🎉 30-day free trial • No credit card required
+                    </p>
                   </div>
 
+                  {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting || !formData.plan}
-                    className={`w-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-                      isSubmitting || !formData.plan ? 'button-secondary' : 'button-primary'
-                    }`}
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                        Creating Your Account...
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Creating Account...
                       </>
                     ) : (
                       <>
                         Start Free Trial
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="ml-2 w-5 h-5" />
                       </>
                     )}
                   </button>
 
-                  <p className="text-center text-caption text-muted">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-accent hover:text-primary font-medium transition-colors">
-                      Sign in here
+                  {/* Terms */}
+                  <p className="text-xs text-gray-500 text-center">
+                    By creating an account, you agree to our{' '}
+                    <Link href="/terms" className="text-orange-600 hover:text-orange-700">
+                      Terms & Liability
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/privacy" className="text-orange-600 hover:text-orange-700">
+                      Privacy Policy
                     </Link>
                   </p>
                 </form>
-              )}
-            </div>
-
-            {/* Benefits Sidebar */}
-            <div className="space-y-8">
-              <div className="card-elevated">
-                <h2 className="text-headline text-primary mb-8">Why Choose Hospitality Hub?</h2>
-                <div className="space-y-8">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <Zap className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-title text-primary mb-1">Get Started in Minutes</h3>
-                      <p className="text-body text-muted leading-relaxed">No complex setup required. Start using our platform immediately after signup.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <Shield className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-title text-primary mb-1">Enterprise Security</h3>
-                      <p className="text-body text-muted leading-relaxed">Bank-level security with 99.9% uptime guarantee and daily backups.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-charcoal rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-title text-primary mb-1">Dedicated Support</h3>
-                      <p className="text-body text-muted leading-relaxed">24/7 customer support with live chat, phone, and email assistance.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-slate-gray rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <Building2 className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-title text-primary mb-1">Scalable Platform</h3>
-                      <p className="text-body text-muted leading-relaxed">Grow with confidence. Our platform scales from small businesses to enterprise.</p>
-                    </div>
-                  </div>
-                </div>
               </div>
-
-              {/* Testimonials */}
-              <div className="card-elevated">
-                <div className="flex items-center gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-accent fill-current" />
-                  ))}
-                </div>
-                <p className="text-body text-primary mb-6 leading-relaxed font-medium">
-                  "Hospitality Hub transformed our operations. We've reduced inventory waste by 40% and saved 5 hours per week on manual tasks."
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-sm">SJ</span>
-                  </div>
-                  <div>
-                    <p className="text-title text-primary">Sarah Johnson</p>
-                    <p className="text-caption text-muted">General Manager, Blue Moon Restaurant</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-stone-gray py-12">
-        <div className="container-max">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">H</span>
-                </div>
-                <span className="text-title text-primary">Hospitality Hub</span>
-              </div>
-              <p className="text-caption text-muted">
-                Complete hospitality management platform for modern businesses.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-title text-primary mb-4">Apps</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><a href="#" className="hover:text-accent transition-colors">Liquor Inventory</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Consumption Sheet</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Reservation Management</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Member Database</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-title text-primary mb-4">Company</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><Link href="/about" className="hover:text-accent transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Blog</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-title text-primary mb-4">Legal</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><Link href="/legal/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/legal/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Cookie Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-stone-gray mt-8 pt-8 text-center text-caption text-muted">
-            <p>&copy; 2024 Hospitality Hub. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   )
 }

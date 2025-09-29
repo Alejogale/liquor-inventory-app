@@ -94,7 +94,7 @@ export class InventoryService implements GoogleAppsScriptAPI {
       }
 
       // Extract unique brands from all items
-      const brands = [...new Set(items?.map(item => item.brand).filter(Boolean))] || []
+      const brands = items ? [...new Set(items.map(item => item.brand).filter(Boolean))] : []
       return brands.length > 0 ? brands : this.getDefaultBrands()
     } catch (error) {
       console.error('❌ Failed to get brands:', error)

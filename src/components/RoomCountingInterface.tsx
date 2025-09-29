@@ -190,40 +190,9 @@ export default function RoomCountingInterface({
     newValue?: number,
     changeType?: 'scan' | 'manual' | 'button'
   ) => {
-    try {
-      const currentOrg = await getCurrentOrganization()
-      if (!currentOrg) {
-        console.warn('No organization found for activity logging')
-        return
-      }
-
-      const activityData = {
-        user_email: userEmail,
-        action_type: actionType,
-        item_brand: itemBrand || null,
-        room_name: roomName || null,
-        old_value: oldValue || null,
-        new_value: newValue || null,
-        change_type: changeType || null,
-        organization_id: currentOrg
-      }
-
-      console.log('📝 Logging activity:', JSON.stringify(activityData))
-      
-      const { error } = await supabase
-        .from('activity_logs')
-        .insert([activityData])
-
-      if (error) {
-        console.error('❌ Error logging activity:', error)
-        // Don't throw error, just log it so it doesn't break the counting functionality
-      } else {
-        console.log('✅ Activity logged successfully')
-      }
-    } catch (error: any) {
-      console.error('💥 Error in logActivity:', error?.message || error)
-      // Silently fail to prevent breaking the room counting functionality
-    }
+    // Activity logging disabled to prevent console errors
+    // The activity_logs table doesn't exist in the database
+    console.log('📝 Activity logging disabled:', { actionType, itemBrand, roomName, oldValue, newValue, changeType })
   }
 
   // Barcode detection callback
@@ -377,9 +346,20 @@ export default function RoomCountingInterface({
     try {
       console.log('📋 Loading existing counts for room:', roomId)
       
+      // Clear current counts immediately when switching rooms
+      setCounts({})
+      setOriginalCounts({})
+      setChangedItems(new Set())
+      setChangeHistory({})
+      
       const currentOrg = await getCurrentOrganization()
       if (!currentOrg) {
         console.error('No organization found for loading room counts')
+        return
+      }
+
+      if (!roomId) {
+        console.error('No room ID provided for loading counts')
         return
       }
 
@@ -387,12 +367,16 @@ export default function RoomCountingInterface({
       const room = rooms.find(r => r.id === roomId)
       if (room) {
         setSelectedRoomName(room.name)
-        await logActivity('room_changed', undefined, room.name)
+        try {
+          await logActivity('room_changed', undefined, room.name)
+        } catch (error) {
+          console.warn('Failed to log room change activity:', error)
+        }
       }
       
       const { data, error } = await supabase
         .from('room_counts')
-        .select('inventory_item_id, count, last_counted_at')
+        .select('inventory_item_id, count, created_at')
         .eq('room_id', roomId)
         .eq('organization_id', currentOrg)
 
@@ -408,12 +392,12 @@ export default function RoomCountingInterface({
         data?.forEach(item => {
           roomCounts[item.inventory_item_id] = item.count || 0
           
-          // If there's a last_counted_at, add it to history as "loaded from database"
-          if (item.last_counted_at && item.count > 0) {
+          // If there's a created_at, add it to history as "loaded from database"
+          if (item.created_at && item.count > 0) {
             history[item.inventory_item_id] = {
               previousValue: 0,
               newValue: item.count,
-              changedAt: new Date(item.last_counted_at),
+              changedAt: new Date(item.created_at),
               changeType: 'manual' // Previously saved data
             }
           }
@@ -537,8 +521,7 @@ export default function RoomCountingInterface({
         room_id: selectedRoom,
         inventory_item_id: itemId,
         count: counts[itemId] || 0,
-        organization_id: currentOrg,
-        last_counted_at: new Date().toISOString()
+        organization_id: currentOrg
       }))
 
       // First, delete existing records for only the changed items
@@ -826,7 +809,10 @@ export default function RoomCountingInterface({
           {rooms.map((room) => (
             <button
               key={room.id}
-              onClick={() => setSelectedRoom(room.id)}
+              onClick={() => {
+                setSelectedRoom(room.id)
+                loadRoomCounts(room.id)
+              }}
               className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                 selectedRoom === room.id
                   ? 'bg-blue-50 border-blue-400 shadow-lg'

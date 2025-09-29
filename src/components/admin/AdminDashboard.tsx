@@ -26,13 +26,6 @@ interface AdminMetrics {
   totalInventoryItems: number
   totalSuppliers: number
   totalCategories: number
-  recentActivity: Array<{
-    id: string
-    action: string
-    user_email: string
-    organization_name: string
-    timestamp: string
-  }>
   organizationGrowth: Array<{
     month: string
     count: number
@@ -137,14 +130,6 @@ export default function AdminDashboard() {
       // Calculate average items per organization
       const averageItemsPerOrg = totalOrganizations > 0 ? Math.round(totalInventoryItems / totalOrganizations) : 0
 
-      // Simulate recent activity
-      const recentActivity = countsResult.data?.slice(0, 10).map((count, index) => ({
-        id: count.id || `activity_${index}`,
-        action: 'Inventory Count Updated',
-        user_email: 'user@example.com',
-        organization_name: 'Morris County Golf Club',
-        timestamp: count.created_at || new Date().toISOString()
-      })) || []
 
       // Simulate organization growth over time
       const organizationGrowth = [
@@ -174,7 +159,6 @@ export default function AdminDashboard() {
         totalInventoryItems,
         totalSuppliers,
         totalCategories,
-        recentActivity,
         organizationGrowth,
         featureUsage
       }
@@ -398,27 +382,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl p-6 border border-blue-200 shadow-lg">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            {metrics.recentActivity.slice(0, 8).map((activity, index) => (
-              <div key={`activity-${activity.id}-${index}`} className="flex items-center justify-between py-2 border-b border-blue-100 last:border-b-0">
-                <div className="flex items-center space-x-3">
-                  <Activity className="h-4 w-4 text-blue-500" />
-                  <div>
-                    <p className="text-slate-800 text-sm">{activity.action}</p>
-                    <p className="text-slate-600 text-xs">{activity.organization_name}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-slate-600 text-xs">{new Date(activity.timestamp).toLocaleDateString()}</p>
-                  <p className="text-slate-500 text-xs">{new Date(activity.timestamp).toLocaleTimeString()}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )

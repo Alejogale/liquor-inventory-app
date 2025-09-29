@@ -321,7 +321,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('❌ Organization not found for ID:', profile.organization_id)
         }
       } else {
-        console.log('❌ No organization_id in profile - this is the problem!')
+        console.log('❌ No organization_id in profile - checking if admin user...')
+        
+        // Special handling for admin user - ensure they have an organization
+        if (profile.email === 'alejogaleis@gmail.com' || profile.is_platform_admin) {
+          console.log('🔧 Admin user detected, ensuring organization access...')
+          
+          // Try to find the default organization
+          const { data: defaultOrg, error: orgError } = await supabase
+            .from('organizations')
+            .select('*')
+            .eq('id', '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0')
+            .single()
+          
+          if (defaultOrg) {
+            console.log('✅ Found default organization for admin:', defaultOrg)
+            setOrganization(defaultOrg)
+            
+            // Link admin user to organization
+            const { error: linkError } = await supabase
+              .from('user_profiles')
+              .update({ organization_id: defaultOrg.id })
+              .eq('id', userId)
+            
+            if (linkError) {
+              console.error('❌ Error linking admin to organization:', linkError)
+            } else {
+              console.log('✅ Admin linked to default organization')
+            }
+          } else {
+            console.log('❌ Default organization not found for admin')
+          }
+        }
       }
     } catch (error) {
       console.error('💥 Error in fetchUserProfile:', error)

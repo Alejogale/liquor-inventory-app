@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import QuickBooksIntegration from '../../../../components/QuickBooksIntegration';
 
 export default async function IntegrationsPage() {
   // For demo purposes, we'll assume user is authenticated
@@ -19,9 +18,6 @@ export default async function IntegrationsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          {/* QuickBooks Integration */}
-          <QuickBooksIntegration user={user} />
-          
           {/* Future integrations can go here */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 opacity-50">
             <div className="flex items-center space-x-3 mb-4">

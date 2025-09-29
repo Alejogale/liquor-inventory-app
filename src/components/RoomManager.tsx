@@ -60,14 +60,14 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       }, 300) // Small delay to ensure database is updated
     }
     
-    window.addEventListener('reservationsImported', handleReservationsImported)
-    window.addEventListener('roomsImported', handleRoomsImported)
-    window.addEventListener('forceRoomRefresh', handleForceRoomRefresh)
+    window.addEventListener('reservationsImported', handleReservationsImported as EventListener)
+    window.addEventListener('roomsImported', handleRoomsImported as EventListener)
+    window.addEventListener('forceRoomRefresh', handleForceRoomRefresh as EventListener)
     
     return () => {
-      window.removeEventListener('reservationsImported', handleReservationsImported)
-      window.removeEventListener('roomsImported', handleRoomsImported)
-      window.removeEventListener('forceRoomRefresh', handleForceRoomRefresh)
+      window.removeEventListener('reservationsImported', handleReservationsImported as EventListener)
+      window.removeEventListener('roomsImported', handleRoomsImported as EventListener)
+      window.removeEventListener('forceRoomRefresh', handleForceRoomRefresh as EventListener)
     }
   }, [])
 
@@ -97,10 +97,10 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       }
 
       const { data, error } = await supabase
-        .from('reservation_rooms')
+        .from('rooms')
         .select('*')
         .eq('organization_id', currentOrg)
-        .order('created_at', { ascending: true })
+        .order('display_order')
 
       if (error) {
         console.error('❌ Error fetching rooms:', error)
@@ -122,7 +122,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
     try {
       console.log('🏠 Adding room:', newRoomName.trim())
       
-      // No need to calculate display order for reservation_rooms
+      // Calculate display order for rooms
       
       // Use organizationId prop if available, otherwise fetch from database
       let currentOrg = organizationId;
@@ -147,14 +147,13 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       const insertData = {
         name: newRoomName.trim(),
         organization_id: currentOrg,
-        is_active: true,
-        capacity: 50 // Default capacity
+        display_order: 0 // Default display order
       }
       
       console.log('📝 Insert data:', insertData)
       
       const { data, error } = await supabase
-        .from('reservation_rooms')
+        .from('rooms')
         .insert([insertData])
         .select()
 
@@ -171,7 +170,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       onUpdate?.()
     } catch (error) {
       console.error('💥 Error adding room:', error)
-      alert(`Error adding room: ${error.message}`)
+      alert(`Error adding room: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setSaving(false)
     }
@@ -185,7 +184,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       console.log('✏️ Updating room:', id, name)
       
       const { error } = await supabase
-        .from('reservation_rooms')
+        .from('rooms')
         .update({ name: name.trim() })
         .eq('id', id)
 
@@ -224,7 +223,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
 
       // Delete the room
       const { error } = await supabase
-        .from('reservation_rooms')
+        .from('rooms')
         .delete()
         .eq('id', id)
 
@@ -376,7 +375,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
                     <div>
                       <h4 className="text-slate-800 font-medium">{room.name}</h4>
                       <p className="text-slate-600 text-sm">
-                        Order: {room.display_order} • Created: {new Date(room.created_at).toLocaleDateString()}
+                        Order: {(room as any).display_order || 'N/A'} • Created: {room.created_at ? new Date(room.created_at).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                   )}

@@ -42,6 +42,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
   const [selectedSupplier, setSelectedSupplier] = useState<SupplierOrderGroup | null>(null)
   const [emailAddress, setEmailAddress] = useState('')
   const [emailLoading, setEmailLoading] = useState(false)
+  const [expandedSuppliers, setExpandedSuppliers] = useState<Set<number | null>>(new Set())
 
   useEffect(() => {
     if (user && (organization || organizationId)) {
@@ -271,6 +272,16 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
     setShowEmailModal(true)
   }
 
+  const toggleSupplierDropdown = (supplierId: number | null) => {
+    const newExpanded = new Set(expandedSuppliers)
+    if (newExpanded.has(supplierId)) {
+      newExpanded.delete(supplierId)
+    } else {
+      newExpanded.add(supplierId)
+    }
+    setExpandedSuppliers(newExpanded)
+  }
+
   const handleEmailReport = async () => {
     if (!emailAddress.trim() || !selectedSupplier) {
       alert('Please enter an email address')
@@ -295,7 +306,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         },
         body: JSON.stringify({
           to: emailAddress,
-          organizationName: organization?.name || 'Morris County Golf Club',
+          organizationName: organization?.Name || 'Morris County Golf Club',
           reportData,
           reportDate: new Date().toLocaleDateString(),
           reportUrl: window.location.href
@@ -398,91 +409,113 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
           <p className="text-slate-600">All inventory items are above their threshold levels.</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {supplierGroups.map((supplier, index) => (
-            <div key={`${supplier.supplier_id}-${index}`} className="bg-white rounded-xl p-6 border border-blue-200 shadow-sm">
-              {/* Supplier Header */}
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    🏪 {supplier.supplier_name}
-                    {!supplier.supplier_email && (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
-                        No Email
-                      </span>
-                    )}
-                  </h3>
-                  <p className="text-slate-600">
-                    {supplier.total_items} items • {supplier.total_units} units needed
-                    {supplier.supplier_email && (
-                      <span className="text-green-600 ml-2">📧 {supplier.supplier_email}</span>
-                    )}
-                  </p>
+        <div className="space-y-4">
+          {supplierGroups.map((supplier, index) => {
+            const isExpanded = expandedSuppliers.has(supplier.supplier_id)
+            return (
+              <div key={`${supplier.supplier_id}-${index}`} className="bg-white rounded-xl border border-blue-200 shadow-sm overflow-hidden">
+                {/* Supplier Header - Clickable Dropdown */}
+                <div 
+                  className="p-6 cursor-pointer hover:bg-slate-50 transition-colors"
+                  onClick={() => toggleSupplierDropdown(supplier.supplier_id)}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-90' : 'rotate-0'}`}>
+                        ▶️
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                          🏪 {supplier.supplier_name}
+                          {!supplier.supplier_email && (
+                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+                              No Email
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-slate-600">
+                          {supplier.total_items} items • {supplier.total_units} units needed
+                          {supplier.supplier_email && (
+                            <span className="text-green-600 ml-2">📧 {supplier.supplier_email}</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      {supplier.supplier_email ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleEmailSupplier(supplier)
+                          }}
+                          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2"
+                        >
+                          📧 Email {supplier.supplier_name}
+                        </button>
+                      ) : (
+                        <div className="text-slate-500 text-sm">
+                          Add email in Suppliers tab<br/>to enable direct ordering
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                
-                {supplier.supplier_email ? (
-                  <button
-                    onClick={() => handleEmailSupplier(supplier)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2"
-                  >
-                    📧 Email {supplier.supplier_name}
-                  </button>
-                ) : (
-                  <div className="text-slate-500 text-sm">
-                    Add email in Suppliers tab<br/>to enable direct ordering
+
+                {/* Collapsible Items Section */}
+                {isExpanded && (
+                  <div className="px-6 pb-6 border-t border-slate-200 bg-slate-50">
+                    <div className="pt-4 space-y-3">
+                      {supplier.items.map(item => (
+                        <div key={item.item_id} className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-slate-800 text-lg">{item.brand}</h4>
+                              <p className="text-slate-600 text-sm">{item.category_name}</p>
+                              
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
+                                <div>
+                                  <span className="text-slate-600">Current Stock:</span>
+                                  <span className="text-red-600 font-bold ml-2">{item.current_stock}</span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-600">Threshold:</span>
+                                  <span className="text-slate-800 ml-2">{item.threshold}</span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-600">Par Level:</span>
+                                  <span className="text-slate-800 ml-2">{item.par_level}</span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-600">Order:</span>
+                                  <span className="text-green-600 font-bold ml-2">{item.needed_quantity} units</span>
+                                </div>
+                              </div>
+                              
+                              {item.rooms_with_stock.length > 0 && (
+                                <div className="mt-2">
+                                  <span className="text-slate-600 text-sm">Current locations: </span>
+                                  {item.rooms_with_stock.map((room, idx) => (
+                                    <span key={idx} className="text-blue-600 text-sm">
+                                      {room.room_name} ({room.count}){idx < item.rooms_with_stock.length - 1 ? ', ' : ''}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="bg-red-100 border border-red-300 rounded-lg px-3 py-1">
+                              <span className="text-red-700 font-bold">ORDER NOW</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-
-              {/* Items for this supplier */}
-              <div className="space-y-3">
-                {supplier.items.map(item => (
-                  <div key={item.item_id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-slate-800 text-lg">{item.brand}</h4>
-                        <p className="text-slate-600 text-sm">{item.category_name}</p>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
-                          <div>
-                            <span className="text-slate-600">Current Stock:</span>
-                            <span className="text-red-600 font-bold ml-2">{item.current_stock}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-600">Threshold:</span>
-                            <span className="text-slate-800 ml-2">{item.threshold}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-600">Par Level:</span>
-                            <span className="text-slate-800 ml-2">{item.par_level}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-600">Order:</span>
-                            <span className="text-green-600 font-bold ml-2">{item.needed_quantity} units</span>
-                          </div>
-                        </div>
-                        
-                        {item.rooms_with_stock.length > 0 && (
-                          <div className="mt-2">
-                            <span className="text-slate-600 text-sm">Current locations: </span>
-                            {item.rooms_with_stock.map((room, idx) => (
-                              <span key={idx} className="text-blue-600 text-sm">
-                                {room.room_name} ({room.count}){idx < item.rooms_with_stock.length - 1 ? ', ' : ''}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="bg-red-100 border border-red-300 rounded-lg px-3 py-1">
-                        <span className="text-red-700 font-bold">ORDER NOW</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

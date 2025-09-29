@@ -5,7 +5,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-07-30.basil',
   typescript: true,
 });
 
@@ -18,12 +18,8 @@ export const getStripe = () => {
   );
 };
 
-// Price IDs for your plans (you'll get these from Stripe Dashboard)
+// Price IDs for your plans from Stripe Dashboard
 export const STRIPE_PRICE_IDS = {
-  starter_monthly: 'price_starter_monthly_id',
-  starter_annual: 'price_starter_annual_id', 
-  professional_monthly: 'price_professional_monthly_id',
-  professional_annual: 'price_professional_annual_id',
-  enterprise_monthly: 'price_enterprise_monthly_id',
-  enterprise_annual: 'price_enterprise_annual_id',
+  pro_monthly: 'price_1SCW6jGp6QH8POrP1X7faANK', // $10/month
+  pro_annual: 'price_1SCW89Gp6QH8POrP7dPZ5dED',  // $100/year
 } as const;

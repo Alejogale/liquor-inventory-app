@@ -132,7 +132,9 @@ export default function EnhancedReports() {
         return {
           ...item,
           roomCounts,
-          totalCount
+          totalCount,
+          categories: item.categories?.[0] || { name: 'Unknown' },
+          suppliers: item.suppliers?.[0] || { name: 'Unknown' }
         }
       }) || []
 

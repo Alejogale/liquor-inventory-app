@@ -3,34 +3,17 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { 
-  Activity, 
   User, 
-  Clock, 
-  MapPin, 
-  Package, 
   Mail, 
   Download,
   Send,
   CheckCircle,
-  AlertCircle,
   Calendar,
-  Database,
   BarChart3,
   FileText,
   Building2
 } from 'lucide-react'
 
-interface ActivityLog {
-  id: string
-  user_email: string
-  action_type: 'count_updated' | 'item_added' | 'item_edited' | 'room_changed' | 'report_sent'
-  item_brand?: string
-  room_name?: string
-  old_value?: number
-  new_value?: number
-  change_type?: 'scan' | 'manual' | 'button'
-  created_at: string
-}
 
 interface InventoryReport {
   categories: {
@@ -55,13 +38,11 @@ interface ActivityDashboardProps {
 }
 
 export default function ActivityDashboard({ userEmail, organizationId }: ActivityDashboardProps) {
-  const [activities, setActivities] = useState<ActivityLog[]>([])
   const [loading, setLoading] = useState(true)
   const [sendingReport, setSendingReport] = useState(false)
   const [managerEmails, setManagerEmails] = useState(['manager@example.com'])
   const [newEmail, setNewEmail] = useState('')
   const [reportSent, setReportSent] = useState(false)
-  const [databaseError, setDatabaseError] = useState<string | null>(null)
   
   // Enhanced Reports State
   const [categoryReports, setCategoryReports] = useState<any[]>([])
@@ -113,67 +94,17 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       
       if (organizationId) {
         console.log('🔄 Initializing dashboard with organization:', organizationId)
-        await fetchActivityLogs()
+        setLoading(false) // Set loading to false since we're not fetching activity logs anymore
         await generateEnhancedReports() // Auto-generate reports when component loads
       } else {
         console.log('⚠️ No organization ID provided, skipping dashboard initialization')
+        setLoading(false) // Set loading to false even if no organization
       }
     }
 
     initializeDashboard()
   }, [organizationId])
 
-  const fetchActivityLogs = async () => {
-    try {
-      setLoading(true)
-      setDatabaseError(null)
-      console.log('📋 Fetching real activity logs...')
-
-      const currentOrg = await getCurrentOrganization()
-      if (!currentOrg) {
-        console.log('⚠️ No organization found for activity logs, skipping fetch')
-        setActivities([])
-        setLoading(false)
-        return
-      }
-
-      console.log('🔍 Fetching activity logs for organization:', currentOrg)
-      
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select('*')
-        .eq('organization_id', currentOrg)
-        .order('created_at', { ascending: false })
-        .limit(50) // Get last 50 activities
-
-      if (error) {
-        console.error('❌ Error fetching activity logs:', error)
-        
-        // Check if it's a table not found error
-        if (error.message?.includes('relation "activity_logs" does not exist') || 
-            error.code === 'PGRST116' || 
-            error.message?.includes('does not exist')) {
-          setDatabaseError('table_missing')
-        } else if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
-          console.log('🔐 Authentication error, user may not be logged in')
-          setActivities([])
-        } else {
-          setDatabaseError('generic_error')
-        }
-        setActivities([])
-      } else {
-        console.log('✅ Real activity logs loaded:', data?.length)
-        setActivities(data || [])
-      }
-
-    } catch (error: any) {
-      console.error('💥 Error fetching activity logs:', error)
-      setDatabaseError('network_error')
-      setActivities([])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const generateInventoryReport = async (): Promise<InventoryReport> => {
     console.log('📊 Generating inventory report...')
@@ -447,21 +378,19 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       const report = await generateInventoryReport()
 
       // Try to log the report generation activity (only if table exists)
-      if (!databaseError) {
-        try {
-          const currentOrg = await getCurrentOrganization()
-          if (currentOrg) {
-            await supabase
-              .from('activity_logs')
-              .insert([{
-                user_email: userEmail,
-                action_type: 'report_sent',
-                organization_id: currentOrg  // Use dynamic organization
-              }])
-          }
-        } catch (logError) {
-          console.warn('Could not log report activity:', logError)
+      try {
+        const currentOrg = await getCurrentOrganization()
+        if (currentOrg) {
+          await supabase
+            .from('activity_logs')
+            .insert([{
+              user_email: userEmail,
+              action_type: 'report_sent',
+              organization_id: currentOrg  // Use dynamic organization
+            }])
         }
+      } catch (logError) {
+        console.warn('Could not log report activity:', logError)
       }
 
       // Create email content
@@ -481,9 +410,6 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
 
       setReportSent(true)
       setTimeout(() => setReportSent(false), 5000) // Clear success message after 5 seconds
-
-      // Refresh activity logs to show the report_sent activity
-      fetchActivityLogs()
 
       console.log('✅ Report sent successfully')
 
@@ -547,48 +473,6 @@ Total: ${item.totalCount} bottles
     setManagerEmails(managerEmails.filter(e => e !== email))
   }
 
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins}m ago`
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
-  }
-
-  const getActivityIcon = (actionType: string) => {
-    switch (actionType) {
-      case 'count_updated': return <Package className="h-5 w-5 text-blue-400" />
-      case 'room_changed': return <MapPin className="h-5 w-5 text-green-400" />
-      case 'item_added': return <Package className="h-5 w-5 text-purple-400" />
-      case 'item_edited': return <Package className="h-5 w-5 text-orange-400" />
-      case 'report_sent': return <Mail className="h-5 w-5 text-pink-400" />
-      default: return <Activity className="h-5 w-5 text-gray-400" />
-    }
-  }
-
-  const getActivityDescription = (activity: ActivityLog) => {
-    switch (activity.action_type) {
-      case 'count_updated':
-        return `updated ${activity.item_brand} in ${activity.room_name}`
-      case 'room_changed':
-        return `switched to ${activity.room_name}`
-      case 'item_added':
-        return `added new item ${activity.item_brand}`
-      case 'item_edited':
-        return `edited ${activity.item_brand}`
-      case 'report_sent':
-        return `sent inventory report to managers`
-      default:
-        return 'performed an action'
-    }
-  }
 
   if (loading) {
     return (
@@ -624,50 +508,9 @@ Total: ${item.totalCount} bottles
               </>
             )}
           </button>
-          <button
-            onClick={fetchActivityLogs}
-            className="flex items-center space-x-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
-          >
-            <Activity className="h-4 w-4" />
-            <span>Refresh</span>
-          </button>
         </div>
       </div>
 
-      {/* Database Setup Warning */}
-      {databaseError === 'table_missing' && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            <Database className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-yellow-800 font-medium">Activity Logging Setup Required</h4>
-              <p className="text-yellow-700 text-sm mt-1">
-                The activity_logs table doesn&apos;t exist yet. To enable activity tracking:
-              </p>
-              <ol className="text-yellow-700 text-sm mt-2 ml-4 list-decimal">
-                <li>Go to your Supabase SQL Editor</li>
-                <li>Run the CREATE TABLE script for activity_logs</li>
-                <li>Refresh this page</li>
-              </ol>
-              <p className="text-yellow-700 text-sm mt-2">
-                Reports will still work without activity logging.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {databaseError === 'generic_error' && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            <span className="text-red-800 font-medium">Database Error</span>
-          </div>
-          <p className="text-red-700 text-sm mt-1">
-            Unable to load activity logs. Check your database connection and permissions.
-          </p>
-        </div>
-      )}
 
       {/* Success Message */}
       {reportSent && (
@@ -723,86 +566,6 @@ Total: ${item.totalCount} bottles
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-        <div className="p-6 border-b border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-800 flex items-center">
-            <Activity className="h-5 w-5 mr-2 text-green-600" />
-            Recent Activity
-            {!databaseError && (
-              <span className="ml-2 text-slate-600 text-sm">
-                ({activities.length} activities)
-              </span>
-            )}
-          </h3>
-        </div>
-
-        <div className="p-6">
-          {databaseError ? (
-            <div className="text-center py-8">
-              <Database className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600">Activity logging not yet set up</p>
-              <p className="text-slate-500 text-sm mt-1">
-                Create the activity_logs table to start tracking changes
-              </p>
-            </div>
-          ) : activities.length === 0 ? (
-            <div className="text-center py-8">
-              <Activity className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600">No recent activity</p>
-              <p className="text-slate-500 text-sm mt-1">
-                Start counting inventory to see activity here
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="flex-shrink-0">
-                    {getActivityIcon(activity.action_type)}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-slate-800 font-medium">
-                        {activity.user_email}
-                      </span>
-                      <span className="text-slate-600">
-                        {getActivityDescription(activity)}
-                      </span>
-                    </div>
-                    
-                    {activity.action_type === 'count_updated' && (
-                      <div className="flex items-center space-x-4 mt-1 text-sm">
-                        <span className="text-slate-600">
-                          {activity.old_value} → {activity.new_value} bottles
-                        </span>
-                        {activity.change_type && (
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            activity.change_type === 'scan' ? 'bg-green-100 text-green-700' :
-                            activity.change_type === 'button' ? 'bg-blue-100 text-blue-700' :
-                            'bg-slate-100 text-slate-600'
-                          }`}>
-                            {activity.change_type === 'scan' ? '📱 Scanned' : 
-                             activity.change_type === 'button' ? '🔘 Button' : '✏️ Manual'}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center space-x-2 mt-2 text-sm text-slate-500">
-                      <Clock className="h-3 w-3" />
-                      <span>{formatTimeAgo(activity.created_at)}</span>
-                      <span>•</span>
-                      <span>{new Date(activity.created_at).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Enhanced Reports Section */}
       <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
@@ -951,6 +714,14 @@ Total: ${item.totalCount} bottles
           </div>
         )}
 
+        {reportsLoading && (
+          <div className="text-center py-8">
+            <div className="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-slate-600">Generating reports...</p>
+            <p className="text-slate-500 text-sm mt-1">Please wait while we fetch your inventory data</p>
+          </div>
+        )}
+
         {categoryReports.length === 0 && !reportsLoading && (
           <div className="text-center py-8">
             <BarChart3 className="h-12 w-12 text-slate-400 mx-auto mb-4" />
@@ -958,6 +729,17 @@ Total: ${item.totalCount} bottles
             <p className="text-slate-500 text-sm mt-1">
               Click "Generate Reports" to create comprehensive inventory reports
             </p>
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-800 text-sm">
+                <strong>Note:</strong> Reports will show your inventory items organized by category. 
+                If you don't see any data, make sure you have:
+              </p>
+              <ul className="text-blue-700 text-sm mt-2 text-left">
+                <li>• Added inventory items in the Inventory tab</li>
+                <li>• Created categories in the Categories tab</li>
+                <li>• Added room counts in the Count tab</li>
+              </ul>
+            </div>
           </div>
         )}
       </div>

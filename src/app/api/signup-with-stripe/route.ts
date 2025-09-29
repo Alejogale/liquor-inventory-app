@@ -13,19 +13,11 @@ const supabaseAdmin = createClient(
   }
 )
 
-// Stripe price IDs mapping - using environment variables
+// Stripe price IDs mapping
 const STRIPE_PRICE_IDS = {
-  starter: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter_monthly',
-    annual: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || 'price_starter_annual'
-  },
-  professional: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || 'price_professional_monthly',
-    annual: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID || 'price_professional_annual'
-  },
-  enterprise: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise_monthly',
-    annual: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_ANNUAL_PRICE_ID || 'price_enterprise_annual'
+  pro: {
+    monthly: 'price_1SCW6jGp6QH8POrP1X7faANK', // $10/month
+    annual: 'price_1SCW89Gp6QH8POrP7dPZ5dED'   // $100/year
   }
 }
 
@@ -188,18 +180,18 @@ export async function POST(request: NextRequest) {
       .update({ stripe_customer_id: customer.id })
       .eq('id', organization.id)
 
-    // Get the appropriate Stripe price ID
-    const priceId = STRIPE_PRICE_IDS[plan as keyof typeof STRIPE_PRICE_IDS]?.[billingCycle as keyof typeof STRIPE_PRICE_IDS.starter]
+    // Get the appropriate Stripe price ID (default to pro plan)
+    const priceId = STRIPE_PRICE_IDS.pro[billingCycle as keyof typeof STRIPE_PRICE_IDS.pro]
     
     if (!priceId) {
-      console.error('Invalid plan or billing cycle:', { plan, billingCycle })
+      console.error('Invalid billing cycle:', { billingCycle })
       return NextResponse.json(
-        { error: 'Invalid plan or billing cycle' },
+        { error: 'Invalid billing cycle. Must be "monthly" or "annual"' },
         { status: 400 }
       )
     }
 
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout Session with 30-day free trial
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       payment_method_types: ['card'],
@@ -221,6 +213,7 @@ export async function POST(request: NextRequest) {
         primary_app: primaryApp
       },
       subscription_data: {
+        trial_period_days: 30, // 30-day free trial
         metadata: {
           organization_id: organization.id,
           user_id: userData.user.id,
@@ -260,7 +253,7 @@ export async function POST(request: NextRequest) {
           employees: employees,
           stripe_session_id: session.id
         },
-        ip_address: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown'
       })
 

@@ -4,13 +4,13 @@ import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-10-28.acacia'
+  apiVersion: '2025-07-30.basil'
 })
 
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabaseClient = createRouteHandlerClient({ cookies: () => Promise.resolve(cookieStore) })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -66,10 +66,9 @@ export async function GET(request: NextRequest) {
       hostedInvoiceUrl: invoice.hosted_invoice_url,
       invoicePdf: invoice.invoice_pdf,
       description: invoice.description,
-      subscription: invoice.subscription ? {
-        id: invoice.subscription.id,
-        // @ts-expect-error - Stripe types might not include all expanded fields
-        plan: invoice.subscription.items?.data[0]?.price?.nickname || 'Unknown Plan'
+      subscription: (invoice as any).subscription ? {
+        id: (invoice as any).subscription.id,
+        plan: (invoice as any).subscription.items?.data[0]?.price?.nickname || 'Unknown Plan'
       } : null,
       lineItems: invoice.lines.data.map(line => ({
         id: line.id,

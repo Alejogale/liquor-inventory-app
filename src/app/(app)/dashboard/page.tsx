@@ -30,11 +30,8 @@ import RoomManager from '@/components/RoomManager'
 import ActivityDashboard from '@/components/ActivityDashboard'
 import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
-import QuickBooksIntegration from '@/components/QuickBooksIntegration'
 import SubscriptionManager from '@/components/SubscriptionManager'
-import EmailTester from '@/components/EmailTester'
 import UserPermissions from '@/components/UserPermissions'
-import AppAccessGuard from '@/components/AppAccessGuard'
 
 
 interface Category {
@@ -99,6 +96,14 @@ function DashboardContent() {
 
   // Get the correct organization ID - for admin, use the known organization ID if context is missing
   const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : undefined)
+  
+  console.log('🔍 Dashboard state:', {
+    user: user?.email,
+    organization: organization?.Name,
+    organizationId,
+    isAdmin,
+    loading
+  })
 
   useEffect(() => {
     // Admin user can load data even without organization context
@@ -110,6 +115,15 @@ function DashboardContent() {
         orgId: organizationId 
       })
       fetchData()
+    } else {
+      console.log('⚠️ Dashboard not loading data:', { 
+        hasUser: !!user, 
+        hasOrg: !!organization, 
+        isAdmin: isAdmin,
+        orgId: organizationId 
+      })
+      // Set loading to false if we can't load data
+      setLoading(false)
     }
   }, [user, organization, isAdmin])
 
@@ -129,6 +143,7 @@ function DashboardContent() {
 
       if (!organizationId) {
         console.log('⚠️ No organization found, skipping data fetch')
+        setLoading(false)
         return
       }
 
@@ -931,48 +946,45 @@ function DashboardContent() {
 
 
 
-            {activeTab === 'integrations' && (
-              <div className="p-6">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Integrations</h2>
-                  <p className="text-gray-600 mt-1">Connect with QuickBooks and other business tools</p>
-                </div>
-                <QuickBooksIntegration user={user} />
-              </div>
-            )}
 
             {activeTab === 'subscription' && (
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Subscription & Team Management</h2>
-                  <p className="text-gray-600 mt-1">Manage your subscription, team members, and app access</p>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Billing & Account</h2>
+                  <p className="text-gray-600 mt-1">Manage your subscription and account settings</p>
                 </div>
                 
-                {/* Subscription Management */}
+                {/* Billing Management */}
                 <div className="space-y-8">
                   <SubscriptionManager />
                   
-                  {/* Team & Permissions Management */}
-                  {(userProfile?.role === 'owner' || userProfile?.role === 'manager') && (
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Team & Permissions</h3>
-                      <p className="text-gray-600 mb-6">Manage team member roles and access permissions</p>
-                      <UserPermissions organizationId={organization?.id} />
+                  {/* Account Cancellation */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Account Management</h3>
+                    <p className="text-gray-600 mb-6">Need to cancel your account or have billing questions?</p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => window.open('mailto:support@liquorinventory.com?subject=Account Cancellation Request', '_blank')}
+                        className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                      >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>Contact Support</span>
+                      </button>
+                      
+                      <div className="text-sm text-gray-600">
+                        <p>• Account cancellation requests</p>
+                        <p>• Billing questions and support</p>
+                        <p>• Feature requests and feedback</p>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'email-testing' && (
-              <div className="p-6">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Email System Testing</h2>
-                  <p className="text-gray-600 mt-1">Test all email templates with consistent design</p>
-                </div>
-                <EmailTester />
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -1019,17 +1031,5 @@ function DashboardContent() {
 }
 
 export default function Dashboard() {
-  return (
-    <AppAccessGuard 
-      appId="liquor-inventory" 
-      appName="Liquor Inventory"
-      fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-gray-800 text-xl">Loading Liquor Inventory...</div>
-        </div>
-      }
-    >
-      <DashboardContent />
-    </AppAccessGuard>
-  )
+  return <DashboardContent />
 }

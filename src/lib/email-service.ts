@@ -5,7 +5,12 @@ let resend: Resend | null = null
 
 if (typeof window === 'undefined') {
   // Server side only
-  resend = new Resend(process.env.RESEND_API_KEY)
+  const apiKey = process.env.RESEND_API_KEY
+  if (apiKey && apiKey !== 'your_resend_api_key_here') {
+    resend = new Resend(apiKey)
+  } else {
+    console.warn('Resend API key not configured. Email functionality will be disabled.')
+  }
 }
 
 // Email Design System - Consistent across all apps

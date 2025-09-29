@@ -169,7 +169,7 @@ export default function UserAnalytics() {
         user_email: activity.user_email,
         action_type: activity.action_type,
         created_at: activity.created_at,
-        organization_name: activity.organizations?.name || 'Unknown'
+        organization_name: activity.organizations?.[0]?.name || 'Unknown'
       })) || []
 
       setAnalytics({

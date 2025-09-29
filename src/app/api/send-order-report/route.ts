@@ -6,7 +6,7 @@ import { sendOrderReport } from '@/lib/email-service'
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createRouteHandlerClient({ cookies: () => Promise.resolve(cookieStore) })
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()

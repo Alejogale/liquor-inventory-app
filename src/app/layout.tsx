@@ -3,12 +3,12 @@ import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
-  title: 'Hospitality Hub – Easy, Reliable Hospitality Apps',
-  description: 'All-in-one hospitality software that\'s simple, reliable, and affordable. Try our easy inventory, reservations, and member tools today.',
-  keywords: 'hospitality software, hospitality apps, liquor inventory software, restaurant reservation system, member database',
+  title: 'Liquor Inventory System – Professional Inventory Management',
+  description: 'Professional liquor inventory management system for bars and restaurants. Track stock, manage suppliers, and streamline operations.',
+  keywords: 'liquor inventory, bar inventory, restaurant inventory, inventory management, barcode scanning, supplier management',
   openGraph: {
-    title: 'Hospitality Hub – Easy, Reliable Hospitality Apps',
-    description: 'All-in-one hospitality software that\'s simple, reliable, and affordable. Try our easy inventory, reservations, and member tools today.',
+    title: 'Liquor Inventory System – Professional Inventory Management',
+    description: 'Professional liquor inventory management system for bars and restaurants. Track stock, manage suppliers, and streamline operations.',
     type: 'website',
   },
 }

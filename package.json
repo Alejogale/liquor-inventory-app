@@ -1,9 +1,9 @@
 {
-  "name": "hospitality-hub",
+  "name": "liquor-inventory-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 3002",
+    "dev": "next dev --turbopack -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -15,7 +15,6 @@
     "@supabase/supabase-js": "^2.53.0",
     "dotenv": "^17.2.1",
     "framer-motion": "^11.0.0",
-    "intuit-oauth": "^4.2.0",
     "lucide-react": "^0.536.0",
     "next": "15.4.5",
     "react": "19.1.0",

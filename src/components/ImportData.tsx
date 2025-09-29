@@ -369,29 +369,52 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
 
       // Process based on import type
       if (activeImportType === 'categories') {
-        // Import categories
+        // Import categories with duplicate prevention
         const categoryData = previewData.map(item => ({
           name: item.name,
           organization_id: currentOrg
         }))
 
-        console.log('📝 Importing categories:', categoryData)
+        console.log('📝 Importing categories (preventing duplicates):', categoryData)
 
-        const { data, error } = await supabase
+        // First, get existing categories to avoid duplicates
+        const { data: existingCategories } = await supabase
           .from('categories')
-          .insert(categoryData)
-          .select()
+          .select('name')
+          .eq('organization_id', currentOrg)
 
-        if (error) {
-          console.error('❌ Category import error:', error)
-          throw new Error(`Failed to import categories: ${error.message}`)
+        const existingNames = new Set(existingCategories?.map(cat => cat.name.toLowerCase()) || [])
+        
+        // Filter out duplicates - keep only unique category names
+        const uniqueCategories = categoryData.filter(category => 
+          !existingNames.has(category.name.toLowerCase())
+        )
+
+        console.log(`📊 Found ${categoryData.length} categories, ${uniqueCategories.length} unique (${categoryData.length - uniqueCategories.length} duplicates skipped)`)
+
+        let importedCount = 0
+        let errorCount = 0
+
+        if (uniqueCategories.length > 0) {
+          const { data, error } = await supabase
+            .from('categories')
+            .insert(uniqueCategories)
+            .select()
+
+          if (error) {
+            console.error('❌ Category import error:', error)
+            throw new Error(`Failed to import categories: ${error.message}`)
+          }
+
+          importedCount = data?.length || 0
+          console.log('✅ Categories imported successfully:', data)
         }
 
-        console.log('✅ Categories imported successfully:', data)
         importResults = {
           success: true,
-          imported: data?.length || 0,
-          errors: 0
+          imported: importedCount,
+          errors: errorCount,
+          duplicatesSkipped: categoryData.length - uniqueCategories.length
         }
 
       } else if (activeImportType === 'suppliers') {
@@ -1615,6 +1638,11 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             }`}>
               ✅ <strong>Successfully imported:</strong> {importResults.imported} items
             </p>
+            {importResults.duplicatesSkipped > 0 && (
+              <p className="text-sm text-yellow-700">
+                ⚠️ <strong>Duplicates skipped:</strong> {importResults.duplicatesSkipped} items (first one kept)
+              </p>
+            )}
               {importResults.errors > 0 && (
               <p className="text-sm text-red-700">
                 ❌ <strong>Failed:</strong> {importResults.errors} items

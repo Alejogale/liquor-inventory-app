@@ -1,0 +1,117 @@
+
+> hospitality-hub@0.1.0 dev
+> next dev --turbopack -p 3000
+
+ ⚠ Warning: Found multiple lockfiles. Selecting /Users/alejandrogaleano/Desktop/package-lock.json.
+   Consider removing the lockfiles at:
+   * /Users/alejandrogaleano/Desktop/my-projects/liquor-inventory-app/package-lock.json
+
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.96:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 590ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1152ms
+ HEAD / 200 in 1347ms
+ GET / 200 in 88ms
+ GET / 200 in 81ms
+ ✓ Compiled /login in 165ms
+ GET /login 200 in 189ms
+ ✓ Compiled /apps in 172ms
+ GET /apps 200 in 194ms
+ ✓ Compiled /dashboard in 337ms
+ GET /dashboard 200 in 356ms
+ ⨯ Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at [project]/src/lib/email-service.ts [app-ssr] (ecmascript) (src/lib/email-service.ts:8:11)
+    at [project]/src/components/EmailTester.tsx [app-ssr] (ecmascript) (src/components/EmailTester.tsx:5:0)
+    at [project]/src/app/(app)/dashboard/page.tsx [app-ssr] (ecmascript) (src/app/(app)/dashboard/page.tsx:35:0)
+   6 | if (typeof window === 'undefined') {
+   7 |   // Server side only
+>  8 |   resend = new Resend(process.env.RESEND_API_KEY)
+     |           ^
+   9 | }
+  10 |
+  11 | // Email Design System - Consistent across all apps {
+  digest: '4239966392'
+}
+ GET /dashboard 500 in 200ms
+ ✓ Compiled /favicon.ico in 92ms
+ GET /favicon.ico?favicon.45db1c09.ico 200 in 352ms
+ GET /login 200 in 40ms
+ GET / 200 in 40ms
+ GET /login 200 in 43ms
+ GET /apps 200 in 37ms
+ GET /dashboard 200 in 39ms
+ GET /apps 200 in 42ms
+ GET /dashboard 200 in 38ms
+ ⨯ Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at [project]/src/lib/email-service.ts [app-ssr] (ecmascript) (src/lib/email-service.ts:8:11)
+    at [project]/src/components/EmailTester.tsx [app-ssr] (ecmascript) (src/components/EmailTester.tsx:5:0)
+    at [project]/src/app/(app)/dashboard/page.tsx [app-ssr] (ecmascript) (src/app/(app)/dashboard/page.tsx:35:0)
+   6 | if (typeof window === 'undefined') {
+   7 |   // Server side only
+>  8 |   resend = new Resend(process.env.RESEND_API_KEY)
+     |           ^
+   9 | }
+  10 |
+  11 | // Email Design System - Consistent across all apps {
+  digest: '4239966392'
+}
+ GET /dashboard 500 in 160ms
+ ⨯ Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at [project]/src/lib/email-service.ts [app-ssr] (ecmascript) (src/lib/email-service.ts:8:11)
+    at [project]/src/components/EmailTester.tsx [app-ssr] (ecmascript) (src/components/EmailTester.tsx:5:0)
+    at [project]/src/app/(app)/dashboard/page.tsx [app-ssr] (ecmascript) (src/app/(app)/dashboard/page.tsx:35:0)
+   6 | if (typeof window === 'undefined') {
+   7 |   // Server side only
+>  8 |   resend = new Resend(process.env.RESEND_API_KEY)
+     |           ^
+   9 | }
+  10 |
+  11 | // Email Design System - Consistent across all apps {
+  digest: '4239966392'
+}
+ GET /dashboard 500 in 159ms
+ GET /login 200 in 42ms
+ GET / 200 in 36ms
+ GET /login 200 in 40ms
+ GET /apps 200 in 32ms
+ ✓ Compiled /reservations in 149ms
+ GET /reservations 200 in 168ms
+ GET /apps 200 in 32ms
+ GET /dashboard 200 in 39ms
+ ⨯ Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at [project]/src/lib/email-service.ts [app-ssr] (ecmascript) (src/lib/email-service.ts:8:11)
+    at [project]/src/components/EmailTester.tsx [app-ssr] (ecmascript) (src/components/EmailTester.tsx:5:0)
+    at [project]/src/app/(app)/dashboard/page.tsx [app-ssr] (ecmascript) (src/app/(app)/dashboard/page.tsx:35:0)
+   6 | if (typeof window === 'undefined') {
+   7 |   // Server side only
+>  8 |   resend = new Resend(process.env.RESEND_API_KEY)
+     |           ^
+   9 | }
+  10 |
+  11 | // Email Design System - Consistent across all apps {
+  digest: '4239966392'
+}
+ GET /dashboard 500 in 159ms
+ ⨯ Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at [project]/src/lib/email-service.ts [app-ssr] (ecmascript) (src/lib/email-service.ts:8:11)
+    at [project]/src/components/EmailTester.tsx [app-ssr] (ecmascript) (src/components/EmailTester.tsx:5:0)
+    at [project]/src/app/(app)/dashboard/page.tsx [app-ssr] (ecmascript) (src/app/(app)/dashboard/page.tsx:35:0)
+   6 | if (typeof window === 'undefined') {
+   7 |   // Server side only
+>  8 |   resend = new Resend(process.env.RESEND_API_KEY)
+     |           ^
+   9 | }
+  10 |
+  11 | // Email Design System - Consistent across all apps {
+  digest: '4239966392'
+}
+ GET /dashboard 500 in 160ms
+ GET /login 200 in 41ms
+ GET / 200 in 37ms

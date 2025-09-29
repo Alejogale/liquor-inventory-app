@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const supabaseClient = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabaseClient = createRouteHandlerClient({ cookies: () => Promise.resolve(cookieStore) })
     const { data: { user } } = await supabaseClient.auth.getUser()
 
     if (!user) {
@@ -69,10 +69,10 @@ export async function GET(request: NextRequest) {
 
     // Calculate usage percentages
     const userUsagePercent = planLimits.maxUsers === -1 ? 0 : 
-      Math.round((activeUsers / planLimits.maxUsers) * 100)
+      Math.round(((activeUsers || 0) / planLimits.maxUsers) * 100)
     
     const itemUsagePercent = planLimits.maxItems === -1 ? 0 :
-      Math.round((inventoryItems / planLimits.maxItems) * 100)
+      Math.round(((inventoryItems || 0) / planLimits.maxItems) * 100)
 
     // Get recent activity count (last 30 days)
     const thirtyDaysAgo = new Date()
@@ -135,7 +135,7 @@ function getPlanLimits(plan: string) {
       maxUsers: 25,
       maxItems: -1, // Unlimited
       maxApps: -1, // All apps
-      features: ['Advanced inventory management', 'Unlimited items', 'Priority support', 'Advanced reporting', 'QuickBooks integration']
+      features: ['Advanced inventory management', 'Unlimited items', 'Priority support', 'Advanced reporting', 'Third-party integrations']
     },
     enterprise: {
       maxUsers: -1, // Unlimited

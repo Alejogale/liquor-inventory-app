@@ -84,8 +84,8 @@ export default function InvitePage() {
 
       setInvitation({
         ...data,
-        organization: data.organizations,
-        invited_by: data.user_profiles
+        organization: data.organizations?.[0] || null,
+        invited_by: data.user_profiles?.[0] || null
       })
 
     } catch (err) {

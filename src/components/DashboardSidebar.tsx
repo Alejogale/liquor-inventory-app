@@ -55,9 +55,7 @@ export default function DashboardSidebar({
     { id: 'count', label: 'Count', icon: Building2, description: 'Room counting' },
     { id: 'orders', label: 'Orders', icon: ShoppingCart, description: 'Order reports' },
     { id: 'activity', label: 'Activity & Reports', icon: Activity, description: 'Analytics, logs & CSV export' },
-    { id: 'integrations', label: 'Integrations', icon: Settings, description: 'QuickBooks & more' },
-    { id: 'subscription', label: 'Team & Billing', icon: CreditCard, description: 'Manage subscription & team' },
-    ...(isAdmin ? [{ id: 'email-testing', label: 'Email Testing', icon: Mail, description: 'Test email templates' }] : [])
+    { id: 'subscription', label: 'Billing & Account', icon: CreditCard, description: 'Manage subscription & billing' }
   ]
 
   return (
@@ -95,8 +93,8 @@ export default function DashboardSidebar({
                 </div>
                 {!isCollapsed && (
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">LiquorTrack</h1>
-                    <p className="text-gray-600 text-sm">Inventory System</p>
+                    <h1 className="text-xl font-bold text-gray-900">Liquor Inventory</h1>
+                    <p className="text-gray-600 text-sm">Management System</p>
                   </div>
                 )}
               </div>
@@ -136,34 +134,6 @@ export default function DashboardSidebar({
 
           {/* Navigation */}
           <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {/* Back to Apps Link */}
-            <Link
-              href="/apps"
-              className="w-full group relative flex items-center p-3 rounded-xl transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-slate-50 border border-transparent hover:border-purple-200"
-            >
-              <Home className="h-5 w-5 flex-shrink-0 text-purple-600 group-hover:text-purple-700" />
-              
-              {!isCollapsed && (
-                <div className="ml-3 text-left">
-                  <p className="text-sm font-medium text-purple-700 group-hover:text-purple-800">
-                    Back to Apps
-                  </p>
-                  <p className="text-xs text-purple-600 group-hover:text-purple-700">
-                    App launcher
-                  </p>
-                </div>
-              )}
-
-              {/* Tooltip for collapsed state */}
-              {isCollapsed && (
-                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                  Back to Apps
-                </div>
-              )}
-            </Link>
-
-            {/* Divider */}
-            <div className="border-t border-slate-200 my-3"></div>
 
             {navigationItems.map((item) => {
               const Icon = item.icon
