@@ -172,18 +172,18 @@ export default function LandingPage() {
           </div>
           
           {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-gray-600">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-gray-600">
             <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-              <span>No credit card required</span>
+              <span className="text-sm sm:text-base">No credit card required</span>
             </div>
             <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <span>Setup in 5 minutes</span>
+                <span className="text-sm sm:text-base">Setup in 5 minutes</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-              <span>30-day free trial</span>
+              <span className="text-sm sm:text-base">30-day free trial</span>
             </div>
             </div>
           </div>
@@ -202,9 +202,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Mobile-First Design */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-6">
                 <Smartphone className="w-6 h-6 text-white" />
               </div>
@@ -215,7 +215,7 @@ export default function LandingPage() {
             </div>
 
             {/* Real-Time Sync */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6">
                 <Globe className="w-6 h-6 text-white" />
               </div>
@@ -226,7 +226,7 @@ export default function LandingPage() {
             </div>
 
             {/* Smart Categories */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
                 <Package className="w-6 h-6 text-white" />
               </div>
@@ -237,7 +237,7 @@ export default function LandingPage() {
             </div>
 
             {/* Multi-Location */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
@@ -248,7 +248,7 @@ export default function LandingPage() {
             </div>
 
             {/* Team Access */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
                 <Users className="w-6 h-6 text-white" />
               </div>
@@ -259,7 +259,7 @@ export default function LandingPage() {
             </div>
 
             {/* Analytics */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
               <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center mb-6">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
@@ -286,7 +286,7 @@ export default function LandingPage() {
 
           <div className="space-y-20">
             {/* Barcode Scanner Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
                   <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
@@ -356,9 +356,9 @@ export default function LandingPage() {
             </div>
 
             {/* Rooms & Locations Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="order-2 lg:order-1">
-                <div className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100">
+                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-orange-100">
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-4 text-white text-center">
                       <Building2 className="w-6 h-6 mx-auto mb-2" />
@@ -433,7 +433,7 @@ export default function LandingPage() {
                 </div>
 
             {/* Import & Export Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-6">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -526,9 +526,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Home Organization */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
                 <Home className="w-8 h-8 text-white" />
               </div>
@@ -557,7 +557,7 @@ export default function LandingPage() {
             </div>
 
             {/* Hobby & Collectibles */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
                 <Heart className="w-8 h-8 text-white" />
               </div>
@@ -586,7 +586,7 @@ export default function LandingPage() {
             </div>
 
             {/* Small Business */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6">
                 <Briefcase className="w-8 h-8 text-white" />
               </div>
@@ -629,7 +629,7 @@ export default function LandingPage() {
             </p>
             </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-16">
             {/* Step 1 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -720,7 +720,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">
                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Smartphone className="w-6 h-6 text-orange-600" />
@@ -793,17 +793,19 @@ export default function LandingPage() {
                 </span>
               </div>
               
-              <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
                 {!isAnnual ? (
                   <>
-                    <span className="text-5xl font-bold text-gray-900">$10</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-gray-900">$10</span>
                     <span className="text-gray-600">/month</span>
                   </>
                 ) : (
                   <>
-                    <span className="text-5xl font-bold text-gray-900">$100</span>
-                    <span className="text-gray-600">/year</span>
-                    <div className="ml-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$100</span>
+                      <span className="text-gray-600">/year</span>
+                    </div>
+                    <div className="text-sm mt-2 sm:mt-0 sm:ml-4 text-center sm:text-left">
                       <div className="text-gray-500 line-through">$120/year</div>
                       <div className="text-green-600 font-medium">Save $20</div>
                     </div>
@@ -813,7 +815,7 @@ export default function LandingPage() {
               <p className="text-gray-600">30-day free trial • No credit card required</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-green-500" />
@@ -927,7 +929,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">

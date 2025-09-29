@@ -109,15 +109,15 @@ export default function SignupPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* Left Side - Benefits */}
           <div className="space-y-8">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                 Start Your Free Trial
               </h1>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-lg sm:text-xl text-gray-600 mb-8">
                 Join thousands of people who are organizing their lives with Easy Inventory.
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function SignupPage() {
             </div>
 
             {/* Social Proof */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
@@ -191,7 +191,7 @@ export default function SignupPage() {
           </div>
 
           {/* Right Side - Signup Form */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
             {isSubmitted ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -215,7 +215,7 @@ export default function SignupPage() {
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Name Fields */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         First Name
@@ -406,7 +406,7 @@ export default function SignupPage() {
                         </label>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
                         <span>Unlimited items</span>
