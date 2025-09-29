@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Check, Star, Package, Home, Heart, Briefcase, ArrowRight, Lock, Mail, User, Building } from 'lucide-react'
+import { trackSignup, trackButtonClick } from '@/lib/analytics'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     organization: '',
     useCase: 'personal',
     plan: 'pro',
@@ -34,7 +36,8 @@ export default function SignupPage() {
           company: formData.organization,
           primaryApp: 'liquor-inventory',
           plan: 'pro',
-          billingCycle: formData.billingCycle
+          billingCycle: formData.billingCycle,
+          password: formData.password
         }),
       })
 
@@ -45,6 +48,10 @@ export default function SignupPage() {
       }
 
       console.log('✅ Account created successfully:', result)
+      
+      // Track successful signup
+      trackSignup('email')
+      
       setIsSubmitted(true)
     } catch (error) {
       console.error('❌ Signup error:', error)
@@ -269,6 +276,29 @@ export default function SignupPage() {
                         placeholder="john@example.com"
                       />
                     </div>
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                        minLength={6}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                        placeholder="Create a secure password"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Must be at least 6 characters long
+                    </p>
                   </div>
 
                   {/* Organization/Project Name */}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   Check,
@@ -34,6 +35,20 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null)
   const [isAnnual, setIsAnnual] = useState(false)
+  const router = useRouter()
+
+  // Handle password reset redirect
+  useEffect(() => {
+    const handleAuthRedirect = () => {
+      const hash = window.location.hash
+      if (hash.includes('access_token') && hash.includes('type=recovery')) {
+        // This is a password reset link, redirect to reset password page
+        router.push(`/reset-password${hash}`)
+      }
+    }
+
+    handleAuthRedirect()
+  }, [])
 
   const toggleFAQ = (index: number) => {
     setActiveFAQ(activeFAQ === index ? null : index)

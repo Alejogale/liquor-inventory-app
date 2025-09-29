@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Eye, EyeOff, Lock, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, Lock, CheckCircle, Package } from 'lucide-react'
 
 function ResetPasswordForm() {
   const [password, setPassword] = useState('')
@@ -16,14 +16,36 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check if we have access token and type from URL
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const type = hashParams.get('type')
-    
-    if (!accessToken || type !== 'recovery') {
-      setError('Invalid or expired reset link. Please request a new one.')
+    const handlePasswordReset = async () => {
+      // Check if we have access token and type from URL
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
+      const type = hashParams.get('type')
+      
+      if (!accessToken || !refreshToken || type !== 'recovery') {
+        setError('Invalid or expired reset link. Please request a new password reset.')
+        return
+      }
+
+      try {
+        // Set the session with the tokens from the URL
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        })
+
+        if (error) {
+          console.error('Session error:', error)
+          setError('Invalid or expired reset link. Please request a new password reset.')
+        }
+      } catch (error) {
+        console.error('Auth error:', error)
+        setError('Invalid or expired reset link. Please request a new password reset.')
+      }
     }
+
+    handlePasswordReset()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,11 +66,29 @@ function ResetPasswordForm() {
     }
 
     try {
+      // First check if we have a valid session
+      const { data: { user }, error: sessionError } = await supabase.auth.getUser()
+      
+      if (sessionError || !user) {
+        setError('Session expired. Please click the reset link in your email again.')
+        setIsLoading(false)
+        return
+      }
+
+      // Update the password
       const { error } = await supabase.auth.updateUser({
         password: password
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Password update error:', error)
+        if (error.message.includes('session')) {
+          setError('Session expired. Please click the reset link in your email again.')
+        } else {
+          throw error
+        }
+        return
+      }
 
       setSuccess(true)
       
@@ -59,7 +99,7 @@ function ResetPasswordForm() {
 
     } catch (error: any) {
       console.error('Password reset error:', error)
-      setError(error.message || 'Failed to reset password')
+      setError(error.message || 'Failed to reset password. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -67,7 +107,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -85,12 +125,12 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <span className="text-white font-bold text-2xl">L</span>
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Package className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900">Set New Password</h1>
           <p className="text-slate-600 mt-2">Choose a secure password for your account</p>
@@ -117,7 +157,7 @@ function ResetPasswordForm() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-12 pr-12 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder-slate-400"
+                  className="block w-full pl-12 pr-12 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-slate-900 placeholder-slate-400"
                   placeholder="Enter new password"
                   required
                 />
@@ -147,7 +187,7 @@ function ResetPasswordForm() {
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder-slate-400"
+                  className="block w-full pl-12 pr-4 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-slate-900 placeholder-slate-400"
                   placeholder="Confirm new password"
                   required
                 />
@@ -157,7 +197,7 @@ function ResetPasswordForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 focus:ring-4 focus:ring-orange-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Updating Password...' : 'Update Password'}
             </button>
@@ -180,11 +220,11 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-white font-bold text-2xl">L</span>
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Package className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-slate-900">Loading...</h1>
             <p className="text-slate-600 mt-2">Please wait while we prepare the reset password form</p>

@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
       firstName,
       lastName,
       email,
+      password,
       company,
       phone,
       businessType,
@@ -22,9 +23,17 @@ export async function POST(request: NextRequest) {
     } = await request.json()
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !company || !businessType || !primaryApp || !plan || !billingCycle) {
+    if (!firstName || !lastName || !email || !password || !company || !businessType || !primaryApp || !plan || !billingCycle) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
@@ -76,7 +85,7 @@ export async function POST(request: NextRequest) {
     // Create user account
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password: Math.random().toString(36).slice(-12), // Generate temporary password
+      password: password, // Use the password provided by user
       email_confirm: true,
       user_metadata: {
         first_name: firstName,

@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       firstName,
       lastName,
       email,
+      password,
       company,
       phone,
       businessType,
@@ -37,9 +38,17 @@ export async function POST(request: NextRequest) {
     } = await request.json()
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !company || !businessType || !primaryApp || !plan || !billingCycle) {
+    if (!firstName || !lastName || !email || !password || !company || !businessType || !primaryApp || !plan || !billingCycle) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
@@ -97,7 +106,7 @@ export async function POST(request: NextRequest) {
     // Create user account with email confirmation
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password: Math.random().toString(36).slice(-12), // Generate temporary password
+      password: password, // Use the password provided by user
       email_confirm: true,
       user_metadata: {
         first_name: firstName,
@@ -223,20 +232,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Send password reset email so user can set their password
-    try {
-      await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login?message=Welcome! Please set your password to complete setup.`
-        }
-      })
-      console.log('✅ Password reset email sent to:', email)
-    } catch (emailError) {
-      console.error('⚠️ Failed to send password reset email:', emailError)
-      // Don't fail the signup if email fails
-    }
+    // User account created with password - no password reset needed
+    console.log('✅ Account created successfully for:', email)
 
     // Log the signup for analytics
     await supabaseAdmin
