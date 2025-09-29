@@ -13,7 +13,7 @@ import {
   ClipboardList
 } from 'lucide-react'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useOrganizationData } from '@/lib/use-data-loading'
 import { supabase } from '@/lib/supabase'
@@ -1031,5 +1031,23 @@ function DashboardContent() {
 }
 
 export default function Dashboard() {
-  return <DashboardContent />
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <Package className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Loading Dashboard...</h2>
+              <p className="text-gray-600">Please wait while we prepare your inventory data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
+  )
 }
