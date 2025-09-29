@@ -93,7 +93,7 @@ export default function DashboardSidebar({
                 </div>
                 {!isCollapsed && (
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">Liquor Inventory</h1>
+                    <h1 className="text-xl font-bold text-gray-900">InvyEasy</h1>
                     <p className="text-gray-600 text-sm">Management System</p>
                   </div>
                 )}

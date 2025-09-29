@@ -61,9 +61,9 @@ const blogArticles = [
 
       <p>For families reading this, the message is clear: the tools and knowledge to transform your garage are available right now. The question isn't whether you can afford to implement these changes—it's whether you can afford not to.</p>
 
-      <p>Ready to join thousands of homeowners who have revolutionized their garage organization? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of Easy Inventory today</a></strong> and discover how digital organization tools can accelerate your garage transformation. With barcode scanning, photo documentation, and zone-based categorization, you'll implement Mike's proven system in half the time.</p>
+      <p>Ready to join thousands of homeowners who have revolutionized their garage organization? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of InvyEasy today</a></strong> and discover how digital organization tools can accelerate your garage transformation. With barcode scanning, photo documentation, and zone-based categorization, you'll implement Mike's proven system in half the time.</p>
 
-      <p>As Mike puts it: "I wish I had known about Easy Inventory ten years ago. We could have saved thousands of hours and dollars. But better late than never, right?"</p>
+      <p>As Mike puts it: "I wish I had known about InvyEasy ten years ago. We could have saved thousands of hours and dollars. But better late than never, right?"</p>
 
       <p>Indeed, better late than never. The garage organization revolution is here, and it's time for families to join it.</p>
     `,
@@ -132,7 +132,7 @@ const blogArticles = [
 
       <p>"The most successful closet transformations happen when people realize this isn't about having more stuff—it's about having the right systems," says Dr. Foster. "And those systems are accessible to anyone willing to invest a week in changing their approach."</p>
 
-      <p>Ready to reclaim your mornings and transform your relationship with your wardrobe? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of Easy Inventory today</a></strong> and implement the digital tracking system that makes the Capsule Zone Method even more powerful. With photo documentation, category tags, and wear-frequency tracking, you'll maintain your organized closet effortlessly.</p>
+      <p>Ready to reclaim your mornings and transform your relationship with your wardrobe? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of InvyEasy today</a></strong> and implement the digital tracking system that makes the Capsule Zone Method even more powerful. With photo documentation, category tags, and wear-frequency tracking, you'll maintain your organized closet effortlessly.</p>
 
       <p>As Rachel puts it: "I went from dreading getting dressed to actually enjoying my wardrobe. And it all started with just seven days of focused organization. If I can do it, anyone can."</p>
 
@@ -195,9 +195,9 @@ const blogArticles = [
 
       <p>For business owners like Tom and Maria, the message is clear: the future of small business isn't about having the biggest budget or the most employees. It's about having the right inventory management systems and the willingness to implement them.</p>
 
-      <p>Ready to transform your business operations and join the ranks of profitable small business owners? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of Easy Inventory today</a></strong> and implement the proven inventory management system that saved Tom's hardware store and Maria's boutique. With barcode scanning, automated reorder points, and real-time reporting, you'll see improvements in your first week.</p>
+      <p>Ready to transform your business operations and join the ranks of profitable small business owners? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of InvyEasy today</a></strong> and implement the proven inventory management system that saved Tom's hardware store and Maria's boutique. With barcode scanning, automated reorder points, and real-time reporting, you'll see improvements in your first week.</p>
 
-      <p>As Tom puts it: "I never thought Easy Inventory could change our entire business. But it did. And I'm not going back. The best part is, it pays for itself within the first month through reduced waste and better purchasing decisions."</p>
+      <p>As Tom puts it: "I never thought InvyEasy could change our entire business. But it did. And I'm not going back. The best part is, it pays for itself within the first month through reduced waste and better purchasing decisions."</p>
 
       <p>Neither, it seems, are thousands of other business owners who have discovered that sometimes the most revolutionary strategy is the one that simply works.</p>
     `,
@@ -257,7 +257,7 @@ const blogArticles = [
 
       <p>"The most successful restaurant inventory transformations happen when owners realize this isn't about making their job harder—it's about making their business more profitable," says Marcus. "And the tools to make it happen are more accessible than ever."</p>
 
-      <p>Ready to transform your restaurant's profitability and join the ranks of systematically successful restaurateurs? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of Easy Inventory today</a></strong> and implement the digital inventory system that makes the FIFO Plus method effortless. With barcode scanning, automatic reorder points, and real-time cost analysis, you'll see results in your first week.</p>
+      <p>Ready to transform your restaurant's profitability and join the ranks of systematically successful restaurateurs? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of InvyEasy today</a></strong> and implement the digital inventory system that makes the FIFO Plus method effortless. With barcode scanning, automatic reorder points, and real-time cost analysis, you'll see results in your first week.</p>
 
       <p>As Marcus puts it: "I wish I had implemented this system from day one. We would have saved thousands of dollars and avoided months of stress. But the important thing is that we're profitable now, and we have the systems in place to stay that way."</p>
 
@@ -327,9 +327,9 @@ const blogArticles = [
 
       <p>For remote workers reading this, the message is clear: the tools and knowledge to transform your home office are available right now. The question isn't whether you can afford to implement these changes—it's whether you can afford not to.</p>
 
-      <p>Ready to boost your productivity and create the organized workspace that will transform your remote work experience? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of Easy Inventory today</a></strong> and implement the digital organization system that makes the 5-Zone Method effortless. With photo documentation, zone-based categorization, and productivity tracking, you'll see results in your first week.</p>
+      <p>Ready to boost your productivity and create the organized workspace that will transform your remote work experience? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of InvyEasy today</a></strong> and implement the digital organization system that makes the 5-Zone Method effortless. With photo documentation, zone-based categorization, and productivity tracking, you'll see results in your first week.</p>
 
-      <p>As Jennifer puts it: "I wish I had discovered Easy Inventory ten years ago. It would have saved me thousands of hours and made my workspace transformation so much easier. The digital tools make maintaining organization effortless."</p>
+      <p>As Jennifer puts it: "I wish I had discovered InvyEasy ten years ago. It would have saved me thousands of hours and made my workspace transformation so much easier. The digital tools make maintaining organization effortless."</p>
 
       <p>Indeed, better late than never. The home office organization revolution is here, and it's time for remote workers to join it.</p>
     `,
@@ -393,7 +393,7 @@ const blogArticles = [
 
       <p>"The families who create detailed estate inventories report feeling more in control of their financial lives and more confident about their family's future," notes Dr. Williams. "It's one of the most loving gifts you can give your family."</p>
 
-      <p>Ready to protect your family's future and create the comprehensive estate inventory that will save them time, money, and stress? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of Easy Inventory today</a></strong> and use our estate planning templates to create a professional-grade asset inventory. With photo documentation, valuation tracking, and secure sharing capabilities, you'll build the foundation for effective estate planning.</p>
+      <p>Ready to protect your family's future and create the comprehensive estate inventory that will save them time, money, and stress? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free trial of InvyEasy today</a></strong> and use our estate planning templates to create a professional-grade asset inventory. With photo documentation, valuation tracking, and secure sharing capabilities, you'll build the foundation for effective estate planning.</p>
 
       <p>As Robert puts it: "Creating our estate inventory was one of the most important things we've ever done for our family. It gave us peace of mind and will save our children from the confusion and expense we experienced. Every family should have this level of documentation."</p>
 
@@ -408,7 +408,7 @@ const blogArticles = [
   },
   {
     id: 'easy-inventory-vs-excel-google-sheets-comparison',
-    title: 'Easy Inventory vs Excel vs Google Sheets: Why Smart Businesses Are Making the Switch in 2024',
+    title: 'InvyEasy vs Excel vs Google Sheets: Why Smart Businesses Are Making the Switch in 2024',
     excerpt: 'Discover why successful entrepreneurs are moving beyond spreadsheets to dedicated inventory management. Learn the hidden costs of Excel, the power of purpose-built tools, and how to transform your business efficiency.',
     content: `
       <p>Every successful business reaches a pivotal moment when they outgrow their current systems. For most entrepreneurs, that moment comes when they realize their trusted Excel spreadsheets are actually costing them thousands of dollars and countless hours of productivity.</p>
@@ -446,7 +446,7 @@ const blogArticles = [
             <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Business Impact</th>
             <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Excel</th>
             <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Google Sheets</th>
-            <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Easy Inventory</th>
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">InvyEasy</th>
           </tr>
         </thead>
         <tbody>
@@ -504,7 +504,7 @@ const blogArticles = [
         <li><strong>Total Annual Cost: $18,000</strong></li>
       </ul>
 
-      <p><strong>Easy Inventory Solution:</strong></p>
+      <p><strong>InvyEasy Solution:</strong></p>
       <ul>
         <li>Software subscription: $120</li>
         <li>Setup time (2 hours): $50</li>
@@ -596,9 +596,9 @@ const blogArticles = [
       <h2>Transform Your Business Today</h2>
       <p>The evidence is overwhelming, the ROI is immediate, and the competitive advantage is significant. Modern inventory management isn't just about tracking items—it's about building operational excellence that scales with your ambitions.</p>
 
-      <p>Ready to leave spreadsheet limitations behind and unlock your business's full potential? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of Easy Inventory today</a></strong> and experience what happens when you choose tools built for success. With seamless data import, intuitive mobile apps, and barcode scanning capabilities, you'll wonder why you waited so long to make this crucial business decision.</p>
+      <p>Ready to leave spreadsheet limitations behind and unlock your business's full potential? <strong><a href="/signup" style="color: #ea580c; text-decoration: none;">Start your free 30-day trial of InvyEasy today</a></strong> and experience what happens when you choose tools built for success. With seamless data import, intuitive mobile apps, and barcode scanning capabilities, you'll wonder why you waited so long to make this crucial business decision.</p>
 
-      <p>Your spreadsheet struggles end today. Your efficient, profitable, and scalable inventory management begins now with Easy Inventory.</p>
+      <p>Your spreadsheet struggles end today. Your efficient, profitable, and scalable inventory management begins now with InvyEasy.</p>
     `,
     author: 'Alejandro',
     date: '2024-02-20',
@@ -622,22 +622,22 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   
   if (!article) {
     return {
-      title: 'Article Not Found - Easy Inventory Blog',
+      title: 'Article Not Found - InvyEasy Blog',
       description: 'The article you\'re looking for doesn\'t exist.',
     }
   }
 
   return {
-    title: `${article.title} - Easy Inventory Blog`,
+    title: `${article.title} - InvyEasy Blog`,
     description: article.excerpt,
     keywords: article.tags.join(', '),
     authors: [{ name: article.author }],
     openGraph: {
-      title: `${article.title} - Easy Inventory Blog`,
+      title: `${article.title} - InvyEasy Blog`,
       description: article.excerpt,
       type: 'article',
       url: `https://easyinventory.com/blog/${article.id}`,
-      siteName: 'Easy Inventory',
+      siteName: 'InvyEasy',
       publishedTime: article.date,
       authors: [article.author],
       section: article.category,
@@ -710,7 +710,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     "dateModified": article.date,
     "publisher": {
       "@type": "Organization",
-      "name": "Easy Inventory",
+      "name": "InvyEasy",
       "logo": {
         "@type": "ImageObject",
         "url": "https://easyinventory.com/logo.png"
@@ -749,7 +749,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">E</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900">Easy Inventory</span>
+                <span className="text-xl font-bold text-gray-900">InvyEasy</span>
               </Link>
               
               <div className="hidden md:flex items-center space-x-8">
@@ -870,7 +870,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 Ready to Get Organized?
               </h3>
               <p className="text-xl mb-8 text-white/95 max-w-2xl mx-auto leading-relaxed">
-                Start your free trial today and experience the power of Easy Inventory. Transform how you manage everything you own.
+                Start your free trial today and experience the power of InvyEasy. Transform how you manage everything you own.
               </p>
               <Link 
                 href="/signup"

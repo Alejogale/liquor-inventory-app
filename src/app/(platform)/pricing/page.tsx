@@ -22,7 +22,7 @@ export default function PricingPage() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md">
                 <span className="text-white font-bold text-sm">H</span>
               </div>
-              <span className="text-headline text-primary">Hospitality Hub</span>
+              <span className="text-headline text-primary">InvyEasy</span>
             </div>
             
             {/* Navigation Links */}
@@ -90,7 +90,7 @@ export default function PricingPage() {
             <div className="relative z-30 transform -rotate-1 hover:rotate-0 transition-transform duration-500 card-elevated">
               <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-white font-semibold text-sm">🍾 Liquor Inventory</div>
+                  <div className="text-white font-semibold text-sm">📦 InvyEasy</div>
                   <Package className="w-4 h-4 text-accent" />
                 </div>
                 <div className="space-y-3">
@@ -172,7 +172,7 @@ export default function PricingPage() {
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-title text-primary mb-2">Liquor Inventory</h3>
+              <h3 className="text-title text-primary mb-2">InvyEasy</h3>
               <div className="mb-4">
                 <span className="text-3xl font-bold text-primary">$29</span>
                 <span className="text-muted ml-2">/month</span>
@@ -584,7 +584,7 @@ export default function PricingPage() {
             <div>
               <h3 className="text-title text-primary mb-4">Apps</h3>
               <ul className="space-y-2 text-caption text-muted">
-                <li><a href="#" className="hover:text-accent transition-colors">Liquor Inventory</a></li>
+                <li><a href="#" className="hover:text-accent transition-colors">InvyEasy</a></li>
                 <li><a href="#" className="hover:text-accent transition-colors">Consumption Sheet</a></li>
                 <li><a href="#" className="hover:text-accent transition-colors">Reservation Management</a></li>
                 <li><a href="#" className="hover:text-accent transition-colors">Member Database</a></li>

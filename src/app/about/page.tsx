@@ -15,7 +15,7 @@ export default function AboutPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
                 <Package className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Easy Inventory</span>
+              <span className="text-xl font-bold text-gray-900">InvyEasy</span>
             </Link>
             
             {/* Back to Home */}
@@ -31,7 +31,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            About Easy Inventory
+            About InvyEasy
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             A personal project born from the simple idea that everyone deserves to stay organized without breaking the bank.
@@ -47,7 +47,7 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-6 text-gray-600 leading-relaxed">
                 <p>
-                  Easy Inventory started as a personal project to solve a simple problem: 
+                  InvyEasy started as a personal project to solve a simple problem: 
                   keeping track of everything you own shouldn't be complicated or expensive.
                 </p>
                 <p>
@@ -93,7 +93,7 @@ export default function AboutPage() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-4">For Everyone</h3>
             <p className="text-gray-600">
-              Whether you're organizing your home, managing a hobby, or running a small business - Easy Inventory adapts to your needs.
+              Whether you're organizing your home, managing a hobby, or running a small business - InvyEasy adapts to your needs.
             </p>
           </div>
           
