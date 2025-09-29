@@ -42,7 +42,7 @@ export default function LandingPage() {
   const faqs = [
     {
       question: "Is this just for businesses?",
-      answer: "No! InvyEasy is perfect for personal use, hobbies, and businesses. Whether you're organizing your home pantry, tracking craft supplies, or managing a small retail store - we've got you covered."
+      answer: "No! Easy Inventory is perfect for personal use, hobbies, and businesses. Whether you're organizing your home pantry, tracking craft supplies, or managing a small retail store - we've got you covered."
     },
     {
       question: "Can I use it for multiple locations?",
@@ -134,7 +134,7 @@ export default function LandingPage() {
             
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              InvyEasy<br />
+              Easy Inventory<br />
               <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                 Management
               </span><br />
@@ -280,7 +280,7 @@ export default function LandingPage() {
               Powerful Features for Every Need
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover how InvyEasy's advanced features make organization effortless and efficient.
+              Discover how Easy Inventory's advanced features make organization effortless and efficient.
             </p>
           </div>
 
@@ -622,7 +622,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How InvyEasy Works
+              How Easy Inventory Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Get started in minutes with our simple 3-step process. No complex setup, no learning curve.
@@ -772,7 +772,7 @@ export default function LandingPage() {
                 <Star className="w-4 h-4" />
                 Most Popular
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">InvyEasy Pro</h3>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">Easy Inventory Pro</h3>
               
               {/* Billing Toggle */}
               <div className="flex items-center justify-center gap-4 mb-6">
@@ -873,7 +873,7 @@ export default function LandingPage() {
               Frequently Asked Questions
               </h2>
             <p className="text-xl text-gray-600">
-              Everything you need to know about InvyEasy
+              Everything you need to know about Easy Inventory
             </p>
           </div>
 
