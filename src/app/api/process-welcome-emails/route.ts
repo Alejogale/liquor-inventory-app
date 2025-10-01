@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           successCount++
           console.log('Welcome email sent successfully to:', emailRequest.email)
         } else {
-          throw new Error(result.error || 'Unknown error')
+          throw new Error(typeof result.error === 'string' ? result.error : 'Unknown error')
         }
       } catch (error) {
         console.error('Failed to send welcome email:', error)
