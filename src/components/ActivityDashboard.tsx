@@ -393,25 +393,61 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         console.warn('Could not log report activity:', logError)
       }
 
-      // Create email content
-      const emailSubject = `Inventory Report - ${new Date().toLocaleDateString()}`
-      const emailBody = generateEmailBody(report)
+      // Actually send emails to all manager emails
+      console.log('📬 Sending emails to:', managerEmails)
+      
+      const emailPromises = managerEmails.map(async (email) => {
+        try {
+          const response = await fetch('/api/send-order-report', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: email,
+              organizationName: organization?.Name || 'Your Organization',
+              reportData: {
+                totalItems: report.categories.reduce((total, cat) => total + cat.items.length, 0),
+                totalValue: report.grandTotal,
+                categories: report.categories.length,
+                generatedBy: report.generatedBy,
+                summary: `Generated ${report.categories.length} categories with ${report.categories.reduce((total, cat) => total + cat.items.length, 0)} total items`
+              },
+              reportDate: new Date().toLocaleDateString(),
+              reportUrl: window.location.href
+            }),
+          })
 
-      // For now, we'll simulate sending (in production, you'd call your email API)
-      console.log('📬 Email would be sent to:', managerEmails)
-      console.log('📋 Report content preview:', {
-        categories: report.categories.length,
-        grandTotal: report.grandTotal,
-        generatedBy: report.generatedBy
+          const result = await response.json()
+          if (result.success) {
+            console.log(`✅ Report sent successfully to ${email}`)
+            return { email, success: true }
+          } else {
+            console.error(`❌ Failed to send report to ${email}:`, result.error)
+            return { email, success: false, error: result.error }
+          }
+        } catch (error) {
+          console.error(`❌ Error sending report to ${email}:`, error)
+          return { email, success: false, error }
+        }
       })
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const results = await Promise.all(emailPromises)
+      const successCount = results.filter(r => r.success).length
+      const failureCount = results.length - successCount
 
-      setReportSent(true)
-      setTimeout(() => setReportSent(false), 5000) // Clear success message after 5 seconds
+      if (successCount > 0) {
+        console.log(`✅ Successfully sent ${successCount} reports`)
+        setReportSent(true)
+        setTimeout(() => setReportSent(false), 5000)
+      }
 
-      console.log('✅ Report sent successfully')
+      if (failureCount > 0) {
+        console.warn(`⚠️ Failed to send ${failureCount} reports`)
+        alert(`Sent ${successCount}/${results.length} reports successfully. Check console for details.`)
+      } else {
+        console.log('✅ All reports sent successfully')
+      }
 
     } catch (error) {
       console.error('💥 Error sending report:', error)
