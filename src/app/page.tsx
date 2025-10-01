@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Check,
   Star,
+  FileText,
   Zap,
   Shield,
   BarChart3,
@@ -99,6 +100,7 @@ export default function LandingPage() {
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+              <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
             </div>
             
             {/* CTA Buttons */}
@@ -142,6 +144,7 @@ export default function LandingPage() {
               <a href="#how-it-works" className="block text-gray-600 hover:text-gray-900">How It Works</a>
               <a href="#pricing" className="block text-gray-600 hover:text-gray-900">Pricing</a>
               <a href="#faq" className="block text-gray-600 hover:text-gray-900">FAQ</a>
+              <Link href="/contact" className="block text-gray-600 hover:text-gray-900">Contact</Link>
             </div>
           </div>
         )}
@@ -891,6 +894,84 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Conversion Service Section */}
+      <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-12">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
+                <FileText className="w-4 h-4" />
+                Professional Service
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Inventory Conversion Service</h3>
+              <p className="text-xl text-gray-600 mb-6">
+                Don't have time to format your inventory? We'll do it for you.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
+                <span className="text-4xl sm:text-5xl font-bold text-gray-900">$200</span>
+                <span className="text-gray-600">one-time</span>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4">What's Included:</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Professional data conversion to InvyEasy format</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Proper categorization and optimization</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Ready-to-import Excel template</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">24-48 hour delivery</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4">Perfect For:</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Large existing inventory lists</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Complex or messy data formats</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Businesses that need immediate setup</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Save time and ensure accuracy</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Link href="/inventory-conversion" className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                Get Professional Conversion
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              <p className="text-sm text-gray-500 mt-4">
+                Secure payment • Expert conversion • 24-48 hour delivery
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* FAQ Section */}
       <section id="faq" className="py-20 bg-white">

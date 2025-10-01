@@ -1,0 +1,20 @@
+{
+  "id": "f2991a97-5a68-4056-a931-0efed97b69be",
+  "customerInfo": {
+    "name": "test ",
+    "email": "alejogaleis@gmail.com",
+    "company": "tytre",
+    "phone": "9879878787",
+    "notes": "Ithksaiadsoh alias as"
+  },
+  "files": [
+    {
+      "originalName": "inventory-report-2025-09-23.csv",
+      "savedPath": "/Users/alejandrogaleano/Desktop/my-projects/liquor-inventory-app/uploads/conversions/f2991a97-5a68-4056-a931-0efed97b69be/1759283372789_inventory-report-2025-09-23.csv",
+      "size": 19477
+    }
+  ],
+  "status": "uploaded",
+  "createdAt": "2025-10-01T01:49:32.789Z",
+  "paymentStatus": "pending"
+}

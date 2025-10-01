@@ -32,6 +32,7 @@ import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
+import WelcomeOnboardingModal from '@/components/WelcomeOnboardingModal'
 
 
 interface Category {
@@ -91,6 +92,7 @@ function DashboardContent() {
   const [bulkOperation, setBulkOperation] = useState<'delete' | 'move-category' | 'move-supplier' | null>(null)
   const [targetCategory, setTargetCategory] = useState('')
   const [targetSupplier, setTargetSupplier] = useState('')
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
@@ -134,6 +136,23 @@ function DashboardContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Show welcome modal for new users
+  useEffect(() => {
+    if (user && !loading) {
+      const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`)
+      if (!hasSeenWelcome) {
+        setShowWelcomeModal(true)
+      }
+    }
+  }, [user, loading])
+
+  const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false)
+    if (user) {
+      localStorage.setItem(`welcome_seen_${user.id}`, 'true')
+    }
+  }
 
   const fetchData = async () => {
     try {
@@ -523,6 +542,7 @@ function DashboardContent() {
               </div>
             </div>
           </div>
+
 
           {/* Main Content Area */}
           <div className="rounded-2xl border border-white/20 shadow-2xl min-h-[600px] backdrop-blur-xl"
@@ -1026,6 +1046,13 @@ function DashboardContent() {
           organizationId={organizationId}
         />
       )}
+
+      {/* Welcome Onboarding Modal */}
+      <WelcomeOnboardingModal
+        isOpen={showWelcomeModal}
+        onClose={handleCloseWelcomeModal}
+        userName={userProfile?.full_name || user?.email?.split('@')[0] || 'there'}
+      />
     </div>
   )
 }

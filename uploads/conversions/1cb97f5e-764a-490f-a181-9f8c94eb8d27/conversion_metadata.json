@@ -1,0 +1,20 @@
+{
+  "id": "1cb97f5e-764a-490f-a181-9f8c94eb8d27",
+  "customerInfo": {
+    "name": "alejo",
+    "email": "alejogaleis@gmail.com",
+    "company": "kajhdsa",
+    "phone": "7897897878",
+    "notes": "askjdhasdkahj"
+  },
+  "files": [
+    {
+      "originalName": "inventory-report-2025-09-23.csv",
+      "savedPath": "/Users/alejandrogaleano/Desktop/my-projects/liquor-inventory-app/uploads/conversions/1cb97f5e-764a-490f-a181-9f8c94eb8d27/1759283551492_inventory-report-2025-09-23.csv",
+      "size": 19477
+    }
+  ],
+  "status": "uploaded",
+  "createdAt": "2025-10-01T01:52:31.492Z",
+  "paymentStatus": "pending"
+}
