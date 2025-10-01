@@ -37,7 +37,7 @@ function createMarketingEmailTemplate(content: string, preheader?: string) {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>InvyEasy - Inventory Management Excellence</title>
+      <title>InvyEasy - Organize Everything You Own</title>
       ${preheader ? `<meta name="description" content="${preheader}">` : ''}
       <style>
         body {
@@ -154,7 +154,7 @@ function createMarketingEmailTemplate(content: string, preheader?: string) {
       <div class="container">
         <div class="header">
           <h1>📦 InvyEasy</h1>
-          <div class="subtitle">Inventory Management Excellence</div>
+          <div class="subtitle">Organize Everything You Own</div>
         </div>
         
         <div class="content">
@@ -167,7 +167,7 @@ function createMarketingEmailTemplate(content: string, preheader?: string) {
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/contact">📧 Contact</a>
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/pricing">💰 Pricing</a>
           </div>
-          <p>© 2024 InvyEasy. Made with ❤️ for inventory management excellence.</p>
+          <p>© 2024 InvyEasy. Made with ❤️ to help you organize everything you own.</p>
           <p>
             <a href="{{unsubscribe}}">Unsubscribe</a> | 
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/privacy">Privacy Policy</a> | 
@@ -219,8 +219,8 @@ export async function sendNewsletterEmail({
     
     <div class="testimonial">
       <p style="margin: 0; font-size: 14px;">
-        "InvyEasy has transformed how we manage our bar inventory. We've reduced waste by 30% and save hours every week!" 
-        <strong>- Sarah M., Restaurant Manager</strong>
+        "InvyEasy has transformed how I organize my entire home. From pantry to garage to craft room - everything is perfectly tracked!" 
+        <strong>- Sarah M., Home Organizer</strong>
       </p>
     </div>
   `

@@ -685,28 +685,34 @@ export async function sendWelcomeEmail({
   const content = `
     <h2>Welcome to InvyEasy! 🎉</h2>
     <p>Hello ${userName},</p>
-    <p>Welcome to <strong>InvyEasy</strong> - your all-in-one inventory management solution for the liquor and hospitality industry!</p>
+    <p>Welcome to <strong>InvyEasy</strong> - organize everything you own with our intuitive inventory management system!</p>
     
     <div class="card">
-      <h3>🚀 Get Started with InvyEasy</h3>
+      <h3>🚀 Get Started - Organize Your Way</h3>
       <p>Your account is now active and ready to use. Here's what you can do:</p>
       <ul style="text-align: left; padding-left: 20px;">
-        <li><strong>📊 Track Inventory:</strong> Monitor your stock levels in real-time</li>
-        <li><strong>📱 Use Templates:</strong> Download our Excel template for easy data import</li>
-        <li><strong>🔄 Set Thresholds:</strong> Get alerts when items are running low</li>
-        <li><strong>👥 Invite Team:</strong> Collaborate with your staff and managers</li>
-        <li><strong>📈 Generate Reports:</strong> Get insights into your inventory performance</li>
+        <li><strong>🏠 Home Organization:</strong> Track pantry items, craft supplies, and household goods</li>
+        <li><strong>📱 Mobile-First:</strong> Count inventory on your phone, manage on any device</li>
+        <li><strong>📍 Multiple Locations:</strong> Organize across home, office, storage units, and more</li>
+        <li><strong>👥 Share & Collaborate:</strong> Invite family or team members to help stay organized</li>
+        <li><strong>📊 Custom Categories:</strong> Create categories that make sense to you</li>
       </ul>
     </div>
 
-    <div class="alert alert-success">
-      <strong>💡 Pro Tip:</strong> Start by downloading our inventory template and uploading your current stock data. 
-      This will get you up and running in minutes!
+    <div class="card">
+      <h3>💡 Perfect for Everyone</h3>
+      <p>Whether you're organizing your:</p>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li>🍽️ <strong>Home:</strong> Pantry, garage, craft room, or entire household</li>
+        <li>🎨 <strong>Hobbies:</strong> Craft supplies, books, collectibles, sports equipment</li>
+        <li>🏢 <strong>Business:</strong> Retail store, office supplies, or small business inventory</li>
+        <li>📦 <strong>Storage:</strong> Multiple properties, storage units, or shared spaces</li>
+      </ul>
     </div>
 
     ${loginUrl ? `
       <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
-        <a href="${loginUrl}" class="button">Access Your Dashboard</a>
+        <a href="${loginUrl}" class="button">Start Organizing Today</a>
       </div>
     ` : ''}
 
@@ -720,7 +726,7 @@ export async function sendWelcomeEmail({
       </ul>
     </div>
 
-    <p>Thank you for choosing InvyEasy. We're excited to help you streamline your inventory management!</p>
+    <p>Thank you for choosing InvyEasy. <strong>Simple. Smart. Organized.</strong> - Never lose track of what you own again!</p>
   `
 
   const html = createBaseEmailTemplate(content, 'Welcome')
@@ -734,7 +740,7 @@ export async function sendWelcomeEmail({
     const result = await resend.emails.send({
       from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
-      subject: 'Welcome to InvyEasy - Your Inventory Management Journey Starts Here! 🎉',
+      subject: 'Welcome to InvyEasy - Organize Everything You Own! 🎉',
       html: html
     })
     return { success: true, data: result }
@@ -759,18 +765,19 @@ export async function sendEmailVerificationEmail({
   const content = `
     <h2>Verify Your Email Address</h2>
     <p>Hello ${userName},</p>
-    <p>Thank you for signing up for <strong>InvyEasy</strong>! To complete your account setup, please verify your email address.</p>
+    <p>Welcome to <strong>InvyEasy</strong>! To start organizing everything you own, please verify your email address to complete your account setup.</p>
     
     <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
       <a href="${verificationUrl}" class="button">Verify Email Address</a>
     </div>
 
     <div class="card">
-      <h3>Why do we need to verify your email?</h3>
+      <h3>🔐 Stay Connected & Secure</h3>
       <ul style="text-align: left; padding-left: 20px;">
-        <li><strong>Security:</strong> Protect your account from unauthorized access</li>
-        <li><strong>Updates:</strong> Receive important notifications about your inventory</li>
-        <li><strong>Support:</strong> Ensure we can reach you if you need help</li>
+        <li><strong>Security:</strong> Keep your organization system secure and protected</li>
+        <li><strong>Tips & Updates:</strong> Get helpful tips for staying organized</li>
+        <li><strong>Support:</strong> Ensure we can reach you when you need help</li>
+        <li><strong>New Features:</strong> Be the first to know about new organizing tools</li>
       </ul>
     </div>
 
@@ -823,7 +830,7 @@ export async function sendPasswordResetEmail({
   const content = `
     <h2>Reset Your Password</h2>
     <p>Hello ${userName},</p>
-    <p>We received a request to reset the password for your <strong>InvyEasy</strong> account.</p>
+    <p>We received a request to reset your password for your <strong>InvyEasy</strong> account. Click the button below to create a new password and get back to organizing everything you own.</p>
     
     <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
       <a href="${resetUrl}" class="button">Reset Password</a>

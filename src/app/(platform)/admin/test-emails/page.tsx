@@ -63,7 +63,6 @@ export default function EmailTestPage() {
               >
                 <option value="welcome">Welcome Email</option>
                 <option value="verification">Email Verification</option>
-                <option value="password-reset">Password Reset</option>
                 <option value="team-invitation">Team Invitation</option>
               </select>
             </div>
@@ -154,14 +153,25 @@ export default function EmailTestPage() {
             </div>
           )}
 
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="font-semibold text-blue-900 mb-2">💡 Testing Tips:</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Make sure you've added your RESEND_API_KEY to Vercel environment variables</li>
-              <li>• Check your email (including spam folder) for the test emails</li>
-              <li>• Each email type has different styling and content</li>
-              <li>• Test on both desktop and mobile email clients</li>
-            </ul>
+          <div className="mt-8 space-y-4">
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-blue-900 mb-2">💡 Testing Tips:</h3>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Make sure you've added your RESEND_API_KEY to Vercel environment variables</li>
+                <li>• Check your email (including spam folder) for the test emails</li>
+                <li>• Each email type has different styling and content</li>
+                <li>• Test on both desktop and mobile email clients</li>
+              </ul>
+            </div>
+            
+            <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+              <h3 className="font-semibold text-orange-900 mb-2">🔐 Password Reset:</h3>
+              <p className="text-sm text-orange-800">
+                Password reset emails are automatically handled by <strong>Supabase Auth</strong> for security. 
+                To test: Use <code className="bg-orange-100 px-1 rounded">supabase.auth.resetPasswordForEmail()</code> 
+                in your frontend code. The branded email template is already configured in your Supabase project.
+              </p>
+            </div>
           </div>
         </div>
       </div>

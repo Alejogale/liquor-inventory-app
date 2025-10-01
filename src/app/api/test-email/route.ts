@@ -38,13 +38,13 @@ export async function POST(request: NextRequest) {
         break
 
       case 'password-reset':
-        result = await sendPasswordResetEmail({
-          to,
-          userName: params.userName || 'Test User',
-          resetUrl: params.resetUrl || `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=test123`,
-          expirationTime: params.expirationTime || '1 hour'
-        })
-        break
+        // Password reset is handled by Supabase Auth directly
+        // Use supabase.auth.resetPasswordForEmail() in your frontend
+        return NextResponse.json({
+          success: false,
+          message: 'Password reset is handled by Supabase Auth. Use supabase.auth.resetPasswordForEmail() instead.',
+          info: 'This ensures proper security with Supabase tokens and email delivery.'
+        }, { status: 400 })
 
       case 'team-invitation':
         result = await sendTeamInvitationEmail({
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: 'Invalid emailType. Use: welcome, verification, password-reset, or team-invitation' },
+          { error: 'Invalid emailType. Use: welcome, verification, or team-invitation. Note: password-reset is handled by Supabase Auth.' },
           { status: 400 }
         )
     }
