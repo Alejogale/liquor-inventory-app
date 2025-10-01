@@ -405,7 +405,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             },
             body: JSON.stringify({
               to: email,
-              organizationName: organization?.Name || 'Your Organization',
+              organizationName: 'Your Organization',
               reportData: {
                 totalItems: report.categories.reduce((total, cat) => total + cat.items.length, 0),
                 totalValue: report.grandTotal,
