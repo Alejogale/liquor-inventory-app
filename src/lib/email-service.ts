@@ -13,16 +13,16 @@ if (typeof window === 'undefined') {
   }
 }
 
-// Email Design System - Consistent across all apps
+// Email Design System - InvyEasy Brand Colors
 const EMAIL_DESIGN_SYSTEM = {
   colors: {
-    primary: '#1e40af', // Blue
-    secondary: '#64748b', // Gray
+    primary: '#f97316', // InvyEasy Orange
+    secondary: '#dc2626', // InvyEasy Red
     accent: '#f59e0b', // Amber
     success: '#10b981', // Green
     warning: '#f59e0b', // Amber
     error: '#ef4444', // Red
-    background: '#f8fafc', // Light gray
+    background: '#fef2f2', // Light orange/red tint
     white: '#ffffff',
     text: '#1e293b', // Dark gray
     textLight: '#64748b' // Light gray
@@ -68,7 +68,7 @@ function createBaseEmailTemplate(content: string, appName?: string) {
           box-shadow: ${EMAIL_DESIGN_SYSTEM.shadow};
         }
         .header {
-          background: linear-gradient(135deg, ${EMAIL_DESIGN_SYSTEM.colors.primary}, #3b82f6);
+          background: linear-gradient(135deg, ${EMAIL_DESIGN_SYSTEM.colors.primary}, ${EMAIL_DESIGN_SYSTEM.colors.secondary});
           color: ${EMAIL_DESIGN_SYSTEM.colors.white};
           padding: ${EMAIL_DESIGN_SYSTEM.spacing.xlarge};
           text-align: center;
@@ -188,15 +188,15 @@ function createBaseEmailTemplate(content: string, appName?: string) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🏨 Hospitality Hub</h1>
+          <h1>📦 InvyEasy</h1>
           ${appName ? `<div class="subtitle">${appName}</div>` : ''}
         </div>
         <div class="content">
           ${content}
         </div>
         <div class="footer">
-          <p>© 2024 Hospitality Hub. Made with ❤️ for the hospitality industry.</p>
-          <p>This email was sent from your Hospitality Hub account.</p>
+          <p>© 2024 InvyEasy. Made with ❤️ for inventory management excellence.</p>
+          <p>This email was sent from your InvyEasy account.</p>
         </div>
       </div>
     </body>
@@ -280,7 +280,7 @@ export async function sendGuestReportEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: `Guest Report - ${clubName} - ${reportDate}`,
       html: html
@@ -354,7 +354,7 @@ export async function sendLowStockAlertEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: `Low Stock Alert - ${organizationName}`,
       html: html
@@ -383,12 +383,12 @@ export async function sendTeamInvitationEmail({
   customMessage?: string
 }) {
   const content = `
-    <h2>You're Invited!</h2>
+    <h2>You're Invited to Join ${organizationName}! 🎉</h2>
     <p>Hello,</p>
-    <p><strong>${inviterName}</strong> has invited you to join <strong>${organizationName}</strong> on Hospitality Hub.</p>
+    <p><strong>${inviterName}</strong> has invited you to join <strong>${organizationName}</strong> on InvyEasy.</p>
     
     <div class="card">
-      <h3>Invitation Details</h3>
+      <h3>📋 Invitation Details</h3>
       <p><strong>Organization:</strong> ${organizationName}</p>
       <p><strong>Role:</strong> ${role.charAt(0).toUpperCase() + role.slice(1)}</p>
       <p><strong>Invited by:</strong> ${inviterName}</p>
@@ -396,8 +396,8 @@ export async function sendTeamInvitationEmail({
 
     ${customMessage ? `
       <div class="card">
-        <h3>Personal Message</h3>
-        <p><em>"${customMessage}"</em></p>
+        <h3>💬 Personal Message</h3>
+        <p style="font-style: italic; color: ${EMAIL_DESIGN_SYSTEM.colors.textLight};">"${customMessage}"</p>
       </div>
     ` : ''}
 
@@ -405,10 +405,20 @@ export async function sendTeamInvitationEmail({
       <a href="${inviteUrl}" class="button">Accept Invitation</a>
     </div>
 
-    <p>Hospitality Hub is a comprehensive platform designed specifically for hospitality businesses to manage inventory, reservations, customer relationships, and more - all in one place.</p>
+    <div class="card">
+      <h3>🚀 What is InvyEasy?</h3>
+      <p>InvyEasy is a comprehensive inventory management platform designed specifically for the liquor and hospitality industry. With InvyEasy, you can:</p>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li><strong>📊 Track Inventory:</strong> Monitor stock levels in real-time</li>
+        <li><strong>📱 Easy Data Import:</strong> Use our Excel templates for quick setup</li>
+        <li><strong>🔔 Smart Alerts:</strong> Get notified when items are running low</li>
+        <li><strong>👥 Team Collaboration:</strong> Work together with role-based permissions</li>
+        <li><strong>📈 Generate Reports:</strong> Get insights into your inventory performance</li>
+      </ul>
+    </div>
     
-    <div class="alert alert-success">
-      <strong>Note:</strong> This invitation will expire in 7 days. If you have any questions, please contact ${inviterName}.
+    <div class="alert alert-warning">
+      <strong>⏰ Important:</strong> This invitation will expire in 7 days. If you have any questions, please contact ${inviterName} or reach out to our support team at <a href="mailto:invyeasy@gmail.com" style="color: ${EMAIL_DESIGN_SYSTEM.colors.primary};">invyeasy@gmail.com</a>.
     </div>
   `
 
@@ -421,9 +431,9 @@ export async function sendTeamInvitationEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
-      subject: `You're invited to join ${organizationName} on Hospitality Hub`,
+      subject: `You're invited to join ${organizationName} on InvyEasy! 🎉`,
       html: html
     })
     return { success: true, data: result }
@@ -480,7 +490,7 @@ export async function sendReservationConfirmationEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: `Reservation Confirmed - ${organizationName}`,
       html: html
@@ -541,7 +551,7 @@ export async function sendInvoiceEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: `Invoice #${invoiceNumber} - ${organizationName}`,
       html: html
@@ -598,7 +608,7 @@ export async function sendOrderReport({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: `Order Report - ${organizationName} - ${reportDate}`,
       html: html
@@ -648,7 +658,7 @@ export async function sendNotificationEmail({
     }
     
     const result = await resend.emails.send({
-      from: 'Hospitality Hub <noreply@yourdomain.com>',
+      from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
       subject: subject,
       html: html
@@ -656,6 +666,214 @@ export async function sendNotificationEmail({
     return { success: true, data: result }
   } catch (error) {
     console.error('Error sending notification email:', error)
+    return { success: false, error }
+  }
+}
+
+// Authentication Email Templates for InvyEasy
+
+// Welcome Email for New Users
+export async function sendWelcomeEmail({
+  to,
+  userName,
+  loginUrl
+}: {
+  to: string
+  userName: string
+  loginUrl?: string
+}) {
+  const content = `
+    <h2>Welcome to InvyEasy! 🎉</h2>
+    <p>Hello ${userName},</p>
+    <p>Welcome to <strong>InvyEasy</strong> - your all-in-one inventory management solution for the liquor and hospitality industry!</p>
+    
+    <div class="card">
+      <h3>🚀 Get Started with InvyEasy</h3>
+      <p>Your account is now active and ready to use. Here's what you can do:</p>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li><strong>📊 Track Inventory:</strong> Monitor your stock levels in real-time</li>
+        <li><strong>📱 Use Templates:</strong> Download our Excel template for easy data import</li>
+        <li><strong>🔄 Set Thresholds:</strong> Get alerts when items are running low</li>
+        <li><strong>👥 Invite Team:</strong> Collaborate with your staff and managers</li>
+        <li><strong>📈 Generate Reports:</strong> Get insights into your inventory performance</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>💡 Pro Tip:</strong> Start by downloading our inventory template and uploading your current stock data. 
+      This will get you up and running in minutes!
+    </div>
+
+    ${loginUrl ? `
+      <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
+        <a href="${loginUrl}" class="button">Access Your Dashboard</a>
+      </div>
+    ` : ''}
+
+    <div class="card">
+      <h3>🆘 Need Help?</h3>
+      <p>We're here to help you succeed! Here are some resources:</p>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li><a href="${process.env.NEXT_PUBLIC_APP_URL}/contact" style="color: ${EMAIL_DESIGN_SYSTEM.colors.primary};">Contact Support</a></li>
+        <li><a href="${process.env.NEXT_PUBLIC_APP_URL}/inventory-conversion" style="color: ${EMAIL_DESIGN_SYSTEM.colors.primary};">Professional Data Conversion Service</a></li>
+        <li>Email us directly: <a href="mailto:invyeasy@gmail.com" style="color: ${EMAIL_DESIGN_SYSTEM.colors.primary};">invyeasy@gmail.com</a></li>
+      </ul>
+    </div>
+
+    <p>Thank you for choosing InvyEasy. We're excited to help you streamline your inventory management!</p>
+  `
+
+  const html = createBaseEmailTemplate(content, 'Welcome')
+
+  try {
+    if (!resend) {
+      console.warn('Resend not available on client side')
+      return { success: false, error: 'Resend not available on client side' }
+    }
+    
+    const result = await resend.emails.send({
+      from: 'InvyEasy <noreply@invyeasy.com>',
+      to: [to],
+      subject: 'Welcome to InvyEasy - Your Inventory Management Journey Starts Here! 🎉',
+      html: html
+    })
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error sending welcome email:', error)
+    return { success: false, error }
+  }
+}
+
+// Email Verification Template
+export async function sendEmailVerificationEmail({
+  to,
+  userName,
+  verificationUrl,
+  expirationTime = '24 hours'
+}: {
+  to: string
+  userName: string
+  verificationUrl: string
+  expirationTime?: string
+}) {
+  const content = `
+    <h2>Verify Your Email Address</h2>
+    <p>Hello ${userName},</p>
+    <p>Thank you for signing up for <strong>InvyEasy</strong>! To complete your account setup, please verify your email address.</p>
+    
+    <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
+      <a href="${verificationUrl}" class="button">Verify Email Address</a>
+    </div>
+
+    <div class="card">
+      <h3>Why do we need to verify your email?</h3>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li><strong>Security:</strong> Protect your account from unauthorized access</li>
+        <li><strong>Updates:</strong> Receive important notifications about your inventory</li>
+        <li><strong>Support:</strong> Ensure we can reach you if you need help</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>⏰ Important:</strong> This verification link will expire in ${expirationTime}. 
+      If you don't verify within this time, you'll need to request a new verification email.
+    </div>
+
+    <p>If you didn't create an account with InvyEasy, please ignore this email.</p>
+    
+    <p><strong>Can't click the button?</strong> Copy and paste this link into your browser:</p>
+    <p style="word-break: break-all; color: ${EMAIL_DESIGN_SYSTEM.colors.primary}; font-family: monospace; font-size: 12px;">
+      ${verificationUrl}
+    </p>
+  `
+
+  const html = createBaseEmailTemplate(content, 'Email Verification')
+
+  try {
+    if (!resend) {
+      console.warn('Resend not available on client side')
+      return { success: false, error: 'Resend not available on client side' }
+    }
+    
+    const result = await resend.emails.send({
+      from: 'InvyEasy <noreply@invyeasy.com>',
+      to: [to],
+      subject: 'Verify Your InvyEasy Account - Action Required',
+      html: html
+    })
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error sending email verification:', error)
+    return { success: false, error }
+  }
+}
+
+// Password Reset Email Template
+export async function sendPasswordResetEmail({
+  to,
+  userName,
+  resetUrl,
+  expirationTime = '1 hour'
+}: {
+  to: string
+  userName: string
+  resetUrl: string
+  expirationTime?: string
+}) {
+  const content = `
+    <h2>Reset Your Password</h2>
+    <p>Hello ${userName},</p>
+    <p>We received a request to reset the password for your <strong>InvyEasy</strong> account.</p>
+    
+    <div style="text-align: center; margin: ${EMAIL_DESIGN_SYSTEM.spacing.large} 0;">
+      <a href="${resetUrl}" class="button">Reset Password</a>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>⏰ Time Sensitive:</strong> This password reset link will expire in ${expirationTime} for security reasons.
+    </div>
+
+    <div class="card">
+      <h3>🔒 Security Tips</h3>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li>Choose a strong password with at least 8 characters</li>
+        <li>Include a mix of letters, numbers, and special characters</li>
+        <li>Don't reuse passwords from other accounts</li>
+        <li>Consider using a password manager</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-error">
+      <strong>⚠️ Didn't request this?</strong> If you didn't request a password reset, 
+      please ignore this email. Your account remains secure.
+    </div>
+    
+    <p><strong>Can't click the button?</strong> Copy and paste this link into your browser:</p>
+    <p style="word-break: break-all; color: ${EMAIL_DESIGN_SYSTEM.colors.primary}; font-family: monospace; font-size: 12px;">
+      ${resetUrl}
+    </p>
+
+    <p>If you're having trouble accessing your account, contact our support team at 
+    <a href="mailto:invyeasy@gmail.com" style="color: ${EMAIL_DESIGN_SYSTEM.colors.primary};">invyeasy@gmail.com</a></p>
+  `
+
+  const html = createBaseEmailTemplate(content, 'Password Reset')
+
+  try {
+    if (!resend) {
+      console.warn('Resend not available on client side')
+      return { success: false, error: 'Resend not available on client side' }
+    }
+    
+    const result = await resend.emails.send({
+      from: 'InvyEasy <noreply@invyeasy.com>',
+      to: [to],
+      subject: 'Reset Your InvyEasy Password - Action Required',
+      html: html
+    })
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error sending password reset email:', error)
     return { success: false, error }
   }
 }
