@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Clock, Mail, Download, Package, ArrowRight } from 'lucide-react'
 
-export default function ConversionSuccessPage() {
+function ConversionSuccessContent() {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [paymentVerified, setPaymentVerified] = useState(false)
@@ -201,5 +201,27 @@ export default function ConversionSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Package className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading...</h2>
+        <p className="text-gray-600">Please wait while we load your conversion details</p>
+      </div>
+    </div>
+  )
+}
+
+export default function ConversionSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ConversionSuccessContent />
+    </Suspense>
   )
 }
