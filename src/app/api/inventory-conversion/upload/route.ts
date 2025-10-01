@@ -5,8 +5,6 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -140,6 +138,7 @@ export async function POST(request: NextRequest) {
       `
 
       if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'your_resend_api_key_here') {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
           from: 'noreply@invyeasy.com',
           to: ['invyeasy@gmail.com'],

@@ -9,8 +9,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-07-30.basil',
 })
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: NextRequest) {
   try {
     const { sessionId, conversionId } = await request.json()
@@ -115,6 +113,7 @@ export async function POST(request: NextRequest) {
       `
 
       if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'your_resend_api_key_here') {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
           from: 'noreply@invyeasy.com',
           to: [conversionData.customerInfo.email],
@@ -154,6 +153,7 @@ export async function POST(request: NextRequest) {
       `
 
       if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'your_resend_api_key_here') {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
           from: 'noreply@invyeasy.com',
           to: ['invyeasy@gmail.com'],
