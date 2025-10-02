@@ -222,7 +222,7 @@ export default function LandingPage() {
             <div className="flex justify-center lg:justify-end">
               <div className="w-full max-w-lg">
                 <img 
-                  src="/hero-inventory-illustration.svg" 
+                  src="/barcode-scanning-illustration.svg" 
                   alt="Inventory management with barcode scanning"
                   className="w-full h-auto"
                 />
