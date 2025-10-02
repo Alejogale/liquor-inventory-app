@@ -82,7 +82,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Modern Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+      <nav className="sticky top-0 z-[9999] bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -137,33 +137,43 @@ export default function LandingPage() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
             <div className="px-4 py-4 space-y-4">
-              <a href="#features" className="block text-gray-600 hover:text-gray-900">Features</a>
-              <a href="#use-cases" className="block text-gray-600 hover:text-gray-900">Use Cases</a>
-              <a href="#how-it-works" className="block text-gray-600 hover:text-gray-900">How It Works</a>
-              <a href="#pricing" className="block text-gray-600 hover:text-gray-900">Pricing</a>
-              <a href="#faq" className="block text-gray-600 hover:text-gray-900">FAQ</a>
-              <Link href="/contact" className="block text-gray-600 hover:text-gray-900">Contact</Link>
+              <a href="#features" className="block text-gray-600 hover:text-gray-900 py-2">Features</a>
+              <a href="#use-cases" className="block text-gray-600 hover:text-gray-900 py-2">Use Cases</a>
+              <a href="#how-it-works" className="block text-gray-600 hover:text-gray-900 py-2">How It Works</a>
+              <a href="#pricing" className="block text-gray-600 hover:text-gray-900 py-2">Pricing</a>
+              <a href="#faq" className="block text-gray-600 hover:text-gray-900 py-2">FAQ</a>
+              <Link href="/contact" className="block text-gray-600 hover:text-gray-900 py-2">Contact</Link>
+              
+              {/* Mobile CTA Buttons */}
+              <div className="pt-4 border-t border-gray-100 space-y-3">
+                <Link href="/login" className="block text-center text-gray-600 hover:text-gray-900 py-2 font-medium">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="block text-center bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200">
+                  Start Free Trial
+                </Link>
+              </div>
             </div>
           </div>
         )}
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="pt-6 pb-8 sm:pt-8 sm:pb-12 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start">
             {/* Left Side - Hero Content */}
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left order-2 lg:order-1">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
                 <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                Organize Everything You Own
+                <span className="whitespace-nowrap">Organize Everything You Own</span>
               </div>
               
               {/* Main Headline */}
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
                 Easy Inventory<br />
                 <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                   Management
@@ -171,58 +181,45 @@ export default function LandingPage() {
                 for Everyone
               </h1>
               
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
                 Track, count, and manage inventory for your home, hobby, or business. 
                 Never lose track of what you own with our intuitive mobile-first system.
               </p>
               
-              {/* Mission Statement */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 max-w-2xl mx-auto lg:mx-0 border border-orange-100 shadow-lg">
-                <div className="flex items-center justify-center lg:justify-start mb-4">
-                  <Heart className="w-6 h-6 text-orange-500 mr-3" />
-                  <h3 className="text-xl font-bold text-gray-900">Our Mission</h3>
-                </div>
-                <p className="text-base text-gray-700 leading-relaxed text-center lg:text-left">
-                  Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry, 
-                  managing craft supplies, or running a small business - we believe everyone deserves powerful tools that 
-                  are easy to use and affordable. <strong className="text-orange-600">Simple. Smart. Organized.</strong>
-                </p>
-              </div>
-              
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 max-w-2xl mx-auto lg:mx-0">
+                <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center min-w-[200px]">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-                <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all duration-200 flex items-center justify-center">
+                <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all duration-200 flex items-center justify-center min-w-[200px]">
                   <Play className="mr-2 w-5 h-5" />
                   Watch Demo
                 </button>
               </div>
               
               {/* Trust Indicators */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-gray-600">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-gray-600 mb-12 max-w-2xl mx-auto lg:mx-0">
                 <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-sm sm:text-base">No credit card required</span>
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm sm:text-base whitespace-nowrap">No credit card required</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-sm sm:text-base">Setup in 5 minutes</span>
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm sm:text-base whitespace-nowrap">Setup in 5 minutes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-sm sm:text-base">30-day free trial</span>
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm sm:text-base whitespace-nowrap">30-day free trial</span>
                 </div>
               </div>
             </div>
 
             {/* Right Side - Hero Image */}
-            <div className="flex justify-center lg:justify-end">
-              <div className="w-full max-w-lg">
+            <div className="flex justify-center lg:justify-end order-1 lg:order-2 mb-4 sm:mb-0">
+              <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-4 sm:px-0">
                 <img 
-                  src="/barcode-scanning-illustration.svg" 
+                  src="/barcode-scanning-abstract-concept-vector-illustration.png" 
                   alt="Inventory management with barcode scanning"
                   className="w-full h-auto"
                 />
@@ -232,14 +229,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mission Statement Section */}
+      <section className="py-12 sm:py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-orange-100 shadow-xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center mb-4 sm:mb-6">
+              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 mb-2 sm:mb-0 sm:mr-3" />
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Our Mission</h2>
+            </div>
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto px-2 sm:px-0">
+              Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry, 
+              managing craft supplies, or running a small business - we believe everyone deserves powerful tools that 
+              are easy to use and affordable.
+            </p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600 mt-4 sm:mt-6">Simple. Smart. Organized.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-2 sm:px-0">
               Everything You Need to Stay Organized
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0">
               Powerful features designed for everyone - from home organizers to small business owners.
             </p>
           </div>
