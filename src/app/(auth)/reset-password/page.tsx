@@ -97,46 +97,8 @@ function ResetPasswordForm() {
     console.log('✅ Validation passed, proceeding with update')
 
     try {
-      // Skip session checks and go directly to token extraction
-      console.log('🔍 Extracting tokens directly from URL hash...')
-      
-      const hash = window.location.hash
-      if (!hash) {
-        setError('No reset tokens found. Please click the reset link from your email.')
-        return
-      }
-      
-      const hashParams = new URLSearchParams(hash.substring(1))
-      const accessToken = hashParams.get('access_token')
-      const refreshToken = hashParams.get('refresh_token')
-      const type = hashParams.get('type')
-      
-      console.log('🔍 Found tokens:', { 
-        hasAccessToken: !!accessToken, 
-        hasRefreshToken: !!refreshToken, 
-        type: type 
-      })
-      
-      if (!accessToken || !refreshToken || type !== 'recovery') {
-        setError('Invalid reset link. Please request a new password reset.')
-        return
-      }
-      
-      // Set session and update password quickly
-      console.log('🔄 Setting session and updating password...')
-      
-      const { error: setSessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      })
-      
-      if (setSessionError) {
-        console.error('❌ Failed to set session:', setSessionError)
-        setError('Failed to establish session. Please try clicking the reset link again.')
-        return
-      }
-      
-      console.log('✅ Session established, updating password...')
+      // Use the session that's already established by Supabase auth state changes
+      console.log('🔄 Using established session to update password...')
       
       const { data, error } = await supabase.auth.updateUser({
         password: password
