@@ -11,6 +11,7 @@ interface InventoryItem {
   current_stock: number
   par_level: number
   threshold: number
+  price_per_item?: number | null  // Optional price field
   categories: { name: string } | null
   suppliers: { name: string } | null
 }
@@ -63,7 +64,7 @@ export class InventoryService implements GoogleAppsScriptAPI {
       // Get all inventory items for this organization
       let query = supabase
         .from('inventory_items')
-        .select('brand, category_id')
+        .select('brand, category_id, price_per_item')
         .eq('organization_id', this.organizationId)
 
       const { data: items, error } = await query.order('brand')
@@ -116,7 +117,7 @@ export class InventoryService implements GoogleAppsScriptAPI {
       console.log('📋 Executing Supabase query for inventory_items...')
       const { data: items, error } = await supabase
         .from('inventory_items')
-        .select('id, brand, size, category_id')
+        .select('id, brand, size, category_id, price_per_item')
         .eq('organization_id', this.organizationId)
         .order('brand')
 
