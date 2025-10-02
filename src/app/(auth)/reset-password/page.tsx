@@ -14,6 +14,7 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
+  // Updated with Supabase redirect URL fix
 
   useEffect(() => {
     const handlePasswordReset = async () => {
