@@ -70,8 +70,13 @@ function LoginForm() {
     }
 
     try {
+      // Use the production URL for redirects to ensure consistency
+      const redirectUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://invyeasy.com/reset-password'
+        : `${window.location.origin}/reset-password`
+        
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/reset-password`
+        redirectTo: redirectUrl
       })
       if (error) throw error
       

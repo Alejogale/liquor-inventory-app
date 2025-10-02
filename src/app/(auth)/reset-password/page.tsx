@@ -17,13 +17,31 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const handlePasswordReset = async () => {
-      // Check if we have access token and type from URL
+      // First check URL hash parameters (Supabase redirects with these)
       const hashParams = new URLSearchParams(window.location.hash.substring(1))
       const accessToken = hashParams.get('access_token')
       const refreshToken = hashParams.get('refresh_token')
       const type = hashParams.get('type')
       
-      if (!accessToken || !refreshToken || type !== 'recovery') {
+      // Also check search parameters (alternative method)
+      const urlParams = new URLSearchParams(window.location.search)
+      const urlAccessToken = urlParams.get('access_token')
+      const urlRefreshToken = urlParams.get('refresh_token')
+      const urlType = urlParams.get('type')
+      
+      // Use whichever set of parameters is available
+      const finalAccessToken = accessToken || urlAccessToken
+      const finalRefreshToken = refreshToken || urlRefreshToken
+      const finalType = type || urlType
+      
+      console.log('Reset password tokens:', {
+        hashToken: !!accessToken,
+        urlToken: !!urlAccessToken,
+        type: finalType,
+        hasRefresh: !!finalRefreshToken
+      })
+      
+      if (!finalAccessToken || !finalRefreshToken || finalType !== 'recovery') {
         setError('Invalid or expired reset link. Please request a new password reset.')
         return
       }
@@ -31,13 +49,15 @@ function ResetPasswordForm() {
       try {
         // Set the session with the tokens from the URL
         const { data, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
+          access_token: finalAccessToken,
+          refresh_token: finalRefreshToken
         })
 
         if (error) {
           console.error('Session error:', error)
           setError('Invalid or expired reset link. Please request a new password reset.')
+        } else {
+          console.log('✅ Session established successfully for password reset')
         }
       } catch (error) {
         console.error('Auth error:', error)
@@ -45,7 +65,9 @@ function ResetPasswordForm() {
       }
     }
 
-    handlePasswordReset()
+    // Add a small delay to ensure the page has loaded completely
+    const timeoutId = setTimeout(handlePasswordReset, 100)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
