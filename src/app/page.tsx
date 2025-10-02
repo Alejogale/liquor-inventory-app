@@ -37,6 +37,7 @@ export default function LandingPage() {
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null)
   const [isAnnual, setIsAnnual] = useState(false)
   const router = useRouter()
+  // Force deployment trigger
 
   // Handle password reset redirect
   useEffect(() => {
