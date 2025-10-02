@@ -153,66 +153,80 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-24 pb-16 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-8">
-              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-              Organize Everything You Own
-            </div>
-            
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Easy Inventory<br />
-              <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                Management
-              </span><br />
-              for Everyone
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Track, count, and manage inventory for your home, hobby, or business. 
-              Never lose track of what you own with our intuitive mobile-first system.
-            </p>
-            
-            {/* Mission Statement */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-12 max-w-4xl mx-auto border border-orange-100 shadow-lg">
-              <div className="flex items-center justify-center mb-4">
-                <Heart className="w-8 h-8 text-orange-500 mr-3" />
-                <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Hero Content */}
+            <div className="text-center lg:text-left">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-8">
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                Organize Everything You Own
               </div>
-              <p className="text-lg text-gray-700 leading-relaxed text-center">
-                Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry, 
-                managing craft supplies, or running a small business - we believe everyone deserves powerful tools that 
-                are easy to use and affordable. <strong className="text-orange-600">Simple. Smart. Organized.</strong>
+              
+              {/* Main Headline */}
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                Easy Inventory<br />
+                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                  Management
+                </span><br />
+                for Everyone
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                Track, count, and manage inventory for your home, hobby, or business. 
+                Never lose track of what you own with our intuitive mobile-first system.
               </p>
-            </div>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-              <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all duration-200 flex items-center justify-center">
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
-              </button>
-          </div>
-          
-          {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-gray-600">
-            <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-              <span className="text-sm sm:text-base">No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="text-sm sm:text-base">Setup in 5 minutes</span>
+              
+              {/* Mission Statement */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 max-w-2xl mx-auto lg:mx-0 border border-orange-100 shadow-lg">
+                <div className="flex items-center justify-center lg:justify-start mb-4">
+                  <Heart className="w-6 h-6 text-orange-500 mr-3" />
+                  <h3 className="text-xl font-bold text-gray-900">Our Mission</h3>
+                </div>
+                <p className="text-base text-gray-700 leading-relaxed text-center lg:text-left">
+                  Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry, 
+                  managing craft supplies, or running a small business - we believe everyone deserves powerful tools that 
+                  are easy to use and affordable. <strong className="text-orange-600">Simple. Smart. Organized.</strong>
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-              <span className="text-sm sm:text-base">30-day free trial</span>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+                <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all duration-200 flex items-center justify-center">
+                  <Play className="mr-2 w-5 h-5" />
+                  Watch Demo
+                </button>
+              </div>
+              
+              {/* Trust Indicators */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-sm sm:text-base">No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-sm sm:text-base">Setup in 5 minutes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-sm sm:text-base">30-day free trial</span>
+                </div>
+              </div>
             </div>
+
+            {/* Right Side - Hero Image */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="w-full max-w-lg">
+                <img 
+                  src="/hero-barcode-scanning.svg" 
+                  alt="Inventory management with barcode scanning"
+                  className="w-full h-auto"
+                />
+              </div>
             </div>
           </div>
         </div>
