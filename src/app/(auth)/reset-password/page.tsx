@@ -97,13 +97,49 @@ function ResetPasswordForm() {
     console.log('✅ Validation passed, proceeding with update')
 
     try {
-      // Check if session is ready from auth state change
+      // Check if session is ready, if not try to establish it
       if (!sessionReady) {
-        setError('Session not ready. Please wait a moment and try again.')
-        return
+        console.log('⚠️ Session not ready, checking current session...')
+        
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError || !sessionData.session) {
+          console.log('❌ No session found, trying to establish from URL hash...')
+          
+          const hash = window.location.hash
+          if (hash) {
+            const hashParams = new URLSearchParams(hash.substring(1))
+            const accessToken = hashParams.get('access_token')
+            const refreshToken = hashParams.get('refresh_token')
+            const type = hashParams.get('type')
+            
+            if (accessToken && refreshToken && type === 'recovery') {
+              console.log('🔄 Setting session from URL tokens...')
+              const { error: setSessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+              })
+              
+              if (setSessionError) {
+                console.error('❌ Failed to set session:', setSessionError)
+                setError('Failed to establish session. Please try clicking the reset link again.')
+                return
+              }
+              console.log('✅ Session established from URL tokens')
+            } else {
+              setError('Invalid reset link. Please request a new password reset.')
+              return
+            }
+          } else {
+            setError('No reset tokens found. Please click the reset link from your email.')
+            return
+          }
+        } else {
+          console.log('✅ Existing session found:', sessionData.session.user?.email)
+        }
       }
       
-      // Update password directly since session is already established
+      // Update password directly since session is now established
       console.log('🔄 Attempting to update password with established session...')
       const { data, error } = await supabase.auth.updateUser({
         password: password
