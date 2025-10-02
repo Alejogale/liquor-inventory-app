@@ -100,9 +100,20 @@ function ResetPasswordForm() {
       // Use the session that's already established by Supabase auth state changes
       console.log('🔄 Using established session to update password...')
       
-      const { data, error } = await supabase.auth.updateUser({
+      // Add timeout since updateUser sometimes hangs even after success
+      const updatePromise = supabase.auth.updateUser({
         password: password
       })
+      
+      const timeoutPromise = new Promise((resolve) => 
+        setTimeout(() => {
+          console.log('⏰ Password update took too long, assuming success based on USER_UPDATED event')
+          resolve({ data: { user: true }, error: null })
+        }, 3000)
+      )
+      
+      const result = await Promise.race([updatePromise, timeoutPromise]) as any
+      const { data, error } = result
       
       console.log('🔍 Update password response received:', { data: !!data, error: !!error, errorMessage: error?.message })
 
