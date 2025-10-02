@@ -171,26 +171,31 @@ function ResetPasswordForm() {
       }
 
       // Update the password
-      const { error } = await supabase.auth.updateUser({
+      console.log('🔄 Attempting to update password...')
+      const { data, error } = await supabase.auth.updateUser({
         password: password
       })
 
       if (error) {
-        console.error('Password update error:', error)
+        console.error('❌ Password update error:', error)
         if (error.message.includes('session')) {
           setError('Session expired. Please click the reset link in your email again.')
         } else {
-          throw error
+          setError(error.message || 'Failed to update password')
         }
         return
       }
+      
+      console.log('✅ Password update response:', data)
 
+      console.log('✅ Password updated successfully!')
       setSuccess(true)
       
-      // Redirect to login after 2 seconds
+      // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login?message=Password updated successfully! You can now sign in.')
-      }, 2000)
+        console.log('🔄 Redirecting to login...')
+        window.location.href = '/login?message=Password updated successfully! You can now sign in.'
+      }, 3000)
 
     } catch (error: any) {
       console.error('Password reset error:', error)
@@ -212,7 +217,13 @@ function ResetPasswordForm() {
             <p className="text-slate-600 mb-4">
               Your password has been successfully updated. You will be redirected to login shortly.
             </p>
-            <div className="text-sm text-slate-500">Redirecting in 2 seconds...</div>
+            <div className="text-sm text-slate-500">Redirecting in 3 seconds...</div>
+            <button 
+              onClick={() => window.location.href = '/login?message=Password updated successfully! You can now sign in.'}
+              className="mt-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200"
+            >
+              Go to Login Now
+            </button>
           </div>
         </div>
       </div>
