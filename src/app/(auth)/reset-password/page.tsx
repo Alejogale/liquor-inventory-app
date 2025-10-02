@@ -12,6 +12,7 @@ function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [sessionReady, setSessionReady] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   // Updated with Supabase redirect URL fix
@@ -49,16 +50,19 @@ function ResetPasswordForm() {
       if (event === 'PASSWORD_RECOVERY' && session) {
         console.log('✅ Password recovery session established via auth state change')
         setError('')
+        setSessionReady(true)
       }
       
       if (event === 'SIGNED_IN' && session) {
         console.log('✅ User signed in via auth state change:', session.user?.email)
         setError('')
+        setSessionReady(true)
       }
       
       if (event === 'TOKEN_REFRESHED' && session) {
         console.log('✅ Token refreshed via auth state change')
         setError('')
+        setSessionReady(true)
       }
     })
     
@@ -93,64 +97,17 @@ function ResetPasswordForm() {
     console.log('✅ Validation passed, proceeding with update')
 
     try {
-      // Extract tokens directly from URL hash
-      const hash = window.location.hash
-      console.log('🔍 Extracting tokens from URL hash...')
-      
-      if (!hash) {
-        setError('No reset tokens found. Please click the reset link from your email.')
+      // Check if session is ready from auth state change
+      if (!sessionReady) {
+        setError('Session not ready. Please wait a moment and try again.')
         return
       }
       
-      const hashParams = new URLSearchParams(hash.substring(1))
-      const accessToken = hashParams.get('access_token')
-      const refreshToken = hashParams.get('refresh_token')
-      const type = hashParams.get('type')
-      
-      console.log('🔍 Found tokens:', { 
-        hasAccessToken: !!accessToken, 
-        hasRefreshToken: !!refreshToken, 
-        type: type 
-      })
-      
-      if (!accessToken || !refreshToken || type !== 'recovery') {
-        setError('Invalid reset link. Please request a new password reset.')
-        return
-      }
-      
-      // Set session with timeout
-      console.log('🔄 Setting session with tokens...')
-      const sessionPromise = supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      })
-      
-      const sessionTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Session timeout')), 3000)
-      )
-      
-      const sessionResult = await Promise.race([sessionPromise, sessionTimeout]) as any
-      
-      if (sessionResult.error) {
-        console.error('❌ Session error:', sessionResult.error)
-        setError('Failed to establish session. Please try clicking the reset link again.')
-        return
-      }
-      
-      console.log('✅ Session established successfully')
-      
-      // Update password with timeout
-      console.log('🔄 Attempting to update password...')
-      const updatePromise = supabase.auth.updateUser({
+      // Update password directly since session is already established
+      console.log('🔄 Attempting to update password with established session...')
+      const { data, error } = await supabase.auth.updateUser({
         password: password
       })
-      
-      const updateTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Password update timeout')), 5000)
-      )
-      
-      const updateResult = await Promise.race([updatePromise, updateTimeout]) as any
-      const { data, error } = updateResult
       
       console.log('🔍 Update password response received:', { data: !!data, error: !!error, errorMessage: error?.message })
 
