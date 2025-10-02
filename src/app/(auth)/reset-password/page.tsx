@@ -83,7 +83,14 @@ function ResetPasswordForm() {
       }
       
       if (!finalAccessToken || !finalRefreshToken) {
-        console.error('❌ Missing tokens:', { accessToken: !!finalAccessToken, refreshToken: !!finalRefreshToken })
+        console.error('❌ Missing tokens:', { 
+          accessToken: !!finalAccessToken, 
+          refreshToken: !!finalRefreshToken,
+          hashParamsCount: Array.from(hashParams.entries()).length,
+          urlParamsCount: Array.from(urlParams.entries()).length,
+          allHashParams: Array.from(hashParams.entries()),
+          allUrlParams: Array.from(urlParams.entries())
+        })
         setError('Invalid or expired reset link. Please request a new password reset.')
         return
       }
