@@ -132,6 +132,15 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
         }
       })
 
+      console.log('🔥 BulkPricing - Data loaded:', {
+        itemsCount: enrichedItems?.length || 0,
+        categoriesCount: categoriesData?.length || 0,
+        suppliersCount: suppliersData?.length || 0,
+        sampleItem: enrichedItems?.[0],
+        sampleCategory: categoriesData?.[0],
+        sampleSupplier: suppliersData?.[0]
+      })
+
       setItems(enrichedItems || [])
       setCategories(categoriesData || [])
       setSuppliers(suppliersData || [])
@@ -145,6 +154,20 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
 
   // Filter items based on current filters
   const filteredItems = items.filter(item => {
+    // Debug logging
+    if (items.length > 0 && Object.keys(filters).some(key => filters[key as keyof typeof filters])) {
+      console.log('🔍 Filtering item:', {
+        itemId: item.id,
+        itemBrand: item.brand,
+        itemCategoryId: item.category_id,
+        itemSupplierId: item.supplier_id,
+        itemPrice: item.price_per_item,
+        filters: filters,
+        categoryMatch: !filters.category || item.category_id === filters.category,
+        supplierMatch: !filters.supplier || item.supplier_id === filters.supplier
+      })
+    }
+    
     if (filters.category && item.category_id !== filters.category) return false
     if (filters.supplier && item.supplier_id !== filters.supplier) return false
     
