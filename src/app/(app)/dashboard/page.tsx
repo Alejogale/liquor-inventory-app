@@ -92,9 +92,10 @@ function DashboardContent() {
   // Add to existing state
   const [selectedItems, setSelectedItems] = useState(new Set<string>())
   const [showBulkActions, setShowBulkActions] = useState(false)
-  const [bulkOperation, setBulkOperation] = useState<'delete' | 'move-category' | 'move-supplier' | null>(null)
+  const [bulkOperation, setBulkOperation] = useState<'delete' | 'move-category' | 'move-supplier' | 'change-price' | null>(null)
   const [targetCategory, setTargetCategory] = useState('')
   const [targetSupplier, setTargetSupplier] = useState('')
+  const [newPrice, setNewPrice] = useState('')
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
   const [showBulkPricingModal, setShowBulkPricingModal] = useState(false)
 
@@ -363,6 +364,9 @@ function DashboardContent() {
     setSelectedItems(new Set())
     setShowBulkActions(false)
     setBulkOperation(null)
+    setTargetCategory('')
+    setTargetSupplier('')
+    setNewPrice('')
   }
 
   const handleItemSelect = (itemId: string) => {
@@ -453,6 +457,35 @@ function DashboardContent() {
       } catch (error) {
         console.error('Error in bulk supplier change:', error)
         alert('Error changing supplier. Please try again.')
+      }
+    }
+  }
+
+  const handleBulkPriceChange = async () => {
+    if (selectedItems.size === 0 || !newPrice || parseFloat(newPrice) <= 0) return
+    
+    const price = parseFloat(newPrice)
+    if (confirm(`Change price to $${price.toFixed(2)} for ${selectedItems.size} selected items?`)) {
+      try {
+        const { error } = await supabase
+          .from('inventory_items')
+          .update({ price_per_item: price })
+          .in('id', Array.from(selectedItems))
+          .eq('organization_id', organizationId)
+
+        if (error) {
+          console.error('Error changing prices:', error)
+          alert('Error changing prices. Please try again.')
+        } else {
+          console.log(`✅ Successfully changed prices for ${selectedItems.size} items`)
+          await fetchData() // Refresh data
+          handleDeselectAll()
+          setNewPrice('') // Clear the input
+          alert(`Successfully changed prices for ${selectedItems.size} items to $${price.toFixed(2)}`)
+        }
+      } catch (error) {
+        console.error('Unexpected error changing prices:', error)
+        alert('Error changing prices. Please try again.')
       }
     }
   }
@@ -742,6 +775,23 @@ function DashboardContent() {
                                   <Users className="h-4 w-4" />
                                   <span>Change Supplier</span>
                                 </button>
+                                
+                                <button
+                                  onClick={() => setBulkOperation('change-price')}
+                                  className="flex items-center space-x-2 px-4 py-2 text-orange-700 rounded-xl transition-all duration-300 backdrop-blur-sm border border-orange-200"
+                                  style={{
+                                    background: 'linear-gradient(135deg, rgba(255, 247, 237, 0.8) 0%, rgba(254, 215, 170, 0.6) 100%)'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 247, 237, 0.9) 0%, rgba(254, 215, 170, 0.7) 100%)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 247, 237, 0.8) 0%, rgba(254, 215, 170, 0.6) 100%)';
+                                  }}
+                                >
+                                  <DollarSign className="h-4 w-4" />
+                                  <span>Change Price</span>
+                                </button>
                               </div>
                             )}
                           </div>
@@ -859,6 +909,60 @@ function DashboardContent() {
         }}
                                 >
                                   Change Supplier
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {bulkOperation === 'change-price' && (
+                          <div className="p-4 bg-orange-50 border-l-4 border-orange-400">
+                            <div className="flex items-center justify-between h-full">
+                              <div className="flex items-center space-x-4">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-orange-800 font-medium">Change price for {selectedItems.size} items</h4>
+                                  <p className="text-orange-600 text-sm">Enter the new price per item below.</p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-orange-700 font-medium">$</span>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={newPrice}
+                                    onChange={(e) => setNewPrice(e.target.value)}
+                                    placeholder="0.00"
+                                    className="px-3 py-2 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 w-24"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => setBulkOperation(null)}
+                                  className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleBulkPriceChange}
+                                  disabled={!newPrice || parseFloat(newPrice) <= 0}
+                                  className="px-4 py-2 text-white rounded-lg disabled:bg-slate-300 transition-all duration-300"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                                    boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!e.currentTarget.disabled) {
+                                      e.currentTarget.style.transform = 'translateY(-1px)';
+                                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(255, 119, 0, 0.4)';
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0px)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 119, 0, 0.3)';
+                                  }}
+                                >
+                                  Change Price
                                 </button>
                               </div>
                             </div>
