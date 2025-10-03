@@ -10,7 +10,8 @@ import {
   ChevronDown,
   Package,
   Building2,
-  ClipboardList
+  ClipboardList,
+  DollarSign
 } from 'lucide-react'
 
 import { useState, useEffect, Suspense } from 'react'
@@ -83,7 +84,8 @@ function DashboardContent() {
     totalItems: 0,
     totalCategories: 0,
     totalSuppliers: 0,
-    totalRooms: 0
+    totalRooms: 0,
+    totalInventoryValue: 0
   })
 
   // Add to existing state
@@ -248,11 +250,24 @@ function DashboardContent() {
       setCategories(categoriesData || [])
       setSuppliers(suppliersData || [])
 
+      // Calculate total inventory value
+      let totalInventoryValue = 0
+      if (inventoryData && roomCountsData) {
+        totalInventoryValue = inventoryData.reduce((total, item) => {
+          // Get total count for this item across all rooms
+          const itemCounts = roomCountsData.filter(count => count.inventory_item_id === item.id)
+          const totalCount = itemCounts.reduce((sum, count) => sum + count.count, 0)
+          const itemValue = totalCount * (item.price_per_item || 0)
+          return total + itemValue
+        }, 0)
+      }
+
       setStats({
         totalItems: inventoryData?.length || 0,
         totalCategories: categoriesData?.length || 0,
         totalSuppliers: suppliersData?.length || 0,
-        totalRooms: roomsData?.length || 0
+        totalRooms: roomsData?.length || 0,
+        totalInventoryValue
       })
 
     } catch (error) {
@@ -453,7 +468,7 @@ function DashboardContent() {
       } lg:ml-0`}>
         {/* Top Stats Bar */}
         <div className="p-6 lg:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
@@ -538,6 +553,28 @@ function DashboardContent() {
                        boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)'
                      }}>
                   <Building2 className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                   backdropFilter: 'blur(20px)',
+                   WebkitBackdropFilter: 'blur(20px)',
+                   boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
+                 }}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium mb-2">Total Inventory Value</p>
+                  <p className="text-3xl font-bold text-gray-900">${stats.totalInventoryValue.toFixed(2)}</p>
+                </div>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                     style={{
+                       background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                       boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
+                     }}>
+                  <DollarSign className="h-7 w-7 text-white" />
                 </div>
               </div>
             </div>
