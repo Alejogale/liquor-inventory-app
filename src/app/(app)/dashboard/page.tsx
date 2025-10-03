@@ -34,6 +34,7 @@ import DashboardSidebar from '@/components/DashboardSidebar'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
 import WelcomeOnboardingModal from '@/components/WelcomeOnboardingModal'
+import BulkPricingModal from '@/components/BulkPricingModal'
 
 
 interface Category {
@@ -95,6 +96,7 @@ function DashboardContent() {
   const [targetCategory, setTargetCategory] = useState('')
   const [targetSupplier, setTargetSupplier] = useState('')
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
+  const [showBulkPricingModal, setShowBulkPricingModal] = useState(false)
 
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
@@ -609,24 +611,33 @@ function DashboardContent() {
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Inventory Management</h2>
                     <p className="text-gray-600 mt-1">Manage your liquor inventory items and stock levels</p>
                   </div>
-                  <button
-                    onClick={() => setShowAddItem(true)}
-                    className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
-                    style={{
-                      background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                      boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0px)';
-                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
-                    }}
-                  >
-                    Add Item
-                  </button>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setShowBulkPricingModal(true)}
+                      className="text-green-700 bg-green-100 hover:bg-green-200 px-4 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2 border border-green-200"
+                    >
+                      <DollarSign className="h-4 w-4" />
+                      Bulk Pricing
+                    </button>
+                    <button
+                      onClick={() => setShowAddItem(true)}
+                      className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+                      style={{
+                        background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                        boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0px)';
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
+                      }}
+                    >
+                      Add Item
+                    </button>
+                  </div>
                 </div>
                 
                 {loading ? (
@@ -1103,6 +1114,15 @@ function DashboardContent() {
         onClose={handleCloseWelcomeModal}
         userName={userProfile?.full_name || user?.email?.split('@')[0] || 'there'}
       />
+
+      {/* Bulk Pricing Modal */}
+      {showBulkPricingModal && (
+        <BulkPricingModal
+          onClose={() => setShowBulkPricingModal(false)}
+          onPricingUpdated={fetchData}
+          organizationId={organizationId}
+        />
+      )}
     </div>
   )
 }
