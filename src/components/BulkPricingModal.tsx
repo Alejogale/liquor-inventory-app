@@ -18,8 +18,8 @@ interface InventoryItem {
   id: string
   brand: string
   price_per_item?: number | null
-  categories: { name: string } | null
-  suppliers: { name: string } | null
+  categories: { name: string }[] | { name: string } | null
+  suppliers: { name: string }[] | { name: string } | null
   category_id: string
   supplier_id: string
 }
@@ -562,7 +562,7 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
                           <div>
                             <p className="font-medium text-slate-800">{item.brand}</p>
                             <p className="text-sm text-slate-600">
-                              {item.categories?.name} • {item.suppliers?.name}
+                              {Array.isArray(item.categories) ? item.categories[0]?.name : item.categories?.name} • {Array.isArray(item.suppliers) ? item.suppliers[0]?.name : item.suppliers?.name}
                             </p>
                           </div>
                         </div>
