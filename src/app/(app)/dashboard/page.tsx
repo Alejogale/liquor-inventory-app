@@ -14,7 +14,7 @@ import {
   DollarSign
 } from 'lucide-react'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useOrganizationData } from '@/lib/use-data-loading'
 import { supabase } from '@/lib/supabase'
@@ -132,7 +132,7 @@ function DashboardContent() {
       // Set loading to false if we can't load data
       setLoading(false)
     }
-  }, [user, organization, isAdmin])
+  }, [user, organization, isAdmin, organizationId, fetchData])
 
   // Handle URL parameters for tab navigation
   useEffect(() => {
@@ -159,7 +159,7 @@ function DashboardContent() {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       console.log('🔍 Starting data fetch...')
@@ -291,7 +291,7 @@ function DashboardContent() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [organizationId, organization])
 
   const handleCategoryAdded = () => {
     fetchData()
