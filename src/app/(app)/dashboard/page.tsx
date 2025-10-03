@@ -112,27 +112,6 @@ function DashboardContent() {
     loading
   })
 
-  useEffect(() => {
-    // Admin user can load data even without organization context
-    if (user && (organization || isAdmin)) {
-      console.log('🔄 Loading dashboard data...', { 
-        hasUser: !!user, 
-        hasOrg: !!organization, 
-        isAdmin: isAdmin,
-        orgId: organizationId 
-      })
-      fetchData()
-    } else {
-      console.log('⚠️ Dashboard not loading data:', { 
-        hasUser: !!user, 
-        hasOrg: !!organization, 
-        isAdmin: isAdmin,
-        orgId: organizationId 
-      })
-      // Set loading to false if we can't load data
-      setLoading(false)
-    }
-  }, [user, organization, isAdmin, organizationId, fetchData])
 
   // Handle URL parameters for tab navigation
   useEffect(() => {
@@ -292,6 +271,29 @@ function DashboardContent() {
       setLoading(false)
     }
   }, [organizationId, organization])
+
+  // Load data when component mounts or dependencies change
+  useEffect(() => {
+    // Admin user can load data even without organization context
+    if (user && (organization || isAdmin)) {
+      console.log('🔄 Loading dashboard data...', { 
+        hasUser: !!user, 
+        hasOrg: !!organization, 
+        isAdmin: isAdmin,
+        orgId: organizationId 
+      })
+      fetchData()
+    } else {
+      console.log('⚠️ Dashboard not loading data:', { 
+        hasUser: !!user, 
+        hasOrg: !!organization, 
+        isAdmin: isAdmin,
+        orgId: organizationId 
+      })
+      // Set loading to false if we can't load data
+      setLoading(false)
+    }
+  }, [user, organization, isAdmin, organizationId, fetchData])
 
   const handleCategoryAdded = () => {
     fetchData()
