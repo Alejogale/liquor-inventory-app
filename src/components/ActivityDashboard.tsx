@@ -43,7 +43,7 @@ interface ActivityDashboardProps {
 export default function ActivityDashboard({ userEmail, organizationId }: ActivityDashboardProps) {
   const [loading, setLoading] = useState(true)
   const [sendingReport, setSendingReport] = useState(false)
-  const [managerEmails, setManagerEmails] = useState(['manager@example.com'])
+  const [managerEmails, setManagerEmails] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
   const [reportSent, setReportSent] = useState(false)
   
@@ -89,6 +89,35 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       return null
     }
   }
+
+  // Load manager emails from localStorage on component mount
+  useEffect(() => {
+    const loadManagerEmails = () => {
+      try {
+        const savedEmails = localStorage.getItem(`managerEmails_${organizationId}`)
+        if (savedEmails) {
+          const emails = JSON.parse(savedEmails)
+          if (Array.isArray(emails) && emails.length > 0) {
+            setManagerEmails(emails)
+            console.log('📧 Loaded manager emails:', emails)
+          } else {
+            // Set default email if no emails are saved
+            setManagerEmails([userEmail])
+          }
+        } else {
+          // Set default email if no emails are saved
+          setManagerEmails([userEmail])
+        }
+      } catch (error) {
+        console.error('Error loading manager emails:', error)
+        setManagerEmails([userEmail])
+      }
+    }
+
+    if (organizationId && userEmail) {
+      loadManagerEmails()
+    }
+  }, [organizationId, userEmail])
 
   useEffect(() => {
     const initializeDashboard = async () => {
@@ -407,6 +436,12 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       // Actually send emails to all manager emails
       console.log('📬 Sending emails to:', managerEmails)
       
+      if (managerEmails.length === 0) {
+        console.warn('⚠️ No manager emails configured!')
+        alert('No manager emails configured. Please add manager emails in the configuration section.')
+        return
+      }
+      
       const emailPromises = managerEmails.map(async (email) => {
         try {
           const response = await fetch('/api/send-order-report', {
@@ -524,13 +559,31 @@ Total: ${item.totalCount} bottles
 
   const addManagerEmail = () => {
     if (newEmail && newEmail.includes('@') && !managerEmails.includes(newEmail)) {
-      setManagerEmails([...managerEmails, newEmail])
+      const updatedEmails = [...managerEmails, newEmail]
+      setManagerEmails(updatedEmails)
       setNewEmail('')
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem(`managerEmails_${organizationId}`, JSON.stringify(updatedEmails))
+        console.log('📧 Saved manager emails:', updatedEmails)
+      } catch (error) {
+        console.error('Error saving manager emails:', error)
+      }
     }
   }
 
   const removeManagerEmail = (email: string) => {
-    setManagerEmails(managerEmails.filter(e => e !== email))
+    const updatedEmails = managerEmails.filter(e => e !== email)
+    setManagerEmails(updatedEmails)
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem(`managerEmails_${organizationId}`, JSON.stringify(updatedEmails))
+      console.log('📧 Updated manager emails:', updatedEmails)
+    } catch (error) {
+      console.error('Error saving manager emails:', error)
+    }
   }
 
 
