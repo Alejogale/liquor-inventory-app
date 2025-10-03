@@ -203,7 +203,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
 
       console.log('✅ Organization ID:', currentOrg)
 
-      // Get all inventory items
+      // Get all inventory items with pricing
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select('*')
@@ -295,7 +295,9 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
           categories: category ? { name: category.name } : null,
           suppliers: supplier ? { name: supplier.name } : null,
           roomCounts,
-          totalCount
+          totalCount,
+          price_per_item: item.price_per_item || 0,
+          total_value: (totalCount * (item.price_per_item || 0))
         }
       }) || []
 
@@ -314,7 +316,8 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         categoryName,
         items,
         totalItems: items.length,
-        totalCount: items.reduce((sum, item: any) => sum + item.totalCount, 0)
+        totalCount: items.reduce((sum, item: any) => sum + item.totalCount, 0),
+        totalValue: items.reduce((sum, item: any) => sum + (item.total_value || 0), 0)
       }))
 
       // Sort by category name
@@ -331,7 +334,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
   }
 
   const exportToCsv = () => {
-    const headers = ['Category', 'Brand', 'Barcode', 'Supplier', 'Par Level', 'Threshold', 'Total Count']
+    const headers = ['Category', 'Brand', 'Barcode', 'Supplier', 'Par Level', 'Threshold', 'Total Count', 'Price per Item', 'Total Value']
     
     if (reportSettings.includeRoomDetails) {
       headers.push('Room Details')
@@ -348,7 +351,9 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
           reportSettings.includeSuppliers ? (item.suppliers?.name || 'No supplier') : '',
           item.par_level,
           item.threshold,
-          item.totalCount
+          item.totalCount,
+          item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : 'No price',
+          item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00'
         ]
 
         if (reportSettings.includeRoomDetails) {
@@ -675,7 +680,7 @@ Total: ${item.totalCount} bottles
                     <div>
                       <h4 className="text-slate-800 font-medium">{category.categoryName}</h4>
                       <p className="text-slate-600 text-sm">
-                        {category.totalItems} items • {category.totalCount} total units
+                        {category.totalItems} items • {category.totalCount} total units • ${(category.totalValue || 0).toFixed(2)} total value
                       </p>
                     </div>
                   </div>
@@ -695,6 +700,8 @@ Total: ${item.totalCount} bottles
                         <th className="text-left py-3 px-4 text-slate-700 font-medium">Par Level</th>
                         <th className="text-left py-3 px-4 text-slate-700 font-medium">Threshold</th>
                         <th className="text-left py-3 px-4 text-slate-700 font-medium">Total Count</th>
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Price per Item</th>
+                        <th className="text-left py-3 px-4 text-slate-700 font-medium">Total Value</th>
                         {reportSettings.includeRoomDetails && (
                           <th className="text-left py-3 px-4 text-slate-700 font-medium">Room Details</th>
                         )}
@@ -723,6 +730,20 @@ Total: ${item.totalCount} bottles
                                 : 'bg-gray-100 text-gray-600'
                             }`}>
                               {item.totalCount}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {item.price_per_item ? (
+                              <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-medium">
+                                ${item.price_per_item.toFixed(2)}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-sm">No price</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-medium">
+                              ${item.total_value ? item.total_value.toFixed(2) : '0.00'}
                             </span>
                           </td>
                           {reportSettings.includeRoomDetails && (
