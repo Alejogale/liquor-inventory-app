@@ -481,113 +481,113 @@ function DashboardContent() {
       } lg:ml-0`}>
         {/* Top Stats Bar */}
         <div className="p-6 lg:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6 mb-8">
+            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(255, 119, 0, 0.1)'
                  }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-2">Total Items</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalItems}</p>
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Items</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">{stats.totalItems}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
                        boxShadow: '0 8px 24px rgba(255, 119, 0, 0.3)'
                      }}>
-                  <Package className="h-7 w-7 text-white" />
+                  <Package className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
                  }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-2">Categories</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalCategories}</p>
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Categories</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">{stats.totalCategories}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                        boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
                      }}>
-                  <ClipboardList className="h-7 w-7 text-white" />
+                  <ClipboardList className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
                  }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-2">Suppliers</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalSuppliers}</p>
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Suppliers</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">{stats.totalSuppliers}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                        boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
                      }}>
-                  <Users className="h-7 w-7 text-white" />
+                  <Users className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(147, 51, 234, 0.1)'
                  }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-2">Rooms</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalRooms}</p>
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Rooms</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">{stats.totalRooms}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
                        boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)'
                      }}>
-                  <Building2 className="h-7 w-7 text-white" />
+                  <Building2 className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                 </div>
               </div>
             </div>
             
-            <div className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
                  style={{
                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                    backdropFilter: 'blur(20px)',
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
                  }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-2">Total Inventory Value</p>
-                  <p className="text-3xl font-bold text-gray-900">${stats.totalInventoryValue.toFixed(2)}</p>
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Inventory Value</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">${stats.totalInventoryValue.toFixed(2)}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                        boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
                      }}>
-                  <DollarSign className="h-7 w-7 text-white" />
+                  <DollarSign className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                 </div>
               </div>
             </div>
@@ -605,7 +605,7 @@ function DashboardContent() {
             {activeTab === 'inventory' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Inventory Management</h2>
                     <p className="text-gray-600 mt-1">Manage your liquor inventory items and stock levels</p>
                   </div>
@@ -645,7 +645,7 @@ function DashboardContent() {
                              WebkitBackdropFilter: 'blur(20px)'
                            }}>
                         <div className="p-6 border-b border-orange-100/50">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between h-full">
                             <div className="flex items-center space-x-4">
                               <button
                                 onClick={selectedItems.size === inventoryItems.length ? handleDeselectAll : handleSelectAll}
@@ -733,8 +733,8 @@ function DashboardContent() {
                         {/* Bulk Operation Forms */}
                         {bulkOperation === 'delete' && (
                           <div className="p-4 bg-red-50 border-l-4 border-red-400">
-                            <div className="flex items-center justify-between">
-                              <div>
+                            <div className="flex items-center justify-between h-full">
+                              <div className="flex-1 min-w-0">
                                 <h4 className="text-red-800 font-medium">Delete {selectedItems.size} items</h4>
                                 <p className="text-red-600 text-sm">This action cannot be undone.</p>
                               </div>
@@ -758,9 +758,9 @@ function DashboardContent() {
 
                         {bulkOperation === 'move-category' && (
                           <div className="p-4 bg-green-50 border-l-4 border-green-400">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between h-full">
                               <div className="flex items-center space-x-4">
-                                <div>
+                                <div className="flex-1 min-w-0">
                                   <h4 className="text-green-800 font-medium">Move {selectedItems.size} items to category</h4>
                                   <p className="text-green-600 text-sm">Select the target category below.</p>
                                 </div>
@@ -798,9 +798,9 @@ function DashboardContent() {
 
                         {bulkOperation === 'move-supplier' && (
                           <div className="p-4 bg-purple-50 border-l-4 border-purple-400">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between h-full">
                               <div className="flex items-center space-x-4">
-                                <div>
+                                <div className="flex-1 min-w-0">
                                   <h4 className="text-purple-800 font-medium">Change supplier for {selectedItems.size} items</h4>
                                   <p className="text-purple-600 text-sm">Select the target supplier below.</p>
                                 </div>
@@ -875,7 +875,7 @@ function DashboardContent() {
             {activeTab === 'categories' && (
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Categories</h2>
                     <p className="text-gray-600 mt-1">Organize your inventory into categories</p>
                   </div>
@@ -911,7 +911,7 @@ function DashboardContent() {
                              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                              boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
                            }}>
-                        <ClipboardList className="h-7 w-7 text-white" />
+                        <ClipboardList className="h-6 w-6 lg:h-7 lg:w-7 text-white" />
                       </div>
                       <h3 className="text-gray-900 font-bold text-xl mb-2">{category.name}</h3>
                       <p className="text-gray-600 text-sm mb-4">Product category</p>
