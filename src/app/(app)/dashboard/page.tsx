@@ -212,6 +212,19 @@ function DashboardContent() {
         console.log('✅ Rooms:', roomsData?.length, roomsData)
       }
 
+      // Fetch room counts for total value calculation
+      console.log('📊 Fetching room counts for org:', organizationId)
+      const { data: roomCountsData, error: roomCountsError } = await supabase
+        .from('room_counts')
+        .select('inventory_item_id, count')
+        .eq('organization_id', organizationId)
+
+      if (roomCountsError) {
+        console.error('❌ Room counts error:', roomCountsError)
+      } else {
+        console.log('✅ Room counts:', roomCountsData?.length, roomCountsData)
+      }
+
       // Fetch inventory items
       console.log('📦 Fetching inventory items for org:', organizationId)
       const { data: inventoryData, error: inventoryError } = await supabase
