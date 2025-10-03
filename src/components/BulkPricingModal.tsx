@@ -18,8 +18,8 @@ interface InventoryItem {
   id: string
   brand: string
   price_per_item?: number | null
-  categories: { name: string }[] | { name: string } | null
-  suppliers: { name: string }[] | { name: string } | null
+  categories: { name: string } | null
+  suppliers: { name: string } | null
   category_id: string
   supplier_id: string
 }
@@ -96,15 +96,7 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
       // Fetch inventory items with pricing
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
-        .select(`
-          id,
-          brand,
-          price_per_item,
-          category_id,
-          supplier_id,
-          categories (name),
-          suppliers (name)
-        `)
+        .select('*')
         .eq('organization_id', currentOrg)
         .order('brand')
 
@@ -128,7 +120,19 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
 
       if (suppliersError) throw suppliersError
 
-      setItems(itemsData || [])
+      // Manually enrich items with category and supplier names
+      const enrichedItems = itemsData?.map(item => {
+        const category = categoriesData?.find(cat => cat.id === item.category_id)
+        const supplier = suppliersData?.find(sup => sup.id === item.supplier_id)
+        
+        return {
+          ...item,
+          categories: category ? { name: category.name } : null,
+          suppliers: supplier ? { name: supplier.name } : null
+        }
+      })
+
+      setItems(enrichedItems || [])
       setCategories(categoriesData || [])
       setSuppliers(suppliersData || [])
 
@@ -562,7 +566,7 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
                           <div>
                             <p className="font-medium text-slate-800">{item.brand}</p>
                             <p className="text-sm text-slate-600">
-                              {Array.isArray(item.categories) ? item.categories[0]?.name : item.categories?.name} • {Array.isArray(item.suppliers) ? item.suppliers[0]?.name : item.suppliers?.name}
+                              {item.categories?.name} • {item.suppliers?.name}
                             </p>
                           </div>
                         </div>
