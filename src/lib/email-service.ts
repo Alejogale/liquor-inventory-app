@@ -619,6 +619,9 @@ export async function sendOrderReport({
   reportDate: string
   reportUrl?: string
 }) {
+  // Generate CSV filename first so it can be used in email template
+  const csvFilename = `inventory-report-${organizationName.replace(/[^a-zA-Z0-9]/g, '-')}-${reportDate.replace(/\//g, '-')}.csv`
+  
   // Create comprehensive inventory breakdown
   const itemsBreakdown = reportData.items ? reportData.items.map((item: any, index: number) => `
     <tr style="${index % 2 === 0 ? 'background-color: #f8fafc;' : ''}">
@@ -809,7 +812,6 @@ export async function sendOrderReport({
     
     // Generate CSV attachment
     const csvContent = generateInventoryCSV(reportData)
-    const csvFilename = `inventory-report-${organizationName.replace(/[^a-zA-Z0-9]/g, '-')}-${reportDate.replace(/\//g, '-')}.csv`
     
     const emailConfig = {
       from: 'InvyEasy <noreply@invyeasy.com>',
