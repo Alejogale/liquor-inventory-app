@@ -304,7 +304,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       // Prepare report data
       const reportData = {
         totalItems: selectedSupplier.items.length,
-        totalValue: selectedSupplier.total_value
+        totalValue: selectedSupplier.total_value,
         supplierName: selectedSupplier.supplier_name,
         items: selectedSupplier.items
       }
