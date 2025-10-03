@@ -11,6 +11,7 @@ interface InventoryItem {
   threshold: number
   par_level: number
   barcode?: string
+  price_per_item?: number | null  // Add price field
   categories: { name: string } | null
   suppliers: { name: string } | null
   category_id: string
@@ -315,6 +316,7 @@ export default function InventoryTable({
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Brand</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Barcode</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Supplier</th>
+                          <th className="text-left py-3 px-6 text-slate-700 font-medium">Price</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Alert/Target</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Room Counts</th>
                           <th className="text-right py-3 px-6 text-slate-700 font-medium">Actions</th>
@@ -344,6 +346,15 @@ export default function InventoryTable({
                               </span>
                             </td>
                             <td className="py-3 px-6 text-slate-700">{item.suppliers?.name || '-'}</td>
+                            <td className="py-3 px-6 text-slate-700">
+                              {item.price_per_item ? (
+                                <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-medium">
+                                  ${item.price_per_item.toFixed(2)}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400 text-sm">No price</span>
+                              )}
+                            </td>
                             <td className="py-3 px-6">
                               <div className="flex items-center space-x-2">
                                 <span className={`px-2 py-1 rounded text-sm ${
