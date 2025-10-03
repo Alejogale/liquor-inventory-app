@@ -579,10 +579,10 @@ function DashboardContent() {
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
                  }}>
-              <div className="flex items-center justify-between h-full">
-                <div className="flex-1 min-w-0 pr-2">
+              <div className="flex items-center h-full">
+                <div className="flex-1 min-w-0 pr-4 lg:pr-6">
                   <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Inventory Value</p>
-                  <p className={`font-bold text-gray-900 whitespace-nowrap overflow-hidden ${
+                  <p className={`font-bold text-gray-900 whitespace-nowrap ${
                     stats.totalInventoryValue >= 1000000 
                       ? 'text-lg lg:text-xl' 
                       : 'text-xl lg:text-2xl'
