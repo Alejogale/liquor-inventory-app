@@ -166,7 +166,10 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             barcode: item.barcode || 'No barcode',
             supplier: supplier?.name || 'No supplier',
             roomCounts: itemRoomCounts,
-            totalCount
+            totalCount,
+            threshold: item.threshold || 0,
+            par_level: item.par_level || 0,
+            price_per_item: item.price_per_item || 0
           }
         })
 
@@ -416,7 +419,20 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
                 totalValue: report.grandTotal,
                 categories: report.categories.length,
                 generatedBy: report.generatedBy,
-                summary: `Generated ${report.categories.length} categories with ${report.categories.reduce((total, cat) => total + cat.items.length, 0)} total items`
+                summary: `Generated ${report.categories.length} categories with ${report.categories.reduce((total, cat) => total + cat.items.length, 0)} total items`,
+                items: report.categories.flatMap(cat => 
+                  cat.items.map(item => ({
+                    brand: item.brand,
+                    category_name: cat.name,
+                    current_stock: item.totalCount,
+                    threshold: item.threshold || 0,
+                    par_level: item.par_level || 0,
+                    price_per_item: item.price_per_item || 0,
+                    total_value: item.totalCount * (item.price_per_item || 0),
+                    supplier_name: item.supplier,
+                    rooms_with_stock: item.roomCounts
+                  }))
+                )
               },
               reportDate: new Date().toLocaleDateString(),
               reportUrl: window.location.href
