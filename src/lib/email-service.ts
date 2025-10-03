@@ -565,6 +565,9 @@ export async function sendInvoiceEmail({
 
 // CSV generation function for inventory data
 function generateInventoryCSV(reportData: any): string {
+  console.log('📊 Generating CSV for reportData:', Object.keys(reportData || {}))
+  console.log('📊 Items count:', reportData?.items?.length || 0)
+  
   const headers = [
     'Item Brand',
     'Category',
@@ -580,29 +583,41 @@ function generateInventoryCSV(reportData: any): string {
   
   const csvRows = [headers.join(',')]
   
-  if (reportData.items) {
-    reportData.items.forEach((item: any) => {
-      const roomLocations = item.rooms_with_stock && Array.isArray(item.rooms_with_stock) 
-        ? item.rooms_with_stock.map((room: any) => `${room.roomName || room.room_name}(${room.count})`).join('; ')
-        : 'No room data'
-      
-      const row = [
-        `"${item.brand || 'Unknown Item'}"`,
-        `"${item.category_name || 'N/A'}"`,
-        item.current_stock || 0,
-        item.threshold || 0,
-        item.par_level || 0,
-        item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : '$0.00',
-        item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00',
-        `"${item.supplier_name || 'No supplier'}"`,
-        `"${item.barcode || 'No barcode'}"`,
-        `"${roomLocations}"`
-      ]
-      csvRows.push(row.join(','))
+  if (reportData.items && Array.isArray(reportData.items)) {
+    console.log('📊 Processing', reportData.items.length, 'items for CSV')
+    reportData.items.forEach((item: any, index: number) => {
+      try {
+        const roomLocations = item.rooms_with_stock && Array.isArray(item.rooms_with_stock) 
+          ? item.rooms_with_stock.map((room: any) => `${room.roomName || room.room_name}(${room.count})`).join('; ')
+          : 'No room data'
+        
+        const row = [
+          `"${item.brand || 'Unknown Item'}"`,
+          `"${item.category_name || 'N/A'}"`,
+          item.current_stock || 0,
+          item.threshold || 0,
+          item.par_level || 0,
+          item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : '$0.00',
+          item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00',
+          `"${item.supplier_name || 'No supplier'}"`,
+          `"${item.barcode || 'No barcode'}"`,
+          `"${roomLocations}"`
+        ]
+        csvRows.push(row.join(','))
+      } catch (itemError) {
+        console.error(`💥 Error processing item ${index}:`, itemError)
+        console.error('💥 Item data:', item)
+      }
     })
+  } else {
+    console.log('📊 No items found in reportData')
   }
   
-  return csvRows.join('\n')
+  const csvContent = csvRows.join('\n')
+  console.log('📊 CSV generated, length:', csvContent.length)
+  console.log('📊 CSV preview:', csvContent.substring(0, 200) + '...')
+  
+  return csvContent
 }
 
 // Order report email for inventory management
@@ -805,14 +820,22 @@ export async function sendOrderReport({
   const html = createBaseEmailTemplate(content, 'Inventory Management')
 
   try {
+    console.log('📧 Email service - checking resend availability...')
+    console.log('📧 Resend instance:', !!resend)
+    console.log('📧 API Key configured:', !!process.env.RESEND_API_KEY)
+    console.log('📧 Is server side:', typeof window === 'undefined')
+    
     if (!resend) {
-      console.warn('Resend not available - either client side or API key missing')
+      console.warn('❌ Resend not available - either client side or API key missing')
       return { success: false, error: 'Resend not available on client side' }
     }
     
+    console.log('📧 Generating CSV content...')
     // Generate CSV attachment
     const csvContent = generateInventoryCSV(reportData)
+    console.log('📧 CSV content length:', csvContent.length)
     
+    console.log('📧 Creating email configuration...')
     const emailConfig = {
       from: 'InvyEasy <noreply@invyeasy.com>',
       to: [to],
@@ -825,11 +848,22 @@ export async function sendOrderReport({
       }]
     }
     
+    console.log('📧 Email config created, sending with Resend...')
+    console.log('📧 Subject:', emailConfig.subject)
+    console.log('📧 To:', emailConfig.to)
+    console.log('📧 Attachment filename:', csvFilename)
+    
     const result = await resend.emails.send(emailConfig)
+    console.log('✅ Resend API response:', result)
     return { success: true, data: result }
   } catch (error) {
-    console.error('Error sending order report email:', error)
-    return { success: false, error }
+    console.error('💥 Error sending order report email:', error)
+    console.error('💥 Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    })
+    return { success: false, error: error.message || 'Unknown email error' }
   }
 }
 
