@@ -22,6 +22,7 @@ interface InventoryItem {
   threshold: number
   par_level: number
   barcode?: string
+  price_per_item?: number | null  // Add price field
 }
 
 interface EditItemModalProps {
@@ -42,7 +43,8 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
     supplier_id: item.supplier_id || '',
     threshold: item.threshold?.toString() || '',
     par_level: item.par_level?.toString() || '',
-    barcode: item.barcode || ''
+    barcode: item.barcode || '',
+    price_per_item: item.price_per_item?.toString() || ''  // Add price field
   })
   const [loading, setLoading] = useState(false)
 
@@ -73,14 +75,15 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
 
     setLoading(true)
     try {
-      // Simplified approach - just update the item directly (removed size field)
+      // Update item including optional price field
       const updateData = {
         brand: formData.brand.trim(),
         category_id: formData.category_id,
         supplier_id: formData.supplier_id || null,
         threshold: formData.threshold ? parseInt(formData.threshold) : 0,
         par_level: formData.par_level ? parseInt(formData.par_level) : 0,
-        barcode: formData.barcode.trim() || null
+        barcode: formData.barcode.trim() || null,
+        price_per_item: formData.price_per_item ? parseFloat(formData.price_per_item) : null  // Add price field
       }
 
       console.log('🔄 Updating item:', item.id)
@@ -224,6 +227,28 @@ export default function EditItemModal({ item, categories, suppliers, onClose, on
             placeholder="Scan or enter barcode"
             className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
           />
+        </div>
+
+        <div>
+          <label htmlFor="price_per_item" className="block text-sm font-medium text-slate-700 mb-2">
+            Price per Item (Optional)
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-slate-500 text-sm">$</span>
+            </div>
+            <input
+              type="number"
+              id="price_per_item"
+              name="price_per_item"
+              value={formData.price_per_item}
+              onChange={handleChange}
+              placeholder="25.00"
+              min="0"
+              step="0.01"
+              className="w-full pl-8 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500"
+            />
+          </div>
         </div>
         
         <div className="flex space-x-3 pt-4">
