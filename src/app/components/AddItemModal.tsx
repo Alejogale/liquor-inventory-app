@@ -35,7 +35,8 @@ export default function AddItemModal({
     par_level: 0,
     barcode: '',
     category_id: '',
-    supplier_id: ''
+    supplier_id: '',
+    price_per_item: '' // Optional price field
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -80,7 +81,7 @@ export default function AddItemModal({
         throw new Error('No organization found for user');
       }
 
-      // Prepare data for insertion - NO SIZE FIELD
+      // Prepare data for insertion - includes optional price
       const insertData = {
         brand: formData.brand.trim(),
         threshold: parseInt(formData.threshold.toString()) || 0,
@@ -88,7 +89,8 @@ export default function AddItemModal({
         barcode: formData.barcode.trim() || null, // null if empty
         category_id: formData.category_id,
         supplier_id: formData.supplier_id,
-        organization_id: currentOrg
+        organization_id: currentOrg,
+        price_per_item: formData.price_per_item ? parseFloat(formData.price_per_item) : null // Optional price
       }
 
       console.log('📝 Inserting data:', insertData)
@@ -228,6 +230,26 @@ export default function AddItemModal({
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="123456789012"
             />
+          </div>
+
+          <div>
+            <label className="block text-white/80 text-sm font-medium mb-2">
+              Price per Item (Optional)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-white/60 text-sm">$</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.price_per_item}
+                onChange={(e) => setFormData(prev => ({ ...prev, price_per_item: e.target.value }))}
+                className="w-full pl-8 pr-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="25.00"
+              />
+            </div>
           </div>
 
           <div className="flex space-x-3 pt-4">
