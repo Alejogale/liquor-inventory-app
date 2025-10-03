@@ -102,8 +102,8 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
           price_per_item,
           category_id,
           supplier_id,
-          categories (name),
-          suppliers (name)
+          categories!inner (name),
+          suppliers!inner (name)
         `)
         .eq('organization_id', currentOrg)
         .order('brand')
