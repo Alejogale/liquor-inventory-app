@@ -17,6 +17,8 @@ interface OrderItem {
   supplier_name: string | null
   supplier_email: string | null
   rooms_with_stock: { room_name: string; count: number }[]
+  price_per_item?: number | null
+  total_value?: number
 }
 
 interface SupplierOrderGroup {
@@ -26,6 +28,7 @@ interface SupplierOrderGroup {
   items: OrderItem[]
   total_items: number
   total_units: number
+  total_value: number
 }
 
 interface OrderReportProps {
@@ -75,7 +78,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       // Get all inventory items with categories and suppliers
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
-        .select('id, brand, category_id, threshold, par_level, supplier_id')
+        .select('id, brand, category_id, threshold, par_level, supplier_id, price_per_item')
         .eq('organization_id', currentOrganizationId)
 
       if (itemsError) throw itemsError
@@ -129,6 +132,8 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         // Determine if we need to order (below threshold)
         if (totalStock <= item.threshold) {
           const needed = Math.max(item.par_level - totalStock, 1)
+          const itemPrice = item.price_per_item || 0
+          const totalValue = needed * itemPrice
           
           // Get room breakdown
           const roomsWithStock = itemCounts
@@ -152,7 +157,9 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
             supplier_id: item.supplier_id,
             supplier_name: supplier?.name || null,
             supplier_email: supplier?.email || null,
-            rooms_with_stock: roomsWithStock
+            rooms_with_stock: roomsWithStock,
+            price_per_item: itemPrice,
+            total_value: totalValue
           })
         }
       })
@@ -172,7 +179,8 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
             supplier_email: supplierEmail,
             items: [],
             total_items: 0,
-            total_units: 0
+            total_units: 0,
+            total_value: 0
           })
         }
         
@@ -180,6 +188,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         group.items.push(item)
         group.total_items++
         group.total_units += item.needed_quantity
+        group.total_value += item.total_value || 0
       })
 
       // Sort items within each group by category, then brand
@@ -236,7 +245,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
   }
 
   const exportToCsv = () => {
-    const headers = ['Supplier', 'Category', 'Brand', 'Current Stock', 'Threshold', 'Par Level', 'Order Quantity', 'Room Locations']
+    const headers = ['Supplier', 'Category', 'Brand', 'Current Stock', 'Threshold', 'Par Level', 'Order Quantity', 'Price per Item', 'Total Value', 'Room Locations']
     
     const csvContent = [
       headers.join(','),
@@ -248,6 +257,8 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         item.threshold,
         item.par_level,
         item.needed_quantity,
+        item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : 'No price',
+        item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00',
         item.rooms_with_stock.map(r => `${r.room_name}(${r.count})`).join('; ')
       ].join(','))
     ].join('\n')
@@ -293,7 +304,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       // Prepare report data
       const reportData = {
         totalItems: selectedSupplier.items.length,
-        totalValue: selectedSupplier.items.reduce((sum, item) => sum + (item.current_stock * 0), 0), // Placeholder for value calculation
+        totalValue: selectedSupplier.total_value
         supplierName: selectedSupplier.supplier_name,
         items: selectedSupplier.items
       }
@@ -345,6 +356,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
 
   const totalItems = orderItems.length
   const totalUnits = orderItems.reduce((sum, item) => sum + item.needed_quantity, 0)
+  const totalOrderValue = orderItems.reduce((sum, item) => sum + (item.total_value || 0), 0)
   const suppliersAffected = supplierGroups.length
 
   return (
@@ -380,7 +392,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-red-600">{totalItems}</div>
           <div className="text-slate-700">Items to Order</div>
@@ -388,6 +400,12 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-yellow-600">{totalUnits}</div>
           <div className="text-slate-700">Total Units Needed</div>
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="text-2xl font-bold text-green-600">
+            ${totalOrderValue.toFixed(2)}
+          </div>
+          <div className="text-slate-700">Estimated Order Value</div>
         </div>
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-purple-600">{suppliersAffected}</div>
@@ -434,7 +452,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
                           )}
                         </h3>
                         <p className="text-slate-600">
-                          {supplier.total_items} items • {supplier.total_units} units needed
+                          {supplier.total_items} items • {supplier.total_units} units needed • ${supplier.total_value.toFixed(2)} total value
                           {supplier.supplier_email && (
                             <span className="text-green-600 ml-2">📧 {supplier.supplier_email}</span>
                           )}
@@ -473,7 +491,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
                               <h4 className="font-semibold text-slate-800 text-lg">{item.brand}</h4>
                               <p className="text-slate-600 text-sm">{item.category_name}</p>
                               
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2 text-sm">
                                 <div>
                                   <span className="text-slate-600">Current Stock:</span>
                                   <span className="text-red-600 font-bold ml-2">{item.current_stock}</span>
@@ -489,6 +507,18 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
                                 <div>
                                   <span className="text-slate-600">Order:</span>
                                   <span className="text-green-600 font-bold ml-2">{item.needed_quantity} units</span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-600">Unit Price:</span>
+                                  <span className="text-blue-600 font-bold ml-2">
+                                    {item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : 'No price'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-600">Total Value:</span>
+                                  <span className="text-green-600 font-bold ml-2">
+                                    ${item.total_value ? item.total_value.toFixed(2) : '0.00'}
+                                  </span>
                                 </div>
                               </div>
                               
