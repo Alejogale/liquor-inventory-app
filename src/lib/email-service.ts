@@ -620,7 +620,7 @@ export async function sendOrderReport({
   reportUrl?: string
 }) {
   // Create comprehensive inventory breakdown
-  const itemsBreakdown = reportData.items ? reportData.items.map((item, index) => `
+  const itemsBreakdown = reportData.items ? reportData.items.map((item: any, index: number) => `
     <tr style="${index % 2 === 0 ? 'background-color: #f8fafc;' : ''}">
       <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${item.brand || 'Unknown Item'}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${item.category_name || 'N/A'}</td>
@@ -644,9 +644,9 @@ export async function sendOrderReport({
 
   // Calculate summary statistics
   const totalItems = reportData.totalItems || reportData.items?.length || 0
-  const totalValue = reportData.totalValue || (reportData.items?.reduce((sum, item) => sum + (item.total_value || 0), 0)) || 0
-  const lowStockItems = reportData.items?.filter(item => (item.current_stock || 0) <= (item.threshold || 0)).length || 0
-  const categories = reportData.categories || new Set(reportData.items?.map(item => item.category_name)).size || 0
+  const totalValue = reportData.totalValue || (reportData.items?.reduce((sum: number, item: any) => sum + (item.total_value || 0), 0)) || 0
+  const lowStockItems = reportData.items?.filter((item: any) => (item.current_stock || 0) <= (item.threshold || 0)).length || 0
+  const categories = reportData.categories || new Set(reportData.items?.map((item: any) => item.category_name)).size || 0
 
   const content = `
     <h2>📊 Comprehensive Inventory Dashboard Report</h2>
