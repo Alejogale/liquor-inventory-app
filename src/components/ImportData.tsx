@@ -84,16 +84,17 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import liquor, wine, and beer inventory',
       icon: Package,
       color: 'from-blue-500 to-cyan-500',
-      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode'],
+      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item'],
       requiredFields: ['brand', 'category_name', 'supplier_name'],
-      example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789',
+      example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789,25.99',
       dbMapping: {
         'brand': 'brand',
         'category_name': 'category_id', // Will lookup category by name
         'supplier_name': 'supplier_id', // Will lookup supplier by name
         'par_level': 'par_level',
         'threshold': 'threshold',
-        'barcode': 'barcode'
+        'barcode': 'barcode',
+        'price_per_item': 'price_per_item'
       }
     },
     {
@@ -651,7 +652,8 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           supplier_name: item.supplier_name?.toString().trim().substring(0, 80) || '', // Max 80 chars
           par_level: item.par_level,
           threshold: item.threshold,
-          barcode: item.barcode?.toString().trim().substring(0, 50) || null
+          barcode: item.barcode?.toString().trim().substring(0, 50) || null,
+          price_per_item: item.price_per_item
         }
         
         // Log if we truncated anything
@@ -757,6 +759,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
               par_level: parseInt(sanitizedItem.par_level) || 0,
               threshold: parseInt(sanitizedItem.threshold) || 0,
               barcode: sanitizedItem.barcode,
+              price_per_item: sanitizedItem.price_per_item ? parseFloat(sanitizedItem.price_per_item) : null,
               organization_id: currentOrg
             }])
             .select()
@@ -899,6 +902,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             par_level: parseInt(item.par_level) || 0,
             threshold: parseInt(item.threshold) || 0,
             barcode: item.barcode || null,
+            price_per_item: item.price_per_item ? parseFloat(item.price_per_item) : null,
             organization_id: currentOrg
           }])
           .select()
@@ -1124,6 +1128,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
         par_level: parseInt(item.par_level) || 0,
         threshold: parseInt(item.threshold) || 0,
         barcode: item.barcode || null,
+        price_per_item: item.price_per_item ? parseFloat(item.price_per_item) : null,
         organization_id: currentOrg
       }
 
