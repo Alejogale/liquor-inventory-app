@@ -132,14 +132,13 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
         }
       })
 
-      console.log('🔥 BulkPricing - Data loaded:', {
-        itemsCount: enrichedItems?.length || 0,
-        categoriesCount: categoriesData?.length || 0,
-        suppliersCount: suppliersData?.length || 0,
-        sampleItem: enrichedItems?.[0],
-        sampleCategory: categoriesData?.[0],
-        sampleSupplier: suppliersData?.[0]
-      })
+      console.log('🔥 BulkPricing - Data loaded:')
+      console.log('   - Items:', enrichedItems?.length || 0)
+      console.log('   - Categories:', categoriesData?.length || 0)
+      console.log('   - Suppliers:', suppliersData?.length || 0)
+      console.log('   - Sample item:', enrichedItems?.[0])
+      console.log('   - Available categories:', categoriesData?.map(c => ({ id: c.id, name: c.name })))
+      console.log('   - Available suppliers:', suppliersData?.map(s => ({ id: s.id, name: s.name })))
 
       setItems(enrichedItems || [])
       setCategories(categoriesData || [])
@@ -156,16 +155,19 @@ export default function BulkPricingModal({ onClose, onPricingUpdated, organizati
   const filteredItems = items.filter(item => {
     // Debug logging
     if (items.length > 0 && Object.keys(filters).some(key => filters[key as keyof typeof filters])) {
-      console.log('🔍 Filtering item:', {
-        itemId: item.id,
-        itemBrand: item.brand,
-        itemCategoryId: item.category_id,
-        itemSupplierId: item.supplier_id,
-        itemPrice: item.price_per_item,
-        filters: filters,
-        categoryMatch: !filters.category || item.category_id === filters.category,
-        supplierMatch: !filters.supplier || item.supplier_id === filters.supplier
-      })
+      console.log('🔍 Filtering item:', item.brand, 'ID:', item.id)
+      console.log('   - Item category_id:', item.category_id, 'Filter category:', filters.category)
+      console.log('   - Item supplier_id:', item.supplier_id, 'Filter supplier:', filters.supplier)
+      console.log('   - Item price:', item.price_per_item, 'hasPrice filter:', filters.hasPrice)
+      console.log('   - Category match:', !filters.category || item.category_id === filters.category)
+      console.log('   - Supplier match:', !filters.supplier || item.supplier_id === filters.supplier)
+      console.log('   - Will this item pass filter?', 
+        (!filters.category || item.category_id === filters.category) &&
+        (!filters.supplier || item.supplier_id === filters.supplier) &&
+        (filters.hasPrice !== 'with-price' || !!item.price_per_item) &&
+        (filters.hasPrice !== 'without-price' || !item.price_per_item)
+      )
+      console.log('---')
     }
     
     if (filters.category && item.category_id !== filters.category) return false
