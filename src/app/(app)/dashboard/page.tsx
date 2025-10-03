@@ -14,7 +14,7 @@ import {
   DollarSign
 } from 'lucide-react'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useOrganizationData } from '@/lib/use-data-loading'
 import { supabase } from '@/lib/supabase'
@@ -98,6 +98,7 @@ function DashboardContent() {
   const [newPrice, setNewPrice] = useState('')
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
   const [showBulkPricingModal, setShowBulkPricingModal] = useState(false)
+  const fetchingRef = useRef(false)
 
   const isAdmin = user?.email === 'alejogaleis@gmail.com'
 
@@ -139,7 +140,14 @@ function DashboardContent() {
   }
 
   const fetchData = useCallback(async () => {
+    // Prevent duplicate fetches
+    if (fetchingRef.current) {
+      console.log('⏳ Fetch already in progress, skipping...')
+      return
+    }
+
     try {
+      fetchingRef.current = true
       setLoading(true)
       console.log('🔍 Starting data fetch...')
       console.log('🏢 Current organization:', organization)
@@ -147,6 +155,7 @@ function DashboardContent() {
       if (!organizationId) {
         console.log('⚠️ No organization found, skipping data fetch')
         setLoading(false)
+        fetchingRef.current = false
         return
       }
 
@@ -269,13 +278,14 @@ function DashboardContent() {
       console.error('💥 Unexpected error:', error)
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
   }, [organizationId, organization])
 
   // Load data when component mounts or dependencies change
   useEffect(() => {
-    // Admin user can load data even without organization context
-    if (user && (organization || isAdmin)) {
+    // Only fetch if we have the minimum required data and organization ID is available
+    if (user && organizationId && (organization || isAdmin)) {
       console.log('🔄 Loading dashboard data...', { 
         hasUser: !!user, 
         hasOrg: !!organization, 
@@ -288,12 +298,15 @@ function DashboardContent() {
         hasUser: !!user, 
         hasOrg: !!organization, 
         isAdmin: isAdmin,
-        orgId: organizationId 
+        orgId: organizationId,
+        reason: !user ? 'no user' : !organizationId ? 'no orgId' : 'no org and not admin'
       })
       // Set loading to false if we can't load data
-      setLoading(false)
+      if (user && !organizationId) {
+        setLoading(false)
+      }
     }
-  }, [user, organization, isAdmin, organizationId, fetchData])
+  }, [user?.id, organizationId, organization?.id, isAdmin, fetchData])
 
   const handleCategoryAdded = () => {
     fetchData()
