@@ -582,7 +582,13 @@ function DashboardContent() {
               <div className="flex items-center justify-between h-full">
                 <div className="flex-1 min-w-0 pr-2">
                   <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Inventory Value</p>
-                  <p className="text-xl lg:text-2xl font-bold text-gray-900 break-words">${stats.totalInventoryValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className={`font-bold text-gray-900 whitespace-nowrap overflow-hidden ${
+                    stats.totalInventoryValue >= 1000000 
+                      ? 'text-lg lg:text-xl' 
+                      : 'text-xl lg:text-2xl'
+                  }`}>
+                    ${stats.totalInventoryValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
                 </div>
                 <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
                      style={{
