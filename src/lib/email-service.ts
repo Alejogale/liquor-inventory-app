@@ -859,11 +859,11 @@ export async function sendOrderReport({
   } catch (error) {
     console.error('💥 Error sending order report email:', error)
     console.error('💥 Error details:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
     })
-    return { success: false, error: error.message || 'Unknown email error' }
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown email error' }
   }
 }
 
