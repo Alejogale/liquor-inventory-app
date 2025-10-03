@@ -24,6 +24,9 @@ interface InventoryReport {
       supplier: string
       roomCounts: { roomName: string; count: number }[]
       totalCount: number
+      threshold: number
+      par_level: number
+      price_per_item: number
     }[]
     totalCount: number
   }[]
