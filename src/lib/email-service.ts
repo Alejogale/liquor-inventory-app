@@ -296,6 +296,7 @@ export async function sendGuestReportEmail({
   const html = createBaseEmailTemplate(content, 'Guest Manager')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -370,6 +371,7 @@ export async function sendLowStockAlertEmail({
   const html = createBaseEmailTemplate(content, 'Inventory Management')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -447,6 +449,7 @@ export async function sendTeamInvitationEmail({
   const html = createBaseEmailTemplate(content, 'Team Management')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -506,6 +509,7 @@ export async function sendReservationConfirmationEmail({
   const html = createBaseEmailTemplate(content, 'Reservation System')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -567,6 +571,7 @@ export async function sendInvoiceEmail({
   const html = createBaseEmailTemplate(content, 'Billing')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -925,6 +930,7 @@ export async function sendNotificationEmail({
   const html = createBaseEmailTemplate(content, appName)
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -1005,6 +1011,7 @@ export async function sendWelcomeEmail({
   const html = createBaseEmailTemplate(content, 'Welcome')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -1070,6 +1077,7 @@ export async function sendEmailVerificationEmail({
   const html = createBaseEmailTemplate(content, 'Email Verification')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
@@ -1140,6 +1148,7 @@ export async function sendPasswordResetEmail({
   const html = createBaseEmailTemplate(content, 'Password Reset')
 
   try {
+    const resend = getResendClient()
     if (!resend) {
       console.warn('Resend not available on client side')
       return { success: false, error: 'Resend not available on client side' }
