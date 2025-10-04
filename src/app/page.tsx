@@ -260,71 +260,148 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {/* Mobile-First Design */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-6">
-                <Smartphone className="w-6 h-6 text-white" />
+          {/* Hero Feature with Image */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+            <div className="lg:order-2">
+              <img 
+                src="/interactive-experience.png" 
+                alt="Interactive learning and organization experience" 
+                className="w-full h-auto max-w-lg mx-auto"
+              />
+            </div>
+            <div className="lg:order-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                ✨ Experience the Difference
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">📱 Mobile-First Design</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Count inventory on your phone, manage on any device. Perfect for quick updates while you're organizing.
+              <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+                Interactive Learning Makes Organization Easy
+              </h3>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                Our intuitive platform adapts to how you think and work. Whether you're organizing your home pantry or managing business inventory, InvyEasy learns your patterns and makes suggestions that actually help.
               </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Smart Suggestions</h4>
+                    <p className="text-gray-600">Get personalized recommendations based on your usage patterns</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Smartphone className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Mobile-First Experience</h4>
+                    <p className="text-gray-600">Count and update inventory on the go with our mobile-optimized interface</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Users className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Social Organization</h4>
+                    <p className="text-gray-600">Share and collaborate with family or team members seamlessly</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Core Features in a More Natural Layout */}
+          <div className="space-y-12">
+            {/* Row 1: Two main features */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-3xl border border-orange-100">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
+                    <Package className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Smart Categories</h3>
+                    <p className="text-orange-600 text-sm font-medium">Organize Your Way</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Create custom categories that make sense to you. From pantry staples to craft supplies, organize everything exactly how you think about it.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Pantry</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Office</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Garage</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">+More</span>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-3xl border border-blue-100">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center">
+                    <Globe className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Multi-Location Sync</h3>
+                    <p className="text-blue-600 text-sm font-medium">Everywhere You Go</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Track inventory across multiple locations - home, office, storage units, vacation homes. Everything syncs in real-time across all your devices.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Building2 className="w-4 h-4 text-blue-500" />
+                    <span>Home</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Briefcase className="w-4 h-4 text-purple-500" />
+                    <span>Office</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Home className="w-4 h-4 text-blue-500" />
+                    <span>Storage</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Package className="w-4 h-4 text-purple-500" />
+                    <span>Warehouse</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Real-Time Sync */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6">
-                <Globe className="w-6 h-6 text-white" />
+            {/* Row 2: Three supporting features */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">Smart Analytics</h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  See trends, track usage patterns, and get insights that help you make smarter inventory decisions.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">🔄 Real-Time Sync</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Works everywhere - home, office, storage units. All your data syncs instantly across all devices.
-              </p>
-            </div>
 
-            {/* Smart Categories */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
-                <Package className="w-6 h-6 text-white" />
+              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">Team Collaboration</h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Share with family, roommates, or team members. Everyone can contribute to keeping things organized.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">🏷️ Smart Categories</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Organize your way - pantry items, craft supplies, business inventory. Create custom categories that make sense to you.
-              </p>
-            </div>
 
-            {/* Multi-Location */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="w-6 h-6 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">Mobile Optimized</h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Built mobile-first for quick updates while you're organizing. Scan, count, and manage on the go.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">🏢 Multi-Location Support</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Track inventory across home, office, storage units, and multiple locations seamlessly.
-              </p>
-            </div>
-
-            {/* Team Access */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">👥 Team Access</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Share with family, roommates, or team members. Everyone can help keep things organized.
-              </p>
-            </div>
-
-            {/* Analytics */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center mb-6">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">📊 Smart Analytics</h3>
-              <p className="text-gray-600 leading-relaxed">
-                See what you have, what you need, and trends over time. Make smarter decisions about your inventory.
-              </p>
             </div>
           </div>
         </div>
