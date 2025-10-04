@@ -459,32 +459,35 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-gray-900 mt-2">- Sarah, Home Organizer</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100">
-                <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-6 text-white text-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Smartphone className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-xl font-bold mb-2">Scan & Go</h4>
-                  <p className="text-orange-100">Dedicated scanner recommended</p>
-                </div>
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-green-600" />
+              <div className="relative bg-white rounded-2xl p-8 shadow-xl border border-orange-100 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500 to-red-500 rounded-bl-3xl opacity-10"></div>
+                <img 
+                  src="/barcode-scanning.png" 
+                  alt="Barcode scanning technology" 
+                  className="w-full h-48 object-contain mb-6"
+                />
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Scan & Go</h4>
+                  <p className="text-gray-600 mb-4">Dedicated scanner recommended for best results</p>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-green-600" />
+                      </div>
+                      <span className="text-gray-700">Instant item recognition</span>
                     </div>
-                    <span className="text-gray-700">Item added to inventory</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Package className="w-4 h-4 text-blue-600" />
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Package className="w-3 h-3 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Auto-categorization</span>
                     </div>
-                    <span className="text-gray-700">Category auto-assigned</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-purple-600" />
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                        <BarChart3 className="w-3 h-3 text-purple-600" />
+                      </div>
+                      <span className="text-gray-700">Real-time updates</span>
                     </div>
-                    <span className="text-gray-700">Count updated instantly</span>
                   </div>
                 </div>
               </div>
@@ -606,44 +609,38 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-gray-900 mt-2">- Jennifer, Home Organizer</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-green-100">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Package className="w-8 h-8 text-white" />
-                  </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Data Import</h4>
-                  <p className="text-gray-600">Upload your CSV file</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-gray-700">File uploaded successfully</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-blue-600" />
+              <div className="relative bg-white rounded-2xl p-8 shadow-xl border border-green-100 overflow-hidden">
+                <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-green-500 to-teal-500 rounded-br-3xl opacity-10"></div>
+                <img 
+                  src="/modern-workflow.jpg" 
+                  alt="Modern data workflow and management" 
+                  className="w-full h-48 object-cover rounded-xl mb-6"
+                />
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 border border-green-100">
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Smart Data Management</h4>
+                  <p className="text-gray-600 mb-4">Seamless import, export, and data handling</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-green-600" />
                       </div>
-                    <span className="text-gray-700">247 items imported</span>
-                      </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-yellow-600" />
+                      <span className="text-gray-700">CSV upload & validation</span>
                     </div>
-                    <span className="text-gray-700">12 duplicates skipped</span>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <BarChart3 className="w-3 h-3 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Bulk data processing</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Shield className="w-3 h-3 text-purple-600" />
+                      </div>
+                      <span className="text-gray-700">Duplicate detection</span>
+                    </div>
                   </div>
                 </div>
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Import Progress</span>
-                    <span className="text-green-600 font-medium">100% Complete</span>
-                </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-green-500 h-2 rounded-full w-full"></div>
               </div>
-            </div>
-          </div>
             </div>
           </div>
         </div>
