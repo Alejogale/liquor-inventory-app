@@ -459,35 +459,32 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-gray-900 mt-2">- Sarah, Home Organizer</p>
                 </div>
               </div>
-              <div className="relative bg-white rounded-2xl p-8 shadow-xl border border-orange-100 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500 to-red-500 rounded-bl-3xl opacity-10"></div>
-                <img 
-                  src="/barcode-scanning.png" 
-                  alt="Barcode scanning technology" 
-                  className="w-full h-48 object-contain mb-6"
-                />
-                <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Scan & Go</h4>
-                  <p className="text-gray-600 mb-4">Dedicated scanner recommended for best results</p>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-green-600" />
-                      </div>
-                      <span className="text-gray-700">Instant item recognition</span>
+              <div className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100">
+                <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-6 text-white text-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="w-8 h-8" />
+                  </div>
+                  <h4 className="text-xl font-bold mb-2">Scan & Go</h4>
+                  <p className="text-orange-100">Dedicated scanner recommended</p>
+                </div>
+                <div className="mt-6 space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-green-600" />
                     </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Package className="w-3 h-3 text-blue-600" />
-                      </div>
-                      <span className="text-gray-700">Auto-categorization</span>
+                    <span className="text-gray-700">Item added to inventory</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Package className="w-4 h-4 text-blue-600" />
                     </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                        <BarChart3 className="w-3 h-3 text-purple-600" />
-                      </div>
-                      <span className="text-gray-700">Real-time updates</span>
+                    <span className="text-gray-700">Category auto-assigned</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-purple-600" />
                     </div>
+                    <span className="text-gray-700">Count updated instantly</span>
                   </div>
                 </div>
               </div>
@@ -496,37 +493,41 @@ export default function LandingPage() {
             {/* Rooms & Locations Feature */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="order-2 lg:order-1">
-                <div className="relative bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-blue-100 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-500 rounded-bl-3xl opacity-10"></div>
-                  <img 
-                    src="/digital-library.jpg" 
-                    alt="Digital library and organized database system" 
-                    className="w-full h-48 object-cover rounded-xl mb-6"
-                  />
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">Organized Digital Inventory</h4>
-                    <p className="text-gray-600 mb-4">Your personal inventory database system</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building2 className="w-4 h-4 text-blue-500" />
-                        <span className="text-gray-700">Multi-location</span>
+                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-orange-100">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-4 text-white text-center">
+                      <Building2 className="w-6 h-6 mx-auto mb-2" />
+                      <p className="text-sm font-medium">Home</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl p-4 text-white text-center">
+                      <Briefcase className="w-6 h-6 mx-auto mb-2" />
+                      <p className="text-sm font-medium">Office</p>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Package className="w-4 h-4 text-purple-500" />
-                        <span className="text-gray-700">Smart categories</span>
+                    <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-xl p-4 text-white text-center">
+                      <Home className="w-6 h-6 mx-auto mb-2" />
+                      <p className="text-sm font-medium">Storage</p>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span className="text-gray-700">Real-time sync</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <BarChart3 className="w-4 h-4 text-blue-500" />
-                        <span className="text-gray-700">Instant reports</span>
-                      </div>
+                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white text-center">
+                      <Package className="w-6 h-6 mx-auto mb-2" />
+                      <p className="text-sm font-medium">Garage</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-gray-700">Pantry Items</span>
+                      <span className="text-orange-600 font-medium">47 items</span>
+                </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-gray-700">Office Supplies</span>
+                      <span className="text-blue-600 font-medium">23 items</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-gray-700">Storage Boxes</span>
+                      <span className="text-green-600 font-medium">12 items</span>
                     </div>
                   </div>
                 </div>
-              </div>
+                      </div>
               <div className="order-1 lg:order-2">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-6">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -605,35 +606,41 @@ export default function LandingPage() {
                   <p className="text-sm font-medium text-gray-900 mt-2">- Jennifer, Home Organizer</p>
                 </div>
               </div>
-              <div className="relative bg-white rounded-2xl p-8 shadow-xl border border-green-100 overflow-hidden">
-                <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-green-500 to-teal-500 rounded-br-3xl opacity-10"></div>
-                <img 
-                  src="/modern-workflow.jpg" 
-                  alt="Modern data workflow and management" 
-                  className="w-full h-48 object-cover rounded-xl mb-6"
-                />
-                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 border border-green-100">
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Smart Data Management</h4>
-                  <p className="text-gray-600 mb-4">Seamless import, export, and data handling</p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-green-600" />
-                      </div>
-                      <span className="text-gray-700">CSV upload & validation</span>
+              <div className="bg-white rounded-2xl p-8 shadow-xl border border-green-100">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Package className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Data Import</h4>
+                  <p className="text-gray-600">Upload your CSV file</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-green-600" />
                     </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <BarChart3 className="w-3 h-3 text-blue-600" />
+                    <span className="text-gray-700">File uploaded successfully</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-blue-600" />
                       </div>
-                      <span className="text-gray-700">Bulk data processing</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Shield className="w-3 h-3 text-purple-600" />
+                    <span className="text-gray-700">247 items imported</span>
                       </div>
-                      <span className="text-gray-700">Duplicate detection</span>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-yellow-600" />
                     </div>
+                    <span className="text-gray-700">12 duplicates skipped</span>
+                  </div>
+                </div>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Import Progress</span>
+                    <span className="text-green-600 font-medium">100% Complete</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div className="bg-green-500 h-2 rounded-full w-full"></div>
                   </div>
                 </div>
               </div>
@@ -656,61 +663,77 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Home Organization */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
-                <Home className="w-8 h-8 text-white" />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-bl-3xl opacity-10"></div>
+              <img 
+                src="/barcode-scanning.png" 
+                alt="Easy barcode scanning for home inventory" 
+                className="w-full h-36 object-contain rounded-xl mb-6"
+              />
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4">
+                  <Home className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">🏠 Home Organization</h3>
+                <ul className="space-y-3 text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Pantry management
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Garage inventory
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Closet organization
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Emergency supplies
+                  </li>
+                </ul>
+                <p className="text-gray-600 leading-relaxed">
+                  Never lose track of what you own. Organize your entire home with ease and always know what you have.
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🏠 Home Organization</h3>
-              <ul className="space-y-3 text-gray-600 mb-6">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Pantry management
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Garage inventory
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Closet organization
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Emergency supplies
-                </li>
-              </ul>
-              <p className="text-gray-600 leading-relaxed">
-                Never lose track of what you own. Organize your entire home with ease and always know what you have.
-              </p>
             </div>
 
             {/* Hobby & Collectibles */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
-                <Heart className="w-8 h-8 text-white" />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-br-3xl opacity-10"></div>
+              <img 
+                src="/digital-library.jpg" 
+                alt="Digital organization for hobbies and collections" 
+                className="w-full h-36 object-cover rounded-xl mb-6"
+              />
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">🎨 Hobby & Collectibles</h3>
+                <ul className="space-y-3 text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Craft supplies
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Sports equipment
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Books & games
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Collectibles
+                  </li>
+                </ul>
+                <p className="text-gray-600 leading-relaxed">
+                  Track craft supplies, sports equipment, books, games, and collectibles with ease across multiple rooms.
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🎨 Hobby & Collectibles</h3>
-              <ul className="space-y-3 text-gray-600 mb-6">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Craft supplies
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Sports equipment
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Books & games
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Collectibles
-                </li>
-              </ul>
-              <p className="text-gray-600 leading-relaxed">
-                Track craft supplies, sports equipment, books, games, and collectibles with ease across multiple rooms.
-              </p>
             </div>
 
             {/* Small Business */}
