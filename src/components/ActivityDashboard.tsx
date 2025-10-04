@@ -46,6 +46,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
   const [managerEmails, setManagerEmails] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
   const [reportSent, setReportSent] = useState(false)
+  const [organization, setOrganization] = useState<any>(null)
   
   // Enhanced Reports State
   const [categoryReports, setCategoryReports] = useState<any[]>([])
@@ -90,6 +91,29 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
     }
   }
 
+  // Fetch organization details
+  const fetchOrganizationDetails = async () => {
+    try {
+      const orgId = await getCurrentOrganization()
+      if (!orgId) return
+
+      const { data: orgData, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', orgId)
+        .single()
+
+      if (error) {
+        console.error('Error fetching organization:', error)
+        return
+      }
+
+      setOrganization(orgData)
+    } catch (error) {
+      console.error('Error in fetchOrganizationDetails:', error)
+    }
+  }
+
   // Load manager emails from localStorage on component mount
   useEffect(() => {
     const loadManagerEmails = () => {
@@ -127,6 +151,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       if (organizationId) {
         console.log('🔄 Initializing dashboard with organization:', organizationId)
         setLoading(false) // Set loading to false since we're not fetching activity logs anymore
+        await fetchOrganizationDetails() // Fetch organization details
         await generateEnhancedReports() // Auto-generate reports when component loads
       } else {
         console.log('⚠️ No organization ID provided, skipping dashboard initialization')
@@ -456,10 +481,12 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             credentials: 'include',
             body: JSON.stringify({
               to: email,
-              organizationName: 'Your Organization',
+              organizationName: organization?.name || 'Your Organization',
               reportData: {
                 totalItems: report.categories.reduce((total, cat) => total + cat.items.length, 0),
-                totalValue: report.grandTotal,
+                totalValue: report.categories.reduce((total, cat) => 
+                  total + cat.items.reduce((catTotal, item) => 
+                    catTotal + (item.totalCount * (item.price_per_item || 0)), 0), 0),
                 categories: report.categories.length,
                 generatedBy: report.generatedBy,
                 summary: `Generated ${report.categories.length} categories with ${report.categories.reduce((total, cat) => total + cat.items.length, 0)} total items`,
@@ -473,6 +500,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
                     price_per_item: item.price_per_item || 0,
                     total_value: item.totalCount * (item.price_per_item || 0),
                     supplier_name: item.supplier,
+                    barcode: item.barcode,
                     rooms_with_stock: item.roomCounts
                   }))
                 )

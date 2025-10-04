@@ -615,7 +615,7 @@ function generateInventoryCSV(reportData: any): string {
     reportData.items.forEach((item: any, index: number) => {
       try {
         const roomLocations = item.rooms_with_stock && Array.isArray(item.rooms_with_stock) 
-          ? item.rooms_with_stock.map((room: any) => `${room.roomName || room.room_name}(${room.count})`).join('; ')
+          ? item.rooms_with_stock.map((room: any) => `${room.roomName || room.room_name || 'Unknown Room'}(${room.count || 0})`).join('; ')
           : 'No room data'
         
         const row = [
