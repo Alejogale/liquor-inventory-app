@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('📦 Request body keys:', Object.keys(body))
     console.log('📦 Report data keys:', body.reportData ? Object.keys(body.reportData) : 'No reportData')
+    console.log('📦 Items in reportData:', body.reportData?.items?.length || 'No items')
+    console.log('📦 First item sample:', body.reportData?.items?.[0] || 'No first item')
+    console.log('📦 Organization name:', body.organizationName)
+    console.log('📦 Report date:', body.reportDate)
     
     const { to, organizationName, reportData, reportDate, reportUrl } = body
 
