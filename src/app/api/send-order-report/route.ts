@@ -3,7 +3,12 @@ import { sendOrderReport } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('📧 Email API route called')
+    console.log('📧 Email API route called - v2.0 with header auth')
+    console.log('📧 Environment check:', {
+      nodeEnv: process.env.NODE_ENV,
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      resendKeyLength: process.env.RESEND_API_KEY?.length || 0
+    })
     
     // Get user email from request headers for authentication
     const userEmail = request.headers.get('x-user-email')

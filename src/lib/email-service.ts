@@ -11,11 +11,17 @@ function getResendClient(): Resend | null {
   console.log('🔑 API Key check:', {
     exists: !!apiKey,
     length: apiKey?.length || 0,
-    starts: apiKey?.substring(0, 5) || 'none'
+    starts: apiKey?.substring(0, 5) || 'none',
+    env: process.env.NODE_ENV
   })
+  
+  // List all environment variables that start with RESEND for debugging
+  const resendEnvVars = Object.keys(process.env).filter(key => key.startsWith('RESEND'))
+  console.log('🔑 Resend env vars found:', resendEnvVars)
   
   if (!apiKey || apiKey === 'your_resend_api_key_here') {
     console.warn('❌ Resend API key not configured properly')
+    console.warn('Available env vars:', Object.keys(process.env).slice(0, 10))
     return null
   }
   
@@ -836,8 +842,13 @@ export async function sendOrderReport({
   const html = createBaseEmailTemplate(content, 'Inventory Management')
 
   try {
-    console.log('📧 Email service - initializing resend client...')
+    console.log('📧 Email service v2.0 - initializing resend client...')
     console.log('📧 Is server side:', typeof window === 'undefined')
+    console.log('📧 Environment variables:', {
+      nodeEnv: process.env.NODE_ENV,
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      keyLength: process.env.RESEND_API_KEY?.length || 0
+    })
     
     const resend = getResendClient()
     if (!resend) {
