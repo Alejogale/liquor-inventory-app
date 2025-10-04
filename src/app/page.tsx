@@ -272,13 +272,13 @@ export default function LandingPage() {
             <div className="lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
                 <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                ✨ Experience the Difference
+                📱 Simple & Powerful
               </div>
               <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Interactive Learning Makes Organization Easy
+                Inventory Management That Just Works
               </h3>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Our intuitive platform adapts to how you think and work. Whether you're organizing your home pantry or managing business inventory, InvyEasy learns your patterns and makes suggestions that actually help.
+                Built for real people with real stuff to organize. Whether you're tracking pantry items at home or managing business inventory, InvyEasy makes it simple to know what you have and where you have it.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -286,8 +286,8 @@ export default function LandingPage() {
                     <Check className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Smart Suggestions</h4>
-                    <p className="text-gray-600">Get personalized recommendations based on your usage patterns</p>
+                    <h4 className="font-semibold text-gray-900 mb-1">Room-Based Tracking</h4>
+                    <p className="text-gray-600">Organize by location - kitchen, garage, office, warehouse. See exactly where everything is.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -304,7 +304,7 @@ export default function LandingPage() {
                     <Users className="w-4 h-4 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Social Organization</h4>
+                    <h4 className="font-semibold text-gray-900 mb-1">Team Collaboration</h4>
                     <p className="text-gray-600">Share and collaborate with family or team members seamlessly</p>
                   </div>
                 </div>
