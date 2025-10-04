@@ -7,9 +7,8 @@ export async function POST(request: NextRequest) {
   try {
     console.log('📧 Email API route called')
     
-    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ 
-      cookies: () => cookieStore
+      cookies
     })
     
     // Check authentication
