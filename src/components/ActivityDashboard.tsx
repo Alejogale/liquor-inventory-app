@@ -451,6 +451,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-user-email': userEmail,
             },
             credentials: 'include',
             body: JSON.stringify({
