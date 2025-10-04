@@ -1,15 +1,31 @@
 import { Resend } from 'resend'
 
-// Initialize Resend only on server side
-let resend: Resend | null = null
-
-if (typeof window === 'undefined') {
-  // Server side only
+// Initialize Resend - will be created when needed
+function getResendClient(): Resend | null {
+  if (typeof window !== 'undefined') {
+    console.warn('❌ Attempted to use Resend on client side')
+    return null
+  }
+  
   const apiKey = process.env.RESEND_API_KEY
-  if (apiKey && apiKey !== 'your_resend_api_key_here') {
-    resend = new Resend(apiKey)
-  } else {
-    console.warn('Resend API key not configured. Email functionality will be disabled.')
+  console.log('🔑 API Key check:', {
+    exists: !!apiKey,
+    length: apiKey?.length || 0,
+    starts: apiKey?.substring(0, 5) || 'none'
+  })
+  
+  if (!apiKey || apiKey === 'your_resend_api_key_here') {
+    console.warn('❌ Resend API key not configured properly')
+    return null
+  }
+  
+  try {
+    const client = new Resend(apiKey)
+    console.log('✅ Resend client created successfully')
+    return client
+  } catch (error) {
+    console.error('❌ Failed to create Resend client:', error)
+    return null
   }
 }
 
@@ -820,14 +836,13 @@ export async function sendOrderReport({
   const html = createBaseEmailTemplate(content, 'Inventory Management')
 
   try {
-    console.log('📧 Email service - checking resend availability...')
-    console.log('📧 Resend instance:', !!resend)
-    console.log('📧 API Key configured:', !!process.env.RESEND_API_KEY)
+    console.log('📧 Email service - initializing resend client...')
     console.log('📧 Is server side:', typeof window === 'undefined')
     
+    const resend = getResendClient()
     if (!resend) {
-      console.warn('❌ Resend not available - either client side or API key missing')
-      return { success: false, error: 'Resend not available on client side' }
+      console.warn('❌ Failed to initialize Resend client')
+      return { success: false, error: 'Failed to initialize email service' }
     }
     
     console.log('📧 Generating CSV content...')
