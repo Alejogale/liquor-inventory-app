@@ -496,41 +496,37 @@ export default function LandingPage() {
             {/* Rooms & Locations Feature */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="order-2 lg:order-1">
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-orange-100">
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-4 text-white text-center">
-                      <Building2 className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Home</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl p-4 text-white text-center">
-                      <Briefcase className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Office</p>
+                <div className="relative bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-blue-100 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-500 rounded-bl-3xl opacity-10"></div>
+                  <img 
+                    src="/digital-library.jpg" 
+                    alt="Digital library and organized database system" 
+                    className="w-full h-48 object-cover rounded-xl mb-6"
+                  />
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Organized Digital Inventory</h4>
+                    <p className="text-gray-600 mb-4">Your personal inventory database system</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Building2 className="w-4 h-4 text-blue-500" />
+                        <span className="text-gray-700">Multi-location</span>
                       </div>
-                    <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-xl p-4 text-white text-center">
-                      <Home className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Storage</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Package className="w-4 h-4 text-purple-500" />
+                        <span className="text-gray-700">Smart categories</span>
                       </div>
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white text-center">
-                      <Package className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Garage</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Pantry Items</span>
-                      <span className="text-orange-600 font-medium">47 items</span>
-                </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Office Supplies</span>
-                      <span className="text-blue-600 font-medium">23 items</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Storage Boxes</span>
-                      <span className="text-green-600 font-medium">12 items</span>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span className="text-gray-700">Real-time sync</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <BarChart3 className="w-4 h-4 text-blue-500" />
+                        <span className="text-gray-700">Instant reports</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                      </div>
+              </div>
               <div className="order-1 lg:order-2">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-6">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -718,32 +714,40 @@ export default function LandingPage() {
             </div>
 
             {/* Small Business */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6">
-                <Briefcase className="w-8 h-8 text-white" />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-br-3xl opacity-10"></div>
+              <img 
+                src="/warehouse-management.jpg" 
+                alt="Professional warehouse and inventory management" 
+                className="w-full h-40 object-cover rounded-xl mb-6"
+              />
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-4">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">💼 Small Business</h3>
+                <ul className="space-y-3 text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Retail stores
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Warehouses & storage
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Professional services
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-500" />
+                    Multi-location ops
+                  </li>
+                </ul>
+                <p className="text-gray-600 leading-relaxed">
+                  Professional inventory management for retail stores, warehouses, and growing businesses. Scale with confidence.
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">💼 Small Business</h3>
-              <ul className="space-y-3 text-gray-600 mb-6">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Retail stores
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Home-based businesses
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Side hustles
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
-                  Multi-location ops
-                </li>
-              </ul>
-              <p className="text-gray-600 leading-relaxed">
-                Perfect for retail stores, home-based businesses, and side hustles. Track everything professionally.
-              </p>
             </div>
           </div>
               </div>
