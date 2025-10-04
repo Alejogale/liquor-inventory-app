@@ -627,23 +627,23 @@ function DashboardContent() {
                    WebkitBackdropFilter: 'blur(20px)',
                    boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
                  }}>
-              <div className="flex items-center h-full">
-                <div className="flex-1 min-w-0 pr-4 lg:pr-6">
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1 min-w-0">
                   <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Inventory Value</p>
-                  <p className={`font-bold text-gray-900 whitespace-nowrap ${
+                  <p className={`font-bold text-gray-900 ${
                     stats.totalInventoryValue >= 1000000 
-                      ? 'text-lg lg:text-xl' 
-                      : 'text-xl lg:text-2xl'
-                  }`}>
+                      ? 'text-base lg:text-lg' 
+                      : 'text-lg lg:text-xl'
+                  } leading-tight`}>
                     ${stats.totalInventoryValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
+                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
                      style={{
                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                        boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
                      }}>
-                  <DollarSign className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+                  <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
                 </div>
               </div>
             </div>
