@@ -441,6 +441,9 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
         alert('No manager emails configured. Please add manager emails in the configuration section.')
         return
       }
+
+      // Add a small delay to ensure authentication is fully established
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       const emailPromises = managerEmails.map(async (email) => {
         try {
@@ -449,6 +452,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
             headers: {
               'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({
               to: email,
               organizationName: 'Your Organization',
