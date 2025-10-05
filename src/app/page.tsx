@@ -913,6 +913,154 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Recommended Barcode Scanner Section */}
+      <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
+              <Package className="w-4 h-4" />
+              Recommended Hardware
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Get the Most Out of InvyEasy
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              While you can use your phone camera, a dedicated Bluetooth barcode scanner makes inventory management lightning-fast and effortless.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="grid lg:grid-cols-2 gap-0">
+              {/* Product Images */}
+              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
+                <div className="relative">
+                  <img 
+                    src="/barccode scanner image.jpg" 
+                    alt="Bluetooth Wireless Barcode Scanner - Perfect for InvyEasy"
+                    className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg"
+                  />
+                  <div className="absolute -top-4 -right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                    ⭐ Recommended
+                  </div>
+                </div>
+                
+                {/* Additional product images */}
+                <div className="flex gap-3 mt-6 justify-center">
+                  <img src="/71F7l9ydGeL._AC_SL1500_.jpg" alt="Scanner angle 1" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
+                  <img src="/71tAACAKRdL._AC_SL1500_.jpg" alt="Scanner angle 2" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
+                  <img src="/81GEHejYbnL._AC_SL1500_.jpg" alt="Scanner angle 3" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="p-8 lg:p-12">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-yellow-400 text-lg">★★★★★</div>
+                  <span className="text-gray-600 text-sm">(1000+ reviews)</span>
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Bluetooth Wireless Barcode Scanner
+                </h3>
+                
+                <div className="text-3xl font-bold text-blue-600 mb-6">
+                  ~$50-80
+                  <span className="text-lg text-gray-500 font-normal ml-2">on Amazon</span>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h4 className="font-semibold text-gray-900 mb-3">Perfect for InvyEasy because:</h4>
+                  
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-gray-900">Wireless Bluetooth Connection</span>
+                      <p className="text-gray-600 text-sm">Connects directly to your phone, tablet, or computer</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-gray-900">All Barcode Types</span>
+                      <p className="text-gray-600 text-sm">Reads 1D, 2D, QR codes, and more</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-gray-900">Long Battery Life</span>
+                      <p className="text-gray-600 text-sm">Days of use on a single charge</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-gray-900">Plug & Play Setup</span>
+                      <p className="text-gray-600 text-sm">No drivers needed - works instantly</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-gray-900">Portable & Durable</span>
+                      <p className="text-gray-600 text-sm">Perfect for home, office, or warehouse use</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 rounded-xl p-4 mb-6">
+                  <h5 className="font-semibold text-blue-900 mb-2">💡 Pro Tip:</h5>
+                  <p className="text-blue-800 text-sm">
+                    Any Bluetooth barcode scanner will work with InvyEasy! This is just our top recommendation based on user feedback and reliability.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a 
+                    href="https://amzn.to/3KWOup6" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl text-center flex items-center justify-center gap-2"
+                  >
+                    <Package className="w-5 h-5" />
+                    View on Amazon
+                  </a>
+                  <Link 
+                    href="/signup" 
+                    className="bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-center flex items-center justify-center gap-2"
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                    Try InvyEasy Free
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Alternative Options */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 mb-4">
+              <strong>Don't need a scanner?</strong> No problem! InvyEasy works great with:
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
+                <span className="text-sm text-gray-700">📱 Phone camera scanning</span>
+              </div>
+              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
+                <span className="text-sm text-gray-700">📄 CSV file imports</span>
+              </div>
+              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
+                <span className="text-sm text-gray-700">⌨️ Manual entry</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

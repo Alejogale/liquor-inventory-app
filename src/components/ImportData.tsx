@@ -84,17 +84,17 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import liquor, wine, and beer inventory',
       icon: Package,
       color: 'from-blue-500 to-cyan-500',
-      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item'],
-      requiredFields: ['brand', 'category_name', 'supplier_name'],
+      fields: ['Brand', 'Category', 'Supplier', 'Par Level', 'Threshold', 'Barcode', 'Price Per Item'],
+      requiredFields: ['Brand', 'Category', 'Supplier'],
       example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789,25.99',
       dbMapping: {
-        'brand': 'brand',
-        'category_name': 'category_id', // Will lookup category by name
-        'supplier_name': 'supplier_id', // Will lookup supplier by name
-        'par_level': 'par_level',
-        'threshold': 'threshold',
-        'barcode': 'barcode',
-        'price_per_item': 'price_per_item'
+        'Brand': 'brand',
+        'Category': 'category_id', // Will lookup category by name
+        'Supplier': 'supplier_id', // Will lookup supplier by name
+        'Par Level': 'par_level',
+        'Threshold': 'threshold',
+        'Barcode': 'barcode',
+        'Price Per Item': 'price_per_item'
       }
     },
     {
@@ -103,15 +103,15 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import vendor and supplier information',
       icon: Users,
       color: 'from-green-500 to-emerald-500',
-      fields: ['name', 'email', 'phone', 'contact_person', 'notes'],
-      requiredFields: ['name', 'email'],
+      fields: ['Name', 'Email', 'Phone', 'Contact Person', 'Notes'],
+      requiredFields: ['Name', 'Email'],
       example: 'ABC Liquors,sales@abc.com,555-1234,John Smith,Primary liquor vendor',
       dbMapping: {
-        'name': 'name',
-        'email': 'email',
-        'phone': 'phone',
-        'contact_person': 'contact_person',
-        'notes': 'notes'
+        'Name': 'name',
+        'Email': 'email',
+        'Phone': 'phone',
+        'Contact Person': 'contact_person',
+        'Notes': 'notes'
       }
     },
     {
@@ -120,11 +120,11 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import product categories',
       icon: ClipboardList,
       color: 'from-purple-500 to-pink-500',
-      fields: ['name'],
-      requiredFields: ['name'],
+      fields: ['Name'],
+      requiredFields: ['Name'],
       example: 'Vodka',
       dbMapping: {
-        'name': 'name'
+        'Name': 'name'
       }
     },
     {
@@ -133,14 +133,14 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import venue locations and storage areas',
       icon: Building2,
       color: 'from-orange-500 to-red-500',
-      fields: ['name', 'type', 'description', 'display_order'],
-      requiredFields: ['name'],
+      fields: ['Name', 'Type', 'Description', 'Display Order'],
+      requiredFields: ['Name'],
       example: 'Main Bar,Bar,Primary service area,1',
       dbMapping: {
-        'name': 'name',
-        'type': 'type',
-        'description': 'description',
-        'display_order': 'display_order'
+        'Name': 'name',
+        'Type': 'type',
+        'Description': 'description',
+        'Display Order': 'display_order'
       }
     }
   ], [])
