@@ -925,7 +925,7 @@ export default function LandingPage() {
               Get the Most Out of InvyEasy
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              While you can use your phone camera, a dedicated Bluetooth barcode scanner makes inventory management lightning-fast and effortless.
+              A dedicated Bluetooth barcode scanner makes inventory management lightning-fast and effortless.
             </p>
           </div>
 
@@ -937,7 +937,8 @@ export default function LandingPage() {
                   <img 
                     src="/barccode scanner image.jpg" 
                     alt="Bluetooth Wireless Barcode Scanner - Perfect for InvyEasy"
-                    className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg"
+                    className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
+                    onClick={() => window.open('/barccode scanner image.jpg', '_blank')}
                   />
                   <div className="absolute -top-4 -right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                     ⭐ Recommended
@@ -946,9 +947,24 @@ export default function LandingPage() {
                 
                 {/* Additional product images */}
                 <div className="flex gap-3 mt-6 justify-center">
-                  <img src="/71F7l9ydGeL._AC_SL1500_.jpg" alt="Scanner angle 1" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
-                  <img src="/71tAACAKRdL._AC_SL1500_.jpg" alt="Scanner angle 2" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
-                  <img src="/81GEHejYbnL._AC_SL1500_.jpg" alt="Scanner angle 3" className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer" />
+                  <img 
+                    src="/71F7l9ydGeL._AC_SL1500_.jpg" 
+                    alt="Scanner angle 1" 
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
+                    onClick={() => window.open('/71F7l9ydGeL._AC_SL1500_.jpg', '_blank')}
+                  />
+                  <img 
+                    src="/71tAACAKRdL._AC_SL1500_.jpg" 
+                    alt="Scanner angle 2" 
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
+                    onClick={() => window.open('/71tAACAKRdL._AC_SL1500_.jpg', '_blank')}
+                  />
+                  <img 
+                    src="/81GEHejYbnL._AC_SL1500_.jpg" 
+                    alt="Scanner angle 3" 
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
+                    onClick={() => window.open('/81GEHejYbnL._AC_SL1500_.jpg', '_blank')}
+                  />
                 </div>
               </div>
 
@@ -964,8 +980,8 @@ export default function LandingPage() {
                 </h3>
                 
                 <div className="text-3xl font-bold text-blue-600 mb-6">
-                  ~$50-80
-                  <span className="text-lg text-gray-500 font-normal ml-2">on Amazon</span>
+                  $39.99
+                  <span className="text-lg text-gray-500 font-normal ml-2">(price may vary)</span>
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -1048,9 +1064,6 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
-                <span className="text-sm text-gray-700">📱 Phone camera scanning</span>
-              </div>
-              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
                 <span className="text-sm text-gray-700">📄 CSV file imports</span>
               </div>
               <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
@@ -1103,7 +1116,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
                 {!isAnnual ? (
                   <>
-                    <span className="text-4xl sm:text-5xl font-bold text-gray-900">$10</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-gray-900">$25</span>
                     <span className="text-gray-600">/month</span>
                   </>
                 ) : (
