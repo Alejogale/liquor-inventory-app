@@ -275,9 +275,11 @@ export default function LandingPage() {
           {/* Hero Feature with Image */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
             <div className="lg:order-2">
-              <img 
-                src="/interactive-experience.png" 
-                alt="Interactive learning and organization experience" 
+              <Image
+                src="/interactive-experience.png"
+                alt="Interactive learning and organization experience"
+                width={2000}
+                height={2000}
                 className="w-full h-auto max-w-lg mx-auto"
               />
             </div>
@@ -677,9 +679,11 @@ export default function LandingPage() {
             {/* Home Organization */}
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-bl-3xl opacity-10"></div>
-              <img 
-                src="/barcode-scanning.png" 
-                alt="Easy barcode scanning for home inventory" 
+              <Image
+                src="/barcode-scanning.png"
+                alt="Easy barcode scanning for home inventory"
+                width={2000}
+                height={2000}
                 className="w-full h-36 object-contain rounded-xl mb-6"
               />
               <div className="relative">
@@ -714,9 +718,11 @@ export default function LandingPage() {
             {/* Hobby & Collectibles */}
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-br-3xl opacity-10"></div>
-              <img 
-                src="/digital-library.jpg" 
-                alt="Digital organization for hobbies and collections" 
+              <Image
+                src="/digital-library.jpg"
+                alt="Digital organization for hobbies and collections"
+                width={5209}
+                height={5210}
                 className="w-full h-36 object-cover rounded-xl mb-6"
               />
               <div className="relative">
@@ -751,9 +757,11 @@ export default function LandingPage() {
             {/* Small Business */}
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-br-3xl opacity-10"></div>
-              <img 
-                src="/warehouse-management.jpg" 
-                alt="Professional warehouse and inventory management" 
+              <Image
+                src="/warehouse-management.jpg"
+                alt="Professional warehouse and inventory management"
+                width={5210}
+                height={5209}
                 className="w-full h-40 object-cover rounded-xl mb-6"
               />
               <div className="relative">
@@ -946,9 +954,11 @@ export default function LandingPage() {
               {/* Product Images */}
               <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
                 <div className="relative">
-                  <img
+                  <Image
                     src="/barccode scanner image.jpg"
                     alt="Bluetooth Wireless Barcode Scanner - Perfect for InvyEasy"
+                    width={1500}
+                    height={1359}
                     className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
                     onClick={() => setModalImage('/barccode scanner image.jpg')}
                   />
@@ -959,21 +969,27 @@ export default function LandingPage() {
                 
                 {/* Additional product images */}
                 <div className="flex gap-3 mt-6 justify-center">
-                  <img
+                  <Image
                     src="/71F7l9ydGeL._AC_SL1500_.jpg"
                     alt="Scanner angle 1"
+                    width={1500}
+                    height={1500}
                     className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                     onClick={() => setModalImage('/71F7l9ydGeL._AC_SL1500_.jpg')}
                   />
-                  <img
+                  <Image
                     src="/71tAACAKRdL._AC_SL1500_.jpg"
                     alt="Scanner angle 2"
+                    width={1500}
+                    height={1500}
                     className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                     onClick={() => setModalImage('/71tAACAKRdL._AC_SL1500_.jpg')}
                   />
-                  <img
+                  <Image
                     src="/81GEHejYbnL._AC_SL1500_.jpg"
                     alt="Scanner angle 3"
+                    width={1500}
+                    height={1466}
                     className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                     onClick={() => setModalImage('/81GEHejYbnL._AC_SL1500_.jpg')}
                   />
@@ -1100,9 +1116,11 @@ export default function LandingPage() {
                 {/* Product Images */}
                 <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
                   <div className="relative">
-                    <img
+                    <Image
                       src="/71QmDP5DjpL._AC_SL1500_.jpg"
                       alt="Alternative Bluetooth Barcode Scanner"
+                      width={1500}
+                      height={1482}
                       className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={() => setModalImage('/71QmDP5DjpL._AC_SL1500_.jpg')}
                     />
@@ -1110,27 +1128,35 @@ export default function LandingPage() {
 
                   {/* Additional product images */}
                   <div className="flex gap-3 mt-6 justify-center flex-wrap">
-                    <img
+                    <Image
                       src="/71mehx2HvsL._AC_SL1500_.jpg"
                       alt="Scanner view 1"
+                      width={1500}
+                      height={1469}
                       className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                       onClick={() => setModalImage('/71mehx2HvsL._AC_SL1500_.jpg')}
                     />
-                    <img
+                    <Image
                       src="/71lHVUl-3jL._AC_SL1500_.jpg"
                       alt="Scanner view 2"
+                      width={1500}
+                      height={1370}
                       className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                       onClick={() => setModalImage('/71lHVUl-3jL._AC_SL1500_.jpg')}
                     />
-                    <img
+                    <Image
                       src="/61hQBIB41TL._AC_SL1500_.jpg"
                       alt="Scanner view 3"
+                      width={1302}
+                      height={1141}
                       className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                       onClick={() => setModalImage('/61hQBIB41TL._AC_SL1500_.jpg')}
                     />
-                    <img
+                    <Image
                       src="/61NpPb-xBML._AC_.jpg"
                       alt="Scanner view 4"
+                      width={970}
+                      height={600}
                       className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
                       onClick={() => setModalImage('/61NpPb-xBML._AC_.jpg')}
                     />
