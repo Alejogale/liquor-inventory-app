@@ -233,18 +233,30 @@ export default function LandingPage() {
 
       {/* Mission Statement Section */}
       <section className="py-12 sm:py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-orange-100 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-center justify-center mb-4 sm:mb-6">
-              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 mb-2 sm:mb-0 sm:mr-3" />
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Our Mission</h2>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Logo */}
+            <div className="flex justify-center lg:justify-end">
+              <img
+                src="/InvyEasy logo.png"
+                alt="InvyEasy Logo"
+                className="w-72 sm:w-80 md:w-96 lg:w-[28rem] h-auto"
+              />
             </div>
-            <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto px-2 sm:px-0">
-              Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry, 
-              managing craft supplies, or running a small business - we believe everyone deserves powerful tools that 
-              are easy to use and affordable.
-            </p>
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600 mt-4 sm:mt-6">Simple. Smart. Organized.</p>
+
+            {/* Mission Text */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-orange-100 shadow-xl text-center lg:text-left">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start mb-3 sm:mb-4">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mb-2 sm:mb-0 sm:mr-2" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Our Mission</h2>
+              </div>
+              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed px-2 sm:px-0">
+                Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry,
+                managing craft supplies, or running a small business - we believe everyone deserves powerful tools that
+                are easy to use and affordable.
+              </p>
+              <p className="text-base sm:text-lg md:text-xl font-bold text-orange-600 mt-3 sm:mt-4">Simple. Smart. Organized.</p>
+            </div>
           </div>
         </div>
       </section>
