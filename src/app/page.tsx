@@ -25,6 +25,7 @@ import {
   ChevronDown,
   Play
 } from 'lucide-react'
+import { ExitIntentPopup } from '@/components/ExitIntentPopup'
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -33,6 +34,21 @@ export default function LandingPage() {
   const [modalImage, setModalImage] = useState<string | null>(null)
   const router = useRouter()
   // Force deployment trigger - updated
+
+  // Handle email capture from popup
+  const handleEmailCapture = async (email: string) => {
+    const response = await fetch('/api/capture-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to capture email')
+    }
+
+    return response.json()
+  }
 
   // Handle password reset redirect
   useEffect(() => {
@@ -1558,6 +1574,9 @@ export default function LandingPage() {
           </div>
         </div>
       )}
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup onEmailSubmit={handleEmailCapture} />
     </div>
   )
 }

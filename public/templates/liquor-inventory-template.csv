@@ -1,0 +1,38 @@
+Item Name,Category,Brand,Size (ml),Quantity on Hand,Unit Cost ($),Total Value ($),Par Level,Reorder Point,Supplier,Location,Notes,Last Updated
+Absolut Vodka,Vodka,Absolut,750,12,18.99,227.88,24,8,ABC Distributors,Bar Storage A1,Premium shelf vodka,2025-01-15
+Tanqueray Gin,Gin,Tanqueray,750,8,24.99,199.92,16,6,Premium Spirits Co,Bar Storage A2,Top shelf gin,2025-01-15
+Bacardi Rum,Rum,Bacardi,750,15,16.99,254.85,20,8,Caribbean Imports,Bar Storage B1,White rum - well drink,2025-01-15
+Jack Daniel's Whiskey,Whiskey,Jack Daniel's,750,10,26.99,269.90,18,6,Tennessee Spirits,Bar Storage C1,Tennessee whiskey,2025-01-15
+Patron Silver Tequila,Tequila,Patron,750,6,44.99,269.94,12,4,Premium Spirits Co,Bar Storage D1,Premium tequila,2025-01-15
+Grey Goose Vodka,Vodka,Grey Goose,750,5,39.99,199.95,10,4,Premium Spirits Co,Bar Storage A1,Super premium vodka,2025-01-15
+Maker's Mark Bourbon,Bourbon,Maker's Mark,750,8,29.99,239.92,16,6,Kentucky Bourbon Co,Bar Storage C2,Premium bourbon,2025-01-15
+Jameson Irish Whiskey,Whiskey,Jameson,750,12,24.99,299.88,20,8,Irish Spirits Ltd,Bar Storage C3,Irish whiskey,2025-01-15
+Captain Morgan Spiced Rum,Rum,Captain Morgan,750,18,15.99,287.82,24,10,Caribbean Imports,Bar Storage B2,Spiced rum - well drink,2025-01-15
+Bombay Sapphire Gin,Gin,Bombay Sapphire,750,7,22.99,160.93,14,6,Premium Spirits Co,Bar Storage A2,Premium gin,2025-01-15
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+INSTRUCTIONS:,,,,,,,,,,,,
+1. Item Name: Full product name,,,,,,,,,,
+2. Category: Spirit type (Vodka Gin Rum Whiskey Tequila Bourbon Liqueur Wine Beer),,,,,,,,,,
+3. Brand: Manufacturer name,,,,,,,,,,
+4. Size: Bottle size in ml (750 1000 375),,,,,,,,,,
+5. Quantity on Hand: Current inventory count,,,,,,,,,,
+6. Unit Cost: Cost per bottle,,,,,,,,,,
+7. Total Value: Auto-calculated (Quantity × Unit Cost),,,,,,,,,,
+8. Par Level: Target inventory level,,,,,,,,,,
+9. Reorder Point: When to reorder (usually 1/3 of par level),,,,,,,,,,
+10. Supplier: Distributor name,,,,,,,,,,
+11. Location: Physical storage location,,,,,,,,,,
+12. Notes: Additional info (expiration dates promotions special instructions),,,,,,,,,,
+13. Last Updated: Date of last inventory check,,,,,,,,,,
+,,,,,,,,,,,,,
+TIPS FOR SUCCESS:,,,,,,,,,,,,
+• Update this weekly or after major events,,,,,,,,,,
+• Set par levels based on 2-3 weeks of typical usage,,,,,,,,,,
+• Keep reorder points at about 1/3 of par level to avoid stockouts,,,,,,,,,,
+• Use location codes for faster restocking,,,,,,,,,,
+• Track slow-moving items in the Notes column,,,,,,,,,,
+• Calculate total inventory value monthly for accounting,,,,,,,,,,
+,,,,,,,,,,,,,
+Ready to automate this? Try InvyEasy for real-time inventory tracking!,,,,,,,,,,,,
+Visit: invyeasy.com,,,,,,,,,,,,
