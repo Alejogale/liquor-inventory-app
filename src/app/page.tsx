@@ -36,6 +36,7 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null)
   const [isAnnual, setIsAnnual] = useState(false)
+  const [modalImage, setModalImage] = useState<string | null>(null)
   const router = useRouter()
   // Force deployment trigger
 
@@ -934,11 +935,11 @@ export default function LandingPage() {
               {/* Product Images */}
               <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
                 <div className="relative">
-                  <img 
-                    src="/barccode scanner image.jpg" 
+                  <img
+                    src="/barccode scanner image.jpg"
                     alt="Bluetooth Wireless Barcode Scanner - Perfect for InvyEasy"
                     className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={() => window.open('/barccode scanner image.jpg', '_blank')}
+                    onClick={() => setModalImage('/barccode scanner image.jpg')}
                   />
                   <div className="absolute -top-4 -right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                     ⭐ Recommended
@@ -947,23 +948,23 @@ export default function LandingPage() {
                 
                 {/* Additional product images */}
                 <div className="flex gap-3 mt-6 justify-center">
-                  <img 
-                    src="/71F7l9ydGeL._AC_SL1500_.jpg" 
-                    alt="Scanner angle 1" 
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
-                    onClick={() => window.open('/71F7l9ydGeL._AC_SL1500_.jpg', '_blank')}
+                  <img
+                    src="/71F7l9ydGeL._AC_SL1500_.jpg"
+                    alt="Scanner angle 1"
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                    onClick={() => setModalImage('/71F7l9ydGeL._AC_SL1500_.jpg')}
                   />
-                  <img 
-                    src="/71tAACAKRdL._AC_SL1500_.jpg" 
-                    alt="Scanner angle 2" 
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
-                    onClick={() => window.open('/71tAACAKRdL._AC_SL1500_.jpg', '_blank')}
+                  <img
+                    src="/71tAACAKRdL._AC_SL1500_.jpg"
+                    alt="Scanner angle 2"
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                    onClick={() => setModalImage('/71tAACAKRdL._AC_SL1500_.jpg')}
                   />
-                  <img 
-                    src="/81GEHejYbnL._AC_SL1500_.jpg" 
-                    alt="Scanner angle 3" 
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110" 
-                    onClick={() => window.open('/81GEHejYbnL._AC_SL1500_.jpg', '_blank')}
+                  <img
+                    src="/81GEHejYbnL._AC_SL1500_.jpg"
+                    alt="Scanner angle 3"
+                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                    onClick={() => setModalImage('/81GEHejYbnL._AC_SL1500_.jpg')}
                   />
                 </div>
               </div>
@@ -1036,9 +1037,9 @@ export default function LandingPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a 
-                    href="https://amzn.to/3KWOup6" 
-                    target="_blank" 
+                  <a
+                    href="https://amzn.to/4pMXEEK"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl text-center flex items-center justify-center gap-2"
                   >
@@ -1068,6 +1069,133 @@ export default function LandingPage() {
               </div>
               <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
                 <span className="text-sm text-gray-700">⌨️ Manual entry</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Scanner One - Alternative Option */}
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                Another Great Option
+              </h3>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Looking for alternatives? This scanner also works perfectly with InvyEasy.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+              <div className="grid lg:grid-cols-2 gap-0">
+                {/* Product Images */}
+                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
+                  <div className="relative">
+                    <img
+                      src="/71QmDP5DjpL._AC_SL1500_.jpg"
+                      alt="Alternative Bluetooth Barcode Scanner"
+                      className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
+                      onClick={() => setModalImage('/71QmDP5DjpL._AC_SL1500_.jpg')}
+                    />
+                  </div>
+
+                  {/* Additional product images */}
+                  <div className="flex gap-3 mt-6 justify-center flex-wrap">
+                    <img
+                      src="/71mehx2HvsL._AC_SL1500_.jpg"
+                      alt="Scanner view 1"
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                      onClick={() => setModalImage('/71mehx2HvsL._AC_SL1500_.jpg')}
+                    />
+                    <img
+                      src="/71lHVUl-3jL._AC_SL1500_.jpg"
+                      alt="Scanner view 2"
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                      onClick={() => setModalImage('/71lHVUl-3jL._AC_SL1500_.jpg')}
+                    />
+                    <img
+                      src="/61hQBIB41TL._AC_SL1500_.jpg"
+                      alt="Scanner view 3"
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                      onClick={() => setModalImage('/61hQBIB41TL._AC_SL1500_.jpg')}
+                    />
+                    <img
+                      src="/61NpPb-xBML._AC_.jpg"
+                      alt="Scanner view 4"
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
+                      onClick={() => setModalImage('/61NpPb-xBML._AC_.jpg')}
+                    />
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <div className="p-8 lg:p-12">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="text-yellow-400 text-lg">★★★★★</div>
+                    <span className="text-gray-600 text-sm">(500+ reviews)</span>
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    Alternative Bluetooth Barcode Scanner
+                  </h3>
+
+                  <div className="text-3xl font-bold text-blue-600 mb-6">
+                    Check Amazon for Price
+                  </div>
+
+                  <div className="space-y-4 mb-8">
+                    <h4 className="font-semibold text-gray-900 mb-3">Key Features:</h4>
+
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-gray-900">Wireless Connectivity</span>
+                        <p className="text-gray-600 text-sm">Bluetooth connection to all devices</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-gray-900">Multi-Format Support</span>
+                        <p className="text-gray-600 text-sm">Reads all standard barcode types</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-gray-900">Reliable Performance</span>
+                        <p className="text-gray-600 text-sm">Consistent scanning speed and accuracy</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-gray-900">Easy Setup</span>
+                        <p className="text-gray-600 text-sm">Quick pairing with your devices</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <a
+                      href="https://amzn.to/4h2tJVm"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl text-center flex items-center justify-center gap-2"
+                    >
+                      <Package className="w-5 h-5" />
+                      View on Amazon
+                    </a>
+                    <Link
+                      href="/signup"
+                      className="bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-center flex items-center justify-center gap-2"
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                      Try InvyEasy Free
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1122,12 +1250,12 @@ export default function LandingPage() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2">
-                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$100</span>
+                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$192</span>
                       <span className="text-gray-600">/year</span>
                     </div>
                     <div className="text-sm mt-2 sm:mt-0 sm:ml-4 text-center sm:text-left">
-                      <div className="text-gray-500 line-through">$120/year</div>
-                      <div className="text-green-600 font-medium">Save $20</div>
+                      <div className="text-gray-500 line-through">$300/year</div>
+                      <div className="text-green-600 font-medium">Save 20%</div>
                     </div>
                   </>
                 )}
@@ -1370,6 +1498,29 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <div
+          className="fixed inset-0 z-[10000] bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setModalImage(null)}
+        >
+          <div className="relative max-w-6xl w-full">
+            <button
+              onClick={() => setModalImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 text-4xl font-bold"
+            >
+              ×
+            </button>
+            <img
+              src={modalImage}
+              alt="Enlarged view"
+              className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
