@@ -231,7 +231,7 @@ export default function LandingPage() {
             {/* Logo */}
             <div className="flex justify-center lg:justify-end">
               <img
-                src="/InvyEasy logo.png"
+                src="/InvyEasy-logo.png"
                 alt="InvyEasy Logo"
                 className="w-72 sm:w-80 md:w-96 lg:w-[28rem] h-auto"
               />
