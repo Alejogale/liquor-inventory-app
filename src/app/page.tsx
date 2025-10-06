@@ -38,7 +38,7 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(false)
   const [modalImage, setModalImage] = useState<string | null>(null)
   const router = useRouter()
-  // Force deployment trigger
+  // Force deployment trigger - updated
 
   // Handle password reset redirect
   useEffect(() => {
