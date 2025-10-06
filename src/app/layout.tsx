@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
@@ -39,9 +40,11 @@ export default function RootLayout({
           `}
         </Script>
 
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ErrorBoundary>
         <SpeedInsights />
       </body>
     </html>
