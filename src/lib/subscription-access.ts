@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { config } from './config'
 
 // Subscription-based app access system
 export type AppId = 'liquor-inventory' | 'reservation-management' | 'member-database' | 'pos-system'
@@ -194,5 +195,5 @@ export interface AppAccessGuardProps {
 
 // Helper function to check if user is platform admin (always has access)
 export function isPlatformAdminEmail(email?: string): boolean {
-  return email === 'alejogaleis@gmail.com'
+  return config.isPlatformAdmin(email)
 }

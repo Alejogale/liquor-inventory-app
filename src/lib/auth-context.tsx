@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { config } from './config'
 import { useRouter } from 'next/navigation'
 
 interface UserProfile {
@@ -202,8 +203,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               full_name: userName,
               email: userEmail,
               role: signupCompleted ? 'owner' : 'staff', // Users from signup get 'owner', others get 'staff'
-              // 🚀 Set platform admin status for your email
-              is_platform_admin: userEmail === 'alejogaleis@gmail.com'
+              // 🚀 Set platform admin status (configured via environment variable)
+              is_platform_admin: config.isPlatformAdmin(userEmail)
             })
             .select()
             .single()
@@ -324,7 +325,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('❌ No organization_id in profile - checking if admin user...')
         
         // Special handling for admin user - ensure they have an organization
-        if (profile.email === 'alejogaleis@gmail.com' || profile.is_platform_admin) {
+        if (config.isPlatformAdmin(profile.email) || profile.is_platform_admin) {
           console.log('🔧 Admin user detected, ensuring organization access...')
           
           // Try to find the default organization
@@ -372,9 +373,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 🚀 NEW: Helper functions for hybrid admin system
   const isPlatformAdmin = () => {
     // Check multiple sources to ensure admin access works
-    const isAdmin = userProfile?.is_platform_admin === true || 
-                   userProfile?.email === 'alejogaleis@gmail.com' ||
-                   user?.email === 'alejogaleis@gmail.com'
+    const isAdmin = userProfile?.is_platform_admin === true ||
+                   config.isPlatformAdmin(userProfile?.email) ||
+                   config.isPlatformAdmin(user?.email)
     
     if (isAdmin) {
       console.log('✅ Platform admin detected:', {

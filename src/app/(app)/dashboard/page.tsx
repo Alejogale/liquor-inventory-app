@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useOrganizationData } from '@/lib/use-data-loading'
 import { supabase } from '@/lib/supabase'
+import { config } from '@/lib/config'
 import { useSearchParams } from 'next/navigation'
 import AddCategoryModal from '@/app/components/AddCategoryModal'
 import EditCategoryModal from '@/app/components/EditCategoryModal'
@@ -100,7 +101,7 @@ function DashboardContent() {
   const [showBulkPricingModal, setShowBulkPricingModal] = useState(false)
   const fetchingRef = useRef(false)
 
-  const isAdmin = user?.email === 'alejogaleis@gmail.com'
+  const isAdmin = config.isPlatformAdmin(user?.email)
 
   // Get the correct organization ID - for admin, use the known organization ID if context is missing
   const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : undefined)
