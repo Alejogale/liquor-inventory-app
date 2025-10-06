@@ -1250,7 +1250,7 @@ export default function LandingPage() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2">
-                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$192</span>
+                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$240</span>
                       <span className="text-gray-600">/year</span>
                     </div>
                     <div className="text-sm mt-2 sm:mt-0 sm:ml-4 text-center sm:text-left">
