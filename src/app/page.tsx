@@ -234,9 +234,11 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Logo */}
             <div className="flex justify-center lg:justify-end">
-              <img
+              <Image
                 src="/InvyEasy-logo.png"
                 alt="InvyEasy Logo"
+                width={2000}
+                height={1401}
                 className="w-72 sm:w-80 md:w-96 lg:w-[28rem] h-auto"
               />
             </div>
