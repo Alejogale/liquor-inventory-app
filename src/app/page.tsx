@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
@@ -213,10 +214,13 @@ export default function LandingPage() {
             {/* Right Side - Hero Image */}
             <div className="flex justify-center lg:justify-end order-1 lg:order-2 mb-4 sm:mb-0">
               <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-0">
-                <img
+                <Image
                   src="/InvyEasyLaptop1.png"
                   alt="Inventory management with barcode scanning"
+                  width={2000}
+                  height={2000}
                   className="w-full h-auto"
+                  priority
                 />
               </div>
             </div>
