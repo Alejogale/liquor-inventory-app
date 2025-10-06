@@ -219,9 +219,9 @@ export default function LandingPage() {
 
             {/* Right Side - Hero Image */}
             <div className="flex justify-center lg:justify-end order-1 lg:order-2 mb-4 sm:mb-0">
-              <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-4 sm:px-0">
+              <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-0">
                 <img
-                  src="/computer invyeasy.png"
+                  src="/InvyEasyLaptop1.png"
                   alt="Inventory management with barcode scanning"
                   className="w-full h-auto"
                 />
