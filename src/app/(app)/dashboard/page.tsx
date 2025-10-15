@@ -89,6 +89,8 @@ function DashboardContent() {
     totalRooms: 0,
     totalInventoryValue: 0
   })
+  const [showValueBreakdown, setShowValueBreakdown] = useState(false)
+  const [categoryBreakdown, setCategoryBreakdown] = useState<{ categoryName: string; totalValue: number }[]>([])
 
   // Add to existing state
   const [selectedItems, setSelectedItems] = useState(new Set<string>())
@@ -255,17 +257,34 @@ function DashboardContent() {
       setCategories(categoriesData || [])
       setSuppliers(suppliersData || [])
 
-      // Calculate total inventory value
+      // Calculate total inventory value and category breakdown
       let totalInventoryValue = 0
+      const categoryValues = new Map<string, number>()
+
       if (inventoryData && roomCountsData) {
         totalInventoryValue = inventoryData.reduce((total, item) => {
           // Get total count for this item across all rooms
           const itemCounts = roomCountsData.filter(count => count.inventory_item_id === item.id)
           const totalCount = itemCounts.reduce((sum, count) => sum + count.count, 0)
           const itemValue = totalCount * (item.price_per_item || 0)
+
+          // Add to category total
+          const category = categoriesData?.find(cat => cat.id === item.category_id)
+          if (category) {
+            const currentValue = categoryValues.get(category.name) || 0
+            categoryValues.set(category.name, currentValue + itemValue)
+          }
+
           return total + itemValue
         }, 0)
       }
+
+      // Convert category values to array and sort by value
+      const breakdown = Array.from(categoryValues.entries())
+        .map(([categoryName, totalValue]) => ({ categoryName, totalValue }))
+        .sort((a, b) => b.totalValue - a.totalValue)
+
+      setCategoryBreakdown(breakdown)
 
       setStats({
         totalItems: inventoryData?.length || 0,
@@ -621,32 +640,99 @@ function DashboardContent() {
               </div>
             </div>
             
-            <div className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px]"
-                 style={{
-                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
-                   backdropFilter: 'blur(20px)',
-                   WebkitBackdropFilter: 'blur(20px)',
-                   boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
-                 }}>
-              <div className="flex items-center justify-between h-full">
-                <div className="flex-1 min-w-0">
-                  <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">Total Inventory Value</p>
-                  <p className={`font-bold text-gray-900 ${
-                    stats.totalInventoryValue >= 1000000 
-                      ? 'text-base lg:text-lg' 
-                      : 'text-lg lg:text-xl'
-                  } leading-tight`}>
-                    ${stats.totalInventoryValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                </div>
-                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 ml-3"
-                     style={{
-                       background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                       boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
-                     }}>
-                  <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
+            <div className="relative">
+              <div
+                onClick={() => setShowValueBreakdown(!showValueBreakdown)}
+                className="rounded-2xl p-4 lg:p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 min-h-[110px] lg:min-h-[120px] cursor-pointer"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  boxShadow: '0 8px 32px rgba(34, 197, 94, 0.1)'
+                }}>
+                <div className="flex items-center justify-between h-full">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2 truncate">
+                      Total Inventory Value
+                    </p>
+                    <p className={`font-bold text-gray-900 ${
+                      stats.totalInventoryValue >= 1000000
+                        ? 'text-base lg:text-lg'
+                        : 'text-lg lg:text-xl'
+                    } leading-tight`}>
+                      ${stats.totalInventoryValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 flex-shrink-0 ml-3">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shadow-lg"
+                         style={{
+                           background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                           boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)'
+                         }}>
+                      <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap"
+                          style={{
+                            background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                            color: '#166534'
+                          }}>
+                      <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${showValueBreakdown ? 'rotate-180' : ''}`} />
+                      Click
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Category Breakdown Dropdown */}
+              {showValueBreakdown && categoryBreakdown.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl border border-white/20 backdrop-blur-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300"
+                     style={{
+                       background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,247,237,0.95) 100%)',
+                       backdropFilter: 'blur(20px)',
+                       WebkitBackdropFilter: 'blur(20px)',
+                       boxShadow: '0 20px 50px rgba(34, 197, 94, 0.15)'
+                     }}>
+                  <div className="p-4">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3 pb-2 border-b border-green-100">
+                      Value by Category
+                    </h4>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {categoryBreakdown.map((category, index) => (
+                        <div
+                          key={category.categoryName}
+                          className="flex items-center justify-between p-3 rounded-xl hover:bg-green-50/50 transition-colors duration-200"
+                          style={{
+                            background: index % 2 === 0 ? 'rgba(240, 253, 244, 0.3)' : 'transparent'
+                          }}
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                                 style={{
+                                   background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                   boxShadow: '0 2px 8px rgba(34, 197, 94, 0.2)'
+                                 }}>
+                              <Tag className="h-4 w-4 text-white" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-900 truncate">
+                              {category.categoryName}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-green-700">
+                                ${category.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {((category.totalValue / stats.totalInventoryValue) * 100).toFixed(1)}%
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
