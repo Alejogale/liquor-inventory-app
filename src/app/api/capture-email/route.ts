@@ -8,8 +8,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for bypassing RLS
 )
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend (only if API key is available)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -75,9 +75,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Send email with template via Resend
-    try {
-      await resend.emails.send({
+    // Send email with template via Resend (only if configured)
+    if (resend) {
+      try {
+        await resend.emails.send({
         from: 'InvyEasy <onboarding@resend.dev>', // Using Resend's test domain - update to your verified domain later
         to: email,
         subject: 'Your Free Liquor Inventory Template 🍸',
@@ -170,10 +171,11 @@ export async function POST(request: NextRequest) {
             path: `${process.env.NEXT_PUBLIC_APP_URL}/templates/liquor-inventory-template.csv`
           }
         ]
-      })
-    } catch (emailError) {
-      console.error('Resend error:', emailError)
-      // Don't fail the request if email fails - we still captured the lead
+        })
+      } catch (emailError) {
+        console.error('Resend error:', emailError)
+        // Don't fail the request if email fails - we still captured the lead
+      }
     }
 
     return NextResponse.json({
