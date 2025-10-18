@@ -84,17 +84,17 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
       description: 'Import liquor, wine, and beer inventory',
       icon: Package,
       color: 'from-blue-500 to-cyan-500',
-      fields: ['Brand', 'Category', 'Supplier', 'Par Level', 'Threshold', 'Barcode', 'Price Per Item'],
-      requiredFields: ['Brand', 'Category', 'Supplier'],
+      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item'],
+      requiredFields: ['brand', 'category_name', 'supplier_name'],
       example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789,25.99',
       dbMapping: {
-        'Brand': 'brand',
-        'Category': 'category_id', // Will lookup category by name
-        'Supplier': 'supplier_id', // Will lookup supplier by name
-        'Par Level': 'par_level',
-        'Threshold': 'threshold',
-        'Barcode': 'barcode',
-        'Price Per Item': 'price_per_item'
+        'brand': 'brand',
+        'category_name': 'category_id', // Will lookup category by name
+        'supplier_name': 'supplier_id', // Will lookup supplier by name
+        'par_level': 'par_level',
+        'threshold': 'threshold',
+        'barcode': 'barcode',
+        'price_per_item': 'price_per_item'
       }
     },
     {

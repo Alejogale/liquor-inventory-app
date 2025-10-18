@@ -127,20 +127,12 @@ export function ExitIntentPopup({ onEmailSubmit }: ExitIntentPopupProps) {
         </button>
 
         {!hasSubmitted ? (
-          <div className="grid md:grid-cols-2 gap-0">
-            {/* Left side - Image */}
-            <div className="hidden md:block relative bg-gradient-to-br from-orange-500 to-red-500 p-8">
-              <div className="flex flex-col h-full justify-between">
-                {/* Logo */}
-                <div className="flex items-center space-x-2 text-white">
-                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <Package className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xl font-bold">InvyEasy</span>
-                </div>
-
-                {/* Laptop Image */}
-                <div className="relative w-full aspect-[4/3] my-4">
+          <div className="grid md:grid-cols-5 gap-0">
+            {/* Left side - Image (larger, 3 columns) */}
+            <div className="hidden md:flex md:col-span-3 relative bg-gradient-to-br from-orange-500 to-red-500 p-8 items-center justify-center">
+              <div className="relative w-full h-full flex items-center justify-center">
+                {/* Laptop Image - Larger */}
+                <div className="relative w-full aspect-[4/3]">
                   <Image
                     src="/InvyEasyLaptop1.png"
                     alt="InvyEasy Dashboard Preview"
@@ -148,55 +140,45 @@ export function ExitIntentPopup({ onEmailSubmit }: ExitIntentPopupProps) {
                     className="object-contain drop-shadow-2xl"
                   />
                 </div>
-
-                {/* Testimonial */}
-                <div className="text-white/90 text-sm">
-                  <p className="italic mb-2">"This template saved me hours of work!"</p>
-                  <p className="font-semibold">— Bar Manager, NYC</p>
-                </div>
               </div>
             </div>
 
-            {/* Right side - Form */}
-            <div className="p-8">
-              {/* Mobile gradient header */}
+            {/* Right side - Form (smaller, 2 columns) */}
+            <div className="md:col-span-2 p-8">
+              {/* Mobile image */}
               <div className="md:hidden mb-6 -mx-8 -mt-8 p-6 bg-gradient-to-br from-orange-500 to-red-500">
-                <div className="flex items-center space-x-2 text-white mb-4">
-                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <Package className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xl font-bold">InvyEasy</span>
-                </div>
-                <div className="flex justify-center">
-                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full">
-                    <Download className="w-8 h-8 text-white" />
-                  </div>
+                <div className="relative w-full aspect-[4/3]">
+                  <Image
+                    src="/InvyEasyLaptop1.png"
+                    alt="InvyEasy Dashboard Preview"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                  />
                 </div>
               </div>
 
               {/* Headline */}
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                Wait! Get Your Free Template
+                Get Your Free Template
               </h2>
 
               <p className="text-gray-600 mb-6">
                 Download our professional liquor inventory template — <span className="font-semibold text-orange-600">completely free</span>.
-                Start tracking inventory in Excel today!
               </p>
 
               {/* Features */}
               <div className="space-y-2.5 mb-6 text-sm text-gray-700">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                  <span>Pre-built formulas for inventory calculations</span>
+                  <span>Pre-built formulas for calculations</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                  <span>Sample data to get you started</span>
+                  <span>Sample data included</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                  <span>Used by 1,000+ bars and restaurants</span>
+                  <span>Works with Excel & Google Sheets</span>
                 </div>
               </div>
 

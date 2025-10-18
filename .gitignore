@@ -44,3 +44,6 @@ next-env.d.ts
 *.backup*
 temp_*.js
 temp_*.tsx
+
+# Mobile app (temporary - until ready for production)
+/src/mobile
