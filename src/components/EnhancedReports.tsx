@@ -13,6 +13,7 @@ interface InventoryItem {
   par_level: number
   threshold: number
   barcode?: string
+  price_per_item?: number
   categories: { name: string } | null
   suppliers: { name: string } | null
 }
@@ -82,7 +83,7 @@ export default function EnhancedReports() {
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select(`
-          id, brand, size, category_id, supplier_id, par_level, threshold, barcode, price_per_item,
+          id, brand, category_id, supplier_id, par_level, threshold, barcode, price_per_item,
           categories(name),
           suppliers(name)
         `)
@@ -172,7 +173,7 @@ export default function EnhancedReports() {
 
   const exportToCsv = () => {
     // ✅ UPDATED: Use same format as import for round-trip compatibility
-    const headers = ['brand', 'size', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
+    const headers = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
 
     // Add room details as separate columns if enabled
     const roomNames = reportSettings.includeRoomDetails
@@ -190,7 +191,6 @@ export default function EnhancedReports() {
       category.items.forEach(item => {
         const row = [
           item.brand,
-          item.size || '', // ✅ ADDED: size field for import compatibility
           category.categoryName,
           reportSettings.includeSuppliers ? (item.suppliers?.name || '') : '',
           item.par_level,
