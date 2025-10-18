@@ -82,7 +82,7 @@ export default function EnhancedReports() {
       const { data: itemsData, error: itemsError } = await supabase
         .from('inventory_items')
         .select(`
-          id, brand, category_id, supplier_id, par_level, threshold, barcode,
+          id, brand, size, category_id, supplier_id, par_level, threshold, barcode, price_per_item,
           categories(name),
           suppliers(name)
         `)
@@ -171,29 +171,40 @@ export default function EnhancedReports() {
   }
 
   const exportToCsv = () => {
-    const headers = ['Category', 'Brand', 'Barcode', 'Supplier', 'Par Level', 'Threshold', 'Total Count']
-    
-    if (reportSettings.includeRoomDetails) {
-      headers.push('Room Details')
-    }
+    // ✅ UPDATED: Use same format as import for round-trip compatibility
+    const headers = ['brand', 'size', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
 
-    const csvRows = [headers.join(',')]
+    // Add room details as separate columns if enabled
+    const roomNames = reportSettings.includeRoomDetails
+      ? Array.from(new Set(categoryReports.flatMap(cat =>
+          cat.items.flatMap(item =>
+            item.roomCounts.map(rc => rc.roomName)
+          )
+        )))
+      : []
+
+    const allHeaders = [...headers, ...roomNames]
+    const csvRows = [allHeaders.join(',')]
 
     categoryReports.forEach(category => {
       category.items.forEach(item => {
         const row = [
-          category.categoryName,
           item.brand,
-          reportSettings.includeBarcodes ? (item.barcode || 'No barcode') : '',
-          reportSettings.includeSuppliers ? (item.suppliers?.name || 'No supplier') : '',
+          item.size || '', // ✅ ADDED: size field for import compatibility
+          category.categoryName,
+          reportSettings.includeSuppliers ? (item.suppliers?.name || '') : '',
           item.par_level,
           item.threshold,
-          item.totalCount
+          reportSettings.includeBarcodes ? (item.barcode || '') : '',
+          item.price_per_item || '' // ✅ ADDED: price_per_item for import compatibility
         ]
 
+        // Add room counts as separate columns
         if (reportSettings.includeRoomDetails) {
-          const roomDetails = item.roomCounts.map(rc => `${rc.roomName}(${rc.count})`).join('; ')
-          row.push(roomDetails)
+          roomNames.forEach(roomName => {
+            const roomCount = item.roomCounts.find(rc => rc.roomName === roomName)
+            row.push(roomCount ? roomCount.count.toString() : '0')
+          })
         }
 
         csvRows.push(row.join(','))
