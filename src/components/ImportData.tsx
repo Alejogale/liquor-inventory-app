@@ -621,13 +621,13 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
         let supplierId = null
         
         // ✅ VALIDATE AND SANITIZE DATA (fix long name issues)
-        if (!item.brand || !item.size || !item.category_name || !item.supplier_name) {
+        if (!item.brand || !item.category_name || !item.supplier_name) {
           console.log(`⚠️ Skipping item ${i + 1}: Missing required fields`)
           failedCountRef.current += 1
           setFailedCount(failedCountRef.current) // Update UI
-          setFailedItems(prev => [...prev, { 
-            item, 
-            error: 'Missing required fields (brand, size, category_name, or supplier_name)' 
+          setFailedItems(prev => [...prev, {
+            item,
+            error: 'Missing required fields (brand, category_name, or supplier_name)'
           }])
           continue
         }
@@ -647,7 +647,6 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             .trim()
             .replace(/[^\w\s.-]/g, '') // Remove special characters that might cause DB issues
             .substring(0, 100) || '', // Max 100 chars
-          size: item.size?.toString().trim().substring(0, 50) || '',   // Max 50 chars
           category_name: item.category_name?.toString().trim().substring(0, 80) || '', // Max 80 chars
           supplier_name: item.supplier_name?.toString().trim().substring(0, 80) || '', // Max 80 chars
           par_level: item.par_level,
@@ -655,10 +654,10 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           barcode: item.barcode?.toString().trim().substring(0, 50) || null,
           price_per_item: item.price_per_item
         }
-        
+
         // Log if we truncated anything
-        if (item.brand?.length > 100 || item.size?.length > 50) {
-          console.warn(`⚠️ Truncated long data for ${item.brand}: brand(${item.brand?.length}) size(${item.size?.length})`)
+        if (item.brand?.length > 100) {
+          console.warn(`⚠️ Truncated long data for ${item.brand}: brand(${item.brand?.length})`)
         }
 
         // 🚀 ULTRA-FAST DUPLICATE CHECK (multiple strategies for maximum speed)
@@ -671,7 +670,6 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             .from('inventory_items')
             .select('id')
             .eq('brand', sanitizedItem.brand)
-            .eq('size', sanitizedItem.size)
             .eq('organization_id', currentOrg)
             .limit(1)
             .maybeSingle()
@@ -753,7 +751,6 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
             .from('inventory_items')
             .insert([{
               brand: sanitizedItem.brand,
-              size: sanitizedItem.size,
               category_id: categoryId,
               supplier_id: supplierId,
               par_level: parseInt(sanitizedItem.par_level) || 0,
@@ -896,7 +893,6 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           .from('inventory_items')
           .insert([{
             brand: item.brand?.toString() || '',
-            size: item.size?.toString() || '',
             category_id: category?.id,
             supplier_id: supplierId,
             par_level: parseInt(item.par_level) || 0,
