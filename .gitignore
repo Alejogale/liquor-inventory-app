@@ -45,5 +45,5 @@ next-env.d.ts
 temp_*.js
 temp_*.tsx
 
-# Mobile app (temporary - until ready for production)
-/src/mobile
+# Mobile app - now tracked in git
+# Note: .env files in mobile folder still ignored by global .env* rule above

@@ -77,26 +77,28 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
   }
 
   // Memoize importTypes to prevent recreation on every render
-  const importTypes = useMemo(() => [
-    {
-      id: 'inventory',
-      title: 'Inventory Items',
-      description: 'Import liquor, wine, and beer inventory',
-      icon: Package,
-      color: 'from-blue-500 to-cyan-500',
-      fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item'],
-      requiredFields: ['brand', 'category_name', 'supplier_name'],
-      example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789,25.99',
-      dbMapping: {
-        'brand': 'brand',
-        'category_name': 'category_id', // Will lookup category by name
-        'supplier_name': 'supplier_id', // Will lookup supplier by name
-        'par_level': 'par_level',
-        'threshold': 'threshold',
-        'barcode': 'barcode',
-        'price_per_item': 'price_per_item'
-      }
-    },
+  const importTypes = useMemo(() => {
+    console.log('🔧 ImportData: Initializing import types with LOWERCASE headers')
+    return [
+      {
+        id: 'inventory',
+        title: 'Inventory Items',
+        description: 'Import liquor, wine, and beer inventory',
+        icon: Package,
+        color: 'from-blue-500 to-cyan-500',
+        fields: ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item'],
+        requiredFields: ['brand', 'category_name', 'supplier_name'],
+        example: 'Grey Goose,Vodka,ABC Liquors,12,3,123456789,25.99',
+        dbMapping: {
+          'brand': 'brand',
+          'category_name': 'category_id', // Will lookup category by name
+          'supplier_name': 'supplier_id', // Will lookup supplier by name
+          'par_level': 'par_level',
+          'threshold': 'threshold',
+          'barcode': 'barcode',
+          'price_per_item': 'price_per_item'
+        }
+      },
     {
       id: 'suppliers',
       title: 'Suppliers',
