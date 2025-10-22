@@ -6,6 +6,18 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// CORS headers for mobile app
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -26,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (!firstName || !lastName || !email || !password || !company || !businessType || !primaryApp || !plan || !billingCycle) {
       return NextResponse.json(
         { error: 'Missing required fields' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -34,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -43,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -53,7 +65,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
-        { status: 409 }
+        { status: 409, headers: corsHeaders }
       )
     }
 
@@ -78,7 +90,7 @@ export async function POST(request: NextRequest) {
       console.error('Organization creation error:', orgError)
       return NextResponse.json(
         { error: 'Failed to create organization' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
@@ -105,7 +117,7 @@ export async function POST(request: NextRequest) {
       await supabaseAdmin.from('organizations').delete().eq('id', organization.id)
       return NextResponse.json(
         { error: 'Failed to create user account' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
@@ -128,7 +140,7 @@ export async function POST(request: NextRequest) {
       await supabaseAdmin.from('organizations').delete().eq('id', organization.id)
       return NextResponse.json(
         { error: 'Failed to create user profile' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
@@ -180,13 +192,13 @@ export async function POST(request: NextRequest) {
         id: organization.id,
         name: organization.Name
       }
-    })
+    }, { headers: corsHeaders })
 
   } catch (error) {
     console.error('Signup API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

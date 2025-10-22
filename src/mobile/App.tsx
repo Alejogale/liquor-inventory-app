@@ -60,6 +60,7 @@ import { StatCard, QuickCountButtons } from './ModernComponents';
 // Initialize Supabase client
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+const apiUrl = process.env.EXPO_PUBLIC_API_URL!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Offline Data Service
@@ -4672,6 +4673,9 @@ const Onboarding = memo(({ onGetStarted, onLogin }: { onGetStarted: () => void; 
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<any>(null);
@@ -4707,8 +4711,9 @@ export default function App() {
   };
 
   const handleSignUp = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
+    // Validate required fields
+    if (!email || !password || !firstName || !lastName || !organizationName) {
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -4720,18 +4725,45 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password,
+      // Call the API endpoint to create organization + user profile + auth user
+      const response = await fetch(`${apiUrl}/api/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          password: password,
+          company: organizationName.trim(),
+          phone: '',
+          businessType: 'personal',
+          employees: '1-10',
+          primaryApp: 'inventory-management',
+          plan: 'pro',
+          billingCycle: 'monthly'
+        }),
       });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create account');
+      }
 
       Alert.alert(
         'Success!',
-        'Your account has been created. Please check your email to verify your account.',
+        'Your account has been created successfully! You can now log in.',
         [{ text: 'OK', onPress: () => setShowSignUp(false) }]
       );
+
+      // Clear form fields
+      setFirstName('');
+      setLastName('');
+      setOrganizationName('');
+      setEmail('');
+      setPassword('');
 
     } catch (error: any) {
       Alert.alert('Sign Up Failed', error.message || 'Please try again.');
@@ -4746,6 +4778,9 @@ export default function App() {
     setUserData(null);
     setEmail('');
     setPassword('');
+    setFirstName('');
+    setLastName('');
+    setOrganizationName('');
     setShowOnboarding(true);
   };
 
@@ -4807,7 +4842,51 @@ export default function App() {
         </View>
 
         {/* Login/Sign Up Card */}
-        <View style={styles.loginCard}>
+        <ScrollView style={styles.loginCard} showsVerticalScrollIndicator={false}>
+          {/* Show name and organization fields only in signup mode */}
+          {isSignUpMode && (
+            <>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>First Name</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your first name"
+                  placeholderTextColor="#9ca3af"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  autoCapitalize="words"
+                  editable={!isLoading}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Last Name</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your last name"
+                  placeholderTextColor="#9ca3af"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  autoCapitalize="words"
+                  editable={!isLoading}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Organization Name</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="My Home, My Business, etc."
+                  placeholderTextColor="#9ca3af"
+                  value={organizationName}
+                  onChangeText={setOrganizationName}
+                  autoCapitalize="words"
+                  editable={!isLoading}
+                />
+              </View>
+            </>
+          )}
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email Address</Text>
             <TextInput
@@ -4871,7 +4950,7 @@ export default function App() {
               {isSignUpMode ? 'Sign In' : 'Create Account'}
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </View>
     </KeyboardAvoidingView>
   );
@@ -5691,13 +5770,15 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',  // Darker overlay for better modal visibility
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
   sortModal: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',  // Translucent glass
+    backgroundColor: 'rgba(11, 11, 12, 0.95)',  // Dark semi-opaque background for better visibility
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',  // Subtle glass border
     borderRadius: 16,
     padding: 20,
     width: '100%',
@@ -6251,21 +6332,23 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',  // Darker overlay for better modal visibility
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     zIndex: 1000,
   },
   modalContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',  // Translucent glass
+    backgroundColor: 'rgba(11, 11, 12, 0.95)',  // Dark semi-opaque background for better visibility
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',  // Subtle glass border
     borderRadius: 20,
     width: '100%',
     maxWidth: 500,
     height: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 10,
   },
