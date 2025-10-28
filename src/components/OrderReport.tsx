@@ -248,6 +248,13 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
     // Use lowercase headers matching import format for round-trip compatibility
     const headers = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
 
+    // Get all unique room names from the order items
+    const roomNames = Array.from(new Set(orderItems.flatMap(item =>
+      item.rooms_with_stock.map(r => r.room_name)
+    ))).sort()
+
+    const allHeaders = [...headers, ...roomNames]
+
     // Helper function to properly escape CSV values
     const escapeCSVValue = (value: any): string => {
       if (value === null || value === undefined) return ''
@@ -259,7 +266,7 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
       return stringValue
     }
 
-    const csvRows = [headers.map(escapeCSVValue).join(',')]
+    const csvRows = [allHeaders.map(escapeCSVValue).join(',')]
 
     orderItems.forEach(item => {
       const row = [
@@ -271,6 +278,13 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
         '', // barcode - not available in order report
         item.price_per_item || ''
       ]
+
+      // Add room counts as separate columns
+      roomNames.forEach(roomName => {
+        const roomStock = item.rooms_with_stock.find(r => r.room_name === roomName)
+        row.push(roomStock ? roomStock.count.toString() : '0')
+      })
+
       csvRows.push(row.map(escapeCSVValue).join(','))
     })
 

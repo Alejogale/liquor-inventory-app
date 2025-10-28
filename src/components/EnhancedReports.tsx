@@ -181,7 +181,7 @@ export default function EnhancedReports() {
           cat.items.flatMap(item =>
             item.roomCounts.map(rc => rc.roomName)
           )
-        )))
+        ))).sort()
       : []
 
     const allHeaders = [...headers, ...roomNames]
@@ -211,13 +211,11 @@ export default function EnhancedReports() {
           item.price_per_item || '' // ✅ ADDED: price_per_item for import compatibility
         ]
 
-        // Add room counts as separate columns
-        if (reportSettings.includeRoomDetails) {
-          roomNames.forEach(roomName => {
-            const roomCount = item.roomCounts.find(rc => rc.roomName === roomName)
-            row.push(roomCount ? roomCount.count.toString() : '0')
-          })
-        }
+        // Add room counts as separate columns (always include all rooms, even if not enabled in settings)
+        roomNames.forEach(roomName => {
+          const roomCount = item.roomCounts.find(rc => rc.roomName === roomName)
+          row.push(roomCount ? roomCount.count.toString() : '0')
+        })
 
         csvRows.push(row.map(escapeCSVValue).join(','))
       })

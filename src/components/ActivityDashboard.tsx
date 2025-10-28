@@ -397,6 +397,17 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
     // Use lowercase headers matching import format for round-trip compatibility
     const headers = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
 
+    // Add room columns if enabled - get all unique room names
+    const roomNames = reportSettings.includeRoomDetails
+      ? Array.from(new Set(categoryReports.flatMap(cat =>
+          cat.items.flatMap((item: any) =>
+            item.roomCounts.map((rc: any) => rc.roomName)
+          )
+        )))
+      : []
+
+    const allHeaders = [...headers, ...roomNames]
+
     // Helper function to properly escape CSV values
     const escapeCSVValue = (value: any): string => {
       if (value === null || value === undefined) return ''
@@ -408,7 +419,7 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
       return stringValue
     }
 
-    const csvRows = [headers.map(escapeCSVValue).join(',')]
+    const csvRows = [allHeaders.map(escapeCSVValue).join(',')]
 
     categoryReports.forEach(category => {
       category.items.forEach((item: any) => {
@@ -421,6 +432,14 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
           reportSettings.includeBarcodes ? (item.barcode || '') : '',
           item.price_per_item || ''
         ]
+
+        // Add room counts as separate columns
+        if (reportSettings.includeRoomDetails) {
+          roomNames.forEach(roomName => {
+            const roomCount = item.roomCounts.find((rc: any) => rc.roomName === roomName)
+            row.push(roomCount ? roomCount.count.toString() : '0')
+          })
+        }
 
         csvRows.push(row.map(escapeCSVValue).join(','))
       })
