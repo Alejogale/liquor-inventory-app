@@ -8,7 +8,11 @@ import { Resend } from 'resend'
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const customerInfo = JSON.parse(formData.get('customerInfo') as string)
+    const customerInfoValue = formData.get('customerInfo')
+    if (!customerInfoValue || typeof customerInfoValue !== 'string') {
+      return NextResponse.json({ error: 'Invalid customer info' }, { status: 400 })
+    }
+    const customerInfo = JSON.parse(customerInfoValue)
     
     // Generate unique conversion ID
     const conversionId = uuidv4()
