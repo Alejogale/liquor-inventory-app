@@ -245,29 +245,41 @@ export default function OrderReport({ organizationId }: OrderReportProps) {
   }
 
   const exportToCsv = () => {
-    const headers = ['Supplier', 'Category', 'Brand', 'Current Stock', 'Threshold', 'Par Level', 'Order Quantity', 'Price per Item', 'Total Value', 'Room Locations']
-    
-    const csvContent = [
-      headers.join(','),
-      ...orderItems.map(item => [
-        item.supplier_name || 'No Supplier',
-        item.category_name,
-        item.brand,
-        item.current_stock,
-        item.threshold,
-        item.par_level,
-        item.needed_quantity,
-        item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : 'No price',
-        item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00',
-        item.rooms_with_stock.map(r => `${r.room_name}(${r.count})`).join('; ')
-      ].join(','))
-    ].join('\n')
+    // Use lowercase headers matching import format for round-trip compatibility
+    const headers = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
 
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    // Helper function to properly escape CSV values
+    const escapeCSVValue = (value: any): string => {
+      if (value === null || value === undefined) return ''
+      const stringValue = String(value)
+      // Escape quotes by doubling them and wrap in quotes if contains comma, quote, or newline
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        return `"${stringValue.replace(/"/g, '""')}"`
+      }
+      return stringValue
+    }
+
+    const csvRows = [headers.map(escapeCSVValue).join(',')]
+
+    orderItems.forEach(item => {
+      const row = [
+        item.brand,
+        item.category_name,
+        item.supplier_name || '',
+        item.par_level,
+        item.threshold,
+        '', // barcode - not available in order report
+        item.price_per_item || ''
+      ]
+      csvRows.push(row.map(escapeCSVValue).join(','))
+    })
+
+    const csvContent = csvRows.join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `order-report-by-supplier-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `inventory-export-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     window.URL.revokeObjectURL(url)
   }
