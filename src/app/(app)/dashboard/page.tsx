@@ -103,6 +103,10 @@ function DashboardContent() {
   const [showBulkPricingModal, setShowBulkPricingModal] = useState(false)
   const fetchingRef = useRef(false)
 
+  // Category selection state
+  const [selectedCategories, setSelectedCategories] = useState(new Set<string>())
+  const [showCategoryBulkActions, setShowCategoryBulkActions] = useState(false)
+
   const isAdmin = config.isPlatformAdmin(user?.email)
 
   // Get the correct organization ID - for admin, use the known organization ID if context is missing
@@ -402,6 +406,52 @@ function DashboardContent() {
     setTargetCategory('')
     setTargetSupplier('')
     setNewPrice('')
+  }
+
+  // Category selection handlers
+  const handleSelectAllCategories = () => {
+    const allCategoryIds = new Set(categories.map(cat => cat.id))
+    setSelectedCategories(allCategoryIds)
+    setShowCategoryBulkActions(true)
+  }
+
+  const handleDeselectAllCategories = () => {
+    setSelectedCategories(new Set())
+    setShowCategoryBulkActions(false)
+  }
+
+  const handleToggleCategorySelection = (categoryId: string) => {
+    const newSelected = new Set(selectedCategories)
+    if (newSelected.has(categoryId)) {
+      newSelected.delete(categoryId)
+    } else {
+      newSelected.add(categoryId)
+    }
+    setSelectedCategories(newSelected)
+    setShowCategoryBulkActions(newSelected.size > 0)
+  }
+
+  const handleBulkDeleteCategories = async () => {
+    if (selectedCategories.size === 0) return
+
+    if (confirm(`Are you sure you want to delete ${selectedCategories.size} selected categories? This action cannot be undone.`)) {
+      try {
+        const { error } = await supabase
+          .from('categories')
+          .delete()
+          .in('id', Array.from(selectedCategories))
+
+        if (error) throw error
+
+        console.log(`✅ Successfully deleted ${selectedCategories.size} categories`)
+        await fetchDashboardData()
+        handleDeselectAllCategories()
+        alert(`Successfully deleted ${selectedCategories.size} categories`)
+      } catch (error) {
+        console.error('Error deleting categories:', error)
+        alert('Failed to delete categories. Please try again.')
+      }
+    }
   }
 
   const handleItemSelect = (itemId: string) => {
@@ -1102,33 +1152,69 @@ function DashboardContent() {
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Categories</h2>
                     <p className="text-gray-600 mt-1">Organize your inventory into categories</p>
                   </div>
-                  <button
-                    onClick={() => setShowAddCategory(true)}
-                    className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium"
-                    style={{
-                      background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                      boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0px)';
-                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
-                    }}
-                  >
-                    Add Category
-                  </button>
+                  <div className="flex items-center space-x-3">
+                    {categories.length > 0 && (
+                      <button
+                        onClick={selectedCategories.size === categories.length ? handleDeselectAllCategories : handleSelectAllCategories}
+                        className="px-4 py-2 border-2 border-orange-500 text-orange-600 rounded-xl font-medium hover:bg-orange-50 transition-all"
+                      >
+                        {selectedCategories.size === categories.length ? 'Deselect All' : 'Select All'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowAddCategory(true)}
+                      className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium"
+                      style={{
+                        background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                        boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0px)';
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
+                      }}
+                    >
+                      Add Category
+                    </button>
+                  </div>
                 </div>
+
+                {/* Selection Counter */}
+                {selectedCategories.size > 0 && (
+                  <div className="mb-4 px-4 py-3 bg-orange-50 border border-orange-200 rounded-xl flex justify-between items-center">
+                    <span className="text-orange-800 font-medium">
+                      {selectedCategories.size} categor{selectedCategories.size !== 1 ? 'ies' : 'y'} selected
+                    </span>
+                    <button
+                      onClick={handleBulkDeleteCategories}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                    >
+                      Delete Selected
+                    </button>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categories.map((category) => (
-                    <div key={category.id} className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                    <div key={category.id} className="rounded-2xl p-6 border border-white/20 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 relative"
                          style={{
-                           background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
+                           background: selectedCategories.has(category.id)
+                             ? 'linear-gradient(135deg, rgba(255,237,213,0.9) 0%, rgba(254,215,170,0.7) 100%)'
+                             : 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,247,237,0.6) 100%)',
                            backdropFilter: 'blur(10px)',
                            WebkitBackdropFilter: 'blur(10px)'
                          }}>
+                      {/* Selection Checkbox */}
+                      <div className="absolute top-4 right-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.has(category.id)}
+                          onChange={() => handleToggleCategorySelection(category.id)}
+                          className="w-5 h-5 text-orange-500 border-2 border-gray-300 rounded focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                        />
+                      </div>
                       <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
                            style={{
                              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
