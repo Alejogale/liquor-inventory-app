@@ -394,39 +394,40 @@ export default function ActivityDashboard({ userEmail, organizationId }: Activit
   }
 
   const exportToCsv = () => {
-    const headers = ['Category', 'Brand', 'Barcode', 'Supplier', 'Par Level', 'Threshold', 'Total Count', 'Price per Item', 'Total Value']
-    
-    if (reportSettings.includeRoomDetails) {
-      headers.push('Room Details')
+    // Use lowercase headers matching import format for round-trip compatibility
+    const headers = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
+
+    // Helper function to properly escape CSV values
+    const escapeCSVValue = (value: any): string => {
+      if (value === null || value === undefined) return ''
+      const stringValue = String(value)
+      // Escape quotes by doubling them and wrap in quotes if contains comma, quote, or newline
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        return `"${stringValue.replace(/"/g, '""')}"`
+      }
+      return stringValue
     }
 
-    const csvRows = [headers.join(',')]
+    const csvRows = [headers.map(escapeCSVValue).join(',')]
 
     categoryReports.forEach(category => {
       category.items.forEach((item: any) => {
         const row = [
-          category.categoryName,
           item.brand,
-          reportSettings.includeBarcodes ? (item.barcode || 'No barcode') : '',
-          reportSettings.includeSuppliers ? (item.suppliers?.name || 'No supplier') : '',
-          item.par_level,
-          item.threshold,
-          item.totalCount,
-          item.price_per_item ? `$${item.price_per_item.toFixed(2)}` : 'No price',
-          item.total_value ? `$${item.total_value.toFixed(2)}` : '$0.00'
+          category.categoryName,
+          reportSettings.includeSuppliers ? (item.suppliers?.name || '') : '',
+          item.par_level || '',
+          item.threshold || '',
+          reportSettings.includeBarcodes ? (item.barcode || '') : '',
+          item.price_per_item || ''
         ]
 
-        if (reportSettings.includeRoomDetails) {
-          const roomDetails = item.roomCounts.map((rc: any) => `${rc.roomName}(${rc.count})`).join('; ')
-          row.push(roomDetails)
-        }
-
-        csvRows.push(row.join(','))
+        csvRows.push(row.map(escapeCSVValue).join(','))
       })
     })
 
     const csvContent = csvRows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
