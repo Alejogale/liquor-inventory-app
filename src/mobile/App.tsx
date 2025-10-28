@@ -2302,7 +2302,7 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [autoSaveTimeout, setAutoSaveTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const itemRefs = useRef<Record<string, any>>({});
   const searchInputRef = useRef<TextInput>(null);
