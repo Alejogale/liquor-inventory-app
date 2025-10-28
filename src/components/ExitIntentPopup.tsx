@@ -26,7 +26,7 @@ export function ExitIntentPopup({ onEmailSubmit }: ExitIntentPopupProps) {
       }
     }
 
-    let exitIntentTimeout: NodeJS.Timeout
+    let exitIntentTimeout: ReturnType<typeof setTimeout>
 
     // Desktop: Mouse leaving viewport
     const handleMouseLeave = (e: MouseEvent) => {
