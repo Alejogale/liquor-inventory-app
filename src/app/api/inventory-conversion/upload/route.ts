@@ -8,7 +8,7 @@ import { Resend } from 'resend'
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const customerInfoValue = formData.get('customerInfo')
+    const customerInfoValue = (formData as any).get('customerInfo')
     if (!customerInfoValue || typeof customerInfoValue !== 'string') {
       return NextResponse.json({ error: 'Invalid customer info' }, { status: 400 })
     }
