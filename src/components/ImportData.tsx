@@ -145,7 +145,7 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
         'Display Order': 'display_order'
       }
     }
-  ], [])
+  ]}, [])
 
   // Define validateCSVData function before useEffect
   const validateCSVData = useCallback((headers: string[], data: any[]) => {

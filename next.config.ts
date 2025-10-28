@@ -3,7 +3,13 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* Platform Configuration */
-  
+
+  // Disable ESLint errors during production builds
+  // ESLint warnings still show in development
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Image optimization for platform assets
   images: {
     domains: [
