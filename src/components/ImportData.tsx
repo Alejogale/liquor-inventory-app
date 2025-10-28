@@ -1222,6 +1222,53 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
           throw new Error(`Failed to create inventory item: ${item.brand} - ${itemError.message}`)
         } else {
           console.log(`✅ Successfully created inventory item: ${item.brand} (ID: ${newItem.id})`)
+
+          // Process room counts if any room columns are present
+          const standardColumns = ['brand', 'category_name', 'supplier_name', 'par_level', 'threshold', 'barcode', 'price_per_item']
+          const roomColumns = Object.keys(item).filter(key => !standardColumns.includes(key))
+
+          if (roomColumns.length > 0) {
+            console.log(`🏠 Processing ${roomColumns.length} room columns for ${item.brand}`)
+
+            // Get all rooms for this organization
+            const { data: orgRooms } = await supabase
+              .from('rooms')
+              .select('id, name')
+              .eq('organization_id', currentOrg)
+
+            const roomMap = new Map(orgRooms?.map(r => [r.name, r.id]) || [])
+
+            // Insert room counts for each room column with a value
+            const roomCountsToInsert = []
+            for (const roomColumn of roomColumns) {
+              const count = parseInt(item[roomColumn]) || 0
+              if (count > 0) {
+                const roomId = roomMap.get(roomColumn)
+                if (roomId) {
+                  roomCountsToInsert.push({
+                    item_id: newItem.id,
+                    room_id: roomId,
+                    count: count
+                  })
+                } else {
+                  console.log(`⚠️ Room "${roomColumn}" not found in organization, skipping`)
+                }
+              }
+            }
+
+            if (roomCountsToInsert.length > 0) {
+              const { error: roomError } = await supabase
+                .from('room_counts')
+                .insert(roomCountsToInsert)
+
+              if (roomError) {
+                console.error(`⚠️ Failed to insert room counts for ${item.brand}:`, roomError)
+              } else {
+                console.log(`✅ Inserted ${roomCountsToInsert.length} room counts for ${item.brand}`)
+              }
+            }
+          }
+
           return { success: true, item: newItem, created: true }
         }
       }
