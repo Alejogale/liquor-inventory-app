@@ -298,37 +298,83 @@ export default function ImportData({ onImportComplete, organizationId }: ImportD
 
   const parseCSVPreview = async (file: File) => {
     try {
-      const text = await file.text()
+      let text = await file.text()
+
+      // Remove BOM (Byte Order Mark) if present
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1)
+      }
+
+      // Normalize line endings (\r\n -> \n, \r -> \n)
+      text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+
       const lines = text.split('\n').filter(line => line.trim())
-      
+
       if (lines.length === 0) {
         console.error('❌ No data found in CSV file')
         setValidationErrors(['No data found in CSV file'])
         return
       }
-      
-      const headers = lines[0].split(',').map(h => h.trim())
-      
+
+      // Enhanced CSV parser that handles quoted fields
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = []
+        let current = ''
+        let inQuotes = false
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i]
+          const nextChar = line[i + 1]
+
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote ("")
+              current += '"'
+              i++ // Skip next quote
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes
+            }
+          } else if (char === ',' && !inQuotes) {
+            // Field separator outside quotes
+            result.push(current.trim())
+            current = ''
+          } else {
+            current += char
+          }
+        }
+
+        // Add the last field
+        result.push(current.trim())
+        return result
+      }
+
+      const headers = parseCSVLine(lines[0])
+
+      console.log('📋 Parsed CSV headers:', headers)
+
       if (headers.length === 0) {
         console.error('❌ No headers found in CSV file')
         setValidationErrors(['No headers found in CSV file'])
         return
       }
-      
+
       // Parse all data (not just preview)
       const allData = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim())
+        const values = parseCSVLine(line)
         const row: any = {}
         headers.forEach((header, index) => {
           row[header] = values[index] || ''
         })
         return row
       })
-      
+
+      console.log('📋 Parsed CSV data sample:', allData.slice(0, 2))
+
       // Set preview (first 5 rows) for display
       const preview = allData.slice(0, 5)
       setPreviewData(allData) // Store ALL data, not just preview
-      
+
       // Validate the data using the memoized function - only if we have data
       if (allData.length > 0 && headers.length > 0 && typeof validateCSVData === 'function') {
         validateCSVData(headers, allData)

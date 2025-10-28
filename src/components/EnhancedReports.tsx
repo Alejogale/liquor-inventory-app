@@ -185,7 +185,19 @@ export default function EnhancedReports() {
       : []
 
     const allHeaders = [...headers, ...roomNames]
-    const csvRows = [allHeaders.join(',')]
+
+    // Helper function to properly escape CSV values
+    const escapeCSVValue = (value: any): string => {
+      if (value === null || value === undefined) return ''
+      const stringValue = String(value)
+      // Escape quotes by doubling them and wrap in quotes if contains comma, quote, or newline
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        return `"${stringValue.replace(/"/g, '""')}"`
+      }
+      return stringValue
+    }
+
+    const csvRows = [allHeaders.map(escapeCSVValue).join(',')]
 
     categoryReports.forEach(category => {
       category.items.forEach(item => {
@@ -207,12 +219,12 @@ export default function EnhancedReports() {
           })
         }
 
-        csvRows.push(row.join(','))
+        csvRows.push(row.map(escapeCSVValue).join(','))
       })
     })
 
     const csvContent = csvRows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
