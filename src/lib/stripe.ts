@@ -1,15 +1,19 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set');
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil',
-  typescript: true,
-});
-
 export const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-08-27.basil',
+    typescript: true,
+  });
+};
+
+// Legacy export for backwards compatibility - will throw at runtime if key is missing
+export const stripe = process.env.STRIPE_SECRET_KEY ? getStripe() : null as any;
+
+export const getStripeClient = () => {
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
     throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set');
   }
