@@ -3,9 +3,14 @@ import Stripe from 'stripe'
 
 // Updated API version for deployment compatibility
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-})
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-08-27.basil',
+  })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session using your live price ID
+    const stripe = getStripe()
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',

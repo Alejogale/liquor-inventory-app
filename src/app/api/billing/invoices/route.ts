@@ -3,9 +3,14 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil'
-})
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-08-27.basil'
+  })
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,6 +53,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch invoices from Stripe
+    const stripe = getStripe()
     const invoices = await stripe.invoices.list({
       customer: organization.stripe_customer_id,
       limit: 20,
