@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
 
     // Process uploaded files
     const uploadedFiles: Array<{ originalName: string; savedPath: string; size: number }> = []
-    
-    for (const [key, value] of formData.entries()) {
+
+    for (const [key, value] of (formData as any).entries()) {
       if (key.startsWith('file_') && value instanceof File) {
         const file = value as File
         
