@@ -3728,11 +3728,47 @@ const StockMovementScreen = memo(({ user, onBack }: { user: any; onBack: () => v
   );
 });
 
+// RoleBadge Component
+const RoleBadge = ({ role }: { role: string }) => {
+  const colors = {
+    owner: { bg: '#F3E8FF', text: '#7C3AED', icon: '👑' },
+    manager: { bg: '#DBEAFE', text: '#2563EB', icon: '🔑' },
+    staff: { bg: '#D1FAE5', text: '#059669', icon: '👤' },
+    viewer: { bg: '#F3F4F6', text: '#6B7280', icon: '👁️' }
+  };
+
+  const style = colors[role as keyof typeof colors] || colors.staff;
+
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: style.bg,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      gap: 4
+    }}>
+      <Text style={{ fontSize: 10 }}>{style.icon}</Text>
+      <Text style={{ fontSize: 11, fontWeight: '600', color: style.text }}>
+        {role.charAt(0).toUpperCase() + role.slice(1)}
+      </Text>
+    </View>
+  );
+};
+
 // Team & PINs Screen Component
 const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProfile: any; onBack: () => void }) => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPINs, setShowPINs] = useState<Record<string, boolean>>({});
+  const [managerVerified, setManagerVerified] = useState(false);
+  const [showPINModal, setShowPINModal] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [verifying, setVerifying] = useState(false);
+
+  // Check if current user is manager or owner
+  const isManagerOrOwner = userProfile?.role === 'manager' || userProfile?.role === 'owner';
 
   useEffect(() => {
     fetchTeamMembers();
@@ -3743,7 +3779,7 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
       setLoading(true);
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('organization_id')
+        .select('organization_id, role')
         .eq('id', user.id)
         .single();
 
@@ -3755,6 +3791,11 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
           .order('created_at', { ascending: true });
 
         setTeamMembers(members || []);
+
+        // Auto-verify if user is manager/owner
+        if (profile.role === 'manager' || profile.role === 'owner') {
+          setManagerVerified(true);
+        }
       }
     } catch (error) {
       console.error('Error fetching team members:', error);
@@ -3763,9 +3804,56 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
     }
   };
 
+  const verifyManagerPIN = async () => {
+    if (pinInput.length < 4) {
+      Alert.alert('Error', 'Please enter a 4-digit PIN');
+      return;
+    }
+
+    try {
+      setVerifying(true);
+      const response = await fetch(`${apiUrl}/api/team/verify-manager-pin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pin: pinInput,
+          organizationId: userProfile.organization_id
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.valid) {
+        setManagerVerified(true);
+        setShowPINModal(false);
+        setPinInput('');
+        Alert.alert('Success', `Verified as ${result.manager.name}`);
+      } else {
+        Alert.alert('Invalid PIN', 'This PIN does not belong to a manager');
+        setPinInput('');
+      }
+    } catch (error) {
+      console.error('Error verifying PIN:', error);
+      Alert.alert('Error', 'Failed to verify PIN');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   const togglePINVisibility = (userId: string) => {
+    if (!managerVerified) {
+      setShowPINModal(true);
+      return;
+    }
     setShowPINs(prev => ({ ...prev, [userId]: !prev[userId] }));
   };
+
+  // Filter what staff can see
+  const visibleMembers = isManagerOrOwner || managerVerified
+    ? teamMembers
+    : teamMembers.filter(m => m.id === user.id); // Staff sees only themselves
 
   return (
     <View style={styles.container}>
@@ -3776,10 +3864,89 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
         </TouchableOpacity>
         <View style={styles.modernHeaderCenter}>
           <Text style={styles.modernScreenTitle}>Team & PINs</Text>
-          <Text style={styles.modernScreenSubtitle}>View team members and PINs</Text>
+          <Text style={styles.modernScreenSubtitle}>
+            {isManagerOrOwner || managerVerified ? 'View all team members' : 'Your profile'}
+          </Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
+
+      {/* Manager PIN Modal */}
+      <Modal
+        visible={showPINModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          setShowPINModal(false);
+          setPinInput('');
+        }}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: 24, width: '85%', maxWidth: 400 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 8 }}>
+              Manager Verification Required
+            </Text>
+            <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 20 }}>
+              Enter a manager PIN to view all team member PINs
+            </Text>
+
+            <TextInput
+              value={pinInput}
+              onChangeText={setPinInput}
+              placeholder="Enter 4-digit PIN"
+              keyboardType="number-pad"
+              maxLength={4}
+              secureTextEntry
+              style={{
+                borderWidth: 1,
+                borderColor: '#E5E7EB',
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 16,
+                marginBottom: 16
+              }}
+            />
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowPINModal(false);
+                  setPinInput('');
+                }}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB',
+                  alignItems: 'center'
+                }}
+              >
+                <Text style={{ color: '#6B7280', fontWeight: '600' }}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={verifyManagerPIN}
+                disabled={verifying}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 8,
+                  backgroundColor: '#F97316',
+                  alignItems: 'center',
+                  opacity: verifying ? 0.5 : 1
+                }}
+              >
+                {verifying ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Verify</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {loading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -3788,8 +3955,27 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
       ) : (
         <ScrollView style={{ flex: 1 }}>
           <View style={{ padding: 20 }}>
+            {/* Access Notice for Staff */}
+            {!isManagerOrOwner && !managerVerified && (
+              <View style={{
+                backgroundColor: '#FEF3C7',
+                borderRadius: 12,
+                padding: 16,
+                marginBottom: 16,
+                borderLeftWidth: 4,
+                borderLeftColor: '#F59E0B'
+              }}>
+                <Text style={{ fontSize: 14, color: '#92400E', fontWeight: '600', marginBottom: 4 }}>
+                  Limited Access
+                </Text>
+                <Text style={{ fontSize: 13, color: '#78350F' }}>
+                  You can only view your own information. Enter a manager PIN to view all team members.
+                </Text>
+              </View>
+            )}
+
             {/* Team Members List */}
-            {teamMembers.map((member, index) => (
+            {visibleMembers.map((member, index) => (
               <View
                 key={member.id}
                 style={{
@@ -3827,12 +4013,15 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#1A1A1A', marginBottom: 2 }}>
                       {member.full_name || 'No Name'}
                     </Text>
-                    <Text style={{ fontSize: 13, color: '#6B7280' }}>
-                      {member.email}
-                    </Text>
-                    <Text style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
-                      {member.role || 'team_member'}
-                    </Text>
+                    {/* Show email only to managers/owners */}
+                    {(isManagerOrOwner || managerVerified) && (
+                      <Text style={{ fontSize: 13, color: '#6B7280' }}>
+                        {member.email}
+                      </Text>
+                    )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                      <RoleBadge role={member.role || 'staff'} />
+                    </View>
                   </View>
                 </View>
 
@@ -3860,24 +4049,24 @@ const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProf
                         letterSpacing: 2
                       }}
                     >
-                      {showPINs[member.id] ? member.pin_code : '••••'}
+                      {(isManagerOrOwner || managerVerified) && showPINs[member.id]
+                        ? member.pin_code
+                        : '••••'}
                     </Text>
                   </View>
                   <TouchableOpacity
                     onPress={() => togglePINVisibility(member.id)}
-                    style={{
-                      padding: 4
-                    }}
+                    style={{ padding: 4 }}
                   >
                     <Text style={{ fontSize: 12, color: '#F97316', fontWeight: '600' }}>
-                      {showPINs[member.id] ? 'Hide' : 'Show'}
+                      {(isManagerOrOwner || managerVerified) && showPINs[member.id] ? 'Hide' : 'Show'}
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             ))}
 
-            {teamMembers.length === 0 && (
+            {visibleMembers.length === 0 && (
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Users color="#9CA3AF" size={48} strokeWidth={1.5} />
                 <Text style={{ fontSize: 16, color: '#6B7280', marginTop: 12 }}>
