@@ -1267,100 +1267,197 @@ export default function LandingPage() {
               </p>
             </div>
 
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-12">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
-                <Star className="w-4 h-4" />
-                Most Popular
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">Easy Inventory Pro</h3>
-              
-              {/* Billing Toggle */}
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <span className={`text-sm ${!isAnnual ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>Monthly</span>
-                <div className="relative">
-                  <button 
-                    onClick={() => setIsAnnual(!isAnnual)}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <div className="relative">
-                      <div className={`block w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-                      <div className={`dot absolute top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 ease-in-out shadow-md ${isAnnual ? 'translate-x-6' : 'translate-x-1'}`}></div>
-                    </div>
-                  </button>
-                </div>
-                <span className={`text-sm ${isAnnual ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
-                  Annual <span className="text-orange-600 font-medium">Save $20</span>
-                </span>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
-                {!isAnnual ? (
-                  <>
-                    <span className="text-4xl sm:text-5xl font-bold text-gray-900">$25</span>
-                    <span className="text-gray-600">/month</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span className="text-4xl sm:text-5xl font-bold text-gray-900">$240</span>
-                      <span className="text-gray-600">/year</span>
-                    </div>
-                    <div className="text-sm mt-2 sm:mt-0 sm:ml-4 text-center sm:text-left">
-                      <div className="text-gray-500 line-through">$300/year</div>
-                      <div className="text-green-600 font-medium">Save 20%</div>
-                    </div>
-                  </>
-                )}
-              </div>
-              <p className="text-gray-600">30-day free trial • No credit card required</p>
-            </div>
+          <div className="bg-gradient-to-br from-white via-orange-50/30 to-white rounded-2xl shadow-2xl border-2 border-orange-100 p-6 relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-100 to-transparent rounded-full blur-3xl opacity-30 -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-100 to-transparent rounded-full blur-3xl opacity-20 -z-10"></div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Unlimited inventory items</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Multi-location support</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Team collaboration</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Advanced reporting</span>
-                </div>
+            {/* Header */}
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-semibold mb-2 shadow-lg">
+                <Star className="w-3 h-3 fill-white" />
+                Enterprise-Grade Solution
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Mobile app access</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Priority support</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Data export</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Smart analytics</span>
-            </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Custom Pricing</span> for Your Business
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">Pricing tailored to your business size and needs. Start your 30-day free trial, then get invoiced monthly.</p>
+              <div className="inline-block bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg px-4 py-2">
+                <div className="text-xs font-semibold text-blue-900 mb-0.5">Starting at</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">$499<span className="text-sm text-gray-600">/month</span></div>
+                <div className="text-xs text-blue-700">Final price based on business size</div>
               </div>
             </div>
 
+            {/* Main Content - Horizontal Layout */}
+            <div className="grid md:grid-cols-3 gap-3 mb-4">
+              {/* Left - Pricing Benefits */}
+              <div className="bg-white rounded-lg shadow-md border-2 border-orange-200 p-4 flex flex-col h-full">
+                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                  <FileText className="w-4 h-4 text-orange-500" />
+                  What You Get
+                </h4>
+                <div className="space-y-2 text-xs flex-1">
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <span className="font-medium">30 days completely free</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span className="font-medium">Monthly invoice billing</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                    <span className="font-medium">Cancel anytime</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                    <span className="font-medium">Unlimited locations</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <span className="font-medium">Unlimited users</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Check className="w-4 h-4 text-teal-500 flex-shrink-0" />
+                    <span className="font-medium">Priority support</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mt-3">
+                  <div className="text-xs font-semibold text-green-800 mb-0.5">Typical ROI</div>
+                  <div className="text-lg font-bold text-green-700">$2K-$10K/mo</div>
+                  <div className="text-xs text-green-600">in savings</div>
+                </div>
+              </div>
+
+              {/* Middle - How It Works */}
+              <div className="bg-white rounded-lg shadow-md border-2 border-gray-200 p-4 flex flex-col h-full">
+                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                  <ArrowRight className="w-4 h-4 text-orange-500" />
+                  How It Works
+                </h4>
+                <div className="flex flex-col justify-between flex-1 gap-3">
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">1</div>
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Start Free Trial</div>
+                      <div className="text-xs text-gray-600">No credit card required</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">2</div>
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Use for 30 Days</div>
+                      <div className="text-xs text-gray-600">See the value firsthand</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">3</div>
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Get Custom Invoice</div>
+                      <div className="text-xs text-gray-600">Based on your business size</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3 mt-3">
+                  <div className="text-xs font-bold text-orange-900 text-center">Volume Discounts Available</div>
+                  <div className="text-xs text-orange-700 text-center">Contact us for multi-location pricing</div>
+                </div>
+              </div>
+
+              {/* Right - Key Features */}
+              <div className="bg-white rounded-lg shadow-md border-2 border-gray-200 p-4 flex flex-col h-full">
+                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                  <Star className="w-4 h-4 text-orange-500" />
+                  Key Features
+                </h4>
+                <div className="grid grid-cols-1 gap-2 flex-1">
+                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Barcode Scanning</div>
+                      <div className="text-xs text-gray-600">Lightning-fast counts</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Mobile App</div>
+                      <div className="text-xs text-gray-600">Count anywhere</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Smart Reports</div>
+                      <div className="text-xs text-gray-600">Real-time insights</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-xs text-gray-900">Team Collaboration</div>
+                      <div className="text-xs text-gray-600">Unlimited access</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 max-w-4xl mx-auto">
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Unlimited Items</div>
+                  <div className="text-xs text-gray-600">Track unlimited products</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Multi-Location</div>
+                  <div className="text-xs text-gray-600">Manage across locations</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Team Collaboration</div>
+                  <div className="text-xs text-gray-600">Unlimited team members</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Mobile Access</div>
+                  <div className="text-xs text-gray-600">Count on-the-go</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Smart Reports</div>
+                  <div className="text-xs text-gray-600">Real-time analytics</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-sm text-gray-900">Priority Support</div>
+                  <div className="text-xs text-gray-600">Get help when needed</div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Button */}
             <div className="text-center">
-              <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
+              <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3.5 rounded-xl font-bold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-xl hover:shadow-2xl inline-flex items-center group transform hover:scale-105">
+                Start Your Free 30-Day Trial
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <p className="text-sm text-gray-500 mt-4">
+              <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto">
+                No credit card required • Full access • Cancel anytime
               </p>
             </div>
           </div>

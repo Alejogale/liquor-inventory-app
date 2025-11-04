@@ -23,6 +23,7 @@ interface InvitationData {
   custom_message?: string
   expires_at: string
   status: string
+  organization_id: string
   organization: {
     Name: string
     id: string
@@ -30,7 +31,7 @@ interface InvitationData {
   invited_by: {
     full_name: string
     email: string
-  }
+  } | null
 }
 
 export default function InvitePage() {
@@ -64,8 +65,7 @@ export default function InvitePage() {
           custom_message,
           expires_at,
           status,
-          organizations!organization_id(id, Name),
-          user_profiles!invited_by(full_name, email)
+          organization_id
         `)
         .eq('invitation_token', token)
         .single()
@@ -82,10 +82,28 @@ export default function InvitePage() {
         throw new Error('This invitation has expired')
       }
 
+      // Fetch organization separately
+      const { data: orgData } = await supabase
+        .from('organizations')
+        .select('id, Name')
+        .eq('id', data.organization_id)
+        .single()
+
+      // Fetch inviter info separately (optional)
+      let inviterData = null
+      if (data.invited_by) {
+        const { data: inviter } = await supabase
+          .from('user_profiles')
+          .select('full_name, email')
+          .eq('id', data.invited_by)
+          .single()
+        inviterData = inviter
+      }
+
       setInvitation({
         ...data,
-        organization: data.organizations?.[0] || null,
-        invited_by: data.user_profiles?.[0] || null
+        organization: orgData || { id: data.organization_id, Name: 'Unknown Organization' },
+        invited_by: inviterData || { full_name: 'Team Admin', email: '' }
       })
 
     } catch (err) {
@@ -263,7 +281,9 @@ export default function InvitePage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Invited by:</span>
-                  <span className="font-medium text-gray-900">{invitation.invited_by.full_name || invitation.invited_by.email}</span>
+                  <span className="font-medium text-gray-900">
+                    {invitation.invited_by?.full_name || invitation.invited_by?.email || 'Team Admin'}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Expires:</span>

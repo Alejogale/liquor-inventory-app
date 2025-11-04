@@ -19,7 +19,9 @@ import {
   Settings,
   BarChart3,
   CreditCard,
-  Mail
+  Mail,
+  Key,
+  TrendingUp
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -52,6 +54,8 @@ export default function DashboardSidebar({
     { id: 'categories', label: 'Categories', icon: ClipboardList, description: 'Product categories' },
     { id: 'suppliers', label: 'Suppliers', icon: Users, description: 'Vendor management' },
     { id: 'rooms', label: 'Rooms', icon: MapPin, description: 'Location setup' },
+    { id: 'team', label: 'Team & PINs', icon: Key, description: 'Manage team member PINs' },
+    { id: 'stock-movements', label: 'Stock Analytics', icon: TrendingUp, description: 'Stock IN/OUT history & reports' },
     { id: 'count', label: 'Count', icon: Building2, description: 'Room counting' },
     { id: 'orders', label: 'Orders', icon: ShoppingCart, description: 'Order reports' },
     { id: 'activity', label: 'Activity & Reports', icon: Activity, description: 'Analytics, logs & CSV export' },

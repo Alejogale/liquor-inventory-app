@@ -36,6 +36,8 @@ import SubscriptionManager from '@/components/SubscriptionManager'
 import UserPermissions from '@/components/UserPermissions'
 import WelcomeOnboardingModal from '@/components/WelcomeOnboardingModal'
 import BulkPricingModal from '@/components/BulkPricingModal'
+import TeamPINManagement from '@/components/TeamPINManagement'
+import StockMovementAnalytics from '@/components/StockMovementAnalytics'
 
 
 interface Category {
@@ -1287,6 +1289,12 @@ function DashboardContent() {
               </div>
             )}
 
+            {activeTab === 'team' && (
+              <div className="p-6">
+                <TeamPINManagement organizationId={organizationId} />
+              </div>
+            )}
+
             {activeTab === 'count' && (
               <div className="p-6">
                 <div className="mb-6">
@@ -1316,15 +1324,18 @@ function DashboardContent() {
                   <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Activity Dashboard</h2>
                   <p className="text-gray-600 mt-1">View activity logs and performance analytics</p>
                 </div>
-                <ActivityDashboard 
-                  userEmail={user?.email || ''} 
+                <ActivityDashboard
+                  userEmail={user?.email || ''}
                   organizationId={organizationId}
                 />
               </div>
             )}
 
-
-
+            {activeTab === 'stock-movements' && (
+              <div className="p-6">
+                <StockMovementAnalytics organizationId={organizationId} />
+              </div>
+            )}
 
             {activeTab === 'subscription' && (
               <div className="p-6">

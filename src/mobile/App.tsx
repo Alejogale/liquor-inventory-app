@@ -13,6 +13,7 @@ import {
   RefreshControl,
   Modal,
   FlatList,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -44,10 +45,17 @@ import {
   AlertTriangle,
   PieChartIcon,
   ArrowUpDown,
-  Check
+  Check,
+  ShoppingCart,
+  Mail,
+  Phone,
+  MessageSquare,
+  Shield,
+  Activity,
+  Key
 } from 'lucide-react-native';
 import { createClient } from '@supabase/supabase-js';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -1355,8 +1363,488 @@ const SuppliersScreen = memo(({ user, onBack }: { user: any; onBack: () => void 
   );
 });
 
+// Shopping Cart Screen Component
+const ShoppingCartScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) => {
+  const [view, setView] = useState<'browse' | 'cart' | 'review'>('browse');
+  const [items, setItems] = useState<any[]>([]);
+  const [cart, setCart] = useState<Map<string, { item: any; quantity: number; notes: string }>>(new Map());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+
+  const loadData = useCallback(async () => {
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) {
+        setIsLoading(false);
+        return;
+      }
+
+      const [itemsRes, categoriesRes, suppliersRes] = await Promise.all([
+        supabase.from('inventory_items').select('*').eq('organization_id', profile.organization_id),
+        supabase.from('categories').select('*').eq('organization_id', profile.organization_id),
+        supabase.from('suppliers').select('*').eq('organization_id', profile.organization_id),
+      ]);
+
+      const itemsData = itemsRes.data || [];
+      const categories = categoriesRes.data || [];
+
+      // Enrich items with category names
+      const enrichedItems = itemsData.map((item: any) => ({
+        ...item,
+        category_name: categories.find((c: any) => c.id === item.category_id)?.name || 'Unknown'
+      }));
+
+      setItems(enrichedItems);
+      setSuppliers(suppliersRes.data || []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      Alert.alert('Error', 'Failed to load inventory');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user.id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const addToCart = (item: any) => {
+    const newCart = new Map(cart);
+    if (newCart.has(item.id)) {
+      Alert.alert('Already in Cart', 'This item is already in your cart');
+    } else {
+      newCart.set(item.id, { item, quantity: 1, notes: '' });
+      setCart(newCart);
+      Alert.alert('Added', `${item.brand} added to cart`);
+    }
+  };
+
+  const removeFromCart = (itemId: string) => {
+    const newCart = new Map(cart);
+    newCart.delete(itemId);
+    setCart(newCart);
+  };
+
+  const updateCartQuantity = (itemId: string, quantity: number) => {
+    const newCart = new Map(cart);
+    const cartItem = newCart.get(itemId);
+    if (cartItem && quantity > 0) {
+      newCart.set(itemId, { ...cartItem, quantity });
+      setCart(newCart);
+    }
+  };
+
+  const updateCartNotes = (itemId: string, notes: string) => {
+    const newCart = new Map(cart);
+    const cartItem = newCart.get(itemId);
+    if (cartItem) {
+      newCart.set(itemId, { ...cartItem, notes });
+      setCart(newCart);
+    }
+  };
+
+  const sendOrder = async (method: 'email' | 'sms' | 'phone', supplierId?: string) => {
+    try {
+      const cartItems = Array.from(cart.values());
+
+      // Filter items by supplier if specified
+      const itemsToSend = supplierId
+        ? cartItems.filter(ci => ci.item.supplier_id === supplierId)
+        : cartItems;
+
+      if (itemsToSend.length === 0) {
+        Alert.alert('Error', 'No items to send');
+        return;
+      }
+
+      // Find supplier info
+      const supplier = supplierId ? suppliers.find(s => s.id === supplierId) : null;
+
+      if (method === 'email') {
+        // Open native email app with pre-filled content
+        const orderText = formatOrderMessage(itemsToSend, supplier);
+        const emailTo = supplier?.email || '';
+        const subject = `Order Request from ${user.email}`;
+        const body = encodeURIComponent(orderText);
+
+        const mailtoUrl = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${body}`;
+
+        const canOpen = await Linking.canOpenURL(mailtoUrl);
+        if (canOpen) {
+          await Linking.openURL(mailtoUrl);
+        } else {
+          Alert.alert('Error', 'Cannot open email app. Please check if you have an email app installed.');
+        }
+      } else if (method === 'sms') {
+        // Open iOS Messages app with pre-filled text
+        const orderText = formatOrderMessage(itemsToSend, supplier);
+        const smsUrl = `sms:${supplier?.phone || ''}&body=${encodeURIComponent(orderText)}`;
+
+        const canOpen = await Linking.canOpenURL(smsUrl);
+        if (canOpen) {
+          await Linking.openURL(smsUrl);
+        } else {
+          Alert.alert('Error', 'Cannot open Messages app');
+        }
+      } else if (method === 'phone') {
+        // Open phone dialer
+        if (!supplier?.phone) {
+          Alert.alert('Error', 'Supplier phone number not found');
+          return;
+        }
+
+        const phoneUrl = `tel:${supplier.phone}`;
+        const canOpen = await Linking.canOpenURL(phoneUrl);
+
+        if (canOpen) {
+          Alert.alert('Call Supplier', `Call ${supplier.name} at ${supplier.phone}?`, [
+            { text: 'Cancel' },
+            { text: 'Call', onPress: () => Linking.openURL(phoneUrl) }
+          ]);
+        } else {
+          Alert.alert('Error', 'Cannot make phone calls on this device');
+        }
+      }
+    } catch (error) {
+      console.error('Error sending order:', error);
+      Alert.alert('Error', `Failed to send order: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const formatOrderMessage = (cartItems: any[], supplier: any | null) => {
+    const lines = [
+      'ORDER REQUEST',
+      `Date: ${new Date().toLocaleDateString()}`,
+      supplier ? `To: ${supplier.name}` : 'Custom Order',
+      '',
+      '─'.repeat(40),
+      ''
+    ];
+
+    cartItems.forEach(({ item, quantity, notes }) => {
+      lines.push(`${item.brand}`);
+      lines.push(`  Category: ${item.category_name}`);
+      lines.push(`  Quantity: ${quantity}`);
+      if (notes) lines.push(`  Notes: ${notes}`);
+      // Price information removed from message
+      lines.push('');
+    });
+
+    // Total calculation removed from message
+
+    return lines.join('\n');
+  };
+
+  const filteredItems = searchQuery
+    ? items.filter(item =>
+        item.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : items;
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#f97316" />
+        <Text style={styles.loadingText}>Loading inventory...</Text>
+      </View>
+    );
+  }
+
+  // Browse Items View
+  if (view === 'browse') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.inventoryHeader}>
+          <TouchableOpacity onPress={onBack} style={styles.backButton}>
+            <ArrowLeft color="#f97316" size={20} strokeWidth={2.5} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.inventoryTitle}>Create Order</Text>
+          <TouchableOpacity
+            onPress={() => setView('cart')}
+            style={styles.cartBadgeButton}
+          >
+            <ShoppingCart color="#f97316" size={24} strokeWidth={2.5} />
+            {cart.size > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cart.size}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Search color="#9CA3AF" size={18} strokeWidth={2} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search items..."
+              placeholderTextColor="#9CA3AF"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <XIcon color="#9CA3AF" size={18} strokeWidth={2} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        <ScrollView style={styles.itemsList}>
+          <View style={styles.shoppingItemsGrid}>
+            {filteredItems.map((item) => (
+              <View key={item.id} style={styles.shoppingItemCard}>
+                <View style={styles.shoppingItemContent}>
+                  <Text style={styles.shoppingItemBrand}>{item.brand}</Text>
+                  <Text style={styles.shoppingItemCategory}>{item.category_name}</Text>
+                  {item.price_per_item > 0 && (
+                    <Text style={styles.shoppingItemPrice}>${item.price_per_item}</Text>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.addToCartButton,
+                    cart.has(item.id) && styles.addToCartButtonDisabled
+                  ]}
+                  onPress={() => addToCart(item)}
+                  disabled={cart.has(item.id)}
+                >
+                  <Text style={styles.addToCartButtonText}>
+                    {cart.has(item.id) ? '✓ Added' : '+ Add'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // Cart View
+  if (view === 'cart') {
+    const cartItems = Array.from(cart.values());
+    return (
+      <View style={styles.container}>
+        <View style={styles.inventoryHeader}>
+          <TouchableOpacity onPress={() => setView('browse')} style={styles.backButton}>
+            <ArrowLeft color="#f97316" size={20} strokeWidth={2.5} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.inventoryTitle}>Cart ({cart.size})</Text>
+          <View style={{ width: 50 }} />
+        </View>
+
+        {cartItems.length === 0 ? (
+          <View style={styles.emptyState}>
+            <ShoppingCart color="#9ca3af" size={64} strokeWidth={1.5} />
+            <Text style={styles.emptyStateTitle}>Cart is Empty</Text>
+            <Text style={styles.emptyStateText}>
+              Add items from the browse screen to get started
+            </Text>
+            <TouchableOpacity
+              style={styles.emptyStateButton}
+              onPress={() => setView('browse')}
+            >
+              <Text style={styles.emptyStateButtonText}>Browse Items</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <ScrollView style={styles.itemsList}>
+            <View style={styles.cartItemsContainer}>
+              {cartItems.map(({ item, quantity, notes }) => (
+                <View key={item.id} style={styles.cartItemCard}>
+                  <View style={styles.cartItemHeader}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.cartItemBrand}>{item.brand}</Text>
+                      <Text style={styles.cartItemCategory}>{item.category_name}</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => removeFromCart(item.id)}
+                      style={styles.removeButton}
+                    >
+                      <Trash2 color="#ef4444" size={20} strokeWidth={2} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.cartItemControls}>
+                    <View style={styles.quantityControl}>
+                      <Text style={styles.quantityLabel}>Quantity:</Text>
+                      <View style={styles.quantityButtons}>
+                        <TouchableOpacity
+                          onPress={() => updateCartQuantity(item.id, quantity - 1)}
+                          style={styles.quantityButton}
+                          disabled={quantity <= 1}
+                        >
+                          <Minus color={quantity <= 1 ? '#9ca3af' : '#f97316'} size={16} strokeWidth={2.5} />
+                        </TouchableOpacity>
+                        <Text style={styles.quantityValue}>{quantity}</Text>
+                        <TouchableOpacity
+                          onPress={() => updateCartQuantity(item.id, quantity + 1)}
+                          style={styles.quantityButton}
+                        >
+                          <Plus color="#f97316" size={16} strokeWidth={2.5} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.notesContainer}>
+                    <Text style={styles.notesLabel}>Notes (e.g., "Cases not bottles"):</Text>
+                    <TextInput
+                      style={styles.notesInput}
+                      placeholder="Special instructions..."
+                      placeholderTextColor="#9ca3af"
+                      value={notes}
+                      onChangeText={(text) => updateCartNotes(item.id, text)}
+                      multiline
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.cartFooter}>
+              <TouchableOpacity
+                style={styles.reviewOrderButton}
+                onPress={() => setView('review')}
+              >
+                <LinearGradient
+                  colors={['#f97316', '#ea580c']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.reviewOrderGradient}
+                >
+                  <Text style={styles.reviewOrderButtonText}>
+                    Review & Send Order
+                  </Text>
+                  <ChevronRight color="#FFFFFF" size={20} strokeWidth={2.5} />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        )}
+      </View>
+    );
+  }
+
+  // Review & Send View
+  if (view === 'review') {
+    const cartItems = Array.from(cart.values());
+    const supplierGroups = new Map<string, any>();
+
+    cartItems.forEach(({ item, quantity, notes }) => {
+      const supplierId = item.supplier_id || 'no-supplier';
+      if (!supplierGroups.has(supplierId)) {
+        const supplier = suppliers.find(s => s.id === supplierId);
+        supplierGroups.set(supplierId, {
+          supplier: supplier || { name: 'No Supplier', email: null, phone: null },
+          items: []
+        });
+      }
+      supplierGroups.get(supplierId).items.push({ item, quantity, notes });
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.inventoryHeader}>
+          <TouchableOpacity onPress={() => setView('cart')} style={styles.backButton}>
+            <ArrowLeft color="#f97316" size={20} strokeWidth={2.5} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.inventoryTitle}>Review Order</Text>
+          <View style={{ width: 50 }} />
+        </View>
+
+        <ScrollView style={styles.itemsList}>
+          <View style={styles.reviewContainer}>
+            {/* Send All Button */}
+            {cartItems.length > 0 && (
+              <View style={styles.sendAllContainer}>
+                <Text style={styles.sendAllTitle}>Send Entire Order:</Text>
+                <View style={styles.sendButtonsRow}>
+                  <TouchableOpacity
+                    style={styles.sendAllButton}
+                    onPress={() => sendOrder('email')}
+                  >
+                    <Mail color="#FFFFFF" size={20} strokeWidth={2} />
+                    <Text style={styles.sendAllButtonText}>Email</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.sendAllButton}
+                    onPress={() => sendOrder('sms')}
+                  >
+                    <MessageSquare color="#FFFFFF" size={20} strokeWidth={2} />
+                    <Text style={styles.sendAllButtonText}>SMS</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Individual Supplier Cards */}
+            {Array.from(supplierGroups.entries()).map(([supplierId, { supplier, items }]) => (
+              <View key={supplierId} style={styles.reviewSupplierCard}>
+                <Text style={styles.reviewSupplierName}>{supplier.name}</Text>
+                <Text style={styles.reviewSupplierItems}>{items.length} items</Text>
+
+                {items.map(({ item, quantity, notes }: any, idx: number) => (
+                  <View key={idx} style={styles.reviewItemRow}>
+                    <Text style={styles.reviewItemName}>{item.brand}</Text>
+                    <Text style={styles.reviewItemQty}>× {quantity}</Text>
+                    {notes && <Text style={styles.reviewItemNotes}>Note: {notes}</Text>}
+                  </View>
+                ))}
+
+                <View style={styles.sendOptionsContainer}>
+                  <Text style={styles.sendOptionsTitle}>Send to {supplier.name}:</Text>
+                  <View style={styles.sendButtonsRow}>
+                    <TouchableOpacity
+                      style={styles.sendOptionButton}
+                      onPress={() => sendOrder('email', supplierId)}
+                    >
+                      <Mail color="#f97316" size={20} strokeWidth={2} />
+                      <Text style={styles.sendOptionText}>Email</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.sendOptionButton}
+                      onPress={() => sendOrder('sms', supplierId)}
+                    >
+                      <MessageSquare color="#f97316" size={20} strokeWidth={2} />
+                      <Text style={styles.sendOptionText}>SMS</Text>
+                    </TouchableOpacity>
+                    {supplier.phone && (
+                      <TouchableOpacity
+                        style={styles.sendOptionButton}
+                        onPress={() => sendOrder('phone', supplierId)}
+                      >
+                        <Phone color="#f97316" size={20} strokeWidth={2} />
+                        <Text style={styles.sendOptionText}>Call</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  return null;
+});
+
 // Orders Screen Component
 const OrdersScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) => {
+  const [showShoppingCart, setShowShoppingCart] = useState(false);
   const [orderGroups, setOrderGroups] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -1561,8 +2049,9 @@ const OrdersScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) 
 
       const csvContent = rows.join('\n');
       const dateStr = new Date().toISOString().split('T')[0];
-      const fileName = `order-report-${dateStr}.csv`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      const timestamp = Date.now();
+      const fileName = `order-report-${dateStr}-${timestamp}.csv`;
+      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
 
       // Write CSV file
       await FileSystem.writeAsStringAsync(fileUri, csvContent);
@@ -1575,6 +2064,15 @@ const OrdersScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) 
           dialogTitle: 'Export Order Report',
           UTI: 'public.comma-separated-values-text',
         });
+
+        // Clean up file after a delay
+        setTimeout(async () => {
+          try {
+            await FileSystem.deleteAsync(fileUri, { idempotent: true });
+          } catch (e) {
+            console.log('Could not delete temp file:', e);
+          }
+        }, 5000);
       } else {
         Alert.alert('Success', `Order report saved to:\n${fileName}`);
       }
@@ -1583,6 +2081,11 @@ const OrdersScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) 
       Alert.alert('Error', 'Failed to export order report');
     }
   }, [orderGroups]);
+
+  // Show shopping cart if requested
+  if (showShoppingCart) {
+    return <ShoppingCartScreen user={user} onBack={() => setShowShoppingCart(false)} />;
+  }
 
   if (isLoading) {
     return (
@@ -1602,12 +2105,32 @@ const OrdersScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) 
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.inventoryTitle}>Orders</Text>
-        {summaryStats.totalItems > 0 && (
-          <TouchableOpacity onPress={exportToCSV} style={styles.exportButton}>
-            <Share2 color="#f97316" size={20} strokeWidth={2.5} />
-          </TouchableOpacity>
-        )}
-        {summaryStats.totalItems === 0 && <View style={styles.headerSpacer} />}
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {summaryStats.totalItems > 0 && (
+            <TouchableOpacity onPress={exportToCSV} style={styles.exportButton}>
+              <Share2 color="#f97316" size={20} strokeWidth={2.5} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* Create Order Button - Prominent */}
+      <View style={styles.createOrderButtonContainer}>
+        <TouchableOpacity
+          style={styles.createOrderButton}
+          onPress={() => setShowShoppingCart(true)}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#f97316', '#ea580c']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.createOrderGradient}
+          >
+            <ShoppingCart color="#FFFFFF" size={20} strokeWidth={2.5} />
+            <Text style={styles.createOrderButtonText}>Create Custom Order</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
 
       {/* Subtitle */}
@@ -1935,8 +2458,9 @@ const ReportsScreen = memo(({ user, onBack }: { user: any; onBack: () => void })
 
       const csvContent = rows.join('\n');
       const dateStr = new Date().toISOString().split('T')[0];
-      const fileName = `inventory-analytics-${dateStr}.csv`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      const timestamp = Date.now();
+      const fileName = `inventory-analytics-${dateStr}-${timestamp}.csv`;
+      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
 
       await FileSystem.writeAsStringAsync(fileUri, csvContent);
 
@@ -1947,6 +2471,15 @@ const ReportsScreen = memo(({ user, onBack }: { user: any; onBack: () => void })
           dialogTitle: 'Export Analytics Report',
           UTI: 'public.comma-separated-values-text',
         });
+
+        // Clean up file after a delay
+        setTimeout(async () => {
+          try {
+            await FileSystem.deleteAsync(fileUri, { idempotent: true });
+          } catch (e) {
+            console.log('Could not delete temp file:', e);
+          }
+        }, 5000);
       } else {
         Alert.alert('Success', `Report saved to:\n${fileName}`);
       }
@@ -2021,7 +2554,7 @@ const ReportsScreen = memo(({ user, onBack }: { user: any; onBack: () => void })
                   name: cat.name,
                   population: cat.totalValue,
                   color: cat.color,
-                  legendFontColor: '#1f2937',
+                  legendFontColor: '#FFFFFF',
                   legendFontSize: 12
                 }))}
                 width={screenWidth - 48}
@@ -2152,8 +2685,1465 @@ const ReportsScreen = memo(({ user, onBack }: { user: any; onBack: () => void })
   );
 });
 
+// Helper function for time ago display
+const getTimeAgo = (date: Date) => {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+};
+
+// PIN Entry Screen Component
+const PINEntryScreen = memo(({
+  movementType,
+  onBack,
+  onPINVerified
+}: {
+  movementType: 'IN' | 'OUT';
+  onBack: () => void;
+  onPINVerified: (userId: string, userName: string) => void;
+}) => {
+  const [pin, setPin] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleNumberPress = (num: string) => {
+    if (pin.length < 4) {
+      const newPin = pin + num;
+      setPin(newPin);
+      setError('');
+
+      // Auto-verify when 4 digits entered
+      if (newPin.length === 4) {
+        verifyPIN(newPin);
+      }
+    }
+  };
+
+  const handleBackspace = () => {
+    setPin(pin.slice(0, -1));
+    setError('');
+  };
+
+  const handleClear = () => {
+    setPin('');
+    setError('');
+  };
+
+  const verifyPIN = async (pinToVerify: string) => {
+    try {
+      setIsVerifying(true);
+      setError('');
+
+      // Hash the PIN (in production, use proper hashing like bcrypt)
+      // For now, we'll just compare directly - you should hash this!
+      const { data: users, error } = await supabase
+        .from('user_profiles')
+        .select('id, email, full_name, pin_code')
+        .eq('pin_code', pinToVerify);
+
+      if (error) {
+        console.error('Error verifying PIN:', error);
+        setError('Verification error');
+        setPin('');
+        setIsVerifying(false);
+        return;
+      }
+
+      if (users && users.length > 0) {
+        // PIN is valid - use full_name or email as fallback
+        const userName = users[0].full_name || users[0].email?.split('@')[0] || users[0].email || 'User';
+        onPINVerified(users[0].id, userName);
+      } else {
+        // Invalid PIN
+        setError('Invalid PIN');
+        setPin('');
+      }
+
+      setIsVerifying(false);
+    } catch (error) {
+      console.error('Error verifying PIN:', error);
+      setError('Verification error');
+      setPin('');
+      setIsVerifying(false);
+    }
+  };
+
+  const isStockIn = movementType === 'IN';
+  const accentColor = isStockIn ? '#10B981' : '#EF4444';
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#0B0B0C' }]}>
+      {/* Header */}
+      <View style={[styles.screenHeader, { paddingTop: 60 }]}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <ArrowLeft color="#FFFFFF" size={24} strokeWidth={2} />
+        </TouchableOpacity>
+        <Text style={styles.screenTitle}>Enter PIN</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <View style={{ flex: 1, justifyContent: 'space-between', paddingBottom: 40 }}>
+        <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
+          {/* Header Badge */}
+          <View style={{ alignItems: 'center', marginBottom: 32 }}>
+            <View style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: accentColor + '20',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 16
+            }}>
+              {isStockIn ? (
+                <Plus color={accentColor} size={40} strokeWidth={2.5} />
+              ) : (
+                <Minus color={accentColor} size={40} strokeWidth={2.5} />
+              )}
+            </View>
+            <Text style={{ color: '#FFFFFF', fontSize: 20, fontWeight: 'bold', marginBottom: 4 }}>
+              Stock {movementType}
+            </Text>
+            <Text style={{ color: '#9ca3af', fontSize: 14 }}>
+              Enter your 4-digit PIN
+            </Text>
+          </View>
+
+          {/* PIN Display */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16, marginBottom: 32 }}>
+            {[0, 1, 2, 3].map((index) => (
+              <View
+                key={index}
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  backgroundColor: pin.length > index ? accentColor : '#2a2a2c',
+                  borderWidth: 2,
+                  borderColor: pin.length > index ? accentColor : '#404040'
+                }}
+              />
+            ))}
+          </View>
+
+          {/* Error Message */}
+          {error ? (
+            <View style={{ backgroundColor: '#EF444420', borderRadius: 8, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#EF4444', marginHorizontal: 20 }}>
+              <Text style={{ color: '#EF4444', fontSize: 14, textAlign: 'center' }}>{error}</Text>
+            </View>
+          ) : null}
+
+          {/* Verifying Message */}
+          {isVerifying ? (
+            <View style={{ alignItems: 'center', marginBottom: 16 }}>
+              <ActivityIndicator color={accentColor} />
+              <Text style={{ color: '#9ca3af', fontSize: 12, marginTop: 8 }}>Verifying PIN...</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Number Pad */}
+        <View style={{ paddingHorizontal: 40 }}>
+          <View style={{ gap: 12 }}>
+            {/* Row 1: 1, 2, 3 */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[1, 2, 3].map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  onPress={() => handleNumberPress(num.toString())}
+                  disabled={isVerifying}
+                  style={{
+                    flex: 1,
+                    height: 70,
+                    backgroundColor: '#1a1a1c',
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#2a2a2c'
+                  }}
+                >
+                  <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '600' }}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Row 2: 4, 5, 6 */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[4, 5, 6].map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  onPress={() => handleNumberPress(num.toString())}
+                  disabled={isVerifying}
+                  style={{
+                    flex: 1,
+                    height: 70,
+                    backgroundColor: '#1a1a1c',
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#2a2a2c'
+                  }}
+                >
+                  <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '600' }}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Row 3: 7, 8, 9 */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[7, 8, 9].map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  onPress={() => handleNumberPress(num.toString())}
+                  disabled={isVerifying}
+                  style={{
+                    flex: 1,
+                    height: 70,
+                    backgroundColor: '#1a1a1c',
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#2a2a2c'
+                  }}
+                >
+                  <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '600' }}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Row 4: CLR, 0, ← */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity
+                onPress={handleClear}
+                disabled={isVerifying || pin.length === 0}
+                style={{
+                  flex: 1,
+                  height: 70,
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c',
+                  opacity: pin.length === 0 ? 0.5 : 1
+                }}
+              >
+                <Text style={{ color: '#9ca3af', fontSize: 14, fontWeight: '600' }}>CLR</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleNumberPress('0')}
+                disabled={isVerifying}
+                style={{
+                  flex: 1,
+                  height: 70,
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c'
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '600' }}>0</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleBackspace}
+                disabled={isVerifying || pin.length === 0}
+                style={{
+                  flex: 1,
+                  height: 70,
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c',
+                  opacity: pin.length === 0 ? 0.5 : 1
+                }}
+              >
+                <Text style={{ color: '#9ca3af', fontSize: 24 }}>←</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Help Text */}
+          <View style={{ marginTop: 32, alignItems: 'center' }}>
+            <Text style={{ color: '#6b7280', fontSize: 12, textAlign: 'center' }}>
+              Don't have a PIN? Contact your manager
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+});
+
+// Stock Entry Screen Component with Cart
+const StockEntryScreen = memo(({
+  user,
+  movementType,
+  verifiedUser,
+  onBack,
+  onComplete
+}: {
+  user: any;
+  movementType: 'IN' | 'OUT';
+  verifiedUser: { id: string; name: string };
+  onBack: () => void;
+  onComplete: () => void;
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentStock, setCurrentStock] = useState(0);
+  const [selectedRoom, setSelectedRoom] = useState<any | null>(null);
+  const [rooms, setRooms] = useState<any[]>([]);
+
+  // Cart state - array of items to be saved
+  const [cart, setCart] = useState<Array<{
+    item: any;
+    quantity: number;
+    notes: string;
+    currentStock: number;
+    room: any;
+  }>>([]);
+
+  const isStockIn = movementType === 'IN';
+  const accentColor = isStockIn ? '#10B981' : '#EF4444';
+
+  // Fetch rooms for the organization
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.organization_id) {
+        const { data: roomsData } = await supabase
+          .from('rooms')
+          .select('*')
+          .eq('organization_id', profile.organization_id)
+          .order('name');
+
+        if (roomsData && roomsData.length > 0) {
+          setRooms(roomsData);
+          setSelectedRoom(roomsData[0]); // Default to first room
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    }
+  };
+
+  // Search for items as user types
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      searchItems();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  const searchItems = async () => {
+    try {
+      setIsSearching(true);
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) return;
+
+      const { data: items } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .or(`brand.ilike.%${searchQuery}%,barcode.eq.${searchQuery}`)
+        .limit(10);
+
+      setSearchResults(items || []);
+      setIsSearching(false);
+    } catch (error) {
+      console.error('Error searching items:', error);
+      setIsSearching(false);
+    }
+  };
+
+  const handleItemSelect = async (item: any) => {
+    setSelectedItem(item);
+    setSearchQuery(item.brand);
+    setSearchResults([]);
+
+    // Fetch current stock for this item in selected room
+    if (selectedRoom) {
+      const { data: roomCount } = await supabase
+        .from('room_counts')
+        .select('count')
+        .eq('inventory_item_id', item.id)
+        .eq('room_id', selectedRoom.id)
+        .single();
+
+      setCurrentStock(roomCount?.count || 0);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedItem || !selectedRoom) return;
+
+    // Add item to cart
+    setCart([...cart, {
+      item: selectedItem,
+      quantity: quantity,
+      notes: notes,
+      currentStock: currentStock,
+      room: selectedRoom
+    }]);
+
+    // Reset form for next item
+    setSelectedItem(null);
+    setSearchQuery('');
+    setQuantity(1);
+    setNotes('');
+    setCurrentStock(0);
+  };
+
+  const handleRemoveFromCart = (index: number) => {
+    setCart(cart.filter((_, i) => i !== index));
+  };
+
+  const handleSaveAll = async () => {
+    if (cart.length === 0) return;
+
+    try {
+      setIsSaving(true);
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) return;
+
+      // Create array of movements to insert
+      const movements = cart.map(cartItem => {
+        const newStock = isStockIn
+          ? cartItem.currentStock + cartItem.quantity
+          : cartItem.currentStock - cartItem.quantity;
+
+        return {
+          inventory_item_id: cartItem.item.id,
+          item_brand: cartItem.item.brand,
+          item_size: cartItem.item.size,
+          user_id: verifiedUser.id,
+          user_name: verifiedUser.name,
+          movement_type: movementType,
+          quantity: cartItem.quantity,
+          previous_stock: cartItem.currentStock,
+          new_stock: newStock,
+          room_id: cartItem.room.id,
+          room_name: cartItem.room.name,
+          notes: cartItem.notes || null,
+          organization_id: profile.organization_id
+        };
+      });
+
+      // Insert all movements at once
+      const { error } = await supabase
+        .from('stock_movements')
+        .insert(movements);
+
+      if (error) {
+        console.error('Error saving stock movements:', error);
+        alert('Error saving stock movements');
+        setIsSaving(false);
+        return;
+      }
+
+      // Success - go back to main screen
+      setIsSaving(false);
+      onComplete();
+    } catch (error) {
+      console.error('Error saving stock movements:', error);
+      alert('Error saving stock movements');
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#0B0B0C' }]}>
+      <View style={[styles.screenHeader, { paddingTop: 60 }]}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <ArrowLeft color="#FFFFFF" size={24} strokeWidth={2} />
+        </TouchableOpacity>
+        <Text style={styles.screenTitle}>Stock {movementType}</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+        {/* User Badge */}
+        <View style={{ backgroundColor: accentColor + '20', borderRadius: 8, padding: 12, marginBottom: 20, borderWidth: 1, borderColor: accentColor }}>
+          <Text style={{ color: accentColor, fontSize: 12, fontWeight: '600' }}>Logged in as {verifiedUser.name}</Text>
+        </View>
+
+        {/* Cart Summary */}
+        {cart.length > 0 && (
+          <View style={{ backgroundColor: '#1a1a1c', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 2, borderColor: accentColor }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>Cart ({cart.length} items)</Text>
+              <Text style={{ color: accentColor, fontSize: 14, fontWeight: '600' }}>
+                Total: {isStockIn ? '+' : '-'}{cart.reduce((sum, item) => sum + item.quantity, 0)}
+              </Text>
+            </View>
+
+            {/* Cart Items */}
+            {cart.map((cartItem, index) => (
+              <View
+                key={index}
+                style={{
+                  backgroundColor: '#0B0B0C',
+                  borderRadius: 8,
+                  padding: 12,
+                  marginBottom: 8,
+                  borderLeftWidth: 3,
+                  borderLeftColor: accentColor
+                }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600', flex: 1 }}>
+                    {cartItem.item.brand}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleRemoveFromCart(index)} style={{ marginLeft: 8 }}>
+                    <Text style={{ color: '#EF4444', fontSize: 12, fontWeight: '600' }}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                    {cartItem.room.name} • Qty: {isStockIn ? '+' : '-'}{cartItem.quantity}
+                  </Text>
+                  <Text style={{ color: '#9ca3af', fontSize: 12 }}>
+                    {cartItem.currentStock} → {isStockIn ? cartItem.currentStock + cartItem.quantity : cartItem.currentStock - cartItem.quantity}
+                  </Text>
+                </View>
+                {cartItem.notes && (
+                  <Text style={{ color: '#6b7280', fontSize: 11, marginTop: 4, fontStyle: 'italic' }}>
+                    {cartItem.notes}
+                  </Text>
+                )}
+              </View>
+            ))}
+
+            {/* Confirm All Button */}
+            <TouchableOpacity
+              onPress={handleSaveAll}
+              disabled={isSaving}
+              style={{
+                backgroundColor: accentColor,
+                borderRadius: 8,
+                padding: 14,
+                alignItems: 'center',
+                marginTop: 8
+              }}
+            >
+              {isSaving ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' }}>
+                  Confirm All {cart.length} Items
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Room Selection */}
+        {rooms.length > 0 && (
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>ROOM</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row', gap: 8 }}>
+              {rooms.map((room) => (
+                <TouchableOpacity
+                  key={room.id}
+                  onPress={() => {
+                    setSelectedRoom(room);
+                    if (selectedItem) {
+                      handleItemSelect(selectedItem);
+                    }
+                  }}
+                  style={{
+                    backgroundColor: selectedRoom?.id === room.id ? accentColor : '#1a1a1c',
+                    borderRadius: 8,
+                    padding: 12,
+                    marginRight: 8,
+                    borderWidth: 1,
+                    borderColor: selectedRoom?.id === room.id ? accentColor : '#2a2a2c'
+                  }}
+                >
+                  <Text style={{ color: selectedRoom?.id === room.id ? '#FFFFFF' : '#9ca3af', fontSize: 14, fontWeight: '600' }}>
+                    {room.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Search Input */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>SEARCH ITEM OR SCAN BARCODE</Text>
+          <TextInput
+            style={{
+              backgroundColor: '#1a1a1c',
+              borderRadius: 8,
+              padding: 14,
+              color: '#FFFFFF',
+              fontSize: 16,
+              borderWidth: 1,
+              borderColor: '#2a2a2c'
+            }}
+            placeholder="Type brand name or scan barcode..."
+            placeholderTextColor="#6b7280"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        </View>
+
+        {/* Search Results */}
+        {searchResults.length > 0 && (
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>RESULTS</Text>
+            {searchResults.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => handleItemSelect(item)}
+                style={{
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 8,
+                  padding: 14,
+                  marginBottom: 8,
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c'
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>{item.brand}</Text>
+                <Text style={{ color: '#9ca3af', fontSize: 12, marginTop: 4 }}>{item.category_name} • {item.size}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Selected Item */}
+        {selectedItem && (
+          <>
+            <View style={{ backgroundColor: '#1a1a1c', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: accentColor }}>
+              <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>SELECTED ITEM</Text>
+              <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>{selectedItem.brand}</Text>
+              <Text style={{ color: '#9ca3af', fontSize: 14, marginTop: 4 }}>{selectedItem.size}</Text>
+              <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2a2a2c' }}>
+                <Text style={{ color: '#6b7280', fontSize: 12 }}>Current stock in {selectedRoom?.name || 'room'}</Text>
+                <Text style={{ color: '#f97316', fontSize: 24, fontWeight: 'bold', marginTop: 4 }}>{currentStock}</Text>
+              </View>
+            </View>
+
+            {/* Quantity */}
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>QUANTITY</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: '#1a1a1c',
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#2a2a2c'
+                  }}
+                >
+                  <Minus color="#FFFFFF" size={20} strokeWidth={2} />
+                </TouchableOpacity>
+
+                <View style={{
+                  flex: 1,
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 8,
+                  padding: 14,
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c'
+                }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 32, fontWeight: 'bold' }}>{quantity}</Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => setQuantity(quantity + 1)}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: '#1a1a1c',
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#2a2a2c'
+                  }}
+                >
+                  <Plus color="#FFFFFF" size={20} strokeWidth={2} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Notes */}
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>NOTES (OPTIONAL)</Text>
+              <TextInput
+                style={{
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 8,
+                  padding: 14,
+                  color: '#FFFFFF',
+                  fontSize: 14,
+                  borderWidth: 1,
+                  borderColor: '#2a2a2c',
+                  minHeight: 80,
+                  textAlignVertical: 'top'
+                }}
+                placeholder="Add notes about this stock movement..."
+                placeholderTextColor="#6b7280"
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+              />
+            </View>
+
+            {/* Summary */}
+            <View style={{ backgroundColor: '#1a1a1c', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+              <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 12 }}>SUMMARY</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: '#6b7280', fontSize: 14 }}>Current Stock</Text>
+                <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{currentStock}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: '#6b7280', fontSize: 14 }}>{isStockIn ? 'Adding' : 'Removing'}</Text>
+                <Text style={{ color: accentColor, fontSize: 14, fontWeight: '600' }}>{isStockIn ? '+' : '-'}{quantity}</Text>
+              </View>
+              <View style={{ height: 1, backgroundColor: '#2a2a2c', marginVertical: 8 }} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>New Stock</Text>
+                <Text style={{ color: '#f97316', fontSize: 16, fontWeight: 'bold' }}>
+                  {isStockIn ? currentStock + quantity : currentStock - quantity}
+                </Text>
+              </View>
+            </View>
+
+            {/* Add to Cart Button */}
+            <TouchableOpacity
+              onPress={handleAddToCart}
+              style={{
+                backgroundColor: accentColor,
+                borderRadius: 12,
+                padding: 18,
+                alignItems: 'center',
+                marginBottom: 40
+              }}
+            >
+              <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>
+                Add to Cart
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </ScrollView>
+    </View>
+  );
+});
+
+// Stock Movement Screen Component
+const StockMovementScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) => {
+  const [movements, setMovements] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [todayStats, setTodayStats] = useState({ in: 0, out: 0, total: 0 });
+  const [currentView, setCurrentView] = useState<'main' | 'pin' | 'entry'>('main');
+  const [movementType, setMovementType] = useState<'IN' | 'OUT'>('IN');
+  const [verifiedUser, setVerifiedUser] = useState<{ id: string; name: string } | null>(null);
+
+  // Fetch real stock movements from database
+  useEffect(() => {
+    fetchStockMovements();
+  }, []);
+
+  const fetchStockMovements = async () => {
+    try {
+      setIsLoading(true);
+
+      // Get user's organization
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch stock movements from today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const { data: stockMovements, error } = await supabase
+        .from('stock_movements')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .gte('created_at', today.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching stock movements:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      setMovements(stockMovements || []);
+
+      // Calculate today's stats
+      const stats = (stockMovements || []).reduce((acc, movement) => {
+        if (movement.movement_type === 'IN') {
+          acc.in += movement.quantity;
+        } else {
+          acc.out += movement.quantity;
+        }
+        acc.total += movement.quantity;
+        return acc;
+      }, { in: 0, out: 0, total: 0 });
+
+      setTodayStats(stats);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching stock movements:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleStockInPress = () => {
+    setMovementType('IN');
+    setCurrentView('pin');
+  };
+
+  const handleStockOutPress = () => {
+    setMovementType('OUT');
+    setCurrentView('pin');
+  };
+
+  const handlePINVerified = (userId: string, userName: string) => {
+    setVerifiedUser({ id: userId, name: userName });
+    setCurrentView('entry');
+  };
+
+  const handleBackFromPIN = () => {
+    setCurrentView('main');
+    setVerifiedUser(null);
+  };
+
+  // Show PIN screen if needed
+  if (currentView === 'pin') {
+    return (
+      <PINEntryScreen
+        movementType={movementType}
+        onBack={handleBackFromPIN}
+        onPINVerified={handlePINVerified}
+      />
+    );
+  }
+
+  // Show entry screen if needed
+  if (currentView === 'entry' && verifiedUser) {
+    return (
+      <StockEntryScreen
+        user={user}
+        movementType={movementType}
+        verifiedUser={verifiedUser}
+        onBack={handleBackFromPIN}
+        onComplete={() => {
+          // Refresh movements and go back to main
+          setCurrentView('main');
+          setVerifiedUser(null);
+          fetchStockMovements();
+        }}
+      />
+    );
+  }
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#0B0B0C' }]}>
+      {/* Header with more spacing */}
+      <View style={[styles.screenHeader, { paddingTop: 60 }]}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <ArrowLeft color="#FFFFFF" size={24} strokeWidth={2} />
+        </TouchableOpacity>
+        <Text style={styles.screenTitle}>Stock Movements</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {/* Real Data Content */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+        {/* Action Buttons - Now Pressable */}
+        <View style={{ flexDirection: 'row', gap: 12, marginBottom: 24 }}>
+          <TouchableOpacity onPress={handleStockInPress} style={{ flex: 1, backgroundColor: '#10B981', borderRadius: 12, padding: 20, alignItems: 'center' }}>
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Plus color="#FFFFFF" size={28} strokeWidth={2.5} />
+            </View>
+            <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>STOCK IN</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, marginTop: 4 }}>Log Deliveries</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleStockOutPress} style={{ flex: 1, backgroundColor: '#EF4444', borderRadius: 12, padding: 20, alignItems: 'center' }}>
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Minus color="#FFFFFF" size={28} strokeWidth={2.5} />
+            </View>
+            <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>STOCK OUT</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, marginTop: 4 }}>Bar Restocking</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Quick Stats - Real Data */}
+        <View style={{ backgroundColor: '#1a1a1c', borderRadius: 12, padding: 16, marginBottom: 24 }}>
+          <Text style={{ color: '#9ca3af', fontSize: 12, fontWeight: '600', marginBottom: 12 }}>TODAY'S ACTIVITY</Text>
+          {isLoading ? (
+            <ActivityIndicator color="#f97316" />
+          ) : (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ color: '#10B981', fontSize: 24, fontWeight: 'bold' }}>{todayStats.in}</Text>
+                <Text style={{ color: '#6b7280', fontSize: 12 }}>IN</Text>
+              </View>
+              <View style={{ width: 1, backgroundColor: '#2a2a2c' }} />
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ color: '#EF4444', fontSize: 24, fontWeight: 'bold' }}>{todayStats.out}</Text>
+                <Text style={{ color: '#6b7280', fontSize: 12 }}>OUT</Text>
+              </View>
+              <View style={{ width: 1, backgroundColor: '#2a2a2c' }} />
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ color: '#f97316', fontSize: 24, fontWeight: 'bold' }}>{todayStats.total}</Text>
+                <Text style={{ color: '#6b7280', fontSize: 12 }}>TOTAL</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Recent Activity - Real Data */}
+        <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Recent Activity</Text>
+
+        {isLoading ? (
+          <View style={{ padding: 40, alignItems: 'center' }}>
+            <ActivityIndicator color="#f97316" size="large" />
+          </View>
+        ) : movements.length === 0 ? (
+          <View style={{ backgroundColor: '#1a1a1c', borderRadius: 12, padding: 32, alignItems: 'center', marginBottom: 12 }}>
+            <Package color="#6b7280" size={48} strokeWidth={1.5} />
+            <Text style={{ color: '#9ca3af', fontSize: 14, marginTop: 12, textAlign: 'center' }}>
+              No stock movements today
+            </Text>
+            <Text style={{ color: '#6b7280', fontSize: 12, marginTop: 4, textAlign: 'center' }}>
+              Use the buttons above to log stock IN or OUT
+            </Text>
+          </View>
+        ) : (
+          movements.map((movement, index) => {
+            const isStockIn = movement.movement_type === 'IN';
+            const timeAgo = getTimeAgo(new Date(movement.created_at));
+
+            return (
+              <View
+                key={movement.id}
+                style={{
+                  backgroundColor: '#1a1a1c',
+                  borderRadius: 12,
+                  padding: 16,
+                  marginBottom: 12,
+                  borderLeftWidth: 4,
+                  borderLeftColor: isStockIn ? '#10B981' : '#EF4444'
+                }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>
+                    {movement.item_brand} {movement.item_size || ''}
+                  </Text>
+                  <Text style={{
+                    color: isStockIn ? '#10B981' : '#EF4444',
+                    fontSize: 14,
+                    fontWeight: 'bold'
+                  }}>
+                    {isStockIn ? '+' : '-'}{movement.quantity}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ color: '#6b7280', fontSize: 12 }}>by {movement.user_name}</Text>
+                  <Text style={{ color: '#6b7280', fontSize: 12 }}>{timeAgo}</Text>
+                </View>
+                {movement.notes && (
+                  <Text style={{ color: '#9ca3af', fontSize: 11, marginTop: 6, fontStyle: 'italic' }}>
+                    {movement.notes}
+                  </Text>
+                )}
+              </View>
+            );
+          })
+        )}
+
+        {/* Coming Soon Badge */}
+        <View style={{ marginTop: 20, alignItems: 'center', padding: 20, backgroundColor: 'rgba(249, 115, 22, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: '#f97316', borderStyle: 'dashed' }}>
+          <Text style={{ color: '#f97316', fontSize: 14, fontWeight: 'bold' }}>Building Real Feature</Text>
+          <Text style={{ color: '#9ca3af', fontSize: 12, marginTop: 4, textAlign: 'center' }}>
+            Currently showing real data from database. Stock IN/OUT functionality coming next!
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+});
+
+// Team & PINs Screen Component
+const TeamPINScreen = memo(({ user, userProfile, onBack }: { user: any; userProfile: any; onBack: () => void }) => {
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showPINs, setShowPINs] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, []);
+
+  const fetchTeamMembers = async () => {
+    try {
+      setLoading(true);
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile) {
+        const { data: members } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('organization_id', profile.organization_id)
+          .order('created_at', { ascending: true });
+
+        setTeamMembers(members || []);
+      }
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePINVisibility = (userId: string) => {
+    setShowPINs(prev => ({ ...prev, [userId]: !prev[userId] }));
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Modern Header */}
+      <View style={styles.modernScreenHeader}>
+        <TouchableOpacity onPress={onBack} style={styles.modernBackButton}>
+          <ArrowLeft color="#1A1A1A" size={24} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <View style={styles.modernHeaderCenter}>
+          <Text style={styles.modernScreenTitle}>Team & PINs</Text>
+          <Text style={styles.modernScreenSubtitle}>View team members and PINs</Text>
+        </View>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#f97316" />
+        </View>
+      ) : (
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ padding: 20 }}>
+            {/* Team Members List */}
+            {teamMembers.map((member, index) => (
+              <View
+                key={member.id}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 12,
+                  padding: 16,
+                  marginBottom: 12,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 2,
+                  elevation: 1
+                }}
+              >
+                {/* Member Info */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: '#F97316',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 12
+                    }}
+                  >
+                    <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>
+                      {(member.full_name || member.email).charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#1A1A1A', marginBottom: 2 }}>
+                      {member.full_name || 'No Name'}
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#6B7280' }}>
+                      {member.email}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                      {member.role || 'team_member'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* PIN Section */}
+                <View
+                  style={{
+                    backgroundColor: '#F9FAFB',
+                    borderRadius: 8,
+                    padding: 12,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Key color="#6B7280" size={16} strokeWidth={2} />
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
+                      PIN:
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#1A1A1A',
+                        letterSpacing: 2
+                      }}
+                    >
+                      {showPINs[member.id] ? member.pin_code : '••••'}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => togglePINVisibility(member.id)}
+                    style={{
+                      padding: 4
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: '#F97316', fontWeight: '600' }}>
+                      {showPINs[member.id] ? 'Hide' : 'Show'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+
+            {teamMembers.length === 0 && (
+              <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+                <Users color="#9CA3AF" size={48} strokeWidth={1.5} />
+                <Text style={{ fontSize: 16, color: '#6B7280', marginTop: 12 }}>
+                  No team members found
+                </Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      )}
+    </View>
+  );
+});
+
+// Stock Analytics Screen Component
+const StockAnalyticsScreen = memo(({ user, userProfile, onBack }: { user: any; userProfile: any; onBack: () => void }) => {
+  const [movements, setMovements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalIN: 0,
+    totalOUT: 0,
+    netChange: 0,
+    totalMovements: 0
+  });
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile) {
+        const { data: movementsData } = await supabase
+          .from('stock_movements')
+          .select('*')
+          .eq('organization_id', profile.organization_id)
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (movementsData) {
+          setMovements(movementsData);
+
+          const totalIN = movementsData
+            .filter(m => m.movement_type === 'IN')
+            .reduce((sum, m) => sum + m.quantity, 0);
+
+          const totalOUT = movementsData
+            .filter(m => m.movement_type === 'OUT')
+            .reduce((sum, m) => sum + m.quantity, 0);
+
+          setStats({
+            totalIN,
+            totalOUT,
+            netChange: totalIN - totalOUT,
+            totalMovements: movementsData.length
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Modern Header */}
+      <View style={styles.modernScreenHeader}>
+        <TouchableOpacity onPress={onBack} style={styles.modernBackButton}>
+          <ArrowLeft color="#1A1A1A" size={24} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <View style={styles.modernHeaderCenter}>
+          <Text style={styles.modernScreenTitle}>Stock Analytics</Text>
+          <Text style={styles.modernScreenSubtitle}>Movement insights & trends</Text>
+        </View>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#f97316" />
+        </View>
+      ) : (
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ padding: 20 }}>
+            {/* Stats Cards */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '45%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 12,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB'
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <TrendingUp color="#10B981" size={20} strokeWidth={2} />
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginLeft: 6, fontWeight: '500' }}>
+                    Stock IN
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#10B981' }}>
+                  {stats.totalIN}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '45%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 12,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB'
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <TrendingDown color="#EF4444" size={20} strokeWidth={2} />
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginLeft: 6, fontWeight: '500' }}>
+                    Stock OUT
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#EF4444' }}>
+                  {stats.totalOUT}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '45%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 12,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB'
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <Activity color="#F97316" size={20} strokeWidth={2} />
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginLeft: 6, fontWeight: '500' }}>
+                    Net Change
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 'bold',
+                    color: stats.netChange >= 0 ? '#10B981' : '#EF4444'
+                  }}
+                >
+                  {stats.netChange >= 0 ? '+' : ''}{stats.netChange}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '45%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 12,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB'
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <BarChart3 color="#6366F1" size={20} strokeWidth={2} />
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginLeft: 6, fontWeight: '500' }}>
+                    Movements
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1A1A1A' }}>
+                  {stats.totalMovements}
+                </Text>
+              </View>
+            </View>
+
+            {/* Recent Movements */}
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 12 }}>
+                Recent Movements
+              </Text>
+              {movements.slice(0, 20).map((movement, index) => (
+                <View
+                  key={movement.id}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 10,
+                    padding: 14,
+                    marginBottom: 10,
+                    borderWidth: 1,
+                    borderColor: '#E5E7EB',
+                    borderLeftWidth: 3,
+                    borderLeftColor: movement.movement_type === 'IN' ? '#10B981' : '#EF4444'
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1A1A1A', flex: 1 }}>
+                      {movement.item_brand}
+                    </Text>
+                    <View
+                      style={{
+                        backgroundColor: movement.movement_type === 'IN' ? '#D1FAE5' : '#FEE2E2',
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 12
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 'bold',
+                          color: movement.movement_type === 'IN' ? '#047857' : '#DC2626'
+                        }}
+                      >
+                        {movement.movement_type === 'IN' ? '+' : '-'}{movement.quantity}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12, color: '#6B7280' }}>
+                      {movement.user_name}
+                    </Text>
+                    <Text style={{ fontSize: 11, color: '#9CA3AF' }}>
+                      {new Date(movement.created_at).toLocaleDateString()}
+                    </Text>
+                  </View>
+                  {movement.room_name && (
+                    <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                      📍 {movement.room_name}
+                    </Text>
+                  )}
+                </View>
+              ))}
+
+              {movements.length === 0 && (
+                <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+                  <BarChart3 color="#9CA3AF" size={48} strokeWidth={1.5} />
+                  <Text style={{ fontSize: 16, color: '#6B7280', marginTop: 12 }}>
+                    No movements recorded yet
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      )}
+    </View>
+  );
+});
+
 // More/Settings Screen Component
-const MoreScreen = memo(({ user, onLogout, onNavigateToRooms, onNavigateToSuppliers, onNavigateToOrders, onNavigateToReports, onBack }: { user: any; onLogout: () => void; onNavigateToRooms: () => void; onNavigateToSuppliers: () => void; onNavigateToOrders: () => void; onNavigateToReports: () => void; onBack: () => void }) => {
+const MoreScreen = memo(({ user, userProfile, onLogout, onNavigateToRooms, onNavigateToSuppliers, onNavigateToOrders, onNavigateToReports, onNavigateToTeam, onNavigateToAnalytics, onBack }: { user: any; userProfile: any; onLogout: () => void; onNavigateToRooms: () => void; onNavigateToSuppliers: () => void; onNavigateToOrders: () => void; onNavigateToReports: () => void; onNavigateToTeam: () => void; onNavigateToAnalytics: () => void; onBack: () => void }) => {
 
   const handleRoomsPress = () => {
     onNavigateToRooms();
@@ -2169,6 +4159,14 @@ const MoreScreen = memo(({ user, onLogout, onNavigateToRooms, onNavigateToSuppli
 
   const handleReportsPress = () => {
     onNavigateToReports();
+  };
+
+  const handleTeamPress = () => {
+    onNavigateToTeam();
+  };
+
+  const handleAnalyticsPress = () => {
+    onNavigateToAnalytics();
   };
 
   return (
@@ -2189,10 +4187,12 @@ const MoreScreen = memo(({ user, onLogout, onNavigateToRooms, onNavigateToSuppli
         {/* Modern User Info Card */}
         <View style={styles.modernUserCard}>
           <View style={styles.modernUserAvatar}>
-            <Text style={styles.modernUserAvatarText}>{user.email.charAt(0).toUpperCase()}</Text>
+            <Text style={styles.modernUserAvatarText}>
+              {(userProfile?.full_name || user.email).charAt(0).toUpperCase()}
+            </Text>
           </View>
           <View style={styles.modernUserInfo}>
-            <Text style={styles.modernUserName}>{user.email}</Text>
+            <Text style={styles.modernUserName}>{userProfile?.full_name || user.email}</Text>
             <Text style={styles.modernUserStatus}>Signed In</Text>
           </View>
         </View>
@@ -2240,36 +4240,46 @@ const MoreScreen = memo(({ user, onLogout, onNavigateToRooms, onNavigateToSuppli
               </View>
               <ChevronRight color="#9CA3AF" size={20} strokeWidth={2.5} />
             </TouchableOpacity>
-          </View>
-        </View>
 
-        <View style={styles.modernMenuSection}>
-          <Text style={styles.modernMenuSectionTitle}>Settings</Text>
-          <View style={styles.modernMenuGroup}>
-            <TouchableOpacity
-              style={styles.modernMenuItem}
-              onPress={() => Alert.alert('Coming Soon', 'Notification settings will be available in a future update.')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.modernMenuItem} onPress={handleTeamPress} activeOpacity={0.7}>
               <View style={styles.modernMenuItemLeft}>
                 <View style={[styles.modernMenuIcon, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]}>
-                  <Bell color="#6B7280" size={20} strokeWidth={2.5} />
+                  <Shield color="#3B82F6" size={20} strokeWidth={2.5} />
                 </View>
-                <Text style={styles.modernMenuItemText}>Notifications</Text>
+                <Text style={styles.modernMenuItemText}>Team & PINs</Text>
               </View>
               <ChevronRight color="#9CA3AF" size={20} strokeWidth={2.5} />
             </TouchableOpacity>
 
+            <TouchableOpacity style={styles.modernMenuItem} onPress={handleAnalyticsPress} activeOpacity={0.7}>
+              <View style={styles.modernMenuItemLeft}>
+                <View style={[styles.modernMenuIcon, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]}>
+                  <Activity color="#EC4899" size={20} strokeWidth={2.5} />
+                </View>
+                <Text style={styles.modernMenuItemText}>Stock Analytics</Text>
+              </View>
+              <ChevronRight color="#9CA3AF" size={20} strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.modernMenuSection}>
+          <Text style={styles.modernMenuSectionTitle}>Legal</Text>
+          <View style={styles.modernMenuGroup}>
             <TouchableOpacity
               style={styles.modernMenuItem}
-              onPress={() => Alert.alert('Coming Soon', 'App preferences will be available in a future update.')}
+              onPress={() => Alert.alert(
+                'Privacy Policy',
+                'InvyEasy respects your privacy. We collect only essential account and inventory data to provide our service. Your data is encrypted and never shared with third parties. For full details, visit our privacy policy at invyeasy.com/privacy',
+                [{ text: 'OK' }]
+              )}
               activeOpacity={0.7}
             >
               <View style={styles.modernMenuItemLeft}>
                 <View style={[styles.modernMenuIcon, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]}>
-                  <Settings color="#6B7280" size={20} strokeWidth={2.5} />
+                  <FileText color="#6B7280" size={20} strokeWidth={2.5} />
                 </View>
-                <Text style={styles.modernMenuItemText}>Preferences</Text>
+                <Text style={styles.modernMenuItemText}>Privacy Policy</Text>
               </View>
               <ChevronRight color="#9CA3AF" size={20} strokeWidth={2.5} />
             </TouchableOpacity>
@@ -4107,7 +6117,7 @@ const InventoryList = memo(({ user, onBack }: { user: any; onBack: () => void })
 });
 
 // Dashboard Component
-function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
+function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: any; onLogout: () => void }) {
   const [stats, setStats] = useState({
     totalItems: 0,
     totalCategories: 0,
@@ -4313,6 +6323,8 @@ function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
         return <CategoriesScreen user={user} onBack={() => setActiveTab('home')} />;
       case 'count':
         return <CountScreen user={user} onBack={() => setActiveTab('home')} />;
+      case 'stock':
+        return <StockMovementScreen user={user} onBack={() => setActiveTab('home')} />;
       case 'rooms':
         return <RoomsScreen user={user} onBack={() => setActiveTab(previousTab)} />;
       case 'suppliers':
@@ -4321,9 +6333,14 @@ function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
         return <OrdersScreen user={user} onBack={() => setActiveTab(previousTab)} />;
       case 'reports':
         return <ReportsScreen user={user} onBack={() => setActiveTab(previousTab)} />;
+      case 'team':
+        return <TeamPINScreen user={user} userProfile={userProfile} onBack={() => setActiveTab(previousTab)} />;
+      case 'analytics':
+        return <StockAnalyticsScreen user={user} userProfile={userProfile} onBack={() => setActiveTab(previousTab)} />;
       case 'more':
         return <MoreScreen
           user={user}
+          userProfile={userProfile}
           onLogout={onLogout}
           onBack={() => setActiveTab('home')}
           onNavigateToRooms={() => {
@@ -4341,6 +6358,14 @@ function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
           onNavigateToReports={() => {
             setPreviousTab('more');
             setActiveTab('reports');
+          }}
+          onNavigateToTeam={() => {
+            setPreviousTab('more');
+            setActiveTab('team');
+          }}
+          onNavigateToAnalytics={() => {
+            setPreviousTab('more');
+            setActiveTab('analytics');
           }}
         />;
       case 'home':
@@ -4428,8 +6453,8 @@ function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
                 <Text style={styles.welcomeEmoji}>👋</Text>
               </View>
               <View style={styles.welcomeTextContainer}>
-                <Text style={styles.welcomeTitle}>Welcome back!</Text>
-                <Text style={styles.welcomeSubtext}>You're signed in as {user.email}</Text>
+                <Text style={styles.welcomeTitle}>Welcome back{userProfile?.full_name ? `, ${userProfile.full_name}!` : '!'}</Text>
+                <Text style={styles.welcomeSubtext}>You're signed in as {userProfile?.full_name || user.email}</Text>
               </View>
             </View>
             <TouchableOpacity onPress={() => setShowWelcome(false)} style={styles.dismissButton}>
@@ -4568,6 +6593,17 @@ function Dashboard({ user, onLogout }: { user: any; onLogout: () => void }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabItem}
+          onPress={() => setActiveTab('stock')}
+        >
+          <ArrowUpDown
+            color={activeTab === 'stock' ? '#f97316' : '#9ca3af'}
+            size={24}
+            strokeWidth={2}
+          />
+          <Text style={[styles.tabLabel, activeTab === 'stock' && styles.tabLabelActive]}>Stock</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabItem}
           onPress={() => setActiveTab('more')}
         >
           <Settings
@@ -4679,6 +6715,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [showSignUp, setShowSignUp] = useState(false);
 
@@ -4698,9 +6735,21 @@ export default function App() {
 
       if (error) throw error;
 
+      // Fetch user profile from user_profiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('id, email, full_name, role, organization_id')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.warn('Could not fetch user profile:', profileError);
+      }
+
       // Success!
       setIsLoggedIn(true);
       setUserData(data.user);
+      setUserProfile(profile);
       // No alert - smooth transition to dashboard
 
     } catch (error: any) {
@@ -4740,9 +6789,7 @@ export default function App() {
           phone: '',
           businessType: 'personal',
           employees: '1-10',
-          primaryApp: 'inventory-management',
-          plan: 'pro',
-          billingCycle: 'monthly'
+          primaryApp: 'inventory-management'
         }),
       });
 
@@ -4786,7 +6833,7 @@ export default function App() {
 
   // Show dashboard if logged in
   if (isLoggedIn && userData) {
-    return <Dashboard user={userData} onLogout={handleLogout} />;
+    return <Dashboard user={userData} userProfile={userProfile} onLogout={handleLogout} />;
   }
 
   // Show onboarding first
@@ -4836,7 +6883,7 @@ export default function App() {
           </Text>
           <Text style={styles.subtitle}>
             {isSignUpMode
-              ? 'Start your free trial - no credit card required'
+              ? 'Get started with InvyEasy for free'
               : 'Sign in to your InvyEasy account'}
           </Text>
         </View>
@@ -5563,11 +7610,13 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginHorizontal: 24,
     marginTop: 16,
     marginBottom: 12,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     height: 48,
     backgroundColor: 'rgba(255, 255, 255, 0.12)',  // Very subtle glass
@@ -5580,6 +7629,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#FFFFFF',  // Pure white
+    height: 44,
   },
   filterContainer: {
     marginHorizontal: 24,
@@ -6575,6 +8625,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
+  createOrderButtonContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  createOrderButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#f97316',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  createOrderGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  createOrderButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
   orderStatCard: {
     flex: 1,
     padding: 16,
@@ -6611,7 +8688,7 @@ const styles = StyleSheet.create({
   orderSupplierName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   orderSupplierSummary: {
@@ -6639,7 +8716,7 @@ const styles = StyleSheet.create({
   orderItemBrand: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   orderItemCategory: {
@@ -6662,7 +8739,7 @@ const styles = StyleSheet.create({
   orderItemStatValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#FFFFFF',
   },
   orderItemPrice: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -6689,7 +8766,7 @@ const styles = StyleSheet.create({
   },
   orderItemRoomsText: {
     fontSize: 12,
-    color: '#1f2937',
+    color: '#FFFFFF',
   },
   menuIconOrange: {
     backgroundColor: 'rgba(249, 115, 22, 0.2)',
@@ -6726,7 +8803,7 @@ const styles = StyleSheet.create({
   reportSectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   reportChartContainer: {
@@ -6776,13 +8853,13 @@ const styles = StyleSheet.create({
   reportTableCellText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#FFFFFF',
     flex: 1,
   },
   reportTableValue: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#FFFFFF',
   },
   reportTableSubvalue: {
     fontSize: 13,
@@ -7868,5 +9945,310 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255, 255, 255, 0.6)',  // Translucent white
     marginTop: 24,
+  },
+  // Shopping Cart Styles
+  cartBadgeButton: {
+    position: 'relative',
+    padding: 8,
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  cartBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  shoppingItemsGrid: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
+    gap: 12,
+  },
+  shoppingItemCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  shoppingItemContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  shoppingItemBrand: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  shoppingItemCategory: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 4,
+  },
+  shoppingItemPrice: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#10b981',
+  },
+  addToCartButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#f97316',
+    borderRadius: 8,
+    minWidth: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addToCartButtonDisabled: {
+    backgroundColor: '#16a34a',
+  },
+  addToCartButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  cartItemsContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 16,
+    gap: 12,
+  },
+  cartItemCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 16,
+  },
+  cartItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  cartItemBrand: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cartItemCategory: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  removeButton: {
+    padding: 8,
+  },
+  cartItemControls: {
+    marginBottom: 12,
+  },
+  quantityControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  quantityLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  quantityButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 8,
+    padding: 8,
+  },
+  quantityButton: {
+    padding: 4,
+  },
+  quantityValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    minWidth: 40,
+    textAlign: 'center',
+  },
+  notesContainer: {
+    marginTop: 8,
+  },
+  notesLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 8,
+  },
+  notesInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#FFFFFF',
+    minHeight: 60,
+    textAlignVertical: 'top',
+  },
+  cartFooter: {
+    padding: 24,
+  },
+  reviewOrderButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#f97316',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  reviewOrderGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  reviewOrderButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  reviewContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
+    gap: 16,
+  },
+  reviewSupplierCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 16,
+  },
+  reviewSupplierName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  reviewSupplierItems: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 12,
+  },
+  reviewItemRow: {
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  reviewItemName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  reviewItemQty: {
+    fontSize: 14,
+    color: '#f97316',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  reviewItemNotes: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontStyle: 'italic',
+  },
+  sendOptionsContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  sendOptionsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 12,
+  },
+  sendButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  sendOptionButton: {
+    flex: 1,
+    minWidth: 90,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  sendOptionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  sendAllContainer: {
+    backgroundColor: 'rgba(249, 115, 22, 0.15)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1.5,
+    borderColor: '#f97316',
+  },
+  sendAllTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
+  sendAllButton: {
+    flex: 1,
+    minWidth: 140,
+    backgroundColor: '#f97316',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    gap: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  sendAllButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  emptyStateButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: '#f97316',
+    borderRadius: 10,
+  },
+  emptyStateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
