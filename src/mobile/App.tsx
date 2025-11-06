@@ -3183,14 +3183,43 @@ const StockEntryScreen = memo(({
         };
       });
 
-      // Insert all movements at once
-      const { error } = await supabase
-        .from('stock_movements')
-        .insert(movements);
+      // Use API endpoint to insert movements (bypasses RLS)
+      const response = await fetch(`${apiUrl}/api/stock-movements`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          movements: movements,
+          userId: user.id
+        })
+      });
 
-      if (error) {
-        console.error('Error saving stock movements:', error);
-        alert('Error saving stock movements');
+      // Get response text first to handle errors
+      const responseText = await response.text();
+      console.log('API Response:', responseText);
+
+      if (!response.ok) {
+        console.error('API Error:', response.status, responseText);
+        alert(`Error saving stock movements: ${response.status}`);
+        setIsSaving(false);
+        return;
+      }
+
+      // Parse JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (err) {
+        console.error('JSON Parse Error:', err);
+        alert('Invalid response from server');
+        setIsSaving(false);
+        return;
+      }
+
+      if (!data.success) {
+        console.error('Error saving stock movements:', data);
+        alert(data.error || 'Error saving stock movements');
         setIsSaving(false);
         return;
       }

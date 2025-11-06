@@ -61,6 +61,8 @@ interface InventoryItem {
   threshold: number
   par_level: number
   barcode?: string
+  current_stock?: number
+  price_per_item?: number
   categories: { name: string } | null
   suppliers: { name: string } | null
   category_id: string
@@ -212,18 +214,9 @@ function DashboardContent() {
         console.log('✅ Rooms:', roomsData?.length, roomsData)
       }
 
-      // Fetch room counts for total value calculation
-      console.log('📊 Fetching room counts for org:', organizationId)
-      const { data: roomCountsData, error: roomCountsError } = await supabase
-        .from('room_counts')
-        .select('inventory_item_id, count')
-        .eq('organization_id', organizationId)
-
-      if (roomCountsError) {
-        console.error('❌ Room counts error:', roomCountsError)
-      } else {
-        console.log('✅ Room counts:', roomCountsData?.length, roomCountsData)
-      }
+      // Note: We no longer need to fetch room_counts separately
+      // The inventory_items table now has a current_stock column
+      // that's automatically maintained by the trigger
 
       // Fetch inventory items
       console.log('📦 Fetching inventory items for org:', organizationId)
@@ -263,16 +256,14 @@ function DashboardContent() {
       setCategories(categoriesData || [])
       setSuppliers(suppliersData || [])
 
-      // Calculate total inventory value and category breakdown
+      // Calculate total inventory value and category breakdown using current_stock
       let totalInventoryValue = 0
       const categoryValues = new Map<string, number>()
 
-      if (inventoryData && roomCountsData) {
+      if (inventoryData) {
         totalInventoryValue = inventoryData.reduce((total, item) => {
-          // Get total count for this item across all rooms
-          const itemCounts = roomCountsData.filter(count => count.inventory_item_id === item.id)
-          const totalCount = itemCounts.reduce((sum, count) => sum + count.count, 0)
-          const itemValue = totalCount * (item.price_per_item || 0)
+          // Use the current_stock column which is maintained by the trigger
+          const itemValue = (item.current_stock || 0) * (item.price_per_item || 0)
 
           // Add to category total
           const category = categoriesData?.find(cat => cat.id === item.category_id)
