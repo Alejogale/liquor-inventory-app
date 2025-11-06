@@ -70,25 +70,25 @@ export default function SignupPage() {
 
   const useCases = [
     {
-      id: 'personal',
-      title: 'Personal Use',
-      description: 'Organize your home, pantry, garage, or closet',
-      icon: Home,
+      id: 'restaurant',
+      title: 'Restaurant & Bar',
+      description: 'Liquor, beer, wine, and food inventory tracking',
+      icon: Briefcase,
       color: 'from-orange-500 to-red-500'
     },
     {
-      id: 'hobby',
-      title: 'Hobby & Collectibles',
-      description: 'Track craft supplies, sports equipment, books, games',
-      icon: Heart,
-      color: 'from-purple-500 to-pink-500'
+      id: 'retail',
+      title: 'Retail Store',
+      description: 'Multi-location inventory and stock management',
+      icon: Package,
+      color: 'from-blue-500 to-indigo-500'
     },
     {
-      id: 'business',
-      title: 'Small Business',
-      description: 'Manage retail inventory, home-based business, side hustles',
-      icon: Briefcase,
-      color: 'from-blue-500 to-indigo-500'
+      id: 'hospitality',
+      title: 'Hospitality',
+      description: 'Hotels, events, catering inventory control',
+      icon: Home,
+      color: 'from-purple-500 to-pink-500'
     }
   ]
 
@@ -103,7 +103,7 @@ export default function SignupPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
                 <Package className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Easy Inventory</span>
+              <span className="text-xl font-bold text-gray-900">InvyEasy</span>
             </Link>
             
             {/* Back to Home */}
@@ -122,76 +122,76 @@ export default function SignupPage() {
           <div className="space-y-8">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Start Your Free Trial
+                Professional Inventory Management
               </h1>
-              <p className="text-lg sm:text-xl text-gray-600 mb-8">
-                Join thousands of people who are organizing their lives with Easy Inventory.
+              <p className="text-lg sm:text-xl text-gray-600 mb-6">
+                Join businesses managing their inventory with InvyEasy. Custom pricing based on your business size.
               </p>
             </div>
 
             {/* Benefits List */}
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
+            <div className="space-y-5">
+              <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Check className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">30-day free trial</h3>
-                  <p className="text-gray-600">No credit card required. Cancel anytime.</p>
+                  <h3 className="font-semibold text-gray-900">Enterprise-grade features</h3>
+                  <p className="text-gray-600">Full inventory tracking, barcode scanning, real-time updates.</p>
                 </div>
               </div>
-              
-              <div className="flex items-start gap-4">
+
+              <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Check className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Setup in 5 minutes</h3>
-                  <p className="text-gray-600">Get started immediately with our intuitive interface.</p>
+                  <h3 className="font-semibold text-gray-900">Hands-free operation</h3>
+                  <p className="text-gray-600">Barcode scanner workflow for lightning-fast counting.</p>
                 </div>
               </div>
-              
-              <div className="flex items-start gap-4">
+
+              <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Check className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Perfect for everyone</h3>
-                  <p className="text-gray-600">Whether you're organizing your home or running a business.</p>
+                  <h3 className="font-semibold text-gray-900">Multi-location support</h3>
+                  <p className="text-gray-600">Manage inventory across multiple venues and locations.</p>
                 </div>
               </div>
-              
-              <div className="flex items-start gap-4">
+
+              <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Check className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Mobile-first design</h3>
-                  <p className="text-gray-600">Count inventory on your phone, manage on any device.</p>
+                  <h3 className="font-semibold text-gray-900">Mobile + Web platform</h3>
+                  <p className="text-gray-600">iOS app for counting, web dashboard for management.</p>
                 </div>
               </div>
             </div>
 
             {/* Social Proof */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="bg-white p-5 rounded-2xl shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <span className="text-sm font-medium text-gray-600">4.9/5 stars</span>
+                <span className="text-sm font-medium text-gray-600">5.0/5 stars</span>
               </div>
-              <p className="text-gray-700 italic mb-4">
-                "Finally, I can keep track of everything in my house! My pantry is perfectly organized and I never run out of essentials."
+              <p className="text-gray-700 italic mb-3">
+                "InvyEasy transformed our inventory management. The barcode scanning is incredibly fast, and we've cut counting time by 70%."
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">SM</span>
+                  <span className="text-white text-sm font-semibold">MR</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Sarah M.</p>
-                  <p className="text-sm text-gray-600">Home Organizer</p>
+                  <p className="font-semibold text-gray-900">Michael R.</p>
+                  <p className="text-sm text-gray-600">Bar Manager</p>
                 </div>
               </div>
             </div>
@@ -204,9 +204,9 @@ export default function SignupPage() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Check className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Easy Inventory!</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Welcome to InvyEasy!</h3>
                 <p className="text-gray-600 mb-8">
-                  Your account has been created successfully. You can now start organizing everything you own!
+                  Your account has been created successfully. Our team will contact you shortly to finalize your custom pricing.
                 </p>
                 <Link 
                   href="/login" 
@@ -218,9 +218,9 @@ export default function SignupPage() {
               </div>
             ) : (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Your Account</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-5">Create Your Account</h2>
                 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Name Fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -319,14 +319,14 @@ export default function SignupPage() {
                       />
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                      This could be your home, business name, or project name
+                      Your business or venue name
                     </p>
                   </div>
 
                   {/* Use Case Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-4">
-                      How will you use Easy Inventory?
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What type of business do you have?
                     </label>
                     <div className="space-y-3">
                       {useCases.map((useCase) => {
@@ -367,10 +367,10 @@ export default function SignupPage() {
                   </div>
 
                   {/* Plan Selection */}
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-5 rounded-xl border border-orange-200">
                     <div className="mb-4">
-                      <h3 className="font-semibold text-gray-900 mb-2">Easy Inventory Pro</h3>
-                      <p className="text-sm text-gray-600 mb-4">Everything you need to stay organized</p>
+                      <h3 className="font-semibold text-gray-900 mb-2">InvyEasy Professional</h3>
+                      <p className="text-sm text-gray-600 mb-4">Complete inventory management platform</p>
                       
                       {/* Billing Cycle Selection */}
                       <div className="space-y-3">
@@ -390,10 +390,10 @@ export default function SignupPage() {
                           <div className="flex items-center justify-between w-full">
                             <div>
                               <div className="font-medium text-gray-900">Monthly Plan</div>
-                              <div className="text-sm text-gray-600">Pay monthly, cancel anytime</div>
+                              <div className="text-sm text-gray-600">Starting at $499/mo (custom pricing)</div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xl font-bold text-gray-900">$10</div>
+                              <div className="text-xl font-bold text-gray-900">$499+</div>
                               <div className="text-sm text-gray-600">/month</div>
                             </div>
                           </div>
@@ -420,12 +420,12 @@ export default function SignupPage() {
                           <div className="flex items-center justify-between w-full">
                             <div>
                               <div className="font-medium text-gray-900">Annual Plan</div>
-                              <div className="text-sm text-gray-600">Save $20 per year</div>
+                              <div className="text-sm text-gray-600">Save 15% with annual billing</div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xl font-bold text-gray-900">$100</div>
+                              <div className="text-xl font-bold text-gray-900">$5,100+</div>
                               <div className="text-sm text-gray-600">/year</div>
-                              <div className="text-xs text-green-600 font-medium">Save $20</div>
+                              <div className="text-xs text-green-600 font-medium">Save $900</div>
                             </div>
                           </div>
                           {formData.billingCycle === 'annual' && (
@@ -436,26 +436,26 @@ export default function SignupPage() {
                         </label>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
-                        <span>Unlimited items</span>
+                        <span>Unlimited items & locations</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
-                        <span>Multi-location</span>
+                        <span>Barcode scanning</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
-                        <span>Team access</span>
+                        <span>Team management</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
-                        <span>Mobile app</span>
+                        <span>iOS & Web access</span>
                       </div>
                     </div>
                     <p className="text-sm text-orange-700 font-medium">
-                      🎉 30-day free trial • No credit card required
+                      💰 Pricing varies based on business size and needs
                     </p>
                   </div>
 
@@ -472,7 +472,7 @@ export default function SignupPage() {
                       </>
                     ) : (
                       <>
-                        Start Free Trial
+                        Get Started
                         <ArrowRight className="ml-2 w-5 h-5" />
                       </>
                     )}

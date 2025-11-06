@@ -85,6 +85,8 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
     try {
       setLoading(true)
 
+      console.log('🔍 Fetching team members for organizationId:', organizationId)
+
       const { data, error } = await supabase
         .from('user_profiles')
         .select('id, email, full_name, pin_code, role, created_at')
@@ -95,6 +97,8 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
         console.error('Error fetching team members:', error)
         return
       }
+
+      console.log('✅ Fetched team members:', data)
 
       setTeamMembers(data || [])
       setLoading(false)
@@ -296,49 +300,42 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
     try {
       setQuickAdding(true)
 
-      // Generate unique identifiers
-      const randomId = crypto.randomUUID().slice(0, 8)
-      const placeholderEmail = `mobile-${quickAddName.toLowerCase().replace(/\s+/g, '-')}-${randomId}@staff.local`
-
-      // Generate a random password (user will never use this, only PIN)
-      const randomPassword = crypto.randomUUID() + crypto.randomUUID()
-
-      // Step 1: Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: placeholderEmail,
-        password: randomPassword,
-        options: {
-          data: {
-            full_name: quickAddName,
-            is_mobile_only: true
-          }
-        }
-      })
-
-      if (authError || !authData.user) {
-        console.error('Error creating auth user:', authError)
-        alert('Error creating team member account')
+      // Get current user ID
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        alert('You must be logged in to add team members')
         setQuickAdding(false)
         return
       }
 
-      // Step 2: Create or update user profile with PIN
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          id: authData.user.id,
-          organization_id: organizationId,
-          email: placeholderEmail,
-          full_name: quickAddName,
-          pin_code: quickAddPIN,
-          role: 'staff',
-          app_access: ['inventory'], // Mobile app access only
-          status: 'active'
-        })
+      console.log('🔍 Adding staff member:', {
+        name: quickAddName,
+        pin: quickAddPIN,
+        organizationId: organizationId,
+        createdBy: user.id
+      })
 
-      if (profileError) {
-        console.error('Error creating user profile:', profileError)
-        alert('Error setting up team member profile')
+      // Call the API endpoint that uses Service Role (won't log us out)
+      const response = await fetch('/api/team/add-staff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: quickAddName,
+          pin: quickAddPIN,
+          organizationId: organizationId,
+          createdBy: user.id
+        })
+      })
+
+      const result = await response.json()
+
+      console.log('✅ API Response:', result)
+
+      if (!response.ok) {
+        console.error('Error from API:', result)
+        alert(`Error: ${result.error || 'Failed to add team member'}`)
         setQuickAdding(false)
         return
       }

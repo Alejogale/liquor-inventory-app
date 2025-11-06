@@ -1542,10 +1542,25 @@ const ShoppingCartScreen = memo(({ user, onBack }: { user: any; onBack: () => vo
   };
 
   const filteredItems = searchQuery
-    ? items.filter(item =>
-        item.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category_name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? items.filter(item => {
+        const query = searchQuery.trim().toLowerCase();
+        const itemBarcode = item.barcode?.trim().toLowerCase();
+
+        // Flexible barcode matching (like Count screen)
+        const barcodeMatch = itemBarcode && (
+          itemBarcode === query ||
+          itemBarcode.includes(query) ||
+          query.includes(itemBarcode) ||
+          itemBarcode === query.replace(/^0+/, '') ||
+          itemBarcode.replace(/^0+/, '') === query
+        );
+
+        return (
+          item.brand?.toLowerCase().includes(query) ||
+          item.category_name?.toLowerCase().includes(query) ||
+          barcodeMatch
+        );
+      })
     : items;
 
   if (isLoading) {
@@ -4502,9 +4517,12 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoSaveTimeout, setAutoSaveTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
   const itemRefs = useRef<Record<string, any>>({});
   const searchInputRef = useRef<TextInput>(null);
+  const countInputRefs = useRef<Record<string, TextInput | null>>({});
 
   // Fetch rooms
   const fetchRooms = async () => {
@@ -4658,11 +4676,10 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
       setOriginalCounts({ ...counts });
       setChangedItems(new Set());
 
-      // Show instant success message (non-blocking)
-      Alert.alert('✓ Saved', `${recordsToUpsert.length} count${recordsToUpsert.length > 1 ? 's' : ''} saved`,
-        [{ text: 'OK' }],
-        { cancelable: true }
-      );
+      // Show auto-dismiss toast notification (brand colors!)
+      setShowToast(true);
+      setToastMessage(`✓ ${recordsToUpsert.length} count${recordsToUpsert.length > 1 ? 's' : ''} saved`);
+      setTimeout(() => setShowToast(false), 2000); // Auto-dismiss after 2 seconds
     } catch (error) {
       console.error('Error saving counts:', error);
       Alert.alert('Error', 'Failed to save counts');
@@ -4713,18 +4730,41 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
     }
   };
 
-  // Filter items based on search (includes barcode) - OPTIMIZED for instant filtering
+  // Filter items based on search (includes barcode) - FLEXIBLE MATCHING
   const filteredItems = useMemo(() => {
     if (!searchQuery.trim()) return items;
 
     const query = searchQuery.trim().toLowerCase();
     const queryUpper = searchQuery.trim();
 
-    // Check for EXACT barcode match - show ONLY that item (isolated)
-    const exactBarcodeMatch = items.find(item => item.barcode && item.barcode === queryUpper);
-    if (exactBarcodeMatch) {
+    // Check for barcode match with FLEXIBLE matching (like website)
+    const barcodeMatch = items.find(item => {
+      if (!item.barcode) return false;
+      const itemBarcode = item.barcode.trim().toLowerCase();
+      const scannedBarcode = query;
+
+      // Try multiple matching strategies
+      return (
+        itemBarcode === scannedBarcode || // Exact match
+        itemBarcode.includes(scannedBarcode) || // Substring match
+        scannedBarcode.includes(itemBarcode) || // Reverse substring
+        itemBarcode === scannedBarcode.replace(/^0+/, '') || // Remove leading zeros
+        itemBarcode.replace(/^0+/, '') === scannedBarcode // Remove leading zeros from DB
+      );
+    });
+
+    if (barcodeMatch) {
+      console.log('✅ Barcode match found:', barcodeMatch.brand);
+      // Auto-focus on count input after a short delay
+      setTimeout(() => {
+        const inputRef = countInputRefs.current[barcodeMatch.id];
+        if (inputRef) {
+          inputRef.focus();
+          console.log('🎯 Auto-focused on count input for:', barcodeMatch.brand);
+        }
+      }, 300);
       // Return ONLY the matched item (isolated view)
-      return [exactBarcodeMatch];
+      return [barcodeMatch];
     }
 
     // Otherwise, filter by text (brand, size, category, or partial barcode) - FAST!
@@ -4732,7 +4772,7 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
       item.brand?.toLowerCase().includes(query) ||
       item.size?.toLowerCase().includes(query) ||
       item.categories?.name?.toLowerCase().includes(query) ||
-      item.barcode?.includes(queryUpper)
+      item.barcode?.toLowerCase().includes(query)
     );
   }, [searchQuery, items]);
 
@@ -4814,32 +4854,64 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
         <View style={styles.headerSpacer} />
       </View>
 
-      {/* Unified Search Bar (text + barcode) */}
-      <TouchableOpacity
-        style={styles.searchContainer}
-        onPress={() => searchInputRef.current?.focus()}
-        activeOpacity={1}
-      >
-        <Search color="#9ca3af" size={18} strokeWidth={2} />
-        <Scan color="#f59e0b" size={16} strokeWidth={2} style={{ marginLeft: 4 }} />
-        <TextInput
-          ref={searchInputRef}
-          style={styles.searchInput}
-          placeholder="Search or scan barcode..."
-          placeholderTextColor="#9ca3af"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-          enablesReturnKeyAutomatically
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <XIcon color="#9ca3af" size={18} strokeWidth={2} />
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
+      {/* Modern Search Bar (text + barcode) */}
+      <View style={{
+        marginHorizontal: 16,
+        marginVertical: 12,
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: '#f97316',
+        shadowColor: '#f97316',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
+      }}>
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            gap: 12,
+          }}
+          onPress={() => {
+            searchInputRef.current?.focus();
+            // Auto-blur after a moment for hands-free scanning
+            setTimeout(() => {
+              searchInputRef.current?.blur();
+            }, 100);
+          }}
+          activeOpacity={0.8}
+        >
+          <Search color="#f97316" size={22} strokeWidth={2.5} />
+          <Scan color="#f59e0b" size={20} strokeWidth={2.5} />
+          <TextInput
+            ref={searchInputRef}
+            style={{
+              flex: 1,
+              fontSize: 17,
+              color: '#1f2937',
+              fontWeight: '500',
+              paddingVertical: 0,
+            }}
+            placeholder="Scan or search items..."
+            placeholderTextColor="#9ca3af"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+            enablesReturnKeyAutomatically
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              <XIcon color="#ef4444" size={20} strokeWidth={2.5} />
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
+      </View>
 
       {/* Items Count */}
       <View style={styles.countHeaderRow}>
@@ -4937,9 +5009,32 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
 
                 {/* Modern Quick Count Buttons */}
                 <View style={styles.modernCountContainer}>
-                  {/* Count Display */}
+                  {/* Count Display - Now Editable */}
                   <View style={styles.modernCountDisplay}>
-                    <Text style={styles.modernCountValue}>{currentCount.toFixed(2)}</Text>
+                    <TextInput
+                      ref={(ref) => { if (ref) countInputRefs.current[item.id] = ref; }}
+                      style={styles.modernCountValue}
+                      value={currentCount === 0 ? '' : currentCount.toString()}
+                      placeholder="0"
+                      placeholderTextColor="#9ca3af"
+                      onChangeText={(text) => {
+                        const num = parseFloat(text) || 0;
+                        updateCount(item.id, num);
+                      }}
+                      keyboardType="numeric"
+                      selectTextOnFocus={true}
+                      onSubmitEditing={() => {
+                        // Save on Enter key and return to search
+                        if (changedItems.size > 0) {
+                          performSave();
+                        }
+                        // Blur count input
+                        countInputRefs.current[item.id]?.blur();
+                        // Clear search and return to ready state
+                        setSearchQuery('');
+                      }}
+                      returnKeyType="done"
+                    />
                     {hasChanged && (
                       <Text style={styles.modernCountOriginal}>
                         was {(originalCounts[item.id] || 0).toFixed(2)}
@@ -5026,6 +5121,37 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
           index,
         })}
       />
+
+      {/* Toast Notification - Brand Identity! */}
+      {showToast && (
+        <View style={{
+          position: 'absolute',
+          bottom: 100,
+          left: 20,
+          right: 20,
+          backgroundColor: '#f97316',
+          borderRadius: 12,
+          padding: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}>
+          <CheckCircle color="#fff" size={24} strokeWidth={2.5} />
+          <Text style={{
+            color: '#fff',
+            fontSize: 16,
+            fontWeight: '600',
+            marginLeft: 12,
+            flex: 1,
+          }}>
+            {toastMessage}
+          </Text>
+        </View>
+      )}
     </View>
   );
 });
@@ -5790,18 +5916,29 @@ const InventoryList = memo(({ user, onBack }: { user: any; onBack: () => void })
       });
     }
 
-    // Apply search filter (includes barcode)
+    // Apply search filter with FLEXIBLE barcode matching
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase().trim();
-      const queryUpper = searchQuery.trim();
 
-      // Otherwise, filter by text (brand, size, category, or partial barcode)
-      filtered = filtered.filter(item =>
-        item.brand?.toLowerCase().includes(query) ||
-        item.size?.toLowerCase().includes(query) ||
-        item.categories?.name?.toLowerCase().includes(query) ||
-        item.barcode?.includes(queryUpper)
-      );
+      filtered = filtered.filter(item => {
+        const itemBarcode = item.barcode?.trim().toLowerCase();
+
+        // Flexible barcode matching (like Count screen)
+        const barcodeMatch = itemBarcode && (
+          itemBarcode === query ||
+          itemBarcode.includes(query) ||
+          query.includes(itemBarcode) ||
+          itemBarcode === query.replace(/^0+/, '') ||
+          itemBarcode.replace(/^0+/, '') === query
+        );
+
+        return (
+          item.brand?.toLowerCase().includes(query) ||
+          item.size?.toLowerCase().includes(query) ||
+          item.categories?.name?.toLowerCase().includes(query) ||
+          barcodeMatch
+        );
+      });
     }
 
     // Apply sorting

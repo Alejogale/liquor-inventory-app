@@ -23,7 +23,8 @@ import {
   Globe,
   MessageCircle,
   ChevronDown,
-  Play
+  Play,
+  Wifi
 } from 'lucide-react'
 import { ExitIntentPopup } from '@/components/ExitIntentPopup'
 
@@ -276,6 +277,108 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mobile App Section */}
+      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-visible">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            {/* Mobile App Image */}
+            <div className="flex justify-center lg:justify-end order-2 lg:order-1">
+              <div className="relative -my-20 lg:-my-32">
+                <Image
+                  src="/iphone-main-mockup-landing-page.png"
+                  alt="InvyEasy Mobile App Interface"
+                  width={800}
+                  height={1600}
+                  className="w-96 sm:w-[450px] md:w-[550px] lg:w-[700px] xl:w-[800px] h-auto drop-shadow-2xl"
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Mobile App Content */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-orange-100 shadow-xl order-1 lg:order-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start mb-3 sm:mb-4">
+                <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mb-2 sm:mb-0 sm:mr-2" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">InvyEasy Mobile App</h2>
+              </div>
+
+              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-4 px-2 sm:px-0">
+                Take your inventory management anywhere with our powerful mobile app. Built for speed and ease of use.
+              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
+                    <Zap className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Hands-Free Barcode Workflow</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Scan, type count, press Enter - zero clicking required</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Real-Time Inventory Tracking</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">View and count inventory across all locations instantly</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                    <Users className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Team Management with PINs</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Role-based access control for owners, managers, and staff</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mt-0.5">
+                    <BarChart3 className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Stock Analytics & Reports</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Track movements, trends, and generate detailed reports</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
+                    <Package className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Multi-Room & Supplier Management</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Organize by rooms and manage supplier orders seamlessly</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
+                    <Zap className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Offline Mode</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Count inventory without internet, syncs automatically</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <p className="text-base sm:text-lg font-bold text-orange-600 text-center">
+                  Available for iOS & Android
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -458,35 +561,40 @@ export default function LandingPage() {
                   📱 Mobile Scanning
                 </div>
                 <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                  Barcode Scanner
+                  Hands-Free Barcode Scanning
                 </h3>
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  We recommend using a dedicated barcode scanner for the best experience, but items can also be added manually. 
-                  Scan barcodes to instantly add items to your inventory with all product details auto-filled.
+                  Our revolutionary hands-free workflow means you never touch your computer during inventory counts.
+                  Scan a barcode, type the count with your scanner's keyboard, hit Enter - and you're ready for the next item.
+                  No clicking, no mouse, just pure efficiency.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Dedicated barcode scanner recommended</span>
+                    <span className="text-gray-700">100% hands-free counting workflow</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Manual entry also available</span>
+                    <span className="text-gray-700">Auto-focus on count input after scan</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Auto-fills product details</span>
+                    <span className="text-gray-700">Press Enter to save and continue</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Lightning-fast scanning</span>
+                    <span className="text-gray-700">Works with any Bluetooth scanner</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="text-gray-700">Cut counting time by 70%</span>
                   </li>
                 </ul>
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
                   <p className="text-sm text-gray-600 italic">
-                    "I can scan my groceries as I put them away. No more forgetting what I have in the pantry!"
+                    "The hands-free workflow is a game-changer. We finish our weekly inventory in half the time. Just scan, count, enter - done!"
                   </p>
-                  <p className="text-sm font-medium text-gray-900 mt-2">- Sarah, Home Organizer</p>
+                  <p className="text-sm font-medium text-gray-900 mt-2">- Michael R., Bar Manager</p>
                 </div>
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100">

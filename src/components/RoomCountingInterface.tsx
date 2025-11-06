@@ -87,6 +87,7 @@ export default function RoomCountingInterface({
   
   // Refs for input focus management and auto-save
   const inputRefs = useRef<{ [itemId: string]: HTMLInputElement }>({})
+  const searchInputRef = useRef<HTMLInputElement>(null) // Ref for search input
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const saveQueueRef = useRef<{ [itemId: string]: number }>({}) // Offline queue
 
@@ -166,7 +167,7 @@ export default function RoomCountingInterface({
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current)
       }
-      
+
       setSaveStatus(prev => ({
         ...prev,
         pendingChanges: 0,
@@ -180,6 +181,36 @@ export default function RoomCountingInterface({
       }
     }
   }, [changedItems.size, selectedRoom])
+
+  // Auto-focus effect - focuses input after React finishes rendering
+  useEffect(() => {
+    if (focusedInput) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      const rafId = requestAnimationFrame(() => {
+        const input = inputRefs.current[focusedInput]
+        if (input) {
+          // Force focus multiple times to ensure it works
+          input.focus()
+          input.select()
+          console.log('🎯 Auto-focused on input for item:', focusedInput)
+
+          // Try again after a tiny delay to be absolutely sure
+          setTimeout(() => {
+            if (document.activeElement !== input) {
+              console.log('⚠️ Focus lost, refocusing...')
+              input.focus()
+              input.select()
+            }
+          }, 50)
+        } else {
+          console.warn('⚠️ Could not find input ref for:', focusedInput)
+          console.log('Available refs:', Object.keys(inputRefs.current))
+        }
+      })
+
+      return () => cancelAnimationFrame(rafId)
+    }
+  }, [focusedInput])
 
   // REAL ACTIVITY LOGGING FUNCTION
   const logActivity = async (
@@ -199,42 +230,75 @@ export default function RoomCountingInterface({
   const handleBarcodeDetected = useCallback((barcode: string) => {
     console.log('🔍 Barcode scanned in counting interface:', barcode)
     setLastScannedBarcode(barcode)
-    
-    // Find item by barcode
-    const foundItem = inventoryItems.find(item => 
-      item.barcode === barcode || 
-      item.barcode === barcode.trim() ||
-      // Try with leading zeros removed (common barcode variation)
-      item.barcode === barcode.replace(/^0+/, '')
-    )
-    
+
+    // CLEAR search term FIRST so next scan starts fresh
+    setSearchTerm('')
+
+    // Find item by barcode - use flexible matching
+    const scannedBarcode = barcode.trim().toLowerCase()
+    const foundItem = inventoryItems.find(item => {
+      if (!item.barcode) return false
+
+      const itemBarcode = item.barcode.trim().toLowerCase()
+
+      // Try multiple matching strategies
+      return (
+        itemBarcode === scannedBarcode || // Exact match
+        itemBarcode.includes(scannedBarcode) || // Substring match
+        scannedBarcode.includes(itemBarcode) || // Reverse substring
+        itemBarcode === scannedBarcode.replace(/^0+/, '') || // Remove leading zeros
+        itemBarcode.replace(/^0+/, '') === scannedBarcode // Remove leading zeros from DB
+      )
+    })
+
     if (foundItem) {
       console.log('✅ Item found for barcode:', foundItem.brand)
       setScannerStatus('detected')
       setHighlightedItem(foundItem.id)
+
+      // Force blur on ALL inputs FIRST
+      searchInputRef.current?.blur()
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+
+      // Set focused state (triggers useEffect)
       setFocusedInput(foundItem.id)
-      
-      // CLEAR search term immediately so next scan works
-      setSearchTerm('')
-      
+
+      // ALSO focus directly after a delay to ensure it happens
+      // This is a backup in case useEffect timing is off
+      setTimeout(() => {
+        const input = inputRefs.current[foundItem.id]
+        if (input) {
+          console.log('🎯 Direct focus attempt on:', foundItem.brand)
+          input.focus()
+          input.select()
+
+          // Verify focus worked
+          setTimeout(() => {
+            if (document.activeElement === input) {
+              console.log('✅ Focus successful!')
+            } else {
+              console.warn('❌ Focus failed! Active element is:', document.activeElement)
+              // Try one more time
+              input.focus()
+              input.select()
+            }
+          }, 50)
+        } else {
+          console.error('❌ Input ref not found for:', foundItem.id)
+          console.log('Available refs:', Object.keys(inputRefs.current))
+        }
+      }, 100)
+
       // Auto-scroll to item
       setTimeout(() => {
         const element = document.getElementById(`item-${foundItem.id}`)
         if (element) {
           element.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
-      }, 100)
-      
-      // Auto-focus on the number input for this item
-      setTimeout(() => {
-        const input = inputRefs.current[foundItem.id]
-        if (input) {
-          input.focus()
-          input.select() // Select all text so user can type over it
-          console.log('🎯 Auto-focused on input for:', foundItem.brand)
-        }
-      }, 200)
-      
+      }, 150)
+
       // Clear highlight and status after 3 seconds (but keep focus)
       setTimeout(() => {
         setHighlightedItem(null)
@@ -244,10 +308,11 @@ export default function RoomCountingInterface({
     } else {
       console.log('❌ No item found for barcode:', barcode)
       setScannerStatus('not_found')
-      
-      // Set search term to the barcode for manual search
-      setSearchTerm(barcode)
-      
+
+      // Keep search clear and blurred for next scan
+      setSearchTerm('')
+      searchInputRef.current?.blur()
+
       // Clear status after 3 seconds
       setTimeout(() => {
         setScannerStatus('ready')
@@ -867,10 +932,18 @@ export default function RoomCountingInterface({
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Manual search (auto-clears after scan)..."
+                placeholder="Search by name, category, or barcode (or use scanner)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={(e) => {
+                  // Auto-blur after a moment to allow hands-free scanning
+                  setTimeout(() => {
+                    e.target.blur()
+                    console.log('🔍 Search auto-blurred for hands-free scanning')
+                  }, 100)
+                }}
                 className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -1021,10 +1094,23 @@ export default function RoomCountingInterface({
                               type="number"
                               min="0"
                               step="0.25"
-                              value={counts[item.id] || 0}
+                              value={counts[item.id] === 0 ? '' : counts[item.id] || ''}
                               onChange={(e) => updateCount(item.id, parseFloat(e.target.value) || 0, 'manual')}
                               onFocus={() => setFocusedInput(item.id)}
                               onBlur={() => setFocusedInput(null)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault()
+                                  // Trigger save if there are changes
+                                  if (changedItems.size > 0) {
+                                    manualSave()
+                                  }
+                                  // Blur count input and keep search blurred for next scanner input
+                                  setFocusedInput(null)
+                                  e.currentTarget.blur()
+                                  // Don't focus search - let it stay blurred so barcode detector can capture next scan
+                                }
+                              }}
                               className={`w-full text-center border rounded-lg py-2 text-slate-800 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 focusedInput === item.id
                                   ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-500'
