@@ -79,6 +79,7 @@ export default function RoomCountingInterface({
     pendingChanges: 0
   })
   const [searchTerm, setSearchTerm] = useState('')
+  const [manualSearchTerm, setManualSearchTerm] = useState('') // New manual search bar
   const [highlightedItem, setHighlightedItem] = useState<string | null>(null)
   const [lastScannedBarcode, setLastScannedBarcode] = useState<string>('')
   const [scannerStatus, setScannerStatus] = useState<'ready' | 'detected' | 'not_found'>('ready')
@@ -90,6 +91,80 @@ export default function RoomCountingInterface({
   const searchInputRef = useRef<HTMLInputElement>(null) // Ref for search input
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const saveQueueRef = useRef<{ [itemId: string]: number }>({}) // Offline queue
+
+  // localStorage helper functions for persistence
+  const getLocalStorageKey = (orgId: string, roomId: string, suffix: string) =>
+    `room_counts_${orgId}_${roomId}_${suffix}`
+
+  const saveToLocalStorage = (orgId: string, roomId: string, counts: RoomCount, changedItems: Set<string>) => {
+    try {
+      localStorage.setItem(getLocalStorageKey(orgId, roomId, 'counts'), JSON.stringify(counts))
+      localStorage.setItem(getLocalStorageKey(orgId, roomId, 'changed'), JSON.stringify(Array.from(changedItems)))
+      localStorage.setItem(getLocalStorageKey(orgId, roomId, 'timestamp'), new Date().toISOString())
+      console.log('💾 Saved unsaved changes to localStorage')
+    } catch (error) {
+      console.warn('Failed to save to localStorage:', error)
+    }
+  }
+
+  const loadFromLocalStorage = (orgId: string, roomId: string): { counts: RoomCount; changedItems: Set<string> } | null => {
+    try {
+      const countsStr = localStorage.getItem(getLocalStorageKey(orgId, roomId, 'counts'))
+      const changedStr = localStorage.getItem(getLocalStorageKey(orgId, roomId, 'changed'))
+      const timestamp = localStorage.getItem(getLocalStorageKey(orgId, roomId, 'timestamp'))
+
+      if (countsStr && changedStr) {
+        // Check if data is less than 24 hours old
+        if (timestamp) {
+          const age = Date.now() - new Date(timestamp).getTime()
+          if (age > 24 * 60 * 60 * 1000) {
+            console.log('🗑️ Clearing stale localStorage data (>24 hours old)')
+            clearLocalStorage(orgId, roomId)
+            return null
+          }
+        }
+
+        const counts = JSON.parse(countsStr)
+        const changedItems = new Set(JSON.parse(changedStr))
+        console.log('📂 Restored', changedItems.size, 'unsaved changes from localStorage')
+        return { counts, changedItems }
+      }
+    } catch (error) {
+      console.warn('Failed to load from localStorage:', error)
+    }
+    return null
+  }
+
+  const clearLocalStorage = (orgId: string, roomId: string) => {
+    try {
+      localStorage.removeItem(getLocalStorageKey(orgId, roomId, 'counts'))
+      localStorage.removeItem(getLocalStorageKey(orgId, roomId, 'changed'))
+      localStorage.removeItem(getLocalStorageKey(orgId, roomId, 'timestamp'))
+      console.log('🗑️ Cleared localStorage for this room')
+    } catch (error) {
+      console.warn('Failed to clear localStorage:', error)
+    }
+  }
+
+  const saveSaveQueueToLocalStorage = (orgId: string) => {
+    try {
+      localStorage.setItem(`room_counts_queue_${orgId}`, JSON.stringify(saveQueueRef.current))
+    } catch (error) {
+      console.warn('Failed to save queue to localStorage:', error)
+    }
+  }
+
+  const loadSaveQueueFromLocalStorage = (orgId: string) => {
+    try {
+      const queueStr = localStorage.getItem(`room_counts_queue_${orgId}`)
+      if (queueStr) {
+        saveQueueRef.current = JSON.parse(queueStr)
+        console.log('📂 Restored', Object.keys(saveQueueRef.current).length, 'items from offline queue')
+      }
+    } catch (error) {
+      console.warn('Failed to load queue from localStorage:', error)
+    }
+  }
 
   // Add helper function to get current organization
   const getCurrentOrganization = async () => {
@@ -117,6 +192,17 @@ export default function RoomCountingInterface({
     if (organizationId) {
       fetchRoomsAndInventory()
     }
+  }, [organizationId])
+
+  // Load offline queue from localStorage on mount
+  useEffect(() => {
+    const loadQueue = async () => {
+      const currentOrg = await getCurrentOrganization()
+      if (currentOrg) {
+        loadSaveQueueFromLocalStorage(currentOrg)
+      }
+    }
+    loadQueue()
   }, [organizationId])
 
   useEffect(() => {
@@ -182,6 +268,37 @@ export default function RoomCountingInterface({
     }
   }, [changedItems.size, selectedRoom])
 
+  // Save unsaved changes to localStorage for recovery after refresh
+  useEffect(() => {
+    const saveToLocal = async () => {
+      if (changedItems.size > 0 && selectedRoom && organizationId) {
+        const currentOrg = await getCurrentOrganization()
+        if (currentOrg) {
+          saveToLocalStorage(currentOrg, selectedRoom, counts, changedItems)
+        }
+      }
+    }
+    saveToLocal()
+  }, [counts, changedItems, selectedRoom, organizationId])
+
+  // Warn user about unsaved changes before leaving page
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (changedItems.size > 0) {
+        // Standard way to show browser confirmation dialog
+        e.preventDefault()
+        e.returnValue = '' // Chrome requires returnValue to be set
+        return '' // Some browsers show this message
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [changedItems.size])
+
   // Auto-focus effect - focuses input after React finishes rendering
   useEffect(() => {
     if (focusedInput) {
@@ -231,8 +348,9 @@ export default function RoomCountingInterface({
     console.log('🔍 Barcode scanned in counting interface:', barcode)
     setLastScannedBarcode(barcode)
 
-    // CLEAR search term FIRST so next scan starts fresh
+    // CLEAR search terms FIRST so next scan starts fresh
     setSearchTerm('')
+    setManualSearchTerm('')
 
     // Find item by barcode - use flexible matching
     const scannedBarcode = barcode.trim().toLowerCase()
@@ -311,6 +429,7 @@ export default function RoomCountingInterface({
 
       // Keep search clear and blurred for next scan
       setSearchTerm('')
+      setManualSearchTerm('')
       searchInputRef.current?.blur()
 
       // Clear status after 3 seconds
@@ -473,12 +592,25 @@ export default function RoomCountingInterface({
         setOriginalCounts({ ...roomCounts }) // Deep copy for comparison
         setChangedItems(new Set()) // Reset changed items
         setChangeHistory(history) // Set change history from database
-        
-        setSaveStatus({
-          status: 'saved',
-          lastSaved: data?.length > 0 ? new Date() : null,
-          pendingChanges: 0
-        })
+
+        // Check for unsaved changes in localStorage
+        const localData = loadFromLocalStorage(currentOrg, roomId)
+        if (localData && Object.keys(localData.changedItems).length > 0) {
+          console.log('⚠️ Found unsaved changes in localStorage - restoring them')
+          setCounts(localData.counts)
+          setChangedItems(localData.changedItems)
+          setSaveStatus({
+            status: 'unsaved',
+            lastSaved: data?.length > 0 ? new Date() : null,
+            pendingChanges: localData.changedItems.size
+          })
+        } else {
+          setSaveStatus({
+            status: 'saved',
+            lastSaved: data?.length > 0 ? new Date() : null,
+            pendingChanges: 0
+          })
+        }
 
         console.log('📊 Loaded', Object.keys(roomCounts).length, 'existing counts with history')
       }
@@ -571,6 +703,11 @@ export default function RoomCountingInterface({
         changedItems.forEach(itemId => {
           saveQueueRef.current[itemId] = counts[itemId] || 0
         })
+        // Persist offline queue to localStorage
+        const currentOrg = await getCurrentOrganization()
+        if (currentOrg) {
+          saveSaveQueueToLocalStorage(currentOrg)
+        }
         setSaveStatus(prev => ({ ...prev, status: 'offline' }))
         console.log('📱 Offline: Queued', changedItems.size, 'items for later sync')
         return
@@ -600,9 +737,9 @@ export default function RoomCountingInterface({
           .in('inventory_item_id', itemIds)
       }
 
-      // Insert only items with count > 0
-      const itemsToInsert = changedCounts.filter(item => item.count > 0)
-      
+      // Insert all changed counts (including zeros to properly update current_stock)
+      const itemsToInsert = changedCounts
+
       if (itemsToInsert.length > 0) {
         const { error } = await supabase
           .from('room_counts')
@@ -630,6 +767,9 @@ export default function RoomCountingInterface({
 
       console.log('✅ Save completed:', itemsToInsert.length, 'items updated')
 
+      // Clear localStorage after successful save
+      clearLocalStorage(currentOrg, selectedRoom)
+
     } catch (error) {
       console.error('💥 Error saving counts:', error)
       setSaveStatus(prev => ({ ...prev, status: 'error' }))
@@ -645,11 +785,22 @@ export default function RoomCountingInterface({
     if (queuedItems.length === 0) return
 
     console.log('🔄 Processing', queuedItems.length, 'queued saves from offline mode')
-    
+
     // Add queued items to changed items and trigger save
     setChangedItems(prev => new Set([...prev, ...queuedItems]))
     saveQueueRef.current = {} // Clear queue
-    
+
+    // Clear queue from localStorage
+    const currentOrg = await getCurrentOrganization()
+    if (currentOrg) {
+      try {
+        localStorage.removeItem(`room_counts_queue_${currentOrg}`)
+        console.log('🗑️ Cleared offline queue from localStorage')
+      } catch (error) {
+        console.warn('Failed to clear queue from localStorage:', error)
+      }
+    }
+
     // Will trigger auto-save via useEffect
   }
 
@@ -692,6 +843,7 @@ export default function RoomCountingInterface({
   // Clear search manually
   const clearSearch = () => {
     setSearchTerm('')
+    setManualSearchTerm('')
     setFocusedInput(null)
   }
 
@@ -712,12 +864,15 @@ export default function RoomCountingInterface({
   const totalItemsCounted = Object.values(counts).filter(count => count > 0).length
   const totalBottlesCounted = Object.values(counts).reduce((sum, count) => sum + count, 0)
 
-  // Filter items based on search
-  const filteredItems = inventoryItems.filter(item =>
-    item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.barcode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.categories?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Filter items based on both search bars
+  const filteredItems = inventoryItems.filter(item => {
+    const combinedSearch = manualSearchTerm || searchTerm
+    return (
+      item.brand.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      item.barcode?.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      item.categories?.name?.toLowerCase().includes(combinedSearch.toLowerCase())
+    )
+  })
 
   if (loading) {
     return (
@@ -927,6 +1082,34 @@ export default function RoomCountingInterface({
 
       {selectedRoom && (
         <>
+          {/* Manual Search Bar - Click to Search */}
+          <div className="flex flex-col gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Click here to manually search inventory..."
+                value={manualSearchTerm}
+                onChange={(e) => {
+                  setManualSearchTerm(e.target.value)
+                  // Clear the barcode scanner search when manually searching
+                  if (e.target.value) {
+                    setSearchTerm('')
+                  }
+                }}
+                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {manualSearchTerm && (
+                <button
+                  onClick={() => setManualSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-sm transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Search and Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
