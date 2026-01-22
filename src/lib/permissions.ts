@@ -168,3 +168,171 @@ export async function hasPermission(
   const access = await checkUserAppAccess(userId, organizationId, appId, userEmail)
   return access.hasAppAccess && access.permissions.includes(permission)
 }
+
+// ============================================
+// Dashboard Tab Permissions (Role-based)
+// ============================================
+
+export type TabPermission =
+  | 'view_inventory'
+  | 'import_data'
+  | 'manage_categories'
+  | 'manage_suppliers'
+  | 'manage_rooms'
+  | 'manage_team'
+  | 'view_stock_analytics'
+  | 'count_inventory'
+  | 'view_orders'
+  | 'view_activity'
+  | 'manage_subscription'
+  | 'add_item'
+  | 'edit_item'
+  | 'delete_item'
+
+// Define tab permissions for each role
+const roleTabPermissions: Record<string, TabPermission[]> = {
+  owner: [
+    'view_inventory',
+    'import_data',
+    'manage_categories',
+    'manage_suppliers',
+    'manage_rooms',
+    'manage_team',
+    'view_stock_analytics',
+    'count_inventory',
+    'view_orders',
+    'view_activity',
+    'manage_subscription',
+    'add_item',
+    'edit_item',
+    'delete_item'
+  ],
+  manager: [
+    'view_inventory',
+    'import_data',
+    'manage_categories',
+    'manage_suppliers',
+    'manage_rooms',
+    'manage_team',
+    'view_stock_analytics',
+    'count_inventory',
+    'view_orders',
+    'view_activity',
+    'add_item',
+    'edit_item',
+    'delete_item'
+  ],
+  staff: [
+    // Staff (bartenders/servers) can only view inventory and count
+    'view_inventory',
+    'count_inventory'
+  ],
+  viewer: [
+    'view_inventory'
+  ]
+}
+
+// Map navigation tab IDs to required permissions
+export const tabPermissionMap: Record<string, TabPermission> = {
+  'inventory': 'view_inventory',
+  'import': 'import_data',
+  'categories': 'manage_categories',
+  'suppliers': 'manage_suppliers',
+  'rooms': 'manage_rooms',
+  'team': 'manage_team',
+  'stock-movements': 'view_stock_analytics',
+  'count': 'count_inventory',
+  'orders': 'view_orders',
+  'activity': 'view_activity',
+  'subscription': 'manage_subscription'
+}
+
+/**
+ * Check if a role has a specific tab permission (synchronous)
+ */
+export function hasTabPermission(role: string | undefined, permission: TabPermission): boolean {
+  if (!role) return false
+
+  const normalizedRole = role.toLowerCase()
+  const permissions = roleTabPermissions[normalizedRole]
+
+  if (!permissions) {
+    // Unknown role defaults to viewer
+    return roleTabPermissions.viewer.includes(permission)
+  }
+
+  return permissions.includes(permission)
+}
+
+/**
+ * Check if a role can access a specific dashboard tab
+ */
+export function canAccessTab(role: string | undefined, tabId: string): boolean {
+  const permission = tabPermissionMap[tabId]
+  if (!permission) return false
+  return hasTabPermission(role, permission)
+}
+
+/**
+ * Get all accessible tab IDs for a role
+ */
+export function getAccessibleTabs(role: string | undefined): string[] {
+  return Object.entries(tabPermissionMap)
+    .filter(([_, permission]) => hasTabPermission(role, permission))
+    .map(([tabId]) => tabId)
+}
+
+/**
+ * Get the default tab for a role
+ */
+export function getDefaultTab(role: string | undefined): string {
+  const accessible = getAccessibleTabs(role)
+  // Staff defaults to count tab, others to inventory
+  if (role?.toLowerCase() === 'staff' && accessible.includes('count')) {
+    return 'count'
+  }
+  return accessible[0] || 'inventory'
+}
+
+/**
+ * Get display name for a role
+ */
+export function getRoleDisplayName(role: string | undefined): string {
+  if (!role) return 'Unknown'
+
+  const displayNames: Record<string, string> = {
+    'owner': 'Owner',
+    'manager': 'Manager',
+    'staff': 'Staff',
+    'viewer': 'Viewer',
+    'admin': 'Admin'
+  }
+
+  return displayNames[role.toLowerCase()] || role
+}
+
+/**
+ * Check if a user can modify another user's role
+ */
+export function canModifyRole(currentRole: string | undefined, targetRole: string): boolean {
+  if (!currentRole) return false
+
+  const roleHierarchy: Record<string, number> = {
+    'owner': 4,
+    'admin': 4,
+    'manager': 3,
+    'staff': 2,
+    'viewer': 1
+  }
+
+  const currentLevel = roleHierarchy[currentRole.toLowerCase()] || 0
+  const targetLevel = roleHierarchy[targetRole.toLowerCase()] || 0
+
+  // Owner/admin can do anything
+  if (currentRole.toLowerCase() === 'owner' || currentRole.toLowerCase() === 'admin') {
+    return true
+  }
+
+  // Others can only assign roles lower than their own
+  return currentLevel > targetLevel
+}
