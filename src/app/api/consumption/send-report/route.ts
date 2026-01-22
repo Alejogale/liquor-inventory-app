@@ -2,19 +2,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-// Create Supabase Admin client for data queries
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+// Lazy initialization to avoid build-time errors
+let resend: Resend | null = null
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY)
   }
-)
+  return resend
+}
+
+// Lazy Supabase Admin client initialization
+let supabaseAdmin: ReturnType<typeof createClient> | null = null
+function getSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+  }
+  return supabaseAdmin
+}
 
 interface ConsumptionItem {
   id: string
@@ -49,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get event details
-    const { data: event, error: eventError } = await supabaseAdmin
+    const { data: event, error: eventError } = await getSupabaseAdmin()
       .from('consumption_events')
       .select('*')
       .eq('id', eventId)
@@ -61,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get organization name
-    const { data: org } = await supabaseAdmin
+    const { data: org } = await getSupabaseAdmin()
       .from('organizations')
       .select('Name')
       .eq('id', userProfile.organization_id)
@@ -70,7 +83,7 @@ export async function POST(request: NextRequest) {
     const organizationName = org?.Name || 'Organization'
 
     // Get categories
-    const { data: categories, error: catError } = await supabaseAdmin
+    const { data: categories, error: catError } = await getSupabaseAdmin()
       .from('consumption_categories')
       .select('id, name')
       .eq('organization_id', userProfile.organization_id)
@@ -79,7 +92,7 @@ export async function POST(request: NextRequest) {
     if (catError) throw catError
 
     // Get items
-    const { data: items, error: itemsError } = await supabaseAdmin
+    const { data: items, error: itemsError } = await getSupabaseAdmin()
       .from('consumption_items')
       .select('id, name, price, category_id')
       .eq('organization_id', userProfile.organization_id)
@@ -89,7 +102,7 @@ export async function POST(request: NextRequest) {
     if (itemsError) throw itemsError
 
     // Get counts for this event
-    const { data: counts, error: countsError } = await supabaseAdmin
+    const { data: counts, error: countsError } = await getSupabaseAdmin()
       .from('consumption_counts')
       .select('item_id, quantity')
       .eq('event_id', eventId)
@@ -141,7 +154,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Get active email recipients
-    const { data: recipients, error: recipientsError } = await supabaseAdmin
+    const { data: recipients, error: recipientsError } = await getSupabaseAdmin()
       .from('consumption_email_recipients')
       .select('email, name')
       .eq('organization_id', userProfile.organization_id)
@@ -175,7 +188,7 @@ export async function POST(request: NextRequest) {
 
     // Send emails to all recipients
     const emailPromises = recipients.map(recipient =>
-      resend.emails.send({
+      getResend().emails.send({
         from: 'InvyEasy <noreply@invyeasy.com>',
         to: [recipient.email],
         subject: `Consumption Report - ${event.name} - ${organizationName}`,
@@ -186,7 +199,7 @@ export async function POST(request: NextRequest) {
     await Promise.all(emailPromises)
 
     // Update event totals
-    await supabaseAdmin
+    await getSupabaseAdmin()
       .from('consumption_events')
       .update({
         total_items: grandItemCount,
