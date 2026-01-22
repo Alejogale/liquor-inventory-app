@@ -44,30 +44,60 @@ export default function LandingPage() {
     handleAuthRedirect()
   }, [router])
 
-  // Scroll progress indicator
+  // Scroll progress indicator with throttling
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = (window.scrollY / totalHeight) * 100
-      setScrollProgress(progress)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+          const progress = (window.scrollY / totalHeight) * 100
+          setScrollProgress(progress)
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Custom cursor effect
+  // Custom cursor effect with optimized animation
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (cursorDotRef.current && cursorRingRef.current) {
-        cursorDotRef.current.style.left = `${e.clientX}px`
-        cursorDotRef.current.style.top = `${e.clientY}px`
+    let mouseX = 0, mouseY = 0
+    let ringX = 0, ringY = 0
+    let animationId: number | null = null
 
-        setTimeout(() => {
-          if (cursorRingRef.current) {
-            cursorRingRef.current.style.left = `${e.clientX}px`
-            cursorRingRef.current.style.top = `${e.clientY}px`
-          }
-        }, 50)
+    const animateRing = () => {
+      if (cursorRingRef.current) {
+        ringX += (mouseX - ringX) * 0.15
+        ringY += (mouseY - ringY) * 0.15
+        cursorRingRef.current.style.left = `${ringX}px`
+        cursorRingRef.current.style.top = `${ringY}px`
+
+        // Only continue if ring hasn't caught up
+        const dx = mouseX - ringX
+        const dy = mouseY - ringY
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+          animationId = requestAnimationFrame(animateRing)
+        } else {
+          animationId = null
+        }
+      }
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX
+      mouseY = e.clientY
+
+      if (cursorDotRef.current) {
+        cursorDotRef.current.style.left = `${mouseX}px`
+        cursorDotRef.current.style.top = `${mouseY}px`
+      }
+
+      // Start ring animation if not running
+      if (!animationId) {
+        animationId = requestAnimationFrame(animateRing)
       }
     }
 
@@ -75,10 +105,10 @@ export default function LandingPage() {
     const handleMouseLeave = () => setCursorHovering(false)
 
     // Check if device has fine pointer (mouse)
-    const hasFinePonter = window.matchMedia('(pointer: fine)').matches
-    if (hasFinePonter) {
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches
+    if (hasFinePointer) {
       document.body.classList.add('custom-cursor-enabled')
-      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mousemove', handleMouseMove, { passive: true })
 
       // Add hover effect to clickable elements
       const clickables = document.querySelectorAll('a, button, [role="button"]')
@@ -90,6 +120,7 @@ export default function LandingPage() {
       return () => {
         document.body.classList.remove('custom-cursor-enabled')
         window.removeEventListener('mousemove', handleMouseMove)
+        if (animationId) cancelAnimationFrame(animationId)
         clickables.forEach(el => {
           el.removeEventListener('mouseenter', handleMouseEnter)
           el.removeEventListener('mouseleave', handleMouseLeave)
