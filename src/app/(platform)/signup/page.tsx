@@ -12,8 +12,8 @@ export default function SignupPage() {
     email: '',
     password: '',
     organization: '',
-    useCase: 'personal',
-    plan: 'pro',
+    useCase: 'restaurant',
+    selectedTier: 'professional', // Default to most popular
     billingCycle: 'monthly'
   })
 
@@ -35,7 +35,7 @@ export default function SignupPage() {
           businessType: formData.useCase,
           company: formData.organization,
           primaryApp: 'liquor-inventory',
-          plan: 'pro',
+          plan: formData.selectedTier,
           billingCycle: formData.billingCycle,
           password: formData.password
         }),
@@ -91,6 +91,50 @@ export default function SignupPage() {
       color: 'from-purple-500 to-pink-500'
     }
   ]
+
+  // Pricing tiers matching database structure
+  const tiers = [
+    {
+      id: 'personal',
+      name: 'Personal',
+      monthlyPrice: 19,
+      yearlyPrice: 193,
+      features: ['2 storage areas', '150 items', '1 user', 'Mobile app access']
+    },
+    {
+      id: 'starter',
+      name: 'Starter',
+      monthlyPrice: 89,
+      yearlyPrice: 906,
+      features: ['5 storage areas', '500 items', '5 users', 'Team collaboration']
+    },
+    {
+      id: 'professional',
+      name: 'Professional',
+      monthlyPrice: 229,
+      yearlyPrice: 2334,
+      popular: true,
+      features: ['15 storage areas', '2,000 items', '15 users', 'Advanced analytics']
+    },
+    {
+      id: 'premium',
+      name: 'Premium',
+      monthlyPrice: 499,
+      yearlyPrice: 5087,
+      features: ['50 storage areas', '10,000 items', '50 users', 'Multi-location']
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      monthlyPrice: 1499,
+      yearlyPrice: 15287,
+      features: ['Unlimited areas', 'Unlimited items', 'Unlimited users', 'White-label']
+    }
+  ]
+
+  const selectedTierData = tiers.find(t => t.id === formData.selectedTier) || tiers[2]
+  const price = formData.billingCycle === 'monthly' ? selectedTierData.monthlyPrice : selectedTierData.yearlyPrice
+  const savings = selectedTierData.monthlyPrice * 12 - selectedTierData.yearlyPrice
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
@@ -366,96 +410,112 @@ export default function SignupPage() {
                     </div>
                   </div>
 
-                  {/* Plan Selection */}
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-5 rounded-xl border border-orange-200">
-                    <div className="mb-4">
-                      <h3 className="font-semibold text-gray-900 mb-2">InvyEasy Professional</h3>
-                      <p className="text-sm text-gray-600 mb-4">Complete inventory management platform</p>
-                      
-                      {/* Billing Cycle Selection */}
-                      <div className="space-y-3">
-                        <label className={`relative flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                  {/* Billing Cycle Toggle */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Billing Cycle
+                    </label>
+                    <div className="flex items-center gap-4 mb-4">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, billingCycle: 'monthly' })}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
                           formData.billingCycle === 'monthly'
-                            ? 'border-orange-500 bg-orange-100'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}>
-                          <input
-                            type="radio"
-                            name="billingCycle"
-                            value="monthly"
-                            checked={formData.billingCycle === 'monthly'}
-                            onChange={handleChange}
-                            className="sr-only"
-                          />
-                          <div className="flex items-center justify-between w-full">
-                            <div>
-                              <div className="font-medium text-gray-900">Monthly Plan</div>
-                              <div className="text-sm text-gray-600">Starting at $499/mo (custom pricing)</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xl font-bold text-gray-900">$499+</div>
-                              <div className="text-sm text-gray-600">/month</div>
-                            </div>
-                          </div>
-                          {formData.billingCycle === 'monthly' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-                        </label>
-                        
-                        <label className={`relative flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                            ? 'bg-orange-500 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Monthly
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, billingCycle: 'annual' })}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
                           formData.billingCycle === 'annual'
-                            ? 'border-orange-500 bg-orange-100'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}>
-                          <input
-                            type="radio"
-                            name="billingCycle"
-                            value="annual"
-                            checked={formData.billingCycle === 'annual'}
-                            onChange={handleChange}
-                            className="sr-only"
-                          />
-                          <div className="flex items-center justify-between w-full">
-                            <div>
-                              <div className="font-medium text-gray-900">Annual Plan</div>
-                              <div className="text-sm text-gray-600">Save 15% with annual billing</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xl font-bold text-gray-900">$5,100+</div>
-                              <div className="text-sm text-gray-600">/year</div>
-                              <div className="text-xs text-green-600 font-medium">Save $900</div>
-                            </div>
-                          </div>
-                          {formData.billingCycle === 'annual' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-                        </label>
-                      </div>
+                            ? 'bg-orange-500 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Annual
+                        <span className="ml-2 text-xs">Save 15%</span>
+                      </button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span>Unlimited items & locations</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span>Barcode scanning</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span>Team management</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span>iOS & Web access</span>
-                      </div>
+                  </div>
+
+                  {/* Tier Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Choose Your Plan
+                    </label>
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {tiers.map((tier) => {
+                        const isSelected = formData.selectedTier === tier.id
+                        const tierPrice = formData.billingCycle === 'monthly' ? tier.monthlyPrice : tier.yearlyPrice
+                        const tierSavings = tier.monthlyPrice * 12 - tier.yearlyPrice
+
+                        return (
+                          <label
+                            key={tier.id}
+                            className={`relative block p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-orange-500 bg-orange-50 shadow-md'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="selectedTier"
+                              value={tier.id}
+                              checked={isSelected}
+                              onChange={handleChange}
+                              className="sr-only"
+                            />
+
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="font-semibold text-gray-900">{tier.name}</h3>
+                                  {tier.popular && (
+                                    <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded-full">
+                                      POPULAR
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-baseline gap-1 mb-2">
+                                  <span className="text-2xl font-bold text-gray-900">
+                                    ${tierPrice.toLocaleString()}
+                                  </span>
+                                  <span className="text-gray-600 text-sm">
+                                    /{formData.billingCycle === 'monthly' ? 'mo' : 'yr'}
+                                  </span>
+                                </div>
+                                {formData.billingCycle === 'annual' && tierSavings > 0 && (
+                                  <p className="text-xs text-green-600 font-medium mb-2">
+                                    Save ${tierSavings}/year
+                                  </p>
+                                )}
+                                <ul className="space-y-1">
+                                  {tier.features.map((feature, idx) => (
+                                    <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                      <span>{feature}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {isSelected && (
+                                <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 ml-3">
+                                  <Check className="w-4 h-4 text-white" />
+                                </div>
+                              )}
+                            </div>
+                          </label>
+                        )
+                      })}
                     </div>
-                    <p className="text-sm text-orange-700 font-medium">
-                      💰 Pricing varies based on business size and needs
+                    <p className="text-sm text-gray-600 mt-3">
+                      All plans include a <span className="font-semibold text-orange-600">30-day free trial</span>. No credit card required.
                     </p>
                   </div>
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendWelcomeEmail } from '@/lib/email-service'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -69,18 +70,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create organization first
+    // Look up tier details from subscription_tiers table
+    const { data: tierData, error: tierError } = await supabaseAdmin
+      .from('subscription_tiers')
+      .select('*')
+      .eq('tier_id', plan)
+      .single()
+
+    if (tierError || !tierData) {
+      console.error('Tier lookup error:', tierError)
+      return NextResponse.json(
+        { error: 'Invalid subscription tier selected' },
+        { status: 400, headers: corsHeaders }
+      )
+    }
+
+    // Calculate subscription price based on billing cycle
+    const subscriptionPrice = billingCycle === 'annual'
+      ? tierData.yearly_price
+      : tierData.monthly_price
+
+    // Calculate trial end date (30 days from now)
+    const trialEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+
+    // Create organization with tier limits
     const { data: organization, error: orgError } = await supabaseAdmin
       .from('organizations')
       .insert({
         Name: company,
         slug: company.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        subscription_tier: plan,
+        storage_area_limit: tierData.storage_area_limit,
+        item_limit: tierData.item_limit,
+        user_limit: tierData.user_limit,
+        billing_cycle: billingCycle,
+        subscription_price: subscriptionPrice,
+        payment_status: 'trial',
         subscription_status: 'trial',
-        subscription_plan: plan,
+        features_enabled: tierData.features,
+        trial_ends_at: trialEndsAt,
+        trial_started_at: new Date().toISOString(),
         address: '',
         phone: phone || '',
         industry: businessType,
-        trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days trial
+        subscription_plan: plan, // Keep for backwards compatibility
         created_by: null // Will be updated after user creation
       })
       .select()
@@ -98,7 +131,7 @@ export async function POST(request: NextRequest) {
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password: password, // Use the password provided by user
-      email_confirm: true,
+      email_confirm: false, // Require email verification for security
       user_metadata: {
         first_name: firstName,
         last_name: lastName,
@@ -171,19 +204,37 @@ export async function POST(request: NextRequest) {
         user_agent: request.headers.get('user-agent') || 'unknown'
       })
 
-    // Send welcome email (you can integrate with your email service here)
-    console.log('📧 Welcome email would be sent to:', email)
-    console.log('Account details:', {
-      name: `${firstName} ${lastName}`,
-      company: company,
-      plan: plan,
-      billingCycle: billingCycle,
-      primaryApp: primaryApp
-    })
+    // Send welcome email after email verification
+    // Note: This will be sent via database trigger after user confirms email
+    // But we can also queue it here as a backup
+    try {
+      console.log('📧 Queuing welcome email for:', email)
+      // The welcome email will be sent automatically via database trigger
+      // after user confirms their email address
+      console.log('Account details:', {
+        name: `${firstName} ${lastName}`,
+        company: company,
+        plan: plan,
+        billingCycle: billingCycle,
+        primaryApp: primaryApp
+      })
+    } catch (emailError) {
+      // Don't fail signup if email fails - it will be retried via trigger
+      console.error('Note: Email will be sent after verification:', emailError)
+    }
+
+    // Trigger welcome email processing in background (fire and forget)
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/process-welcome-emails`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'your-secret-key'}`
+      }
+    }).catch(err => console.log('Email queue processing will retry later:', err))
 
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully',
+      message: 'Account created successfully. Please check your email to verify your account.',
       user: {
         id: userData.user.id,
         email: userData.user.email

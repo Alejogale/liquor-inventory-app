@@ -41,15 +41,19 @@ interface InventoryTableProps {
   selectedItems?: Set<string>  // ✅ NEW: Selected items from dashboard
   onItemSelect?: (itemId: string) => void  // ✅ NEW: Selection handler
   organizationId?: string  // 🚨 SECURITY: Add organizationId prop
+  canEdit?: boolean  // Permission to edit items
+  canDelete?: boolean  // Permission to delete items
 }
 
-export default function InventoryTable({ 
+export default function InventoryTable({
   items,
-  organizationId,  // 🚨 SECURITY: Accept organizationId prop 
-  onEdit, 
-  onDelete, 
-  selectedItems = new Set(), 
-  onItemSelect 
+  organizationId,  // 🚨 SECURITY: Accept organizationId prop
+  onEdit,
+  onDelete,
+  selectedItems = new Set(),
+  onItemSelect,
+  canEdit = true,  // Default to true for backwards compatibility
+  canDelete = true  // Default to true for backwards compatibility
 }: InventoryTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
@@ -319,7 +323,9 @@ export default function InventoryTable({
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Price</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Alert/Target</th>
                           <th className="text-left py-3 px-6 text-slate-700 font-medium">Room Counts</th>
-                          <th className="text-right py-3 px-6 text-slate-700 font-medium">Actions</th>
+                          {(canEdit || canDelete) && (
+                            <th className="text-right py-3 px-6 text-slate-700 font-medium">Actions</th>
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -386,25 +392,31 @@ export default function InventoryTable({
                                 </div>
                               )}
                             </td>
-                            <td className="py-3 px-6">
-                              <div className="flex items-center justify-end space-x-2">
-                                <button
-                                  onClick={() => onEdit(item)}
-                                  className="p-2 text-slate-600 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                                  title="Edit item"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(item.id, item.brand)}
-                                  disabled={deletingId === item.id}
-                                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                  title="Delete item"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
+                            {(canEdit || canDelete) && (
+                              <td className="py-3 px-6">
+                                <div className="flex items-center justify-end space-x-2">
+                                  {canEdit && (
+                                    <button
+                                      onClick={() => onEdit(item)}
+                                      className="p-2 text-slate-600 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+                                      title="Edit item"
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </button>
+                                  )}
+                                  {canDelete && (
+                                    <button
+                                      onClick={() => handleDelete(item.id, item.brand)}
+                                      disabled={deletingId === item.id}
+                                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                      title="Delete item"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>

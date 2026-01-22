@@ -24,7 +24,8 @@ import {
   MessageCircle,
   ChevronDown,
   Play,
-  Wifi
+  Wifi,
+  Sparkles
 } from 'lucide-react'
 import { ExitIntentPopup } from '@/components/ExitIntentPopup'
 
@@ -34,7 +35,7 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(false)
   const [modalImage, setModalImage] = useState<string | null>(null)
   const router = useRouter()
-  // Force deployment trigger - updated
+  // Force deployment trigger - subscription update
 
   // Handle email capture from popup
   const handleEmailCapture = async (email: string) => {
@@ -1365,209 +1366,271 @@ export default function LandingPage() {
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
+              <Star className="w-4 h-4" />
               Simple, Transparent Pricing
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Choose the Right Plan for Your Business
             </h2>
             <p className="text-xl text-gray-600">
-              One plan. Everything included. No hidden fees.
-              </p>
-            </div>
+              Start with a 30-day free trial. No credit card required.
+            </p>
+          </div>
 
-          <div className="bg-gradient-to-br from-white via-orange-50/30 to-white rounded-2xl shadow-2xl border-2 border-orange-100 p-6 relative overflow-hidden">
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-100 to-transparent rounded-full blur-3xl opacity-30 -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-100 to-transparent rounded-full blur-3xl opacity-20 -z-10"></div>
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <span className={`text-base font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="relative inline-flex items-center cursor-pointer"
+            >
+              <div className={`w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-orange-500' : 'bg-gray-300'}`}>
+                <div className={`absolute top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 shadow-md ${isAnnual ? 'translate-x-7' : 'translate-x-1'}`} />
+              </div>
+            </button>
+            <span className={`text-base font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Annual
+              <span className="ml-2 text-orange-600 font-bold">Save 15%</span>
+            </span>
+          </div>
 
-            {/* Header */}
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-semibold mb-2 shadow-lg">
-                <Star className="w-3 h-3 fill-white" />
-                Enterprise-Grade Solution
+          {/* Pricing Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+            {/* Personal Tier */}
+            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
+                <Star className="w-6 h-6 text-orange-500" />
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Custom Pricing</span> for Your Business
-              </h3>
-              <p className="text-sm text-gray-600 mb-2">Pricing tailored to your business size and needs. Start your 30-day free trial, then get invoiced monthly.</p>
-              <div className="inline-block bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg px-4 py-2">
-                <div className="text-xs font-semibold text-blue-900 mb-0.5">Starting at</div>
-                <div className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">$499<span className="text-sm text-gray-600">/month</span></div>
-                <div className="text-xs text-blue-700">Final price based on business size</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Personal</h3>
+              <p className="text-sm text-gray-600 mb-6">Perfect for home bars</p>
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isAnnual ? '193' : '19'}
+                  </span>
+                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
+                </div>
+                {isAnnual && (
+                  <p className="text-xs text-orange-600 mt-1">Save $35 per year</p>
+                )}
               </div>
-            </div>
-
-            {/* Main Content - Horizontal Layout */}
-            <div className="grid md:grid-cols-3 gap-3 mb-4">
-              {/* Left - Pricing Benefits */}
-              <div className="bg-white rounded-lg shadow-md border-2 border-orange-200 p-4 flex flex-col h-full">
-                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                  <FileText className="w-4 h-4 text-orange-500" />
-                  What You Get
-                </h4>
-                <div className="space-y-2 text-xs flex-1">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <span className="font-medium">30 days completely free</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span className="font-medium">Monthly invoice billing</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                    <span className="font-medium">Cancel anytime</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                    <span className="font-medium">Unlimited locations</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-red-500 flex-shrink-0" />
-                    <span className="font-medium">Unlimited users</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Check className="w-4 h-4 text-teal-500 flex-shrink-0" />
-                    <span className="font-medium">Priority support</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mt-3">
-                  <div className="text-xs font-semibold text-green-800 mb-0.5">Typical ROI</div>
-                  <div className="text-lg font-bold text-green-700">$2K-$10K/mo</div>
-                  <div className="text-xs text-green-600">in savings</div>
-                </div>
-              </div>
-
-              {/* Middle - How It Works */}
-              <div className="bg-white rounded-lg shadow-md border-2 border-gray-200 p-4 flex flex-col h-full">
-                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                  <ArrowRight className="w-4 h-4 text-orange-500" />
-                  How It Works
-                </h4>
-                <div className="flex flex-col justify-between flex-1 gap-3">
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">1</div>
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Start Free Trial</div>
-                      <div className="text-xs text-gray-600">No credit card required</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">2</div>
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Use for 30 Days</div>
-                      <div className="text-xs text-gray-600">See the value firsthand</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">3</div>
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Get Custom Invoice</div>
-                      <div className="text-xs text-gray-600">Based on your business size</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3 mt-3">
-                  <div className="text-xs font-bold text-orange-900 text-center">Volume Discounts Available</div>
-                  <div className="text-xs text-orange-700 text-center">Contact us for multi-location pricing</div>
-                </div>
-              </div>
-
-              {/* Right - Key Features */}
-              <div className="bg-white rounded-lg shadow-md border-2 border-gray-200 p-4 flex flex-col h-full">
-                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                  <Star className="w-4 h-4 text-orange-500" />
-                  Key Features
-                </h4>
-                <div className="grid grid-cols-1 gap-2 flex-1">
-                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Barcode Scanning</div>
-                      <div className="text-xs text-gray-600">Lightning-fast counts</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Mobile App</div>
-                      <div className="text-xs text-gray-600">Count anywhere</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Smart Reports</div>
-                      <div className="text-xs text-gray-600">Real-time insights</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-xs text-gray-900">Team Collaboration</div>
-                      <div className="text-xs text-gray-600">Unlimited access</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 max-w-4xl mx-auto">
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Unlimited Items</div>
-                  <div className="text-xs text-gray-600">Track unlimited products</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Multi-Location</div>
-                  <div className="text-xs text-gray-600">Manage across locations</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Team Collaboration</div>
-                  <div className="text-xs text-gray-600">Unlimited team members</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Mobile Access</div>
-                  <div className="text-xs text-gray-600">Count on-the-go</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Smart Reports</div>
-                  <div className="text-xs text-gray-600">Real-time analytics</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-sm text-gray-900">Priority Support</div>
-                  <div className="text-xs text-gray-600">Get help when needed</div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className="text-center">
-              <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3.5 rounded-xl font-bold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-xl hover:shadow-2xl inline-flex items-center group transform hover:scale-105">
-                Start Your Free 30-Day Trial
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">2 storage areas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">150 items</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">1 user</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Mobile app access</span>
+                </li>
+              </ul>
+              <Link
+                href="/signup"
+                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
+              >
+                Start Free Trial
               </Link>
-              <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto">
-                No credit card required • Full access • Cancel anytime
-              </p>
             </div>
+
+            {/* Starter Tier */}
+            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
+                <Zap className="w-6 h-6 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Starter</h3>
+              <p className="text-sm text-gray-600 mb-6">Single venue essentials</p>
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isAnnual ? '906' : '89'}
+                  </span>
+                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
+                </div>
+                {isAnnual && (
+                  <p className="text-xs text-orange-600 mt-1">Save $162 per year</p>
+                )}
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">5 storage areas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">500 items</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">5 users</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Team collaboration</span>
+                </li>
+              </ul>
+              <Link
+                href="/signup"
+                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
+              >
+                Start Free Trial
+              </Link>
+            </div>
+
+            {/* Professional Tier - MOST POPULAR */}
+            <div className="bg-white rounded-xl shadow-2xl border-2 border-orange-500 p-6 transform lg:scale-105 relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                MOST POPULAR
+              </div>
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-orange-500">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Professional</h3>
+              <p className="text-sm text-gray-600 mb-6">For large venues</p>
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isAnnual ? '2,334' : '229'}
+                  </span>
+                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
+                </div>
+                {isAnnual && (
+                  <p className="text-xs text-orange-600 mt-1">Save $414 per year</p>
+                )}
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">15 storage areas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">2,000 items</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">15 users</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Advanced analytics</span>
+                </li>
+              </ul>
+              <Link
+                href="/signup"
+                className="w-full text-center bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg inline-block"
+              >
+                Start Free Trial
+              </Link>
+            </div>
+
+            {/* Premium Tier */}
+            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
+                <Building2 className="w-6 h-6 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Premium</h3>
+              <p className="text-sm text-gray-600 mb-6">Multi-location chains</p>
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isAnnual ? '5,087' : '499'}
+                  </span>
+                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
+                </div>
+                {isAnnual && (
+                  <p className="text-xs text-orange-600 mt-1">Save $901 per year</p>
+                )}
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">50 storage areas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">10,000 items</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">50 users</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">API access</span>
+                </li>
+              </ul>
+              <Link
+                href="/signup"
+                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
+              >
+                Start Free Trial
+              </Link>
+            </div>
+
+            {/* Enterprise Tier */}
+            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
+                <Sparkles className="w-6 h-6 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
+              <p className="text-sm text-gray-600 mb-6">Unlimited everything</p>
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isAnnual ? '15,287' : '1,499'}
+                  </span>
+                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
+                </div>
+                {isAnnual && (
+                  <p className="text-xs text-orange-600 mt-1">Save $2,701 per year</p>
+                )}
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Unlimited areas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Unlimited items</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">Unlimited users</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">White-label options</span>
+                </li>
+              </ul>
+              <Link
+                href="/contact"
+                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
+              >
+                Contact Sales
+              </Link>
+            </div>
+          </div>
+
+          {/* View Full Pricing Link */}
+          <div className="text-center">
+            <Link href="/pricing" className="text-orange-600 hover:text-orange-700 font-medium inline-flex items-center gap-2 group">
+              View detailed pricing comparison
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>

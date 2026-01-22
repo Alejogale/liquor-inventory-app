@@ -34,6 +34,13 @@ interface Organization {
   updated_at?: string
 }
 
+interface SubscriptionInfo {
+  isValid: boolean
+  status: 'active' | 'trial' | 'expired' | 'cancelled' | 'unknown'
+  daysRemaining: number | null
+  trialEndsAt: Date | null
+}
+
 interface AuthContextType {
   user: User | null
   userProfile: UserProfile | null
@@ -45,6 +52,16 @@ interface AuthContextType {
   isPlatformAdmin: () => boolean
   canAccessAllOrganizations: () => boolean
   getAccessibleOrganizationIds: () => string[]
+  // 🚀 Subscription status
+  subscription: SubscriptionInfo
+  hasValidSubscription: () => boolean
+}
+
+const defaultSubscription: SubscriptionInfo = {
+  isValid: false,
+  status: 'unknown',
+  daysRemaining: null,
+  trialEndsAt: null
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -56,16 +73,85 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   isPlatformAdmin: () => false,
   canAccessAllOrganizations: () => false,
-  getAccessibleOrganizationIds: () => []
+  getAccessibleOrganizationIds: () => [],
+  subscription: defaultSubscription,
+  hasValidSubscription: () => false
 })
+
+// Helper function to calculate subscription status
+function calculateSubscriptionInfo(org: Organization | null, isPlatformAdmin: boolean): SubscriptionInfo {
+  // Platform admins always have valid access
+  if (isPlatformAdmin) {
+    return {
+      isValid: true,
+      status: 'active',
+      daysRemaining: null,
+      trialEndsAt: null
+    }
+  }
+
+  if (!org) {
+    return defaultSubscription
+  }
+
+  const now = new Date()
+  const trialEndsAt = org.trial_ends_at ? new Date(org.trial_ends_at) : null
+
+  // Check subscription status
+  if (org.subscription_status === 'active') {
+    return {
+      isValid: true,
+      status: 'active',
+      daysRemaining: null,
+      trialEndsAt
+    }
+  }
+
+  if (org.subscription_status === 'trial' && trialEndsAt) {
+    const daysRemaining = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    return {
+      isValid: daysRemaining > 0,
+      status: daysRemaining > 0 ? 'trial' : 'expired',
+      daysRemaining: Math.max(0, daysRemaining),
+      trialEndsAt
+    }
+  }
+
+  if (org.subscription_status === 'expired' || org.subscription_status === 'cancelled') {
+    return {
+      isValid: false,
+      status: org.subscription_status as 'expired' | 'cancelled',
+      daysRemaining: 0,
+      trialEndsAt
+    }
+  }
+
+  return defaultSubscription
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [organization, setOrganization] = useState<Organization | null>(null)
+  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo>(defaultSubscription)
   const [loading, setLoading] = useState(true)
   const [ready, setReady] = useState(false)
   const router = useRouter()
+
+  // Update subscription status when organization or userProfile changes
+  useEffect(() => {
+    const isAdmin = userProfile?.is_platform_admin === true ||
+                   config.isPlatformAdmin(userProfile?.email) ||
+                   config.isPlatformAdmin(user?.email)
+    const newSubscriptionInfo = calculateSubscriptionInfo(organization, isAdmin)
+    setSubscriptionInfo(newSubscriptionInfo)
+
+    if (newSubscriptionInfo.status === 'trial' && newSubscriptionInfo.daysRemaining !== null) {
+      console.log(`📅 Trial: ${newSubscriptionInfo.daysRemaining} days remaining`)
+    } else if (!newSubscriptionInfo.isValid && organization) {
+      console.log('⚠️ Subscription expired or invalid')
+    }
+  }, [organization, userProfile, user])
 
   useEffect(() => {
     const getSession = async () => {
@@ -403,16 +489,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      userProfile, 
-              organization, 
-        loading, 
-        ready,
-        signOut,
+    <AuthContext.Provider value={{
+      user,
+      userProfile,
+      organization,
+      loading,
+      ready,
+      signOut,
       isPlatformAdmin,
       canAccessAllOrganizations,
-      getAccessibleOrganizationIds
+      getAccessibleOrganizationIds,
+      subscription: subscriptionInfo,
+      hasValidSubscription: () => subscriptionInfo.isValid || isPlatformAdmin()
     }}>
       {children}
     </AuthContext.Provider>

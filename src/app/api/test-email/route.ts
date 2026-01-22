@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { 
-  sendWelcomeEmail, 
-  sendEmailVerificationEmail, 
+import {
+  sendWelcomeEmail,
+  sendEmailVerificationEmail,
   sendPasswordResetEmail,
-  sendTeamInvitationEmail 
+  sendTeamInvitationEmail
 } from '@/lib/email-service'
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!emailType || !to) {
       return NextResponse.json(
         { error: 'emailType and to are required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -44,7 +56,7 @@ export async function POST(request: NextRequest) {
           success: false,
           message: 'Password reset is handled by Supabase Auth. Use supabase.auth.resetPasswordForEmail() instead.',
           info: 'This ensures proper security with Supabase tokens and email delivery.'
-        }, { status: 400 })
+        }, { status: 400, headers: corsHeaders })
 
       case 'team-invitation':
         result = await sendTeamInvitationEmail({
@@ -60,7 +72,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json(
           { error: 'Invalid emailType. Use: welcome, verification, or team-invitation. Note: password-reset is handled by Supabase Auth.' },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         )
     }
 
@@ -69,11 +81,11 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `${emailType} email sent successfully`,
         data: result.data
-      })
+      }, { headers: corsHeaders })
     } else {
       return NextResponse.json(
         { error: `Failed to send ${emailType} email`, details: result.error },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
@@ -81,7 +93,7 @@ export async function POST(request: NextRequest) {
     console.error('Test email API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

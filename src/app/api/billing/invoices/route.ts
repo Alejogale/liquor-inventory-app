@@ -1,29 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 import Stripe from 'stripe'
+
+// Create Supabase Admin client for data queries
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 const getStripe = () => {
   if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error('STRIPE_SECRET_KEY is not configured')
   }
   return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-08-27.basil'
+    apiVersion: '2025-04-30.basil'
   })
 }
 
 export async function GET(request: NextRequest) {
   try {
+    // Get user from auth using SSR client
     const cookieStore = await cookies()
-    const supabaseClient = createRouteHandlerClient({ cookies: () => Promise.resolve(cookieStore) })
-    const { data: { user } } = await supabaseClient.auth.getUser()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user's organization
-    const { data: userProfile, error: profileError } = await supabaseClient
+    // Get user's organization using admin client
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('organization_id, role')
       .eq('id', user.id)
@@ -39,14 +64,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Get organization with Stripe customer ID
-    const { data: organization, error: orgError } = await supabaseClient
+    const { data: organization, error: orgError } = await supabaseAdmin
       .from('organizations')
       .select('stripe_customer_id, Name')
       .eq('id', userProfile.organization_id)
       .single()
 
     if (orgError || !organization || !organization.stripe_customer_id) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         invoices: [],
         message: 'No billing history available'
       })

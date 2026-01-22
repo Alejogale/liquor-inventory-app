@@ -158,10 +158,36 @@ export default function SubscriptionManager() {
 
   const getPlanDetails = (plan: string) => {
     const plans = {
-      trial: { name: 'Trial', price: '$0', features: ['Basic inventory management', 'Up to 100 items', 'Email support'] },
-      starter: { name: 'Starter', price: '$29/month', features: ['Basic inventory management', 'Up to 500 items', 'Email support', 'Basic reporting'] },
-      professional: { name: 'Professional', price: '$79/month', features: ['Advanced inventory management', 'Unlimited items', 'Priority support', 'Advanced reporting', 'Third-party integrations'] },
-      enterprise: { name: 'Enterprise', price: '$199/month', features: ['Everything in Professional', 'Custom integrations', 'Dedicated support', 'Custom reporting', 'API access'] }
+      trial: {
+        name: 'Trial',
+        price: '$0',
+        features: ['30-day free trial', 'All plan features', 'No credit card required']
+      },
+      personal: {
+        name: 'Personal',
+        price: '$19/month',
+        features: ['2 storage areas', '150 items', '1 user', 'Mobile app access', 'Basic reports', 'Email support']
+      },
+      starter: {
+        name: 'Starter',
+        price: '$89/month',
+        features: ['5 storage areas', '500 items', '5 users', 'Room-by-room counting', 'Stock alerts', 'Team collaboration', 'Basic analytics']
+      },
+      professional: {
+        name: 'Professional',
+        price: '$229/month',
+        features: ['15 storage areas', '2,000 items', '15 users', 'Advanced analytics', 'Custom reports', 'Stock movement tracking', 'Priority support', 'Export to Excel']
+      },
+      premium: {
+        name: 'Premium',
+        price: '$499/month',
+        features: ['50 storage areas', '10,000 items', '50 users', 'Multi-location management', 'API access', 'Custom integrations', 'Dedicated account manager', 'Monthly strategy call']
+      },
+      enterprise: {
+        name: 'Enterprise',
+        price: '$1,499/month',
+        features: ['Unlimited storage areas', 'Unlimited items', 'Unlimited users', 'White-label options', 'Custom development', 'On-site training', '24/7 phone support', 'SLA guarantee']
+      }
     }
     return plans[plan as keyof typeof plans] || plans.trial
   }

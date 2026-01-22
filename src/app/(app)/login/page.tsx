@@ -51,9 +51,9 @@ function LoginForm() {
       if (error) throw error
 
       console.log('✅ Login successful:', data.user?.email)
-      
-      // Redirect to dashboard
-      router.push('/dashboard')
+
+      // Redirect to apps page
+      router.push('/apps')
 
     } catch (error: any) {
       console.error('💥 Login error:', error)

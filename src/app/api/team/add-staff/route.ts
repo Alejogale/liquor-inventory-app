@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkUserLimit } from '@/lib/subscription-limits'
+import { createHash } from 'crypto'
+
+// Hash PIN with SHA-256 + salt for secure storage
+const PIN_SALT = process.env.PIN_HASH_SALT || 'invyeasy-pin-salt-2024'
+
+function hashPin(pin: string): string {
+  return createHash('sha256').update(pin + PIN_SALT).digest('hex')
+}
 
 // Use service role to create users without logging in as them
 const supabaseAdmin = createClient(
@@ -24,11 +33,60 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!createdBy) {
+      return NextResponse.json(
+        { error: 'Creator ID is required for permission check' },
+        { status: 400 }
+      )
+    }
+
+    // Permission check: verify the creator has permission
+    const { data: creatorProfile, error: creatorError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('role, organization_id')
+      .eq('id', createdBy)
+      .single()
+
+    if (creatorError || !creatorProfile) {
+      return NextResponse.json(
+        { error: 'Could not verify creator permissions' },
+        { status: 403 }
+      )
+    }
+
+    if (creatorProfile.role !== 'owner' && creatorProfile.role !== 'manager') {
+      return NextResponse.json(
+        { error: 'Only owners and managers can add staff members' },
+        { status: 403 }
+      )
+    }
+
+    if (creatorProfile.organization_id !== organizationId) {
+      return NextResponse.json(
+        { error: 'Cannot add staff to a different organization' },
+        { status: 403 }
+      )
+    }
+
     // Validate PIN
     if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
       return NextResponse.json(
         { error: 'PIN must be exactly 4 digits' },
         { status: 400 }
+      )
+    }
+
+    // Check user limit before creating
+    const limitCheck = await checkUserLimit(organizationId, supabaseAdmin)
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: limitCheck.error || 'User limit reached',
+          upgradeRequired: limitCheck.upgradeRequired,
+          current: limitCheck.current,
+          limit: limitCheck.limit
+        },
+        { status: 403 }
       )
     }
 
@@ -64,7 +122,7 @@ export async function POST(request: Request) {
         organization_id: organizationId,
         email: placeholderEmail,
         full_name: name,
-        pin_code: pin,
+        pin_code: hashPin(pin),
         role: 'staff',
         app_access: ['inventory'],
         status: 'active'

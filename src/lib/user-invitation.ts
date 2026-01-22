@@ -1,8 +1,9 @@
-// User Invitation System for Hospitality Hub Platform
+// User Invitation System for InvyEasy Platform
 // Allows managers to invite staff members with specific roles and permissions
 
 import { supabase } from './supabase'
 import { UserRole, Permission } from './permissions'
+import { sendTeamInvitationEmail } from './email-service'
 
 export interface InvitationData {
   email: string
@@ -83,19 +84,57 @@ export class UserInvitationService {
     }
   }
 
-  // Send invitation email
+  // Send invitation email using Resend email service
   private async sendInvitationEmail(email: string, invitationId: string): Promise<void> {
     try {
-      const { error } = await supabase.functions.invoke('send-invitation-email', {
-        body: {
-          email,
-          invitationId,
-          organizationId: this.organizationId
-        }
+      // Fetch invitation details to get role
+      const { data: invitation, error: invitationError } = await supabase
+        .from('user_invitations')
+        .select('role, full_name')
+        .eq('id', invitationId)
+        .single()
+
+      if (invitationError || !invitation) {
+        console.error('Error fetching invitation for email:', invitationError)
+        return
+      }
+
+      // Fetch organization name
+      const { data: organization, error: orgError } = await supabase
+        .from('organizations')
+        .select('Name')
+        .eq('id', this.organizationId)
+        .single()
+
+      if (orgError || !organization) {
+        console.error('Error fetching organization for email:', orgError)
+        return
+      }
+
+      // Fetch inviter name
+      const { data: inviter, error: inviterError } = await supabase
+        .from('user_profiles')
+        .select('full_name')
+        .eq('id', this.invitedBy)
+        .single()
+
+      // Construct invite URL
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://invyeasy.com'
+      const inviteUrl = `${baseUrl}/accept-invite?token=${invitationId}`
+
+      // Send email using Resend service
+      const result = await sendTeamInvitationEmail({
+        to: email,
+        inviterName: inviter?.full_name || 'Team Manager',
+        organizationName: organization.Name,
+        role: invitation.role,
+        inviteUrl
       })
 
-      if (error) {
-        console.error('Error sending invitation email:', error)
+      if (!result.success) {
+        console.error('Error sending invitation email:', result.error)
+      } else {
+        console.log('✅ Invitation email sent successfully to:', email)
       }
     } catch (error) {
       console.error('Error in sendInvitationEmail:', error)

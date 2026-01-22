@@ -32,12 +32,14 @@ import RoomManager from '@/components/RoomManager'
 import ActivityDashboard from '@/components/ActivityDashboard'
 import ImportData from '@/components/ImportData'
 import DashboardSidebar from '@/components/DashboardSidebar'
-import SubscriptionManager from '@/components/SubscriptionManager'
+import BillingDashboard from '@/components/BillingDashboard'
 import UserPermissions from '@/components/UserPermissions'
 import WelcomeOnboardingModal from '@/components/WelcomeOnboardingModal'
 import BulkPricingModal from '@/components/BulkPricingModal'
 import TeamPINManagement from '@/components/TeamPINManagement'
 import StockMovementAnalytics from '@/components/StockMovementAnalytics'
+import { SubscriptionGuard } from '@/components/SubscriptionGuard'
+import { canAccessTab, getDefaultTab, hasTabPermission } from '@/lib/permissions'
 
 
 interface Category {
@@ -113,6 +115,11 @@ function DashboardContent() {
 
   const isAdmin = config.isPlatformAdmin(user?.email)
 
+  // Role-based permission helpers
+  const canAddItem = isAdmin || hasTabPermission(userProfile?.role, 'add_item')
+  const canEditItem = isAdmin || hasTabPermission(userProfile?.role, 'edit_item')
+  const canDeleteItem = isAdmin || hasTabPermission(userProfile?.role, 'delete_item')
+
   // Get the correct organization ID - for admin, use the known organization ID if context is missing
   const organizationId = organization?.id || (isAdmin ? '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0' : undefined)
   
@@ -132,6 +139,20 @@ function DashboardContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Ensure user can only access tabs they have permission for
+  useEffect(() => {
+    // Skip check for platform admins (they have full access)
+    if (isAdmin) return
+
+    // Check if user can access the current tab
+    if (!canAccessTab(userProfile?.role, activeTab)) {
+      // Redirect to the default tab for their role
+      const defaultTab = getDefaultTab(userProfile?.role)
+      console.log(`🔒 User role "${userProfile?.role}" cannot access "${activeTab}", redirecting to "${defaultTab}"`)
+      setActiveTab(defaultTab)
+    }
+  }, [activeTab, userProfile?.role, isAdmin])
 
   // Show welcome modal for new users
   useEffect(() => {
@@ -584,6 +605,7 @@ function DashboardContent() {
         setActiveTab={setActiveTab}
         isAdmin={isAdmin}
         userEmail={user?.email || ''}
+        userRole={userProfile?.role}
         onSignOut={handleSignOut}
         onCollapsedChange={setSidebarCollapsed}
       />
@@ -795,33 +817,35 @@ function DashboardContent() {
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Inventory Management</h2>
                     <p className="text-gray-600 mt-1">Manage your liquor inventory items and stock levels</p>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => setShowBulkPricingModal(true)}
-                      className="text-green-700 bg-green-100 hover:bg-green-200 px-4 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2 border border-green-200"
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      Bulk Pricing
-                    </button>
-                    <button
-                      onClick={() => setShowAddItem(true)}
-                      className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
-                      style={{
-                        background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-                        boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0px)';
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
-                      }}
-                    >
-                      Add Item
-                    </button>
-                  </div>
+                  {canAddItem && (
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setShowBulkPricingModal(true)}
+                        className="text-green-700 bg-green-100 hover:bg-green-200 px-4 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2 border border-green-200"
+                      >
+                        <DollarSign className="h-4 w-4" />
+                        Bulk Pricing
+                      </button>
+                      <button
+                        onClick={() => setShowAddItem(true)}
+                        className="text-white px-6 py-3 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+                        style={{
+                          background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                          boxShadow: '0 4px 15px rgba(255, 119, 0, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 119, 0, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0px)';
+                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 119, 0, 0.3)';
+                        }}
+                      >
+                        Add Item
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 {loading ? (
@@ -1127,6 +1151,8 @@ function DashboardContent() {
                       onDelete={handleItemDeleted}
                       selectedItems={selectedItems}  // Pass selected items
                       onItemSelect={handleItemSelect}  // Pass selection handler
+                      canEdit={canEditItem}  // Role-based permission
+                      canDelete={canDeleteItem}  // Role-based permission
                     />
                   </>
                 )}
@@ -1282,7 +1308,7 @@ function DashboardContent() {
 
             {activeTab === 'team' && (
               <div className="p-6">
-                <TeamPINManagement organizationId={organizationId} />
+                <TeamPINManagement organizationId={organizationId} currentUserId={user?.id} />
               </div>
             )}
 
@@ -1337,7 +1363,7 @@ function DashboardContent() {
                 
                 {/* Billing Management */}
                 <div className="space-y-8">
-                  <SubscriptionManager />
+                  <BillingDashboard />
                   
                   {/* Account Cancellation */}
                   <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
@@ -1429,22 +1455,24 @@ function DashboardContent() {
 
 export default function Dashboard() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-              <Package className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Loading Dashboard...</h2>
-              <p className="text-gray-600">Please wait while we prepare your inventory data</p>
+    <SubscriptionGuard>
+      <Suspense fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                <Package className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Loading Dashboard...</h2>
+                <p className="text-gray-600">Please wait while we prepare your inventory data</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    }>
-      <DashboardContent />
-    </Suspense>
+      }>
+        <DashboardContent />
+      </Suspense>
+    </SubscriptionGuard>
   )
 }

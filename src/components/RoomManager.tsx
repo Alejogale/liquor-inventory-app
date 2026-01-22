@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  MapPin, 
-  Save, 
+import { checkStorageAreaLimit } from '@/lib/subscription-limits-client'
+import UsageLimitBadge from './UsageLimitBadge'
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  MapPin,
+  Save,
   X,
   Building2,
   CheckCircle,
@@ -36,6 +38,7 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
   const [showAddRoom, setShowAddRoom] = useState(false)
   const [newRoomName, setNewRoomName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [usageLimit, setUsageLimit] = useState({ current: 0, limit: 0 })
 
   useEffect(() => {
     fetchRooms()
@@ -107,11 +110,25 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
       } else {
         console.log('✅ Rooms fetched:', data)
         setRooms(data || [])
+
+        // Check usage limits
+        if (currentOrg) {
+          await checkUsageLimits(currentOrg)
+        }
       }
     } catch (error) {
       console.error('💥 Error in fetchRooms:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const checkUsageLimits = async (orgId: string) => {
+    try {
+      const result = await checkStorageAreaLimit(supabase, orgId)
+      setUsageLimit({ current: result.current, limit: result.limit })
+    } catch (error) {
+      console.error('Error checking usage limits:', error)
     }
   }
 
@@ -287,6 +304,11 @@ export default function RoomManager({ onUpdate, organizationId }: RoomManagerPro
             <RefreshCw className="h-4 w-4" />
             <span>Refresh</span>
           </button>
+          <UsageLimitBadge
+            current={usageLimit.current}
+            limit={usageLimit.limit}
+            label="Storage Areas"
+          />
           <button
             onClick={() => setShowAddRoom(true)}
             className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"

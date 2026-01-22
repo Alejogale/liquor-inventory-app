@@ -52,7 +52,8 @@ import {
   MessageSquare,
   Shield,
   Activity,
-  Key
+  Key,
+  Crown
 } from 'lucide-react-native';
 import { createClient } from '@supabase/supabase-js';
 import * as FileSystem from 'expo-file-system';
@@ -64,6 +65,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { WifiOff, Wifi } from 'lucide-react-native';
 import ModernOnboarding from './ModernOnboarding';
 import { StatCard, QuickCountButtons } from './ModernComponents';
+import WebSubscriptionScreen from './components/WebSubscriptionScreen';
+// import SubscriptionScreen from './components/SubscriptionScreen';
+// import PaywallScreen from './components/PaywallScreen';
+// import { usePaywall } from './hooks/usePaywall';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -2752,30 +2757,24 @@ const PINEntryScreen = memo(({
       setIsVerifying(true);
       setError('');
 
-      // Hash the PIN (in production, use proper hashing like bcrypt)
-      // For now, we'll just compare directly - you should hash this!
-      const { data: users, error } = await supabase
-        .from('user_profiles')
-        .select('id, email, full_name, pin_code')
-        .eq('pin_code', pinToVerify);
+      // Use API endpoint for secure PIN verification (PIN is hashed server-side)
+      const response = await fetch(`${apiUrl}/api/auth/verify-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinToVerify })
+      });
 
-      if (error) {
-        console.error('Error verifying PIN:', error);
-        setError('Verification error');
+      const result = await response.json();
+
+      if (!response.ok || !result.valid) {
+        setError(result.error || 'Invalid PIN');
         setPin('');
         setIsVerifying(false);
         return;
       }
 
-      if (users && users.length > 0) {
-        // PIN is valid - use full_name or email as fallback
-        const userName = users[0].full_name || users[0].email?.split('@')[0] || users[0].email || 'User';
-        onPINVerified(users[0].id, userName);
-      } else {
-        // Invalid PIN
-        setError('Invalid PIN');
-        setPin('');
-      }
+      // PIN is valid
+      onPINVerified(result.user.id, result.user.name);
 
       setIsVerifying(false);
     } catch (error) {
@@ -4376,7 +4375,7 @@ const StockAnalyticsScreen = memo(({ user, userProfile, onBack }: { user: any; u
 });
 
 // More/Settings Screen Component
-const MoreScreen = memo(({ user, userProfile, onLogout, onNavigateToRooms, onNavigateToSuppliers, onNavigateToOrders, onNavigateToReports, onNavigateToTeam, onNavigateToAnalytics, onBack }: { user: any; userProfile: any; onLogout: () => void; onNavigateToRooms: () => void; onNavigateToSuppliers: () => void; onNavigateToOrders: () => void; onNavigateToReports: () => void; onNavigateToTeam: () => void; onNavigateToAnalytics: () => void; onBack: () => void }) => {
+const MoreScreen = memo(({ user, userProfile, onLogout, onNavigateToRooms, onNavigateToSuppliers, onNavigateToOrders, onNavigateToReports, onNavigateToTeam, onNavigateToAnalytics, onNavigateToSubscription, onBack }: { user: any; userProfile: any; onLogout: () => void; onNavigateToRooms: () => void; onNavigateToSuppliers: () => void; onNavigateToOrders: () => void; onNavigateToReports: () => void; onNavigateToTeam: () => void; onNavigateToAnalytics: () => void; onNavigateToSubscription: () => void; onBack: () => void }) => {
 
   const handleRoomsPress = () => {
     onNavigateToRooms();
@@ -4400,6 +4399,10 @@ const MoreScreen = memo(({ user, userProfile, onLogout, onNavigateToRooms, onNav
 
   const handleAnalyticsPress = () => {
     onNavigateToAnalytics();
+  };
+
+  const handleSubscriptionPress = () => {
+    onNavigateToSubscription();
   };
 
   return (
@@ -4496,6 +4499,22 @@ const MoreScreen = memo(({ user, userProfile, onLogout, onNavigateToRooms, onNav
           </View>
         </View>
 
+        {/* Account Section */}
+        <View style={styles.modernMenuSection}>
+          <Text style={styles.modernMenuSectionTitle}>Account</Text>
+          <View style={styles.modernMenuGroup}>
+            <TouchableOpacity style={styles.modernMenuItem} onPress={handleSubscriptionPress} activeOpacity={0.7}>
+              <View style={styles.modernMenuItemLeft}>
+                <View style={[styles.modernMenuIcon, { backgroundColor: 'rgba(249, 115, 22, 0.2)' }]}>
+                  <Crown color="#F97316" size={20} strokeWidth={2.5} />
+                </View>
+                <Text style={styles.modernMenuItemText}>Subscription & Billing</Text>
+              </View>
+              <ChevronRight color="#9CA3AF" size={20} strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.modernMenuSection}>
           <Text style={styles.modernMenuSectionTitle}>Legal</Text>
           <View style={styles.modernMenuGroup}>
@@ -4541,6 +4560,7 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [originalCounts, setOriginalCounts] = useState<Record<string, number>>({});
   const [changedItems, setChangedItems] = useState<Set<string>>(new Set());
+  const [inputTexts, setInputTexts] = useState<Record<string, string>>({}); // Track text input separately
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -4720,6 +4740,13 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
   // Update count with auto-save - OPTIMIZED for instant response
   const updateCount = useCallback((itemId: string, newCount: number) => {
     const finalCount = Math.max(0, newCount);
+
+    // Clear any pending text input for this item
+    setInputTexts(prev => {
+      const updated = { ...prev };
+      delete updated[itemId];
+      return updated;
+    });
 
     // Batch state updates for instant UI response
     setCounts(prev => {
@@ -5043,16 +5070,41 @@ const CountScreen = memo(({ user, onBack }: { user: any; onBack: () => void }) =
                     <TextInput
                       ref={(ref) => { if (ref) countInputRefs.current[item.id] = ref; }}
                       style={styles.modernCountValue}
-                      value={currentCount === 0 ? '' : currentCount.toString()}
+                      value={inputTexts[item.id] !== undefined ? inputTexts[item.id] : (currentCount === 0 ? '' : currentCount.toString())}
                       placeholder="0"
                       placeholderTextColor="#9ca3af"
                       onChangeText={(text) => {
-                        const num = parseFloat(text) || 0;
-                        updateCount(item.id, num);
+                        // Store the raw text input (including decimals like "1.")
+                        setInputTexts(prev => ({ ...prev, [item.id]: text }));
                       }}
-                      keyboardType="numeric"
+                      onBlur={() => {
+                        // Parse to number when done editing
+                        const text = inputTexts[item.id];
+                        if (text !== undefined) {
+                          const num = parseFloat(text) || 0;
+                          updateCount(item.id, num);
+                          // Clear the text input state so it uses the numeric value
+                          setInputTexts(prev => {
+                            const updated = { ...prev };
+                            delete updated[item.id];
+                            return updated;
+                          });
+                        }
+                      }}
+                      keyboardType="decimal-pad"
                       selectTextOnFocus={true}
                       onSubmitEditing={() => {
+                        // Parse to number on submit
+                        const text = inputTexts[item.id];
+                        if (text !== undefined) {
+                          const num = parseFloat(text) || 0;
+                          updateCount(item.id, num);
+                          setInputTexts(prev => {
+                            const updated = { ...prev };
+                            delete updated[item.id];
+                            return updated;
+                          });
+                        }
                         // Save on Enter key and return to search
                         if (changedItems.size > 0) {
                           performSave();
@@ -5784,7 +5836,7 @@ const AddEditItemModal = memo(({
                   onChangeText={setThreshold}
                   placeholder="0"
                   placeholderTextColor="#9ca3af"
-                  keyboardType="number-pad"
+                  keyboardType="decimal-pad"
                 />
               </View>
 
@@ -5796,7 +5848,7 @@ const AddEditItemModal = memo(({
                   onChangeText={setParLevel}
                   placeholder="0"
                   placeholderTextColor="#9ca3af"
-                  keyboardType="number-pad"
+                  keyboardType="decimal-pad"
                 />
               </View>
             </View>
@@ -6489,6 +6541,11 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingChangesCount, setPendingChangesCount] = useState(0);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [subscriptionReason, setSubscriptionReason] = useState<'trial_expired' | 'feature_limit' | 'upgrade_required' | 'manage_subscription'>('upgrade_required');
+
+  // Paywall hook - replaced with web subscription redirect
+  // const { paywallConfig, isPaywallVisible, hidePaywall } = usePaywall(user?.id);
 
   const fetchDashboardData = async () => {
     try {
@@ -6722,6 +6779,10 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
             setPreviousTab('more');
             setActiveTab('analytics');
           }}
+          onNavigateToSubscription={() => {
+            setSubscriptionReason('manage_subscription');
+            setShowSubscriptionModal(true);
+          }}
         />;
       case 'home':
       default:
@@ -6906,7 +6967,12 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         </View>
 
         {/* Sign Out Button */}
-        <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={onLogout}
+          accessibilityLabel="Sign out"
+          accessibilityRole="button"
+        >
           <Text style={styles.logoutButtonText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -6916,6 +6982,9 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         <TouchableOpacity
           style={styles.tabItem}
           onPress={() => setActiveTab('home')}
+          accessibilityLabel="Home tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'home' }}
         >
           <Home
             color={activeTab === 'home' ? '#f97316' : '#9ca3af'}
@@ -6927,6 +6996,9 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         <TouchableOpacity
           style={styles.tabItem}
           onPress={() => setActiveTab('inventory')}
+          accessibilityLabel="Inventory tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'inventory' }}
         >
           <Package
             color={activeTab === 'inventory' ? '#f97316' : '#9ca3af'}
@@ -6938,6 +7010,9 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         <TouchableOpacity
           style={styles.tabItem}
           onPress={() => setActiveTab('count')}
+          accessibilityLabel="Count tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'count' }}
         >
           <BarChart3
             color={activeTab === 'count' ? '#f97316' : '#9ca3af'}
@@ -6949,6 +7024,9 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         <TouchableOpacity
           style={styles.tabItem}
           onPress={() => setActiveTab('stock')}
+          accessibilityLabel="Stock tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'stock' }}
         >
           <ArrowUpDown
             color={activeTab === 'stock' ? '#f97316' : '#9ca3af'}
@@ -6960,6 +7038,9 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
         <TouchableOpacity
           style={styles.tabItem}
           onPress={() => setActiveTab('more')}
+          accessibilityLabel="More tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'more' }}
         >
           <Settings
             color={activeTab === 'more' ? '#f97316' : '#9ca3af'}
@@ -6975,6 +7056,13 @@ function Dashboard({ user, userProfile, onLogout }: { user: any; userProfile?: a
   return (
     <View style={styles.container}>
       {renderScreen()}
+
+      {/* Web Subscription Modal - redirects to website */}
+      <WebSubscriptionScreen
+        visible={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+        reason={subscriptionReason}
+      />
     </View>
   );
 }
@@ -7046,6 +7134,8 @@ const Onboarding = memo(({ onGetStarted, onLogin }: { onGetStarted: () => void; 
         <TouchableOpacity
           style={styles.onboardingGetStartedButton}
           onPress={onGetStarted}
+          accessibilityLabel="Get started free"
+          accessibilityRole="button"
         >
           <Text style={styles.onboardingGetStartedButtonText}>Get Started Free</Text>
         </TouchableOpacity>
@@ -7053,6 +7143,8 @@ const Onboarding = memo(({ onGetStarted, onLogin }: { onGetStarted: () => void; 
         <TouchableOpacity
           style={styles.onboardingLoginButton}
           onPress={onLogin}
+          accessibilityLabel="Log in to existing account"
+          accessibilityRole="button"
         >
           <Text style={styles.onboardingLoginButtonText}>Already have an account? Log in</Text>
         </TouchableOpacity>
@@ -7073,6 +7165,9 @@ export default function App() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -7144,7 +7239,9 @@ export default function App() {
           phone: '',
           businessType: 'personal',
           employees: '1-10',
-          primaryApp: 'inventory-management'
+          primaryApp: 'inventory-management',
+          plan: 'personal',
+          billingCycle: 'monthly'
         }),
       });
 
@@ -7184,6 +7281,44 @@ export default function App() {
     setLastName('');
     setOrganizationName('');
     setShowOnboarding(true);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!resetEmail || !resetEmail.includes('@')) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    setResetMessage('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${apiUrl}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      setResetMessage('Password reset email sent! Check your inbox.');
+      Alert.alert(
+        'Success',
+        'Password reset instructions have been sent to your email. Please check your inbox.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setShowForgotPassword(false);
+              setResetEmail('');
+              setResetMessage('');
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to send password reset email. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Show dashboard if logged in
@@ -7300,6 +7435,8 @@ export default function App() {
               autoCapitalize="none"
               keyboardType="email-address"
               editable={!isLoading}
+              accessibilityLabel="Email address"
+              accessibilityHint="Enter your email address"
             />
           </View>
 
@@ -7313,13 +7450,31 @@ export default function App() {
               onChangeText={setPassword}
               secureTextEntry
               editable={!isLoading}
+              accessibilityLabel="Password"
+              accessibilityHint={isSignUpMode ? "Create a password with at least 6 characters" : "Enter your password"}
             />
           </View>
+
+          {/* Forgot Password Link - Only show in login mode */}
+          {!isSignUpMode && (
+            <TouchableOpacity
+              style={styles.forgotPasswordLink}
+              onPress={() => {
+                setResetEmail(email); // Pre-fill with current email
+                setShowForgotPassword(true);
+              }}
+            >
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
             onPress={isSignUpMode ? handleSignUp : handleLogin}
             disabled={isLoading}
+            accessibilityLabel={isSignUpMode ? 'Sign up' : 'Sign in'}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isLoading }}
           >
             {isLoading ? (
               <View style={styles.loadingContainer}>
@@ -7347,6 +7502,8 @@ export default function App() {
           <TouchableOpacity
             style={styles.signupButton}
             onPress={() => setShowSignUp(!showSignUp)}
+            accessibilityLabel={isSignUpMode ? 'Switch to sign in' : 'Switch to create account'}
+            accessibilityRole="button"
           >
             <Text style={styles.signupButtonText}>
               {isSignUpMode ? 'Sign In' : 'Create Account'}
@@ -7354,6 +7511,92 @@ export default function App() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        visible={showForgotPassword}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowForgotPassword(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowForgotPassword(false)}
+          />
+          <View style={styles.modalContent}>
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowForgotPassword(false)}
+            >
+              <XIcon color="#9ca3af" size={24} />
+            </TouchableOpacity>
+
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Mail color="#F97316" size={32} />
+              <Text style={styles.modalTitle}>Reset Password</Text>
+              <Text style={styles.modalSubtitle}>
+                Enter your email address and we'll send you instructions to reset your password.
+              </Text>
+            </View>
+
+            {/* Email Input */}
+            <View style={styles.modalInputContainer}>
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                placeholderTextColor="#9ca3af"
+                value={resetEmail}
+                onChangeText={setResetEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                editable={!isLoading}
+                autoFocus
+              />
+            </View>
+
+            {/* Success Message */}
+            {resetMessage !== '' && (
+              <View style={styles.successMessage}>
+                <CheckCircle color="#10b981" size={18} />
+                <Text style={styles.successMessageText}>{resetMessage}</Text>
+              </View>
+            )}
+
+            {/* Send Button */}
+            <TouchableOpacity
+              style={[styles.modalButton, isLoading && styles.modalButtonDisabled]}
+              onPress={handleForgotPassword}
+              disabled={isLoading || !resetEmail.trim()}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.modalButtonText}>Send Reset Link</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.modalCancelButton}
+              onPress={() => {
+                setShowForgotPassword(false);
+                setResetEmail('');
+                setResetMessage('');
+              }}
+            >
+              <Text style={styles.modalCancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -7580,6 +7823,99 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: '#FFFFFF',  // Pure white
+  },
+  forgotPasswordLink: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    color: '#F97316',
+    fontWeight: '500',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalOverlay: {
+    flex: 1,
+  },
+  modalContent: {
+    backgroundColor: '#1a1a1c',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    maxHeight: '80%',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 1,
+    padding: 8,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 15,
+    color: '#9ca3af',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  modalInputContainer: {
+    marginBottom: 16,
+  },
+  successMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  successMessageText: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#10b981',
+  },
+  modalButton: {
+    height: 52,
+    backgroundColor: '#F97316',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  modalButtonDisabled: {
+    opacity: 0.5,
+  },
+  modalButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  modalCancelButton: {
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCancelButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#9ca3af',
   },
   centerContent: {
     justifyContent: 'center',

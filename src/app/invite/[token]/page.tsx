@@ -5,14 +5,18 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Building2, 
-  Users, 
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Building2,
+  Users,
   ArrowRight,
-  AlertTriangle
+  AlertTriangle,
+  Lock,
+  Mail,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 
 interface InvitationData {
@@ -43,6 +47,12 @@ export default function InvitePage() {
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  // Signup form state
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [signingUp, setSigningUp] = useState(false)
 
   useEffect(() => {
     if (token) {
@@ -116,6 +126,12 @@ export default function InvitePage() {
   const acceptInvitation = async () => {
     if (!user || !invitation) return
 
+    // Verify the logged-in user's email matches the invitation
+    if (user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
+      setError(`This invitation is for ${invitation.email}. You are logged in as ${user.email}. Please log out and sign in with the correct email.`)
+      return
+    }
+
     try {
       setAccepting(true)
       setError(null)
@@ -135,8 +151,8 @@ export default function InvitePage() {
       }
 
       setSuccess(true)
-      
-      // Redirect to apps page after a short delay
+
+      // Redirect to apps after a short delay
       setTimeout(() => {
         router.push('/apps')
       }, 2000)
@@ -218,32 +234,194 @@ export default function InvitePage() {
     )
   }
 
+  // Handle signup and accept invitation in one step
+  const handleSignupAndAccept = async () => {
+    if (!invitation) return
+
+    // Validation
+    if (!fullName.trim()) {
+      setError('Please enter your full name')
+      return
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    try {
+      setSigningUp(true)
+      setError(null)
+
+      // 1. Create the account
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: invitation.email,
+        password: password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      })
+
+      if (signUpError) {
+        throw new Error(signUpError.message)
+      }
+
+      if (!signUpData.user) {
+        throw new Error('Failed to create account')
+      }
+
+      // 2. Accept the invitation
+      const { data, error: acceptError } = await supabase.rpc('accept_invitation', {
+        invitation_token_param: token,
+        user_id_param: signUpData.user.id
+      })
+
+      if (acceptError) {
+        throw new Error(acceptError.message)
+      }
+
+      if (!data) {
+        throw new Error('Failed to accept invitation')
+      }
+
+      setSuccess(true)
+
+      // 3. Redirect to apps
+      setTimeout(() => {
+        router.push('/apps')
+      }, 2000)
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create account')
+    } finally {
+      setSigningUp(false)
+    }
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50/20 via-white to-blue-50/20 flex items-center justify-center p-4">
-        <div className="max-w-md w-full rounded-2xl p-8 text-center border border-white/20 backdrop-blur-xl"
+        <div className="max-w-md w-full rounded-2xl p-8 border border-white/20 backdrop-blur-xl"
              style={{
                background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,247,237,0.8) 100%)',
                backdropFilter: 'blur(20px)',
                WebkitBackdropFilter: 'blur(20px)',
                boxShadow: '0 25px 50px rgba(255, 119, 0, 0.1)'
              }}>
-          <AlertTriangle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h1>
-          <p className="text-gray-600 mb-6">
-            You need to sign in to accept this invitation to join {invitation?.organization.Name}.
+
+          <div className="text-center mb-6">
+            <Building2 className="h-12 w-12 text-orange-500 mx-auto mb-3" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Join {invitation?.organization.Name}</h1>
+            <p className="text-gray-600 text-sm">
+              Create your account to join as <span className="font-medium text-orange-600">{invitation?.role}</span>
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {/* Email (read-only) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  value={invitation?.email || ''}
+                  disabled
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-gray-600 cursor-not-allowed"
+                />
+              </div>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a password"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              onClick={handleSignupAndAccept}
+              disabled={signingUp || !fullName || !password || !confirmPassword}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: signingUp ? '#9ca3af' : 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
+                boxShadow: signingUp ? 'none' : '0 4px 12px rgba(255, 119, 0, 0.3)'
+              }}
+            >
+              {signingUp ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-5 w-5" />
+                  Create Account & Join Team
+                </>
+              )}
+            </button>
+          </div>
+
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Already have an account?{' '}
+            <Link href={`/login?redirect=/invite/${token}`} className="text-orange-600 hover:underline font-medium">
+              Sign in instead
+            </Link>
           </p>
-          <Link 
-            href={`/login?redirect=/invite/${token}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white transition-all duration-300"
-            style={{
-              background: 'linear-gradient(135deg, #ff7700 0%, #ff4500 100%)',
-              boxShadow: '0 4px 12px rgba(255, 119, 0, 0.3)'
-            }}
-          >
-            Sign In
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </div>
     )
@@ -317,6 +495,33 @@ export default function InvitePage() {
               <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
                 <h3 className="font-semibold text-gray-900 mb-2">Personal Message</h3>
                 <p className="text-gray-700 italic">"{invitation.custom_message}"</p>
+              </div>
+            )}
+
+            {/* Email Mismatch Warning */}
+            {user && user.email?.toLowerCase() !== invitation.email.toLowerCase() && (
+              <div className="bg-red-50 rounded-xl p-6 border border-red-200">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-red-800 mb-2">Wrong Account</h3>
+                    <p className="text-red-700 text-sm mb-2">
+                      This invitation is for <strong>{invitation.email}</strong>
+                    </p>
+                    <p className="text-red-700 text-sm mb-4">
+                      You are logged in as <strong>{user.email}</strong>
+                    </p>
+                    <button
+                      onClick={async () => {
+                        await supabase.auth.signOut()
+                        window.location.reload()
+                      }}
+                      className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                    >
+                      Sign Out & Continue as {invitation.email.split('@')[0]}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -15,12 +15,77 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { userId, userName } = await request.json()
+    const { userId, userName, deletedBy } = await request.json()
 
     if (!userId) {
       return NextResponse.json(
         { error: 'User ID is required' },
         { status: 400 }
+      )
+    }
+
+    if (!deletedBy) {
+      return NextResponse.json(
+        { error: 'Deleter ID is required for permission check' },
+        { status: 400 }
+      )
+    }
+
+    // Permission check: verify the deleter has permission
+    const { data: deleterProfile, error: deleterError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('role, organization_id')
+      .eq('id', deletedBy)
+      .single()
+
+    if (deleterError || !deleterProfile) {
+      return NextResponse.json(
+        { error: 'Could not verify deleter permissions' },
+        { status: 403 }
+      )
+    }
+
+    if (deleterProfile.role !== 'owner' && deleterProfile.role !== 'manager') {
+      return NextResponse.json(
+        { error: 'Only owners and managers can delete users' },
+        { status: 403 }
+      )
+    }
+
+    // Check if target user is in the same organization
+    const { data: targetProfile, error: targetError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('organization_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (targetError || !targetProfile) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    if (targetProfile.organization_id !== deleterProfile.organization_id) {
+      return NextResponse.json(
+        { error: 'Cannot delete users from different organizations' },
+        { status: 403 }
+      )
+    }
+
+    // Prevent deleting self
+    if (userId === deletedBy) {
+      return NextResponse.json(
+        { error: 'Cannot delete yourself' },
+        { status: 400 }
+      )
+    }
+
+    // Prevent non-owners from deleting owners
+    if (targetProfile.role === 'owner' && deleterProfile.role !== 'owner') {
+      return NextResponse.json(
+        { error: 'Only owners can delete other owners' },
+        { status: 403 }
       )
     }
 

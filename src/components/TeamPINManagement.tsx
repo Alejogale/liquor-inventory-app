@@ -23,6 +23,7 @@ interface PendingInvitation {
 
 interface TeamPINManagementProps {
   organizationId: string
+  currentUserId?: string  // For permission checks in API
 }
 
 // Role Badge Component
@@ -49,7 +50,7 @@ const RoleBadge = ({ role }: { role: string }) => {
   )
 }
 
-export default function TeamPINManagement({ organizationId }: TeamPINManagementProps) {
+export default function TeamPINManagement({ organizationId, currentUserId }: TeamPINManagementProps) {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([])
   const [loading, setLoading] = useState(true)
@@ -137,14 +138,24 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
     try {
       setSaving(true)
 
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ pin_code: newPIN })
-        .eq('id', userId)
+      // Use API to hash PIN before storing
+      const response = await fetch('/api/team/update-pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          pin: newPIN,
+          updatedBy: currentUserId
+        })
+      })
 
-      if (error) {
-        console.error('Error setting PIN:', error)
-        alert('Error setting PIN')
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('Error setting PIN:', result.error)
+        alert(`Error setting PIN: ${result.error}`)
         setSaving(false)
         return
       }
@@ -167,14 +178,24 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
     try {
       setSaving(true)
 
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ pin_code: null })
-        .eq('id', userId)
+      // Use API to remove PIN
+      const response = await fetch('/api/team/update-pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'remove',
+          updatedBy: currentUserId
+        })
+      })
 
-      if (error) {
-        console.error('Error removing PIN:', error)
-        alert('Error removing PIN')
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('Error removing PIN:', result.error)
+        alert(`Error removing PIN: ${result.error}`)
         setSaving(false)
         return
       }
@@ -240,9 +261,59 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
       // Create invitation link
       const inviteLink = `${window.location.origin}/invite/${inviteToken}`
 
-      // Copy to clipboard
-      await navigator.clipboard.writeText(inviteLink)
-      alert(`✅ Invitation created!\n\nInvitation link copied to clipboard.\n\nSend this link to ${inviteEmail}:\n${inviteLink}\n\nThis link expires in 7 days.`)
+      // Get organization name and inviter name for email
+      const { data: orgData } = await supabase
+        .from('organizations')
+        .select('Name')
+        .eq('id', organizationId)
+        .single()
+
+      const { data: inviterData } = await supabase
+        .from('user_profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single()
+
+      // Send invitation email via API
+      let emailSent = false
+      try {
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'team-invitation',
+            to: inviteEmail,
+            inviterName: inviterData?.full_name || 'Team Manager',
+            organizationName: orgData?.Name || 'Your Organization',
+            role: 'staff',
+            inviteUrl: inviteLink
+          })
+        })
+
+        if (emailResponse.ok) {
+          emailSent = true
+        }
+      } catch (emailError) {
+        console.warn('Failed to send invitation email:', emailError)
+      }
+
+      // Try to copy to clipboard (may fail due to browser permissions)
+      let clipboardSuccess = false
+      try {
+        await navigator.clipboard.writeText(inviteLink)
+        clipboardSuccess = true
+      } catch (clipboardError) {
+        console.warn('Clipboard access denied:', clipboardError)
+      }
+
+      if (emailSent) {
+        alert(`✅ Invitation sent!\n\n📧 Email sent to ${inviteEmail}\n\n${clipboardSuccess ? 'Link also copied to clipboard.' : ''}\n\nThis invitation expires in 7 days.`)
+      } else if (clipboardSuccess) {
+        alert(`✅ Invitation created!\n\n⚠️ Email could not be sent automatically.\n\nInvitation link copied to clipboard - please send it manually to ${inviteEmail}:\n${inviteLink}\n\nThis link expires in 7 days.`)
+      } else {
+        // Show prompt so user can manually copy
+        prompt(`✅ Invitation created!\n\n⚠️ Email could not be sent. Copy this link and send it to ${inviteEmail}:\n\n(This link expires in 7 days)`, inviteLink)
+      }
 
       setShowInviteModal(false)
       setInviteEmail('')
@@ -259,8 +330,15 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
 
   const handleCopyInviteLink = async (token: string, email: string) => {
     const inviteLink = `${window.location.origin}/invite/${token}`
-    await navigator.clipboard.writeText(inviteLink)
-    alert(`✅ Invitation link copied!\n\nSend this link to ${email}:\n${inviteLink}`)
+
+    try {
+      await navigator.clipboard.writeText(inviteLink)
+      alert(`✅ Invitation link copied!\n\nSend this link to ${email}:\n${inviteLink}`)
+    } catch (clipboardError) {
+      console.warn('Clipboard access denied:', clipboardError)
+      // Show prompt so user can manually copy
+      prompt(`Copy this link and send it to ${email}:`, inviteLink)
+    }
   }
 
   const handleCancelInvitation = async (invitationId: string, email: string) => {
@@ -394,9 +472,28 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
         full_name: editName,
       }
 
-      // Update PIN if changed
-      if (editPIN && editPIN !== editingMember.pin_code) {
-        updates.pin_code = editPIN
+      // Update PIN if changed - use API for hashing
+      const pinChanged = editPIN && editPIN.length === 4
+      if (pinChanged) {
+        const pinResponse = await fetch('/api/team/update-pin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: editingMember.id,
+            pin: editPIN,
+            updatedBy: currentUserId
+          })
+        })
+
+        if (!pinResponse.ok) {
+          const pinResult = await pinResponse.json()
+          console.error('Error updating PIN:', pinResult.error)
+          alert(`Error updating PIN: ${pinResult.error}`)
+          setEditing(false)
+          return
+        }
       }
 
       // Check if we're upgrading from placeholder to real email
@@ -503,7 +600,8 @@ export default function TeamPINManagement({ organizationId }: TeamPINManagementP
         },
         body: JSON.stringify({
           userId: member.id,
-          userName: member.full_name || member.email
+          userName: member.full_name || member.email,
+          deletedBy: currentUserId
         })
       })
 
