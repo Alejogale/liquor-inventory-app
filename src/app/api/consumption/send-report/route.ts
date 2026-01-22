@@ -253,14 +253,15 @@ function generateConsumptionReportEmail({
     ? allItems.reduce((max, item) => (item.quantity * item.price) > (max.quantity * max.price) ? item : max, allItems[0])
     : null
 
+  // Mobile-friendly category sections - simplified 3-column layout
   const categorySections = categoryData.map(cat => `
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 16px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
       <tr>
-        <td style="background: linear-gradient(135deg, #14b8a6, #06b6d4); padding: 16px 20px;">
+        <td style="background: linear-gradient(135deg, #14b8a6, #06b6d4); padding: 12px 16px;">
           <table cellpadding="0" cellspacing="0" border="0" width="100%">
             <tr>
-              <td style="color: #ffffff; font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cat.name}</td>
-              <td align="right" style="color: rgba(255,255,255,0.9); font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cat.itemCount} drinks &bull; $${cat.subtotal.toFixed(2)}</td>
+              <td style="color: #ffffff; font-size: 14px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cat.name}</td>
+              <td align="right" style="color: rgba(255,255,255,0.9); font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cat.itemCount} &bull; $${cat.subtotal.toFixed(2)}</td>
             </tr>
           </table>
         </td>
@@ -269,17 +270,15 @@ function generateConsumptionReportEmail({
         <td style="padding: 0;">
           <table cellpadding="0" cellspacing="0" border="0" width="100%">
             <tr style="background-color: #f8fafc;">
-              <td style="padding: 12px 20px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0;">Item</td>
-              <td align="center" style="padding: 12px 16px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0; width: 60px;">Qty</td>
-              <td align="right" style="padding: 12px 16px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0; width: 70px;">Price</td>
-              <td align="right" style="padding: 12px 20px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0; width: 80px;">Total</td>
+              <td style="padding: 8px 12px; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0;">Item</td>
+              <td align="center" style="padding: 8px 8px; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0; width: 40px;">Qty</td>
+              <td align="right" style="padding: 8px 12px; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #e2e8f0; width: 65px;">Total</td>
             </tr>
             ${cat.items.map((item, idx) => `
             <tr style="background-color: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-              <td style="padding: 14px 20px; font-size: 14px; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">${item.name}</td>
-              <td align="center" style="padding: 14px 16px; font-size: 14px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">${item.quantity}</td>
-              <td align="right" style="padding: 14px 16px; font-size: 14px; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">$${item.price.toFixed(2)}</td>
-              <td align="right" style="padding: 14px 20px; font-size: 14px; font-weight: 700; color: #0d9488; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">$${(item.quantity * item.price).toFixed(2)}</td>
+              <td style="padding: 10px 12px; font-size: 13px; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">${item.name}</td>
+              <td align="center" style="padding: 10px 8px; font-size: 13px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">${item.quantity}</td>
+              <td align="right" style="padding: 10px 12px; font-size: 13px; font-weight: 700; color: #0d9488; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-bottom: 1px solid #f1f5f9;">$${(item.quantity * item.price).toFixed(2)}</td>
             </tr>
             `).join('')}
           </table>
@@ -294,100 +293,100 @@ function generateConsumptionReportEmail({
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Consumption Report - ${eventName}</title>
+  <style type="text/css">
+    /* Mobile styles */
+    @media only screen and (max-width: 480px) {
+      .wrapper { padding: 12px !important; }
+      .container { border-radius: 12px !important; }
+      .header-pad { padding: 20px 16px !important; }
+      .content-pad { padding: 20px 16px !important; }
+      .stat-box { padding: 16px 12px !important; }
+      .stat-number { font-size: 32px !important; }
+      .stat-label { font-size: 11px !important; }
+      .event-title { font-size: 22px !important; }
+      .section-title { font-size: 16px !important; }
+      .footer-pad { padding: 20px 16px !important; }
+      .grand-total-pad { padding: 16px !important; }
+      .grand-total-amount { font-size: 22px !important; }
+      .insight-cell { display: block !important; width: 100% !important; padding: 8px 0 !important; }
+    }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f1f5f9; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f1f5f9;">
     <tr>
-      <td align="center">
-        <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+      <td align="center" class="wrapper" style="padding: 24px 12px;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" class="container" style="max-width: 480px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
 
           <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #f97316, #ea580c); padding: 32px 40px; text-align: center;">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td align="center">
-                    <img src="${process.env.NEXT_PUBLIC_APP_URL || 'https://invyeasy.com'}/InvyEasy-logo.png" alt="InvyEasy" width="160" style="display: block; margin-bottom: 16px;" />
-                    <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;">Consumption Tracker Report</p>
-                  </td>
-                </tr>
-              </table>
+            <td class="header-pad" style="background: linear-gradient(135deg, #f97316, #ea580c); padding: 24px 20px; text-align: center;">
+              <img src="${process.env.NEXT_PUBLIC_APP_URL || 'https://invyeasy.com'}/InvyEasy-logo.png" alt="InvyEasy" width="130" style="display: block; margin: 0 auto 12px auto;" />
+              <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">Consumption Report</p>
             </td>
           </tr>
 
           <!-- Event Header -->
           <tr>
-            <td style="padding: 32px 40px; background-color: #0f172a;">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td>
-                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Event</p>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff;">${eventName}</h1>
-                  </td>
-                  <td align="right" style="vertical-align: top;">
-                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Date</p>
-                    <p style="margin: 0; font-size: 16px; color: #ffffff; font-weight: 500;">${eventDate}</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="2" style="padding-top: 12px;">
-                    <p style="margin: 0; font-size: 13px; color: #64748b;">${organizationName}</p>
-                  </td>
-                </tr>
-              </table>
+            <td class="content-pad" style="padding: 20px; background-color: #0f172a;">
+              <p style="margin: 0 0 4px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Event</p>
+              <h1 class="event-title" style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.2;">${eventName}</h1>
+              <p style="margin: 0 0 4px 0; font-size: 14px; color: #ffffff;">${eventDate}</p>
+              <p style="margin: 0; font-size: 12px; color: #64748b;">${organizationName}</p>
             </td>
           </tr>
 
-          <!-- Main Stats -->
+          <!-- Main Stats - Stacked for mobile -->
           <tr>
-            <td style="padding: 32px 40px;">
+            <td class="content-pad" style="padding: 20px;">
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td width="48%" style="background: linear-gradient(135deg, #14b8a6, #0d9488); border-radius: 12px; padding: 24px; text-align: center;">
-                    <p style="margin: 0; font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1;">${grandItemCount}</p>
-                    <p style="margin: 8px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Drinks</p>
+                  <td width="48%" class="stat-box" style="background: linear-gradient(135deg, #14b8a6, #0d9488); border-radius: 10px; padding: 18px 14px; text-align: center; vertical-align: top;">
+                    <p class="stat-number" style="margin: 0; font-size: 36px; font-weight: 800; color: #ffffff; line-height: 1;">${grandItemCount}</p>
+                    <p class="stat-label" style="margin: 6px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Total Drinks</p>
                   </td>
                   <td width="4%"></td>
-                  <td width="48%" style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 12px; padding: 24px; text-align: center;">
-                    <p style="margin: 0; font-size: 42px; font-weight: 800; color: #14b8a6; line-height: 1;">$${grandTotal.toFixed(2)}</p>
-                    <p style="margin: 8px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Revenue</p>
+                  <td width="48%" class="stat-box" style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 10px; padding: 18px 14px; text-align: center; vertical-align: top;">
+                    <p class="stat-number" style="margin: 0; font-size: 36px; font-weight: 800; color: #14b8a6; line-height: 1;">$${grandTotal.toFixed(0)}</p>
+                    <p class="stat-label" style="margin: 6px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Revenue</p>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Insights Section -->
+          <!-- Insights Section - Compact for mobile -->
           ${mostPopularItem ? `
           <tr>
-            <td style="padding: 0 40px 32px 40px;">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #fef3c7; border-radius: 12px; border: 1px solid #fcd34d;">
+            <td style="padding: 0 20px 20px 20px;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #fef3c7; border-radius: 10px; border: 1px solid #fcd34d;">
                 <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Event Insights</p>
+                  <td style="padding: 14px 16px;">
+                    <p style="margin: 0 0 10px 0; font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.3px;">Insights</p>
                     <table cellpadding="0" cellspacing="0" border="0" width="100%">
                       <tr>
-                        <td width="50%" style="padding: 8px 0; vertical-align: top;">
-                          <p style="margin: 0 0 2px 0; font-size: 11px; color: #92400e; text-transform: uppercase; font-weight: 600;">Most Popular</p>
-                          <p style="margin: 0; font-size: 15px; color: #78350f; font-weight: 700;">${mostPopularItem.name}</p>
-                          <p style="margin: 2px 0 0 0; font-size: 12px; color: #a16207;">${mostPopularItem.quantity} drinks served</p>
+                        <td class="insight-cell" width="50%" style="padding: 6px 4px 6px 0; vertical-align: top;">
+                          <p style="margin: 0 0 2px 0; font-size: 10px; color: #92400e; text-transform: uppercase; font-weight: 600;">Most Popular</p>
+                          <p style="margin: 0; font-size: 13px; color: #78350f; font-weight: 700;">${mostPopularItem.name}</p>
+                          <p style="margin: 1px 0 0 0; font-size: 11px; color: #a16207;">${mostPopularItem.quantity} served</p>
                         </td>
-                        <td width="50%" style="padding: 8px 0; vertical-align: top;">
-                          <p style="margin: 0 0 2px 0; font-size: 11px; color: #92400e; text-transform: uppercase; font-weight: 600;">Top Category</p>
-                          <p style="margin: 0; font-size: 15px; color: #78350f; font-weight: 700;">${topCategory?.name || 'N/A'}</p>
-                          <p style="margin: 2px 0 0 0; font-size: 12px; color: #a16207;">${topCategory?.itemCount || 0} drinks &bull; $${topCategory?.subtotal.toFixed(2) || '0.00'}</p>
+                        <td class="insight-cell" width="50%" style="padding: 6px 0 6px 4px; vertical-align: top;">
+                          <p style="margin: 0 0 2px 0; font-size: 10px; color: #92400e; text-transform: uppercase; font-weight: 600;">Top Category</p>
+                          <p style="margin: 0; font-size: 13px; color: #78350f; font-weight: 700;">${topCategory?.name || 'N/A'}</p>
+                          <p style="margin: 1px 0 0 0; font-size: 11px; color: #a16207;">$${topCategory?.subtotal.toFixed(2) || '0.00'}</p>
                         </td>
                       </tr>
                       <tr>
-                        <td width="50%" style="padding: 8px 0; vertical-align: top;">
-                          <p style="margin: 0 0 2px 0; font-size: 11px; color: #92400e; text-transform: uppercase; font-weight: 600;">Avg. Per Drink</p>
-                          <p style="margin: 0; font-size: 15px; color: #78350f; font-weight: 700;">$${avgPricePerDrink.toFixed(2)}</p>
+                        <td class="insight-cell" width="50%" style="padding: 6px 4px 6px 0; vertical-align: top;">
+                          <p style="margin: 0 0 2px 0; font-size: 10px; color: #92400e; text-transform: uppercase; font-weight: 600;">Avg Price</p>
+                          <p style="margin: 0; font-size: 13px; color: #78350f; font-weight: 700;">$${avgPricePerDrink.toFixed(2)}</p>
                         </td>
-                        <td width="50%" style="padding: 8px 0; vertical-align: top;">
-                          <p style="margin: 0 0 2px 0; font-size: 11px; color: #92400e; text-transform: uppercase; font-weight: 600;">Top Revenue Item</p>
-                          <p style="margin: 0; font-size: 15px; color: #78350f; font-weight: 700;">${highestRevenueItem?.name || 'N/A'}</p>
-                          <p style="margin: 2px 0 0 0; font-size: 12px; color: #a16207;">$${highestRevenueItem ? (highestRevenueItem.quantity * highestRevenueItem.price).toFixed(2) : '0.00'}</p>
+                        <td class="insight-cell" width="50%" style="padding: 6px 0 6px 4px; vertical-align: top;">
+                          <p style="margin: 0 0 2px 0; font-size: 10px; color: #92400e; text-transform: uppercase; font-weight: 600;">Top Revenue</p>
+                          <p style="margin: 0; font-size: 13px; color: #78350f; font-weight: 700;">${highestRevenueItem?.name || 'N/A'}</p>
+                          <p style="margin: 1px 0 0 0; font-size: 11px; color: #a16207;">$${highestRevenueItem ? (highestRevenueItem.quantity * highestRevenueItem.price).toFixed(2) : '0.00'}</p>
                         </td>
                       </tr>
                     </table>
@@ -400,21 +399,23 @@ function generateConsumptionReportEmail({
 
           <!-- Detailed Breakdown -->
           <tr>
-            <td style="padding: 0 40px 32px 40px;">
-              <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Detailed Breakdown</p>
-              ${categorySections || '<p style="color: #64748b; text-align: center; padding: 24px;">No items recorded for this event.</p>'}
+            <td style="padding: 0 20px 20px 20px;">
+              <p class="section-title" style="margin: 0 0 14px 0; font-size: 15px; font-weight: 700; color: #0f172a;">Breakdown</p>
+              ${categorySections || '<p style="color: #64748b; text-align: center; padding: 20px; font-size: 13px;">No items recorded.</p>'}
             </td>
           </tr>
 
           <!-- Grand Total Bar -->
           <tr>
-            <td style="padding: 24px 40px; background-color: #0f172a;">
+            <td class="grand-total-pad" style="padding: 16px 20px; background-color: #0f172a;">
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td style="font-size: 16px; font-weight: 600; color: #ffffff;">Grand Total</td>
-                  <td align="right">
-                    <span style="font-size: 14px; color: #94a3b8; margin-right: 16px;">${grandItemCount} drinks</span>
-                    <span style="font-size: 28px; font-weight: 800; color: #14b8a6;">$${grandTotal.toFixed(2)}</span>
+                  <td style="font-size: 14px; font-weight: 600; color: #ffffff; vertical-align: middle;">
+                    Total
+                    <span style="font-size: 12px; color: #94a3b8; font-weight: 400; display: block;">${grandItemCount} drinks</span>
+                  </td>
+                  <td align="right" style="vertical-align: middle;">
+                    <span class="grand-total-amount" style="font-size: 26px; font-weight: 800; color: #14b8a6;">$${grandTotal.toFixed(2)}</span>
                   </td>
                 </tr>
               </table>
@@ -423,16 +424,16 @@ function generateConsumptionReportEmail({
 
           <!-- Footer -->
           <tr>
-            <td style="padding: 32px 40px; background-color: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
-              <img src="${process.env.NEXT_PUBLIC_APP_URL || 'https://invyeasy.com'}/InvyEasy-logo.png" alt="InvyEasy" width="100" style="display: inline-block; margin-bottom: 12px; opacity: 0.7;" />
-              <p style="margin: 0 0 4px 0; font-size: 13px; color: #64748b;">
-                Sent via <strong style="color: #0f172a;">Consumption Tracker</strong> by InvyEasy
+            <td class="footer-pad" style="padding: 20px; background-color: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+              <img src="${process.env.NEXT_PUBLIC_APP_URL || 'https://invyeasy.com'}/InvyEasy-logo.png" alt="InvyEasy" width="80" style="display: inline-block; margin-bottom: 8px; opacity: 0.6;" />
+              <p style="margin: 0 0 2px 0; font-size: 11px; color: #64748b;">
+                Sent via <strong style="color: #0f172a;">Consumption Tracker</strong>
               </p>
-              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                Report generated: ${reportDate}
+              <p style="margin: 0; font-size: 10px; color: #94a3b8;">
+                ${reportDate}
               </p>
-              <p style="margin: 16px 0 0 0; font-size: 11px; color: #94a3b8;">
-                &copy; ${new Date().getFullYear()} InvyEasy. All rights reserved.
+              <p style="margin: 10px 0 0 0; font-size: 10px; color: #94a3b8;">
+                &copy; ${new Date().getFullYear()} InvyEasy
               </p>
             </td>
           </tr>
