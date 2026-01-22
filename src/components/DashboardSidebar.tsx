@@ -21,23 +21,27 @@ import {
   CreditCard,
   Mail,
   Key,
-  TrendingUp
+  TrendingUp,
+  UserCog
 } from 'lucide-react'
+import { canAccessTab, getRoleDisplayName } from '@/lib/permissions'
 
 interface SidebarProps {
   activeTab: string
   setActiveTab: (tab: string) => void
   isAdmin: boolean
   userEmail: string
+  userRole?: string
   onSignOut: () => void
   onCollapsedChange?: (collapsed: boolean) => void
 }
 
-export default function DashboardSidebar({ 
-  activeTab, 
-  setActiveTab, 
-  isAdmin, 
-  userEmail, 
+export default function DashboardSidebar({
+  activeTab,
+  setActiveTab,
+  isAdmin,
+  userEmail,
+  userRole,
   onSignOut,
   onCollapsedChange
 }: SidebarProps) {
@@ -48,7 +52,8 @@ export default function DashboardSidebar({
     onCollapsedChange?.(isCollapsed)
   }, [isCollapsed, onCollapsedChange])
 
-  const navigationItems = [
+  // All navigation items (will be filtered based on role)
+  const allNavigationItems = [
     { id: 'inventory', label: 'Inventory', icon: Package, description: 'Manage items & stock' },
     { id: 'import', label: 'Import Data', icon: Upload, description: 'Bulk upload via CSV' },
     { id: 'categories', label: 'Categories', icon: ClipboardList, description: 'Product categories' },
@@ -61,6 +66,14 @@ export default function DashboardSidebar({
     { id: 'activity', label: 'Activity & Reports', icon: Activity, description: 'Analytics, logs & CSV export' },
     { id: 'subscription', label: 'Billing & Account', icon: CreditCard, description: 'Manage subscription & billing' }
   ]
+
+  // Filter navigation items based on user role
+  // Platform admins see everything, otherwise filter by role permissions
+  console.log('🔍 Sidebar Debug:', { userRole, isAdmin, canAccessSubscription: canAccessTab(userRole, 'subscription') })
+
+  const navigationItems = isAdmin
+    ? allNavigationItems
+    : allNavigationItems.filter(item => canAccessTab(userRole, item.id))
 
   return (
     <>
@@ -129,7 +142,7 @@ export default function DashboardSidebar({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-gray-900 font-semibold text-sm truncate">{userEmail}</p>
-                    <p className="text-gray-600 text-xs">Dashboard User</p>
+                    <p className="text-gray-600 text-xs">{getRoleDisplayName(userRole)}</p>
                   </div>
                 </div>
               </div>
@@ -219,9 +232,31 @@ export default function DashboardSidebar({
               </Link>
             )}
 
-            {/* Home Button */}
+            {/* Settings Button */}
             <Link
-              href="/"
+              href="/settings"
+              className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 ${
+                isCollapsed ? 'justify-center' : ''
+              }`}
+              style={{
+                background: 'rgba(255,255,255,0.5)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.7)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+              }}
+            >
+              <UserCog className="h-5 w-5 text-gray-600 flex-shrink-0" />
+              {!isCollapsed && (
+                <span className="ml-3 text-gray-700 text-sm font-medium">Account Settings</span>
+              )}
+            </Link>
+
+            {/* All Apps Button */}
+            <Link
+              href="/apps"
               className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 ${
                 isCollapsed ? 'justify-center' : ''
               }`}
@@ -237,7 +272,7 @@ export default function DashboardSidebar({
             >
               <Home className="h-5 w-5 text-gray-600 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 text-gray-700 text-sm font-medium">Back to Home</span>
+                <span className="ml-3 text-gray-700 text-sm font-medium">All Apps</span>
               )}
             </Link>
 
