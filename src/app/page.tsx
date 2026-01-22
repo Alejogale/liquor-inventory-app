@@ -1,68 +1,120 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   Check,
-  Star,
-  FileText,
-  Zap,
-  Shield,
-  BarChart3,
-  Users,
-  Building2,
-  Clock,
   Package,
   Home,
   Heart,
   Briefcase,
   Smartphone,
-  Globe,
-  MessageCircle,
+  BarChart3,
+  Users,
+  Shield,
+  Zap,
+  Clock,
   ChevronDown,
-  Play,
-  Wifi,
-  Sparkles
+  Play
 } from 'lucide-react'
-import { ExitIntentPopup } from '@/components/ExitIntentPopup'
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null)
   const [isAnnual, setIsAnnual] = useState(false)
-  const [modalImage, setModalImage] = useState<string | null>(null)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const router = useRouter()
-  // Force deployment trigger - subscription update
 
-  // Handle email capture from popup
-  const handleEmailCapture = async (email: string) => {
-    const response = await fetch('/api/capture-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to capture email')
-    }
-
-    return response.json()
-  }
+  // Custom cursor refs
+  const cursorDotRef = useRef<HTMLDivElement>(null)
+  const cursorRingRef = useRef<HTMLDivElement>(null)
+  const [cursorHovering, setCursorHovering] = useState(false)
 
   // Handle password reset redirect
   useEffect(() => {
     const handleAuthRedirect = () => {
       const hash = window.location.hash
       if (hash.includes('access_token') && hash.includes('type=recovery')) {
-        // This is a password reset link, redirect to reset password page
         router.push(`/reset-password${hash}`)
       }
     }
-
     handleAuthRedirect()
+  }, [router])
+
+  // Scroll progress indicator
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = (window.scrollY / totalHeight) * 100
+      setScrollProgress(progress)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Custom cursor effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (cursorDotRef.current && cursorRingRef.current) {
+        cursorDotRef.current.style.left = `${e.clientX}px`
+        cursorDotRef.current.style.top = `${e.clientY}px`
+
+        setTimeout(() => {
+          if (cursorRingRef.current) {
+            cursorRingRef.current.style.left = `${e.clientX}px`
+            cursorRingRef.current.style.top = `${e.clientY}px`
+          }
+        }, 50)
+      }
+    }
+
+    const handleMouseEnter = () => setCursorHovering(true)
+    const handleMouseLeave = () => setCursorHovering(false)
+
+    // Check if device has fine pointer (mouse)
+    const hasFinePonter = window.matchMedia('(pointer: fine)').matches
+    if (hasFinePonter) {
+      document.body.classList.add('custom-cursor-enabled')
+      window.addEventListener('mousemove', handleMouseMove)
+
+      // Add hover effect to clickable elements
+      const clickables = document.querySelectorAll('a, button, [role="button"]')
+      clickables.forEach(el => {
+        el.addEventListener('mouseenter', handleMouseEnter)
+        el.addEventListener('mouseleave', handleMouseLeave)
+      })
+
+      return () => {
+        document.body.classList.remove('custom-cursor-enabled')
+        window.removeEventListener('mousemove', handleMouseMove)
+        clickables.forEach(el => {
+          el.removeEventListener('mouseenter', handleMouseEnter)
+          el.removeEventListener('mouseleave', handleMouseLeave)
+        })
+      }
+    }
+  }, [])
+
+  // Scroll animation observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll')
+    animatedElements.forEach((el) => observer.observe(el))
+
+    return () => observer.disconnect()
   }, [])
 
   const toggleFAQ = (index: number) => {
@@ -72,7 +124,7 @@ export default function LandingPage() {
   const faqs = [
     {
       question: "Is this just for businesses?",
-      answer: "No! Easy Inventory is perfect for personal use, hobbies, and businesses. Whether you're organizing your home pantry, tracking craft supplies, or managing a small retail store - we've got you covered."
+      answer: "No! InvyEasy is perfect for personal use, hobbies, and businesses. Whether you're organizing your home pantry, tracking craft supplies, or managing a small retail store - we've got you covered."
     },
     {
       question: "Can I use it for multiple locations?",
@@ -92,53 +144,251 @@ export default function LandingPage() {
     }
   ]
 
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Modern Navigation */}
-      <nav className="sticky top-0 z-[9999] bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
-                <Package className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">InvyEasy</span>
+    <>
+      <style jsx global>{`
+        /* Grayscale Color System with Orange Accent */
+        :root {
+          --primary-color: #FF6B35;
+          --text-dark: #000000;
+          --text-secondary: #333333;
+          --text-accent: #666666;
+          --bg-primary: #FFFFFF;
+          --bg-secondary: #F5F5F5;
+          --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Cursor */
+        @media (min-width: 769px) {
+          body.custom-cursor-enabled {
+            cursor: none;
+          }
+          body.custom-cursor-enabled a,
+          body.custom-cursor-enabled button,
+          body.custom-cursor-enabled [role="button"] {
+            cursor: none;
+          }
+        }
+
+        .cursor-dot {
+          position: fixed;
+          width: 8px;
+          height: 8px;
+          background: #FF6B35;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 99999;
+          transform: translate(-50%, -50%);
+          transition: transform 0.1s ease, background 0.2s ease;
+        }
+
+        .cursor-ring {
+          position: fixed;
+          width: 36px;
+          height: 36px;
+          border: 2px solid rgba(255, 107, 53, 0.5);
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 99998;
+          transform: translate(-50%, -50%);
+          transition: transform 0.15s ease-out, width 0.2s ease, height 0.2s ease;
+        }
+
+        .cursor-dot.hovering {
+          transform: translate(-50%, -50%) scale(0.5);
+          background: #0351E4;
+        }
+
+        .cursor-ring.hovering {
+          width: 50px;
+          height: 50px;
+          border-color: rgba(3, 81, 228, 0.5);
+        }
+
+        @media (max-width: 768px) {
+          .cursor-dot, .cursor-ring { display: none !important; }
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #FF6B35, #F25050);
+          z-index: 10001;
+          transition: width 0.1s ease;
+        }
+
+        /* Animate on scroll */
+        .animate-on-scroll {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .animate-on-scroll.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+        .animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+        .animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+        .animate-on-scroll.delay-4 { transition-delay: 0.4s; }
+
+        /* Hero animations */
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-animate {
+          opacity: 0;
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+        .hero-animate-1 { animation-delay: 0.1s; }
+        .hero-animate-2 { animation-delay: 0.25s; }
+        .hero-animate-3 { animation-delay: 0.4s; }
+        .hero-animate-4 { animation-delay: 0.55s; }
+
+        /* Orbital animations */
+        @keyframes orbit {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes counter-rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(-360deg); }
+        }
+
+        .orbit {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          animation: orbit linear infinite;
+        }
+
+        .orbit-1 { width: 400px; height: 400px; animation-duration: 25s; }
+        .orbit-2 { width: 600px; height: 600px; animation-duration: 35s; animation-direction: reverse; }
+        .orbit-3 { width: 800px; height: 800px; animation-duration: 45s; }
+
+        .orbital-item {
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.9);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        .orbit-1 .orbital-item { animation: counter-rotate 25s linear infinite; }
+        .orbit-2 .orbital-item { animation: counter-rotate 35s linear infinite reverse; }
+        .orbit-3 .orbital-item { animation: counter-rotate 45s linear infinite; }
+
+        .orbital-item:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+        .orbital-item:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+        .orbital-item:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .orbital-item:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+        @media (max-width: 768px) {
+          .orbital-container { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .orbit, .orbital-item { animation: none !important; }
+        }
+
+        /* Partners carousel */
+        @keyframes carousel-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .partners-carousel {
+          display: flex;
+          gap: 40px;
+          animation: carousel-scroll 25s linear infinite;
+          width: max-content;
+        }
+
+        .partners-carousel:hover {
+          animation-play-state: paused;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+          background: linear-gradient(135deg, #FF6B35, #F7931E, #FF8C42);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* Glass card */
+        .glass-card {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
+
+      {/* Custom Cursor */}
+      <div
+        ref={cursorDotRef}
+        className={`cursor-dot ${cursorHovering ? 'hovering' : ''}`}
+      />
+      <div
+        ref={cursorRingRef}
+        className={`cursor-ring ${cursorHovering ? 'hovering' : ''}`}
+      />
+
+      {/* Scroll Progress */}
+      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
+
+      <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+        {/* Header */}
+        <header className="fixed w-full top-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-gray-200/50" style={{ padding: '8px 0' }}>
+          <nav className="max-w-[1024px] mx-auto px-[22px] flex justify-between items-center h-8">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold tracking-tight text-gray-900" style={{ fontFamily: 'system-ui' }}>
+                InvyEasy
+              </span>
+              <span className="text-xs text-gray-400 font-medium">by AIGENZ</span>
             </div>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-              <a href="#use-cases" className="text-gray-600 hover:text-gray-900 transition-colors">Use Cases</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
-              <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
-            </div>
-            
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
-                Sign In
-              </Link>
-              <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl">
-                Start Free Trial
-              </Link>
-            </div>
+
+            <ul className="hidden md:flex items-center gap-6">
+              <li><a href="#features" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Features</a></li>
+              <li><a href="#use-cases" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Use Cases</a></li>
+              <li><a href="#how-it-works" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">How It Works</a></li>
+              <li><a href="#pricing" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Pricing</a></li>
+              <li><a href="#faq" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">FAQ</a></li>
+              <li>
+                <Link href="/login" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">
+                  Sign In
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 text-sm font-semibold border-2 border-[#465C88] text-[#465C88] rounded-lg hover:bg-[#465C88] hover:text-white transition-all"
+                >
+                  Start Free Trial
+                </Link>
+              </li>
+            </ul>
 
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
+              className="md:hidden p-2 text-gray-700"
             >
-              <svg 
-                className={`w-6 h-6 transition-transform duration-200 ${isMenuOpen ? 'rotate-90' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -146,1705 +396,527 @@ export default function LandingPage() {
                 )}
               </svg>
             </button>
-          </div>
-        </div>
+          </nav>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
-            <div className="px-4 py-4 space-y-4">
-              <a href="#features" className="block text-gray-600 hover:text-gray-900 py-2">Features</a>
-              <a href="#use-cases" className="block text-gray-600 hover:text-gray-900 py-2">Use Cases</a>
-              <a href="#how-it-works" className="block text-gray-600 hover:text-gray-900 py-2">How It Works</a>
-              <a href="#pricing" className="block text-gray-600 hover:text-gray-900 py-2">Pricing</a>
-              <a href="#faq" className="block text-gray-600 hover:text-gray-900 py-2">FAQ</a>
-              <Link href="/contact" className="block text-gray-600 hover:text-gray-900 py-2">Contact</Link>
-              
-              {/* Mobile CTA Buttons */}
-              <div className="pt-4 border-t border-gray-100 space-y-3">
-                <Link href="/login" className="block text-center text-gray-600 hover:text-gray-900 py-2 font-medium">
-                  Sign In
-                </Link>
-                <Link href="/signup" className="block text-center bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200">
-                  Start Free Trial
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <section className="pt-6 pb-8 sm:pt-8 sm:pb-12 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start">
-            {/* Left Side - Hero Content */}
-            <div className="text-center lg:text-left order-2 lg:order-1">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                <span className="whitespace-nowrap">Organize Everything You Own</span>
-              </div>
-              
-              {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-                Easy Inventory<br />
-                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  Management
-                </span><br />
-                for Everyone
-              </h1>
-              
-              <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
-                Track, count, and manage inventory for your home, hobby, or business. 
-                Never lose track of what you own with our intuitive mobile-first system.
-              </p>
-              
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 max-w-2xl mx-auto lg:mx-0">
-                <Link href="/signup" className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center min-w-[200px]">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all duration-200 flex items-center justify-center min-w-[200px]">
-                  <Play className="mr-2 w-5 h-5" />
-                  Watch Demo
-                </button>
-              </div>
-              
-              {/* Trust Indicators */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-gray-600 mb-12 max-w-2xl mx-auto lg:mx-0">
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm sm:text-base whitespace-nowrap">No credit card required</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm sm:text-base whitespace-nowrap">Setup in 5 minutes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm sm:text-base whitespace-nowrap">30-day free trial</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Hero Image */}
-            <div className="flex justify-center lg:justify-end order-1 lg:order-2 mb-4 sm:mb-0">
-              <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl px-4 sm:px-0">
-                <Image
-                  src="/InvyEasyLaptop1.png"
-                  alt="Inventory management with barcode scanning"
-                  width={2000}
-                  height={2000}
-                  className="w-full h-auto"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission Statement Section */}
-      <section className="py-12 sm:py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Logo */}
-            <div className="flex justify-center lg:justify-end">
-              <Image
-                src="/InvyEasy-logo.png"
-                alt="InvyEasy Logo"
-                width={2000}
-                height={1401}
-                className="w-72 sm:w-80 md:w-96 lg:w-[28rem] h-auto"
-              />
-            </div>
-
-            {/* Mission Text */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-orange-100 shadow-xl text-center lg:text-left">
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start mb-3 sm:mb-4">
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mb-2 sm:mb-0 sm:mr-2" />
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Our Mission</h2>
-              </div>
-              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed px-2 sm:px-0">
-                Making organization simple, smart, and accessible for everyone. Whether you're organizing your home pantry,
-                managing craft supplies, or running a small business - we believe everyone deserves powerful tools that
-                are easy to use and affordable.
-              </p>
-              <p className="text-base sm:text-lg md:text-xl font-bold text-orange-600 mt-3 sm:mt-4">Simple. Smart. Organized.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mobile App Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-visible">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-            {/* Mobile App Image */}
-            <div className="flex justify-center lg:justify-end order-2 lg:order-1">
-              <div className="relative -my-20 lg:-my-32">
-                <Image
-                  src="/iphone-main-mockup-landing-page.png"
-                  alt="InvyEasy Mobile App Interface"
-                  width={800}
-                  height={1600}
-                  className="w-96 sm:w-[450px] md:w-[550px] lg:w-[700px] xl:w-[800px] h-auto drop-shadow-2xl"
-                  priority
-                />
-              </div>
-            </div>
-
-            {/* Mobile App Content */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-orange-100 shadow-xl order-1 lg:order-2">
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start mb-3 sm:mb-4">
-                <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 mb-2 sm:mb-0 sm:mr-2" />
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">InvyEasy Mobile App</h2>
-              </div>
-
-              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-4 px-2 sm:px-0">
-                Take your inventory management anywhere with our powerful mobile app. Built for speed and ease of use.
-              </p>
-
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
-                    <Zap className="w-4 h-4 text-orange-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Hands-Free Barcode Workflow</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Scan, type count, press Enter - zero clicking required</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Real-Time Inventory Tracking</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">View and count inventory across all locations instantly</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                    <Users className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Team Management with PINs</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Role-based access control for owners, managers, and staff</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mt-0.5">
-                    <BarChart3 className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Stock Analytics & Reports</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Track movements, trends, and generate detailed reports</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
-                    <Package className="w-4 h-4 text-orange-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Multi-Room & Supplier Management</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Organize by rooms and manage supplier orders seamlessly</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
-                    <Zap className="w-4 h-4 text-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Offline Mode</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Count inventory without internet, syncs automatically</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <p className="text-base sm:text-lg font-bold text-orange-600 text-center">
-                  Available for iOS & Android
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-12 sm:py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-2 sm:px-0">
-              Everything You Need to Stay Organized
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0">
-              Powerful features designed for everyone - from home organizers to small business owners.
-            </p>
-          </div>
-
-          {/* Hero Feature with Image */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-            <div className="lg:order-2">
-              <Image
-                src="/interactive-experience.png"
-                alt="Interactive learning and organization experience"
-                width={2000}
-                height={2000}
-                className="w-full h-auto max-w-lg mx-auto"
-              />
-            </div>
-            <div className="lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                📱 Simple & Powerful
-              </div>
-              <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Inventory Management That Just Works
-              </h3>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Built for real people with real stuff to organize. Whether you're tracking pantry items at home or managing business inventory, InvyEasy makes it simple to know what you have and where you have it.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Room-Based Tracking</h4>
-                    <p className="text-gray-600">Organize by location - kitchen, garage, office, warehouse. See exactly where everything is.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <Smartphone className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Mobile-First Experience</h4>
-                    <p className="text-gray-600">Count and update inventory on the go with our mobile-optimized interface</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <Users className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Team Collaboration</h4>
-                    <p className="text-gray-600">Share and collaborate with family or team members seamlessly</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Core Features in a More Natural Layout */}
-          <div className="space-y-12">
-            {/* Row 1: Two main features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-3xl border border-orange-100">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
-                    <Package className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Smart Categories</h3>
-                    <p className="text-orange-600 text-sm font-medium">Organize Your Way</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  Create custom categories that make sense to you. From pantry staples to craft supplies, organize everything exactly how you think about it.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Pantry</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Office</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">Garage</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-orange-200">+More</span>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-3xl border border-blue-100">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center">
-                    <Globe className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Multi-Location Sync</h3>
-                    <p className="text-blue-600 text-sm font-medium">Everywhere You Go</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  Track inventory across multiple locations - home, office, storage units, vacation homes. Everything syncs in real-time across all your devices.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Building2 className="w-4 h-4 text-blue-500" />
-                    <span>Home</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Briefcase className="w-4 h-4 text-purple-500" />
-                    <span>Office</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Home className="w-4 h-4 text-blue-500" />
-                    <span>Storage</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Package className="w-4 h-4 text-purple-500" />
-                    <span>Warehouse</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Three supporting features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">Smart Analytics</h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  See trends, track usage patterns, and get insights that help you make smarter inventory decisions.
-                </p>
-              </div>
-
-              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">Team Collaboration</h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Share with family, roommates, or team members. Everyone can contribute to keeping things organized.
-                </p>
-              </div>
-
-              <div className="text-center p-6 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200">
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Smartphone className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">Mobile Optimized</h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Built mobile-first for quick updates while you're organizing. Scan, count, and manage on the go.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Detailed Features Section */}
-      <section className="py-20 bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Powerful Features for Every Need
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover how Easy Inventory's advanced features make organization effortless and efficient.
-            </p>
-          </div>
-
-          <div className="space-y-20">
-            {/* Barcode Scanner Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                  📱 Mobile Scanning
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                  Hands-Free Barcode Scanning
-                </h3>
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  Our revolutionary hands-free workflow means you never touch your computer during inventory counts.
-                  Scan a barcode, type the count with your scanner's keyboard, hit Enter - and you're ready for the next item.
-                  No clicking, no mouse, just pure efficiency.
-                </p>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">100% hands-free counting workflow</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Auto-focus on count input after scan</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Press Enter to save and continue</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Works with any Bluetooth scanner</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Cut counting time by 70%</span>
-                  </li>
-                </ul>
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
-                  <p className="text-sm text-gray-600 italic">
-                    "The hands-free workflow is a game-changer. We finish our weekly inventory in half the time. Just scan, count, enter - done!"
-                  </p>
-                  <p className="text-sm font-medium text-gray-900 mt-2">- Michael R., Bar Manager</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100">
-                <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-6 text-white text-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Smartphone className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-xl font-bold mb-2">Scan & Go</h4>
-                  <p className="text-orange-100">Dedicated scanner recommended</p>
-                </div>
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-gray-700">Item added to inventory</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Package className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-gray-700">Category auto-assigned</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className="text-gray-700">Count updated instantly</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Rooms & Locations Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div className="order-2 lg:order-1">
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-orange-100">
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-4 text-white text-center">
-                      <Building2 className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Home</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl p-4 text-white text-center">
-                      <Briefcase className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Office</p>
-                      </div>
-                    <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-xl p-4 text-white text-center">
-                      <Home className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Storage</p>
-                      </div>
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white text-center">
-                      <Package className="w-6 h-6 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Garage</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Pantry Items</span>
-                      <span className="text-orange-600 font-medium">47 items</span>
-                </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Office Supplies</span>
-                      <span className="text-blue-600 font-medium">23 items</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700">Storage Boxes</span>
-                      <span className="text-green-600 font-medium">12 items</span>
-                    </div>
-                  </div>
-                </div>
-                      </div>
-              <div className="order-1 lg:order-2">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-6">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  🏢 Multi-Location
-                      </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                  Rooms & Locations
-                </h3>
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  Organize your inventory by rooms, locations, or any way that makes sense to you. 
-                  Track items across your entire home, office, or multiple properties.
-                </p>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Unlimited rooms and locations</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Room-specific counting</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Cross-location reports</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Custom room organization</span>
-                  </li>
-                </ul>
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
-                  <p className="text-sm text-gray-600 italic">
-                    "I can track my craft supplies in the studio, office supplies at work, and pantry items at home - all in one place!"
-                  </p>
-                  <p className="text-sm font-medium text-gray-900 mt-2">- Mike, Small Business Owner</p>
-                    </div>
-                  </div>
-                </div>
-
-            {/* Import & Export Feature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-6">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  📊 Data Management
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                  Import & Export
-                </h3>
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  Easily import your existing inventory from spreadsheets or export your data for backup, 
-                  analysis, or migration. No data loss, no manual entry.
-                </p>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">CSV import/export support</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Bulk data operations</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Duplicate prevention</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Data validation & cleanup</span>
-                  </li>
-                </ul>
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
-                  <p className="text-sm text-gray-600 italic">
-                    "I imported my entire pantry inventory from my old spreadsheet in minutes. The duplicate detection saved me hours!"
-                  </p>
-                  <p className="text-sm font-medium text-gray-900 mt-2">- Jennifer, Home Organizer</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-green-100">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Package className="w-8 h-8 text-white" />
-                  </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Data Import</h4>
-                  <p className="text-gray-600">Upload your CSV file</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-gray-700">File uploaded successfully</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-blue-600" />
-                      </div>
-                    <span className="text-gray-700">247 items imported</span>
-                      </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-yellow-600" />
-                    </div>
-                    <span className="text-gray-700">12 duplicates skipped</span>
-                  </div>
-                </div>
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Import Progress</span>
-                    <span className="text-green-600 font-medium">100% Complete</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-green-500 h-2 rounded-full w-full"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section id="use-cases" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Perfect for Everyone
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Whether you're organizing your home, managing a hobby, or running a business - we've got you covered.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {/* Home Organization */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-bl-3xl opacity-10"></div>
-              <Image
-                src="/barcode-scanning.png"
-                alt="Easy barcode scanning for home inventory"
-                width={2000}
-                height={2000}
-                className="w-full h-36 object-contain rounded-xl mb-6"
-              />
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4">
-                  <Home className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">🏠 Home Organization</h3>
-                <ul className="space-y-3 text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Pantry management
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Garage inventory
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Closet organization
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Emergency supplies
-                  </li>
-                </ul>
-                <p className="text-gray-600 leading-relaxed">
-                  Never lose track of what you own. Organize your entire home with ease and always know what you have.
-                </p>
-              </div>
-            </div>
-
-            {/* Hobby & Collectibles */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-br-3xl opacity-10"></div>
-              <Image
-                src="/digital-library.jpg"
-                alt="Digital organization for hobbies and collections"
-                width={5209}
-                height={5210}
-                className="w-full h-36 object-cover rounded-xl mb-6"
-              />
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4">
-                  <Heart className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">🎨 Hobby & Collectibles</h3>
-                <ul className="space-y-3 text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Craft supplies
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Sports equipment
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Books & games
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Collectibles
-                  </li>
-                </ul>
-                <p className="text-gray-600 leading-relaxed">
-                  Track craft supplies, sports equipment, books, games, and collectibles with ease across multiple rooms.
-                </p>
-              </div>
-            </div>
-
-            {/* Small Business */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-br-3xl opacity-10"></div>
-              <Image
-                src="/warehouse-management.jpg"
-                alt="Professional warehouse and inventory management"
-                width={5210}
-                height={5209}
-                className="w-full h-40 object-cover rounded-xl mb-6"
-              />
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-4">
-                  <Briefcase className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">💼 Small Business</h3>
-                <ul className="space-y-3 text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Retail stores
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Warehouses & storage
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Professional services
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Multi-location ops
-                  </li>
-                </ul>
-                <p className="text-gray-600 leading-relaxed">
-                  Professional inventory management for retail stores, warehouses, and growing businesses. Scale with confidence.
-                </p>
-              </div>
-            </div>
-          </div>
-              </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How Easy Inventory Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Get started in minutes with our simple 3-step process. No complex setup, no learning curve.
-            </p>
-            </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-16">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-2xl font-bold text-white">1</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Set Up Your Spaces</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Create rooms and locations that match your life - pantry, garage, office, storage units. 
-                Organize the way that makes sense to you.
-              </p>
-              <div className="mt-6 bg-gray-50 rounded-xl p-4">
-                <div className="text-sm text-gray-600 mb-2">Example rooms:</div>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">Kitchen</span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Office</span>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Garage</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-2xl font-bold text-white">2</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Add Your Items</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Scan barcodes with a dedicated scanner, import from spreadsheets, or add items manually. 
-                  Create categories and organize everything your way.
-                </p>
-              <div className="mt-6 bg-gray-50 rounded-xl p-4">
-                <div className="text-sm text-gray-600 mb-2">Quick ways to add:</div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Package className="w-4 h-4 text-orange-500" />
-                    <span>Scan with barcode scanner</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Package className="w-4 h-4 text-blue-500" />
-                    <span>Import CSV files</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Add manually</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-2xl font-bold text-white">3</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Track & Manage</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Count inventory, generate reports, and stay organized. 
-                Share with family or team members to keep everyone in sync.
-              </p>
-              <div className="mt-6 bg-gray-50 rounded-xl p-4">
-                <div className="text-sm text-gray-600 mb-2">Stay organized with:</div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <BarChart3 className="w-4 h-4 text-green-500" />
-                    <span>Smart reports</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-blue-500" />
-                    <span>Team sharing</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-purple-500" />
-                    <span>Real-time updates</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature Highlights */}
-          <div className="bg-gradient-to-br from-orange-50 via-white to-red-50 rounded-3xl p-8 md:p-12">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                Everything You Need to Get Started
-              </h3>
-              <p className="text-lg text-gray-600">
-                No complex setup, no learning curve. Just powerful features that work the way you do.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Smartphone className="w-6 h-6 text-orange-600" />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Mobile Ready</h4>
-                <p className="text-sm text-gray-600">Works perfectly on your phone</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-6 h-6 text-blue-600" />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Secure & Private</h4>
-                <p className="text-sm text-gray-600">Your data is always protected</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-6 h-6 text-green-600" />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Lightning Fast</h4>
-                <p className="text-sm text-gray-600">Instant updates and sync</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-purple-600" />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Team Friendly</h4>
-                <p className="text-sm text-gray-600">Share with family or colleagues</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Recommended Barcode Scanner Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
-              <Package className="w-4 h-4" />
-              Recommended Hardware
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Get the Most Out of InvyEasy
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              A dedicated Bluetooth barcode scanner makes inventory management lightning-fast and effortless.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
-              {/* Product Images */}
-              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
-                <div className="relative">
-                  <Image
-                    src="/barccode scanner image.jpg"
-                    alt="Bluetooth Wireless Barcode Scanner - Perfect for InvyEasy"
-                    width={1500}
-                    height={1359}
-                    className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={() => setModalImage('/barccode scanner image.jpg')}
-                  />
-                  <div className="absolute -top-4 -right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                    ⭐ Recommended
-                  </div>
-                </div>
-                
-                {/* Additional product images */}
-                <div className="flex gap-3 mt-6 justify-center">
-                  <Image
-                    src="/71F7l9ydGeL._AC_SL1500_.jpg"
-                    alt="Scanner angle 1"
-                    width={1500}
-                    height={1500}
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                    onClick={() => setModalImage('/71F7l9ydGeL._AC_SL1500_.jpg')}
-                  />
-                  <Image
-                    src="/71tAACAKRdL._AC_SL1500_.jpg"
-                    alt="Scanner angle 2"
-                    width={1500}
-                    height={1500}
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                    onClick={() => setModalImage('/71tAACAKRdL._AC_SL1500_.jpg')}
-                  />
-                  <Image
-                    src="/81GEHejYbnL._AC_SL1500_.jpg"
-                    alt="Scanner angle 3"
-                    width={1500}
-                    height={1466}
-                    className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                    onClick={() => setModalImage('/81GEHejYbnL._AC_SL1500_.jpg')}
-                  />
-                </div>
-              </div>
-
-              {/* Product Details */}
-              <div className="p-8 lg:p-12">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="text-yellow-400 text-lg">★★★★★</div>
-                  <span className="text-gray-600 text-sm">(1000+ reviews)</span>
-                </div>
-                
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Bluetooth Wireless Barcode Scanner
-                </h3>
-                
-                <div className="text-3xl font-bold text-blue-600 mb-6">
-                  $39.99
-                  <span className="text-lg text-gray-500 font-normal ml-2">(price may vary)</span>
-                </div>
-
-                <div className="space-y-4 mb-8">
-                  <h4 className="font-semibold text-gray-900 mb-3">Perfect for InvyEasy because:</h4>
-                  
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <span className="font-medium text-gray-900">Wireless Bluetooth Connection</span>
-                      <p className="text-gray-600 text-sm">Connects directly to your phone, tablet, or computer</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <span className="font-medium text-gray-900">All Barcode Types</span>
-                      <p className="text-gray-600 text-sm">Reads 1D, 2D, QR codes, and more</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <span className="font-medium text-gray-900">Long Battery Life</span>
-                      <p className="text-gray-600 text-sm">Days of use on a single charge</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <span className="font-medium text-gray-900">Plug & Play Setup</span>
-                      <p className="text-gray-600 text-sm">No drivers needed - works instantly</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <span className="font-medium text-gray-900">Portable & Durable</span>
-                      <p className="text-gray-600 text-sm">Perfect for home, office, or warehouse use</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                  <h5 className="font-semibold text-blue-900 mb-2">💡 Pro Tip:</h5>
-                  <p className="text-blue-800 text-sm">
-                    Any Bluetooth barcode scanner will work with InvyEasy! This is just our top recommendation based on user feedback and reliability.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <a
-                    href="https://amzn.to/4pMXEEK"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl text-center flex items-center justify-center gap-2"
-                  >
-                    <Package className="w-5 h-5" />
-                    View on Amazon
-                  </a>
-                  <Link 
-                    href="/signup" 
-                    className="bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-center flex items-center justify-center gap-2"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                    Try InvyEasy Free
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+              <div className="px-4 py-4 space-y-3">
+                <a href="#features" className="block text-gray-700 py-2">Features</a>
+                <a href="#use-cases" className="block text-gray-700 py-2">Use Cases</a>
+                <a href="#how-it-works" className="block text-gray-700 py-2">How It Works</a>
+                <a href="#pricing" className="block text-gray-700 py-2">Pricing</a>
+                <a href="#faq" className="block text-gray-700 py-2">FAQ</a>
+                <div className="pt-3 border-t border-gray-100 space-y-3">
+                  <Link href="/login" className="block text-center text-gray-700 py-2">Sign In</Link>
+                  <Link href="/signup" className="block text-center bg-[#FF6B35] text-white py-3 rounded-lg font-medium">
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
             </div>
+          )}
+        </header>
+
+        {/* Hero Section */}
+        <section className="min-h-screen flex items-center relative overflow-hidden pt-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          {/* Orbital Accents */}
+          <div className="orbital-container absolute top-1/2 left-1/2 w-full h-full pointer-events-none overflow-hidden z-0" style={{ transform: 'translate(-50%, -50%)' }}>
+            <div className="orbit orbit-1">
+              <div className="orbital-item">
+                <Package className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <BarChart3 className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Shield className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+            </div>
+            <div className="orbit orbit-2">
+              <div className="orbital-item">
+                <Users className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Smartphone className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Zap className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Clock className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+            </div>
+            <div className="orbit orbit-3">
+              <div className="orbital-item">
+                <Home className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Briefcase className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+              <div className="orbital-item">
+                <Heart className="w-5 h-5 text-[#FF6B35] opacity-70" />
+              </div>
+            </div>
           </div>
 
-          {/* Alternative Options */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">
-              <strong>Don't need a scanner?</strong> No problem! InvyEasy works great with:
+          <div className="max-w-[1000px] mx-auto px-6 text-center relative z-10">
+            <h1 className="hero-animate hero-animate-1 text-5xl md:text-6xl font-bold leading-tight mb-4 text-black" style={{ fontFamily: 'system-ui' }}>
+              Easy Inventory for <span className="gradient-text">Everyone</span>.
+            </h1>
+            <p className="hero-animate hero-animate-2 text-xl text-gray-600 mb-4" style={{ fontFamily: 'Inter, system-ui' }}>
+              Track, count, and manage everything you own.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
-                <span className="text-sm text-gray-700">📄 CSV file imports</span>
-              </div>
-              <div className="bg-white rounded-lg px-4 py-2 shadow-md border">
-                <span className="text-sm text-gray-700">⌨️ Manual entry</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Scanner One - Alternative Option */}
-          <div className="mt-16">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Another Great Option
-              </h3>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Looking for alternatives? This scanner also works perfectly with InvyEasy.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-              <div className="grid lg:grid-cols-2 gap-0">
-                {/* Product Images */}
-                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
-                  <div className="relative">
-                    <Image
-                      src="/71QmDP5DjpL._AC_SL1500_.jpg"
-                      alt="Alternative Bluetooth Barcode Scanner"
-                      width={1500}
-                      height={1482}
-                      className="w-full h-auto max-w-md mx-auto rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform duration-200"
-                      onClick={() => setModalImage('/71QmDP5DjpL._AC_SL1500_.jpg')}
-                    />
-                  </div>
-
-                  {/* Additional product images */}
-                  <div className="flex gap-3 mt-6 justify-center flex-wrap">
-                    <Image
-                      src="/71mehx2HvsL._AC_SL1500_.jpg"
-                      alt="Scanner view 1"
-                      width={1500}
-                      height={1469}
-                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                      onClick={() => setModalImage('/71mehx2HvsL._AC_SL1500_.jpg')}
-                    />
-                    <Image
-                      src="/71lHVUl-3jL._AC_SL1500_.jpg"
-                      alt="Scanner view 2"
-                      width={1500}
-                      height={1370}
-                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                      onClick={() => setModalImage('/71lHVUl-3jL._AC_SL1500_.jpg')}
-                    />
-                    <Image
-                      src="/61hQBIB41TL._AC_SL1500_.jpg"
-                      alt="Scanner view 3"
-                      width={1302}
-                      height={1141}
-                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                      onClick={() => setModalImage('/61hQBIB41TL._AC_SL1500_.jpg')}
-                    />
-                    <Image
-                      src="/61NpPb-xBML._AC_.jpg"
-                      alt="Scanner view 4"
-                      width={970}
-                      height={600}
-                      className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer hover:scale-110"
-                      onClick={() => setModalImage('/61NpPb-xBML._AC_.jpg')}
-                    />
-                  </div>
-                </div>
-
-                {/* Product Details */}
-                <div className="p-8 lg:p-12">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="text-yellow-400 text-lg">★★★★★</div>
-                    <span className="text-gray-600 text-sm">(500+ reviews)</span>
-                  </div>
-
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                    Alternative Bluetooth Barcode Scanner
-                  </h3>
-
-                  <div className="text-3xl font-bold text-blue-600 mb-6">
-                    Check Amazon for Price
-                  </div>
-
-                  <div className="space-y-4 mb-8">
-                    <h4 className="font-semibold text-gray-900 mb-3">Key Features:</h4>
-
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                      <div>
-                        <span className="font-medium text-gray-900">Wireless Connectivity</span>
-                        <p className="text-gray-600 text-sm">Bluetooth connection to all devices</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                      <div>
-                        <span className="font-medium text-gray-900">Multi-Format Support</span>
-                        <p className="text-gray-600 text-sm">Reads all standard barcode types</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                      <div>
-                        <span className="font-medium text-gray-900">Reliable Performance</span>
-                        <p className="text-gray-600 text-sm">Consistent scanning speed and accuracy</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                      <div>
-                        <span className="font-medium text-gray-900">Easy Setup</span>
-                        <p className="text-gray-600 text-sm">Quick pairing with your devices</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href="https://amzn.to/4h2tJVm"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl text-center flex items-center justify-center gap-2"
-                    >
-                      <Package className="w-5 h-5" />
-                      View on Amazon
-                    </a>
-                    <Link
-                      href="/signup"
-                      className="bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-center flex items-center justify-center gap-2"
-                    >
-                      <ArrowRight className="w-5 h-5" />
-                      Try InvyEasy Free
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
-              <Star className="w-4 h-4" />
-              Simple, Transparent Pricing
-            </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Choose the Right Plan for Your Business
-            </h2>
-            <p className="text-xl text-gray-600">
-              Start with a 30-day free trial. No credit card required.
+            <p className="hero-animate hero-animate-3 text-base text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
+              From home pantries to small businesses, InvyEasy makes inventory management simple, smart, and accessible. No complex setup, no learning curve.
             </p>
-          </div>
-
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <span className={`text-base font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Monthly
-            </span>
-            <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className="relative inline-flex items-center cursor-pointer"
-            >
-              <div className={`w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-orange-500' : 'bg-gray-300'}`}>
-                <div className={`absolute top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 shadow-md ${isAnnual ? 'translate-x-7' : 'translate-x-1'}`} />
-              </div>
-            </button>
-            <span className={`text-base font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annual
-              <span className="ml-2 text-orange-600 font-bold">Save 15%</span>
-            </span>
-          </div>
-
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
-            {/* Personal Tier */}
-            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
-                <Star className="w-6 h-6 text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Personal</h3>
-              <p className="text-sm text-gray-600 mb-6">Perfect for home bars</p>
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isAnnual ? '193' : '19'}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-xs text-orange-600 mt-1">Save $35 per year</p>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">2 storage areas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">150 items</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">1 user</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Mobile app access</span>
-                </li>
-              </ul>
+            <div className="hero-animate hero-animate-4 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/signup"
-                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 border-[#465C88] text-[#465C88] hover:bg-[#465C88] hover:text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
-                Start Free Trial
+                Start Free Trial <ArrowRight className="w-4 h-4" />
               </Link>
-            </div>
-
-            {/* Starter Tier */}
-            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
-                <Zap className="w-6 h-6 text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Starter</h3>
-              <p className="text-sm text-gray-600 mb-6">Single venue essentials</p>
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isAnnual ? '906' : '89'}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-xs text-orange-600 mt-1">Save $162 per year</p>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">5 storage areas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">500 items</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">5 users</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Team collaboration</span>
-                </li>
-              </ul>
-              <Link
-                href="/signup"
-                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* Professional Tier - MOST POPULAR */}
-            <div className="bg-white rounded-xl shadow-2xl border-2 border-orange-500 p-6 transform lg:scale-105 relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
-                MOST POPULAR
-              </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-orange-500">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Professional</h3>
-              <p className="text-sm text-gray-600 mb-6">For large venues</p>
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isAnnual ? '2,334' : '229'}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-xs text-orange-600 mt-1">Save $414 per year</p>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">15 storage areas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">2,000 items</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">15 users</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Advanced analytics</span>
-                </li>
-              </ul>
-              <Link
-                href="/signup"
-                className="w-full text-center bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg inline-block"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* Premium Tier */}
-            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
-                <Building2 className="w-6 h-6 text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Premium</h3>
-              <p className="text-sm text-gray-600 mb-6">Multi-location chains</p>
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isAnnual ? '5,087' : '499'}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-xs text-orange-600 mt-1">Save $901 per year</p>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">50 storage areas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">10,000 items</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">50 users</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">API access</span>
-                </li>
-              </ul>
-              <Link
-                href="/signup"
-                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* Enterprise Tier */}
-            <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-6 hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-100">
-                <Sparkles className="w-6 h-6 text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
-              <p className="text-sm text-gray-600 mb-6">Unlimited everything</p>
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isAnnual ? '15,287' : '1,499'}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{isAnnual ? 'year' : 'month'}</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-xs text-orange-600 mt-1">Save $2,701 per year</p>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Unlimited areas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Unlimited items</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">Unlimited users</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">White-label options</span>
-                </li>
-              </ul>
-              <Link
-                href="/contact"
-                className="w-full text-center bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors inline-block"
-              >
-                Contact Sales
-              </Link>
+              <button className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-base glass-card text-gray-700 border-2 border-gray-300 hover:border-black transition-all hover:-translate-y-0.5">
+                <Play className="w-4 h-4" /> Watch Demo
+              </button>
             </div>
           </div>
+        </section>
 
-          {/* View Full Pricing Link */}
-          <div className="text-center">
-            <Link href="/pricing" className="text-orange-600 hover:text-orange-700 font-medium inline-flex items-center gap-2 group">
-              View detailed pricing comparison
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Conversion Service Section */}
-      <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-12">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
-                <FileText className="w-4 h-4" />
-                Professional Service
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Inventory Conversion Service</h3>
-              <p className="text-xl text-gray-600 mb-6">
-                Don't have time to format your inventory? We'll do it for you.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
-                <span className="text-4xl sm:text-5xl font-bold text-gray-900">$200</span>
-                <span className="text-gray-600">one-time</span>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-4">What's Included:</h4>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Professional data conversion to InvyEasy format</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Proper categorization and optimization</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Ready-to-import Excel template</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">24-48 hour delivery</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-4">Perfect For:</h4>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Large existing inventory lists</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Complex or messy data formats</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Businesses that need immediate setup</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <ArrowRight className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Save time and ensure accuracy</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Link href="/inventory-conversion" className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
-                Get Professional Conversion
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <p className="text-sm text-gray-500 mt-4">
-                Secure payment • Expert conversion • 24-48 hour delivery
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
+        {/* Trust Indicators */}
+        <section className="py-16" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-10">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                Trusted By Thousands
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                Why Choose <span className="gradient-text">InvyEasy</span>
               </h2>
-            <p className="text-xl text-gray-600">
-              Everything you need to know about Easy Inventory
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                <button
-                  onClick={() => toggleFAQ(index)}
-                  className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                >
-                  <span className="font-semibold text-gray-900">{faq.question}</span>
-                  <ChevronDown 
-                    className={`w-5 h-5 text-gray-500 transition-transform ${
-                      activeFAQ === index ? 'rotate-180' : ''
-                    }`} 
-                  />
-                </button>
-                {activeFAQ === index && (
-                  <div className="px-6 pb-4">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-              </div>
-            </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-orange-500 to-red-500">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to Get Organized?
-          </h2>
-          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-            Start your free trial today and never lose track of what you own again.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup" className="bg-white text-orange-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center justify-center">
-              Start Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-            <Link href="/#faq" className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-orange-600 transition-all duration-200 inline-flex items-center justify-center">
-              <MessageCircle className="mr-2 w-5 h-5" />
-              View FAQ
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                  <Package className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">InvyEasy</span>
-              </div>
-              <p className="text-gray-400">
-                Organize everything you own with our intuitive inventory management system.
+              <p className="text-gray-600 max-w-lg mx-auto">
+                Join thousands of happy users who simplified their inventory management
               </p>
             </div>
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="/login" className="hover:text-white transition-colors">Sign In</a></li>
-                <li><a href="/signup" className="hover:text-white transition-colors">Sign Up</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms & Liability</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 InvyEasy. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
 
-      {/* Image Modal */}
-      {modalImage && (
-        <div
-          className="fixed inset-0 z-[10000] bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setModalImage(null)}
-        >
-          <div className="relative max-w-6xl w-full">
-            <button
-              onClick={() => setModalImage(null)}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300 text-4xl font-bold"
-            >
-              ×
-            </button>
-            <img
-              src={modalImage}
-              alt="Enlarged view"
-              className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="animate-on-scroll delay-1 text-center">
+                <div className="text-5xl font-bold gradient-text mb-2">30</div>
+                <div className="text-gray-600">Day Free Trial</div>
+              </div>
+              <div className="animate-on-scroll delay-2 text-center">
+                <div className="text-5xl font-bold gradient-text mb-2">5min</div>
+                <div className="text-gray-600">Setup Time</div>
+              </div>
+              <div className="animate-on-scroll delay-3 text-center">
+                <div className="text-5xl font-bold gradient-text mb-2">24/7</div>
+                <div className="text-gray-600">Support Available</div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        </section>
 
-      {/* Exit Intent Popup */}
-      <ExitIntentPopup onEmailSubmit={handleEmailCapture} />
-    </div>
+        {/* Features Section */}
+        <section id="features" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1000px] mx-auto px-6">
+            {/* Feature 1 - Mobile App */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+              <div className="animate-on-scroll">
+                <span className="inline-block px-3 py-1 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                  Mobile First
+                </span>
+                <h2 className="text-4xl font-bold text-black mb-4" style={{ fontFamily: 'system-ui' }}>
+                  Powerful <span className="gradient-text">Mobile App</span>
+                </h2>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Take your inventory management anywhere with our powerful mobile app. Built for speed and ease of use.
+                </p>
+                <div className="space-y-3">
+                  {[
+                    'Hands-free barcode scanning',
+                    'Real-time inventory tracking',
+                    'Offline mode support',
+                    'Team management with PINs'
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 flex gap-4">
+                  <Link href="/signup" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border-2 border-[#465C88] text-[#465C88] hover:bg-[#465C88] hover:text-white transition-all">
+                    Get Started <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+              <div className="animate-on-scroll delay-2 flex justify-center">
+                <div className="glass-card rounded-2xl p-8 shadow-xl">
+                  <Image
+                    src="/iphone-main-mockup-landing-page.png"
+                    alt="InvyEasy Mobile App"
+                    width={400}
+                    height={800}
+                    className="w-64 h-auto drop-shadow-2xl"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 2 - Dashboard (Reversed) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+              <div className="animate-on-scroll delay-1 flex justify-center lg:order-1">
+                <div className="glass-card rounded-2xl p-6 shadow-xl">
+                  <Image
+                    src="/InvyEasyLaptop1.png"
+                    alt="InvyEasy Dashboard"
+                    width={600}
+                    height={400}
+                    className="w-full max-w-md h-auto rounded-lg"
+                  />
+                </div>
+              </div>
+              <div className="animate-on-scroll lg:order-2">
+                <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-semibold mb-4">
+                  Full Control
+                </span>
+                <h2 className="text-4xl font-bold text-black mb-4" style={{ fontFamily: 'system-ui' }}>
+                  Powerful <span className="gradient-text">Dashboard</span>
+                </h2>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Get a complete view of your inventory across all locations. Manage items, generate reports, and stay organized.
+                </p>
+                <div className="space-y-3">
+                  {[
+                    'Multi-location management',
+                    'Real-time analytics & reports',
+                    'Supplier order tracking',
+                    'Team collaboration tools'
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Use Cases Section */}
+        <section id="use-cases" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-16">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                Perfect For Everyone
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                Built for <span className="gradient-text">Your Needs</span>
+              </h2>
+              <p className="text-gray-600 max-w-lg mx-auto">
+                Whether you're organizing your home or running a business, InvyEasy adapts to you.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Home Organization */}
+              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
+                  <Home className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">Home Organization</h3>
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Never lose track of what you own. Organize your pantry, garage, closets, and more.
+                </p>
+                <ul className="space-y-2">
+                  {['Pantry management', 'Garage inventory', 'Closet organization'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Hobby & Collectibles */}
+              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">Hobby & Collectibles</h3>
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Track craft supplies, sports equipment, books, games, and collectibles with ease.
+                </p>
+                <ul className="space-y-2">
+                  {['Craft supplies', 'Sports equipment', 'Books & games'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Small Business */}
+              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">Small Business</h3>
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Professional inventory management for retail stores, warehouses, and growing businesses.
+                </p>
+                <ul className="space-y-2">
+                  {['Retail stores', 'Warehouses', 'Multi-location ops'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section id="how-it-works" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-16">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                Simple Process
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                How <span className="gradient-text">It Works</span>
+              </h2>
+              <p className="text-gray-600 max-w-lg mx-auto">
+                Get started in minutes with our simple 3-step process.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {[
+                { num: '1', title: 'Set Up Your Spaces', desc: 'Create rooms and locations that match your life - pantry, garage, office, storage units.' },
+                { num: '2', title: 'Add Your Items', desc: 'Scan barcodes, import from spreadsheets, or add items manually. Organize everything your way.' },
+                { num: '3', title: 'Track & Manage', desc: 'Count inventory, generate reports, and share with family or team members.' }
+              ].map((step, i) => (
+                <div key={i} className={`animate-on-scroll delay-${i + 1} text-center`}>
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#FF6B35] to-[#F25050] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <span className="text-2xl font-bold text-white">{step.num}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-black mb-3">{step.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-16">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                Simple Pricing
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                Plans for <span className="gradient-text">Everyone</span>
+              </h2>
+              <p className="text-gray-600 max-w-lg mx-auto mb-8">
+                Start free, upgrade when you need more.
+              </p>
+
+              {/* Billing Toggle */}
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <span className={`text-sm ${!isAnnual ? 'text-black font-semibold' : 'text-gray-500'}`}>Monthly</span>
+                <button
+                  onClick={() => setIsAnnual(!isAnnual)}
+                  className={`relative w-14 h-7 rounded-full transition-colors ${isAnnual ? 'bg-[#FF6B35]' : 'bg-gray-300'}`}
+                >
+                  <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${isAnnual ? 'translate-x-8' : 'translate-x-1'}`} />
+                </button>
+                <span className={`text-sm ${isAnnual ? 'text-black font-semibold' : 'text-gray-500'}`}>Annual</span>
+                {isAnnual && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Save 20%</span>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Starter Plan */}
+              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-8 shadow-lg">
+                <h3 className="text-lg font-bold text-black mb-2">Starter</h3>
+                <p className="text-gray-500 text-sm mb-4">Perfect for personal use</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-black">${isAnnual ? '8' : '9.99'}</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {['Up to 3 rooms', '500 items', '1 team member', 'Mobile app access'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/signup" className="block text-center py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all">
+                  Start Free Trial
+                </Link>
+              </div>
+
+              {/* Professional Plan */}
+              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-8 shadow-xl border-2 border-[#FF6B35] relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#FF6B35] text-white text-xs font-semibold rounded-full">
+                  Most Popular
+                </div>
+                <h3 className="text-lg font-bold text-black mb-2">Professional</h3>
+                <p className="text-gray-500 text-sm mb-4">For growing businesses</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-black">${isAnnual ? '20' : '24.99'}</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {['Unlimited rooms', 'Unlimited items', 'Up to 5 team members', 'Advanced reports', 'Priority support'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/signup" className="block text-center py-3 rounded-lg bg-[#FF6B35] text-white font-semibold hover:bg-[#e55a2b] transition-all">
+                  Start Free Trial
+                </Link>
+              </div>
+
+              {/* Enterprise Plan */}
+              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-8 shadow-lg">
+                <h3 className="text-lg font-bold text-black mb-2">Enterprise</h3>
+                <p className="text-gray-500 text-sm mb-4">For large organizations</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-black">${isAnnual ? '40' : '49.99'}</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {['Everything in Pro', 'Unlimited team members', 'Custom integrations', 'Dedicated support', 'SLA guarantee'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/contact" className="block text-center py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all">
+                  Contact Sales
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-16">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                FAQ
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                Common <span className="gradient-text">Questions</span>
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="animate-on-scroll glass-card rounded-xl overflow-hidden"
+                  style={{ transitionDelay: `${index * 0.1}s` }}
+                >
+                  <button
+                    onClick={() => toggleFAQ(index)}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left"
+                  >
+                    <span className="font-semibold text-black">{faq.question}</span>
+                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === index ? 'rotate-180' : ''}`} />
+                  </button>
+                  {activeFAQ === index && (
+                    <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }}>
+          <div className="max-w-[800px] mx-auto px-6 text-center">
+            <div className="animate-on-scroll">
+              <h2 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: 'system-ui' }}>
+                Ready to Get <span className="gradient-text">Organized</span>?
+              </h2>
+              <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+                Start your 30-day free trial today. No credit card required.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base bg-[#FF6B35] text-white hover:bg-[#e55a2b] transition-all hover:-translate-y-0.5"
+                >
+                  Start Free Trial <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-base border-2 border-gray-600 text-gray-300 hover:border-gray-400 hover:text-white transition-all"
+                >
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-12 bg-[#0f172a] border-t border-gray-800">
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-lg font-semibold text-white">InvyEasy</span>
+                  <span className="text-xs text-gray-500">by AIGENZ</span>
+                </div>
+                <p className="text-gray-400 text-sm">
+                  Simple, smart inventory management for everyone.
+                </p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Product</h4>
+                <ul className="space-y-2">
+                  <li><a href="#features" className="text-gray-400 text-sm hover:text-white transition-colors">Features</a></li>
+                  <li><a href="#pricing" className="text-gray-400 text-sm hover:text-white transition-colors">Pricing</a></li>
+                  <li><a href="#faq" className="text-gray-400 text-sm hover:text-white transition-colors">FAQ</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Company</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/contact" className="text-gray-400 text-sm hover:text-white transition-colors">Contact</Link></li>
+                  <li><a href="https://aigenz.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 text-sm hover:text-white transition-colors">AIGENZ</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Legal</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/privacy" className="text-gray-400 text-sm hover:text-white transition-colors">Privacy Policy</Link></li>
+                  <li><Link href="/terms" className="text-gray-400 text-sm hover:text-white transition-colors">Terms of Service</Link></li>
+                </ul>
+              </div>
+            </div>
+            <div className="pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p className="text-gray-500 text-sm">
+                © {new Date().getFullYear()} InvyEasy. All rights reserved.
+              </p>
+              <p className="text-gray-500 text-sm">
+                A product by <a href="https://aigenz.com" target="_blank" rel="noopener noreferrer" className="text-[#FF6B35] hover:underline">AIGENZ</a>
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   )
 }
