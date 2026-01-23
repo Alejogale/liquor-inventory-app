@@ -12,7 +12,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     organization: '',
-    useCase: 'restaurant',
+    useCase: 'bar',
     selectedTier: 'professional',
     billingCycle: 'monthly'
   })
@@ -68,61 +68,64 @@ export default function SignupPage() {
 
   const useCases = [
     {
-      id: 'restaurant',
-      title: 'Restaurant & Bar',
-      description: 'Liquor, beer, wine, and food inventory',
+      id: 'bar',
+      title: 'Bar & Nightclub',
+      description: 'Spirits, beer, wine tracking',
       icon: Briefcase
     },
     {
-      id: 'retail',
-      title: 'Retail Store',
-      description: 'Multi-location stock management',
+      id: 'restaurant',
+      title: 'Restaurant',
+      description: 'Beverage inventory management',
       icon: Package
     },
     {
-      id: 'hospitality',
-      title: 'Hospitality',
-      description: 'Hotels, events, catering',
+      id: 'hotel',
+      title: 'Hotel & Resort',
+      description: 'Multi-location operations',
       icon: Home
+    },
+    {
+      id: 'events',
+      title: 'Event Venue',
+      description: 'Event-based consumption',
+      icon: Star
     }
   ]
 
   const tiers = [
     {
-      id: 'personal',
-      name: 'Personal',
-      monthlyPrice: 19,
-      yearlyPrice: 193,
-      features: ['2 storage areas', '150 items', '1 user', 'Mobile app']
-    },
-    {
       id: 'starter',
       name: 'Starter',
-      monthlyPrice: 89,
-      yearlyPrice: 906,
-      features: ['5 storage areas', '500 items', '5 users', 'Team collab']
+      app: 'Consumption Tracker',
+      monthlyPrice: 25,
+      yearlyPrice: 255,
+      features: ['2 storage areas', '100 items', '1 user', 'Email reports']
+    },
+    {
+      id: 'basic',
+      name: 'Basic',
+      app: 'Liquor Inventory',
+      monthlyPrice: 99,
+      yearlyPrice: 1010,
+      features: ['5 storage areas', '500 items', '3 users', 'Barcode scanning']
     },
     {
       id: 'professional',
       name: 'Professional',
-      monthlyPrice: 229,
-      yearlyPrice: 2334,
+      app: 'Liquor Inventory (Full)',
+      monthlyPrice: 150,
+      yearlyPrice: 1530,
       popular: true,
-      features: ['15 storage areas', '2,000 items', '15 users', 'Analytics']
+      features: ['15 storage areas', '2,500 items', '10 users', 'Advanced analytics']
     },
     {
-      id: 'premium',
-      name: 'Premium',
-      monthlyPrice: 499,
-      yearlyPrice: 5087,
-      features: ['50 storage areas', '10,000 items', '50 users', 'Multi-location']
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      monthlyPrice: 1499,
-      yearlyPrice: 15287,
-      features: ['Unlimited areas', 'Unlimited items', 'Unlimited users', 'White-label']
+      id: 'business',
+      name: 'Business',
+      app: 'All Apps Included',
+      monthlyPrice: 250,
+      yearlyPrice: 2550,
+      features: ['Unlimited areas', 'Unlimited items', 'Unlimited users', 'API access']
     }
   ]
 
@@ -161,20 +164,20 @@ export default function SignupPage() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
-                  Professional Inventory Management
+                  Smart Tools for Hospitality
                 </h1>
                 <p className="text-gray-600">
-                  Join businesses managing their inventory with InvyEasy. Custom pricing based on your business size.
+                  Choose the apps your business needs. Start with a 30-day free trial.
                 </p>
               </div>
 
               {/* Benefits List */}
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-6 space-y-4">
                 {[
-                  { title: 'Enterprise-grade features', desc: 'Full inventory tracking, barcode scanning, real-time updates.' },
-                  { title: 'Hands-free operation', desc: 'Barcode scanner workflow for lightning-fast counting.' },
-                  { title: 'Multi-location support', desc: 'Manage inventory across multiple venues and locations.' },
-                  { title: 'Mobile + Web platform', desc: 'iOS app for counting, web dashboard for management.' }
+                  { title: 'Built for hospitality', desc: 'Purpose-built tools for bars, restaurants, hotels, and events.' },
+                  { title: 'Barcode scanning', desc: 'Lightning-fast inventory counting with your phone camera.' },
+                  { title: 'Multi-location support', desc: 'Manage inventory across all your venues and storage areas.' },
+                  { title: 'Team collaboration', desc: 'Invite staff with role-based access and PIN protection.' }
                 ].map((benefit, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -188,27 +191,22 @@ export default function SignupPage() {
                 ))}
               </div>
 
-              {/* Social Proof */}
+              {/* What's Included */}
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  <span className="text-sm font-medium text-gray-600">5.0/5 stars</span>
-                </div>
-                <p className="text-gray-700 italic text-sm mb-3">
-                  "InvyEasy transformed our inventory management. The barcode scanning is incredibly fast, and we've cut counting time by 70%."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#FF6B35] rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-semibold">MR</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">Michael R.</p>
-                    <p className="text-xs text-gray-600">Bar Manager</p>
-                  </div>
+                <h3 className="font-semibold text-gray-900 mb-3">Every plan includes:</h3>
+                <div className="space-y-2">
+                  {[
+                    '30-day free trial',
+                    'No credit card required',
+                    'Mobile + web access',
+                    'Real-time sync',
+                    'Cancel anytime'
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-[#FF6B35]" />
+                      {item}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -352,7 +350,7 @@ export default function SignupPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Business Type
                       </label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         {useCases.map((useCase) => {
                           const Icon = useCase.icon
                           const isSelected = formData.useCase === useCase.id
@@ -461,6 +459,7 @@ export default function SignupPage() {
                                       </span>
                                     )}
                                   </div>
+                                  <p className="text-xs text-[#FF6B35] font-medium mb-0.5">{tier.app}</p>
                                   <div className="flex items-baseline gap-1">
                                     <span className="text-lg font-bold text-gray-900">
                                       ${tierPrice.toLocaleString()}

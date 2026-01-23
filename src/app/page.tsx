@@ -154,24 +154,28 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      question: "Is this just for businesses?",
-      answer: "No! InvyEasy is perfect for personal use, hobbies, and businesses. Whether you're organizing your home pantry, tracking craft supplies, or managing a small retail store - we've got you covered."
+      question: "Is this just for bars?",
+      answer: "No! InvyEasy works for any hospitality business — bars, restaurants, hotels, event venues, and catering companies. Our tools are built for the unique needs of the hospitality industry."
+    },
+    {
+      question: "What apps are included?",
+      answer: "It depends on your plan. Starter includes Consumption Tracker, Basic and Professional include Liquor Inventory, and Business gives you access to all current and future apps."
+    },
+    {
+      question: "Can my team use this?",
+      answer: "Yes! Invite team members with role-based access. Managers can view reports while staff counts inventory. Higher plans support more team members."
     },
     {
       question: "Can I use it for multiple locations?",
-      answer: "Absolutely! Track inventory across your home, office, storage units, and any other locations. Everything syncs seamlessly across all your devices."
+      answer: "Absolutely! Track inventory across all your bars, storage rooms, and locations. Everything syncs in real-time across all devices."
     },
     {
       question: "Is there a mobile app?",
-      answer: "Yes! Full mobile access for counting and management. Count inventory on your phone, manage on any device. Perfect for quick updates while you're organizing."
-    },
-    {
-      question: "Can I share with family or team members?",
-      answer: "Yes! Invite family members, roommates, or team members to help manage your inventory. Everyone can contribute to keeping things organized."
+      answer: "Yes! Full mobile access for counting and barcode scanning. Count inventory on your phone while walking the floor. Perfect for busy bar environments."
     },
     {
       question: "What if I need to cancel?",
-      answer: "No problem! You can cancel anytime. Contact our support team and we'll help you export your data if needed. No long-term contracts or hidden fees."
+      answer: "No problem! Cancel anytime from your dashboard. You keep access until your billing period ends. No long-term contracts or hidden fees."
     }
   ]
 
@@ -394,9 +398,8 @@ export default function LandingPage() {
             </div>
 
             <ul className="hidden md:flex items-center gap-6">
-              <li><a href="#features" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Features</a></li>
-              <li><a href="#use-cases" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Use Cases</a></li>
-              <li><a href="#how-it-works" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">How It Works</a></li>
+              <li><Link href="/use-cases/liquor-inventory" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Liquor Inventory</Link></li>
+              <li><Link href="/use-cases/consumption-tracker" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Consumption Tracker</Link></li>
               <li><a href="#pricing" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Pricing</a></li>
               <li><a href="#faq" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">FAQ</a></li>
               <li>
@@ -433,9 +436,8 @@ export default function LandingPage() {
           {isMenuOpen && (
             <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
               <div className="px-4 py-4 space-y-3">
-                <a href="#features" className="block text-gray-700 py-2">Features</a>
-                <a href="#use-cases" className="block text-gray-700 py-2">Use Cases</a>
-                <a href="#how-it-works" className="block text-gray-700 py-2">How It Works</a>
+                <Link href="/use-cases/liquor-inventory" className="block text-gray-700 py-2">Liquor Inventory</Link>
+                <Link href="/use-cases/consumption-tracker" className="block text-gray-700 py-2">Consumption Tracker</Link>
                 <a href="#pricing" className="block text-gray-700 py-2">Pricing</a>
                 <a href="#faq" className="block text-gray-700 py-2">FAQ</a>
                 <div className="pt-3 border-t border-gray-100 space-y-3">
@@ -493,13 +495,13 @@ export default function LandingPage() {
 
           <div className="max-w-[1000px] mx-auto px-6 text-center relative z-10">
             <h1 className="hero-animate hero-animate-1 text-5xl md:text-6xl font-bold leading-tight mb-4 text-black" style={{ fontFamily: 'system-ui' }}>
-              Easy Inventory for <span className="gradient-text">Everyone</span>.
+              Smart Tools for <span className="gradient-text">Hospitality</span>.
             </h1>
             <p className="hero-animate hero-animate-2 text-xl text-gray-600 mb-4" style={{ fontFamily: 'Inter, system-ui' }}>
-              Track, count, and manage everything you own.
+              Inventory management, consumption tracking, and more.
             </p>
             <p className="hero-animate hero-animate-3 text-base text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
-              From home pantries to small businesses, InvyEasy makes inventory management simple, smart, and accessible. No complex setup, no learning curve.
+              Built for bars, restaurants, hotels, and event venues. Powerful apps that work together to streamline your operations. No complex setup required.
             </p>
             <div className="hero-animate hero-animate-4 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -515,18 +517,18 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Trust Indicators */}
+        {/* Why InvyEasy */}
         <section className="py-16" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
           <div className="max-w-[1024px] mx-auto px-6">
             <div className="animate-on-scroll text-center mb-10">
               <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
-                Trusted By Thousands
+                Built for Hospitality
               </span>
               <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
                 Why Choose <span className="gradient-text">InvyEasy</span>
               </h2>
               <p className="text-gray-600 max-w-lg mx-auto">
-                Join thousands of happy users who simplified their inventory management
+                Purpose-built tools for bars, restaurants, and hospitality businesses
               </p>
             </div>
 
@@ -635,74 +637,137 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Apps Showcase Section */}
+        <section className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+          <div className="max-w-[1024px] mx-auto px-6">
+            <div className="animate-on-scroll text-center mb-12">
+              <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
+                Our Platform
+              </span>
+              <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
+                Powerful <span className="gradient-text">Apps</span>, One Platform
+              </h2>
+              <p className="text-gray-600 max-w-lg mx-auto">
+                Choose the apps your business needs. Each one built for hospitality.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Liquor Inventory App */}
+              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Package className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-black mb-2">Liquor Inventory</h3>
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      Complete inventory management with barcode scanning, multi-location support, and automated stock alerts. Know exactly what you have, where it is, and when to reorder.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {['Barcode Scanning', 'Stock Alerts', 'Multi-Location', 'Analytics'].map((tag, i) => (
+                        <span key={i} className="px-2 py-1 bg-orange-50 text-[#FF6B35] text-xs rounded-full font-medium">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <Link href="/use-cases/liquor-inventory" className="text-[#FF6B35] font-medium text-sm hover:underline flex items-center gap-1">
+                      Learn more <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Consumption Tracker App */}
+              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-black mb-2">Consumption Tracker</h3>
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      Track drinks and items served at events in real-time. Simple one-tap counting with instant reports sent straight to your inbox.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {['One-Tap Counting', 'Real-Time', 'Email Reports', 'Event Tracking'].map((tag, i) => (
+                        <span key={i} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full font-medium">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <Link href="/use-cases/consumption-tracker" className="text-blue-500 font-medium text-sm hover:underline flex items-center gap-1">
+                      Learn more <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p className="animate-on-scroll delay-3 text-center text-gray-500 text-sm">
+              More apps coming soon — reservations, member management, and more.
+            </p>
+          </div>
+        </section>
+
         {/* Use Cases Section */}
         <section id="use-cases" className="py-20" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
           <div className="max-w-[1024px] mx-auto px-6">
             <div className="animate-on-scroll text-center mb-16">
               <span className="inline-block px-4 py-2 rounded-full bg-orange-100 text-[#FF6B35] text-xs font-semibold mb-4">
-                Perfect For Everyone
+                Built for Hospitality
               </span>
               <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
-                Built for <span className="gradient-text">Your Needs</span>
+                Perfect for <span className="gradient-text">Your Business</span>
               </h2>
               <p className="text-gray-600 max-w-lg mx-auto">
-                Whether you're organizing your home or running a business, InvyEasy adapts to you.
+                From neighborhood bars to multi-location chains, we have you covered.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Home Organization */}
-              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Home className="w-8 h-8 text-white" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Bars & Nightclubs */}
+              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">🍸</span>
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3">Home Organization</h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  Never lose track of what you own. Organize your pantry, garage, closets, and more.
+                <h3 className="text-lg font-bold text-black mb-2">Bars & Nightclubs</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Track spirits across multiple bar stations. Reduce shrinkage with real-time visibility.
                 </p>
-                <ul className="space-y-2">
-                  {['Pantry management', 'Garage inventory', 'Closet organization'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500" /> {item}
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              {/* Hobby & Collectibles */}
-              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Heart className="w-8 h-8 text-white" />
+              {/* Restaurants */}
+              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">🍽️</span>
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3">Hobby & Collectibles</h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  Track craft supplies, sports equipment, books, games, and collectibles with ease.
+                <h3 className="text-lg font-bold text-black mb-2">Restaurants</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Manage wine inventory, track beverage costs, and optimize ordering cycles.
                 </p>
-                <ul className="space-y-2">
-                  {['Craft supplies', 'Sports equipment', 'Books & games'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500" /> {item}
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              {/* Small Business */}
-              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Briefcase className="w-8 h-8 text-white" />
+              {/* Hotels & Resorts */}
+              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏨</span>
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3">Small Business</h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  Professional inventory management for retail stores, warehouses, and growing businesses.
+                <h3 className="text-lg font-bold text-black mb-2">Hotels & Resorts</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Multi-location inventory for lobby bars, room service, and event spaces.
                 </p>
-                <ul className="space-y-2">
-                  {['Retail stores', 'Warehouses', 'Multi-location ops'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500" /> {item}
-                    </li>
-                  ))}
-                </ul>
+              </div>
+
+              {/* Event Venues */}
+              <div className="animate-on-scroll delay-4 glass-card rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl">🎉</span>
+                </div>
+                <h3 className="text-lg font-bold text-black mb-2">Event Venues</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Track consumption per event. Generate instant reports for billing.
+                </p>
               </div>
             </div>
           </div>
@@ -725,9 +790,9 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
-                { num: '1', title: 'Set Up Your Spaces', desc: 'Create rooms and locations that match your life - pantry, garage, office, storage units.' },
-                { num: '2', title: 'Add Your Items', desc: 'Scan barcodes, import from spreadsheets, or add items manually. Organize everything your way.' },
-                { num: '3', title: 'Track & Manage', desc: 'Count inventory, generate reports, and share with family or team members.' }
+                { num: '1', title: 'Set Up Your Spaces', desc: 'Create storage areas for each bar, cellar, or location. Organize inventory the way your business works.' },
+                { num: '2', title: 'Add Your Items', desc: 'Scan barcodes, import from spreadsheets, or add items manually. Build your catalog in minutes.' },
+                { num: '3', title: 'Track & Manage', desc: 'Count inventory, get low-stock alerts, and generate reports. Invite your team with role-based access.' }
               ].map((step, i) => (
                 <div key={i} className={`animate-on-scroll delay-${i + 1} text-center`}>
                   <div className="w-20 h-20 bg-gradient-to-br from-[#FF6B35] to-[#F25050] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -749,10 +814,10 @@ export default function LandingPage() {
                 Simple Pricing
               </span>
               <h2 className="text-4xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
-                Plans for <span className="gradient-text">Everyone</span>
+                Plans for <span className="gradient-text">Every Business</span>
               </h2>
               <p className="text-gray-600 max-w-lg mx-auto mb-8">
-                Start free, upgrade when you need more.
+                Start with a 30-day free trial. Upgrade as your business grows.
               </p>
 
               {/* Billing Toggle */}
@@ -765,73 +830,115 @@ export default function LandingPage() {
                   <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${isAnnual ? 'translate-x-8' : 'translate-x-1'}`} />
                 </button>
                 <span className={`text-sm ${isAnnual ? 'text-black font-semibold' : 'text-gray-500'}`}>Annual</span>
-                {isAnnual && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Save 20%</span>}
+                {isAnnual && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Save 15%</span>}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Starter Plan */}
-              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-8 shadow-lg">
-                <h3 className="text-lg font-bold text-black mb-2">Starter</h3>
-                <p className="text-gray-500 text-sm mb-4">Perfect for personal use</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">${isAnnual ? '8' : '9.99'}</span>
-                  <span className="text-gray-500">/month</span>
+              <div className="animate-on-scroll delay-1 glass-card rounded-2xl p-6 shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
+                  <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {['Up to 3 rooms', '500 items', '1 team member', 'Mobile app access'].map((feature, i) => (
+                <h3 className="text-lg font-bold text-black mb-1">Starter</h3>
+                <p className="text-xs text-[#FF6B35] font-medium mb-2">Consumption Tracker</p>
+                <p className="text-gray-500 text-sm mb-4">Track event consumption</p>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-black">${isAnnual ? '21' : '25'}</span>
+                  <span className="text-gray-500 text-sm">/month</span>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {['2 storage areas', '100 items', '1 user', 'Email reports'].map((feature, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                       <Check className="w-4 h-4 text-green-500" /> {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup" className="block text-center py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all">
+                <Link href="/signup?plan=starter" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
+                  Start Free Trial
+                </Link>
+              </div>
+
+              {/* Basic Plan */}
+              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-6 shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-4">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-black mb-1">Basic</h3>
+                <p className="text-xs text-[#FF6B35] font-medium mb-2">Liquor Inventory</p>
+                <p className="text-gray-500 text-sm mb-4">Essential inventory tools</p>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-black">${isAnnual ? '84' : '99'}</span>
+                  <span className="text-gray-500 text-sm">/month</span>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {['5 storage areas', '500 items', '3 users', 'Barcode scanning'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-green-500" /> {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/signup?plan=basic" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
                   Start Free Trial
                 </Link>
               </div>
 
               {/* Professional Plan */}
-              <div className="animate-on-scroll delay-2 glass-card rounded-2xl p-8 shadow-xl border-2 border-[#FF6B35] relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#FF6B35] text-white text-xs font-semibold rounded-full">
+              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-6 shadow-xl border-2 border-[#FF6B35] relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#FF6B35] text-white text-xs font-semibold rounded-full">
                   Most Popular
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">Professional</h3>
-                <p className="text-gray-500 text-sm mb-4">For growing businesses</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">${isAnnual ? '20' : '24.99'}</span>
-                  <span className="text-gray-500">/month</span>
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] flex items-center justify-center mb-4">
+                  <Shield className="w-5 h-5 text-white" />
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {['Unlimited rooms', 'Unlimited items', 'Up to 5 team members', 'Advanced reports', 'Priority support'].map((feature, i) => (
+                <h3 className="text-lg font-bold text-black mb-1">Professional</h3>
+                <p className="text-xs text-[#FF6B35] font-medium mb-2">Liquor Inventory (Full)</p>
+                <p className="text-gray-500 text-sm mb-4">Full-featured inventory</p>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-black">${isAnnual ? '127' : '150'}</span>
+                  <span className="text-gray-500 text-sm">/month</span>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {['15 storage areas', '2,500 items', '10 users', 'Advanced analytics'].map((feature, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-green-500" /> {feature}
+                      <Check className="w-4 h-4 text-[#FF6B35]" /> {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup" className="block text-center py-3 rounded-lg bg-[#FF6B35] text-white font-semibold hover:bg-[#e55a2b] transition-all">
+                <Link href="/signup?plan=professional" className="block text-center py-2.5 rounded-lg bg-[#FF6B35] text-white font-semibold hover:bg-[#e55a2b] transition-all text-sm">
                   Start Free Trial
                 </Link>
               </div>
 
-              {/* Enterprise Plan */}
-              <div className="animate-on-scroll delay-3 glass-card rounded-2xl p-8 shadow-lg">
-                <h3 className="text-lg font-bold text-black mb-2">Enterprise</h3>
-                <p className="text-gray-500 text-sm mb-4">For large organizations</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">${isAnnual ? '40' : '49.99'}</span>
-                  <span className="text-gray-500">/month</span>
+              {/* Business Plan */}
+              <div className="animate-on-scroll delay-4 glass-card rounded-2xl p-6 shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4">
+                  <Briefcase className="w-5 h-5 text-white" />
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {['Everything in Pro', 'Unlimited team members', 'Custom integrations', 'Dedicated support', 'SLA guarantee'].map((feature, i) => (
+                <h3 className="text-lg font-bold text-black mb-1">Business</h3>
+                <p className="text-xs text-[#FF6B35] font-medium mb-2">All Apps Included</p>
+                <p className="text-gray-500 text-sm mb-4">Everything unlimited</p>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-black">${isAnnual ? '212' : '250'}</span>
+                  <span className="text-gray-500 text-sm">/month</span>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {['Unlimited areas', 'Unlimited items', 'Unlimited users', 'API access'].map((feature, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                       <Check className="w-4 h-4 text-green-500" /> {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/contact" className="block text-center py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all">
-                  Contact Sales
+                <Link href="/signup?plan=business" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
+                  Start Free Trial
                 </Link>
               </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <Link href="/pricing" className="text-[#FF6B35] font-medium hover:underline">
+                View full pricing details →
+              </Link>
             </div>
           </div>
         </section>

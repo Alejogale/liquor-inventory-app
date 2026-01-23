@@ -1,241 +1,223 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, Star, Zap, Shield, Building2, ArrowRight, Sparkles, Package } from 'lucide-react'
+import { Check, Star, Zap, Shield, Building2, ArrowRight, Package, BarChart3, Users, Smartphone } from 'lucide-react'
 import { useState } from 'react'
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false)
 
-  // Pricing data from database structure
   const tiers = [
     {
-      id: 'personal',
-      name: 'Personal',
-      description: 'Perfect for home bars and personal collections',
-      monthlyPrice: 19,
-      yearlyPrice: 193,
+      id: 'starter',
+      name: 'Starter',
+      description: 'Perfect for trying out or tracking event consumption',
+      monthlyPrice: 25,
+      yearlyPrice: 255,
       icon: Star,
+      color: 'from-blue-500 to-blue-600',
+      apps: ['Consumption Tracker'],
       features: [
+        '1 app (Consumption Tracker)',
         '2 storage areas',
-        '150 items',
+        '100 items',
         '1 user',
-        'Mobile app access',
         'Basic reports',
         'Email support',
       ],
       highlighted: false,
       cta: 'Start Free Trial',
-      ctaLink: '/signup',
+      ctaLink: '/signup?plan=starter',
     },
     {
-      id: 'starter',
-      name: 'Starter',
-      description: 'Everything you need for a single venue',
-      monthlyPrice: 89,
-      yearlyPrice: 906,
+      id: 'basic',
+      name: 'Basic',
+      description: 'Essential inventory management for small venues',
+      monthlyPrice: 99,
+      yearlyPrice: 1010,
       icon: Zap,
+      color: 'from-green-500 to-green-600',
+      apps: ['Liquor Inventory'],
       features: [
+        '1 app (Liquor Inventory)',
         '5 storage areas',
         '500 items',
-        '5 users',
-        'Room-by-room counting',
+        '3 users',
+        'Barcode scanning',
         'Stock alerts',
-        'Team collaboration',
         'Basic analytics',
+        'Email support',
       ],
       highlighted: false,
       cta: 'Start Free Trial',
-      ctaLink: '/signup',
+      ctaLink: '/signup?plan=basic',
     },
     {
       id: 'professional',
       name: 'Professional',
-      description: 'Advanced features for large venues or 2-3 locations',
-      monthlyPrice: 229,
-      yearlyPrice: 2334,
+      description: 'Full-featured inventory for established businesses',
+      monthlyPrice: 150,
+      yearlyPrice: 1530,
       icon: Shield,
+      color: 'from-[#FF6B35] to-[#e55a2b]',
       badge: 'MOST POPULAR',
+      apps: ['Liquor Inventory (Full)'],
       features: [
+        'Liquor Inventory (full features)',
         '15 storage areas',
-        '2,000 items',
-        '15 users',
+        '2,500 items',
+        '10 users',
         'Advanced analytics',
         'Custom reports',
         'Stock movement tracking',
-        'Priority support',
         'Export to Excel',
+        'Priority email support',
       ],
       highlighted: true,
       cta: 'Start Free Trial',
-      ctaLink: '/signup',
+      ctaLink: '/signup?plan=professional',
     },
     {
-      id: 'premium',
-      name: 'Premium',
-      description: 'For multi-location chains and high-volume operations',
-      monthlyPrice: 499,
-      yearlyPrice: 5087,
+      id: 'business',
+      name: 'Business',
+      description: 'Everything unlimited for growing operations',
+      monthlyPrice: 250,
+      yearlyPrice: 2550,
       icon: Building2,
+      color: 'from-purple-500 to-purple-600',
+      apps: ['All Apps'],
       features: [
-        '50 storage areas',
-        '10,000 items',
-        '50 users',
-        'Multi-location management',
-        'API access',
-        'Custom integrations',
-        'Dedicated account manager',
-        'Monthly strategy call',
-      ],
-      highlighted: false,
-      cta: 'Start Free Trial',
-      ctaLink: '/signup',
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      description: 'Unlimited everything for major chains and venues',
-      monthlyPrice: 1499,
-      yearlyPrice: 15287,
-      icon: Sparkles,
-      badge: 'CONTACT SALES',
-      features: [
+        'All apps included',
         'Unlimited storage areas',
         'Unlimited items',
         'Unlimited users',
-        'White-label options',
-        'Custom development',
-        'On-site training',
-        '24/7 phone support',
-        'SLA guarantee',
+        'Multi-location support',
+        'API access',
+        'Custom integrations',
+        'Phone + email support',
+        'Dedicated account manager',
       ],
       highlighted: false,
-      cta: 'Contact Sales',
-      ctaLink: '/contact',
+      cta: 'Start Free Trial',
+      ctaLink: '/signup?plan=business',
     },
   ]
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="nav-modern">
-        <div className="container-max">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
-                <Package className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-headline text-primary">InvyEasy</span>
-            </div>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+      {/* Header */}
+      <header className="fixed w-full top-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-gray-200/50" style={{ padding: '12px 0' }}>
+        <nav className="max-w-[1200px] mx-auto px-6 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-lg font-semibold tracking-tight text-gray-900" style={{ fontFamily: 'system-ui' }}>
+              InvyEasy
+            </span>
+            <span className="text-xs text-gray-400 font-medium">by AIGENZ</span>
+          </Link>
 
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-muted hover:text-primary transition-colors font-medium">Home</Link>
-              <Link href="/#features" className="text-muted hover:text-primary transition-colors font-medium">Features</Link>
-              <Link href="/pricing" className="text-primary font-medium">Pricing</Link>
-              <Link href="/contact" className="text-muted hover:text-primary transition-colors font-medium">Contact</Link>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="text-muted hover:text-primary transition-colors font-medium">
-                Sign In
-              </Link>
-              <Link href="/signup" className="button-primary">
-                Get Started
-              </Link>
-            </div>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Home</Link>
+            <Link href="/use-cases/liquor-inventory" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Liquor Inventory</Link>
+            <Link href="/use-cases/consumption-tracker" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Consumption Tracker</Link>
+            <Link href="/pricing" className="text-sm text-[#FF6B35] font-medium">Pricing</Link>
           </div>
-        </div>
-      </nav>
+
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              Sign In
+            </Link>
+            <Link href="/signup" className="bg-[#FF6B35] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#e55a2b] transition-colors">
+              Get Started
+            </Link>
+          </div>
+        </nav>
+      </header>
 
       {/* Hero Section */}
-      <section className="section-spacing bg-white">
-        <div className="container-max">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-stone-gray">
-              <Star className="w-4 h-4 text-accent" />
-              <span className="text-caption text-secondary">Professional Inventory Management</span>
-            </div>
-
-            <div className="space-y-6">
-              <h1 className="text-display text-primary">
-                Simple, Transparent Pricing
-                <span className="block text-secondary">That Scales With Your Business</span>
-              </h1>
-              <p className="text-body text-muted max-w-3xl mx-auto leading-relaxed">
-                Start with what you need today. Upgrade as you grow. All plans include 30-day free trial,
-                no credit card required.
-              </p>
-            </div>
+      <section className="pt-32 pb-12 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur border border-gray-200/50 mb-6">
+            <Package className="w-4 h-4 text-[#FF6B35]" />
+            <span className="text-sm text-gray-600">Simple, Transparent Pricing</span>
           </div>
-        </div>
-      </section>
 
-      {/* Billing Toggle */}
-      <section className="pb-8">
-        <div className="container-max">
-          <div className="flex items-center justify-center gap-4">
-            <span className={`text-body font-medium ${!isAnnual ? 'text-primary' : 'text-muted'}`}>
+          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'system-ui' }}>
+            Choose Your Plan
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+            Start with what you need today. Upgrade as you grow. All plans include a 30-day free trial, no credit card required.
+          </p>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
               Monthly
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className="relative inline-flex items-center cursor-pointer"
             >
-              <div className={`w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-accent' : 'bg-stone-gray'}`}>
+              <div className={`w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-[#FF6B35]' : 'bg-gray-300'}`}>
                 <div className={`absolute top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 shadow-md ${isAnnual ? 'translate-x-7' : 'translate-x-1'}`} />
               </div>
             </button>
-            <span className={`text-body font-medium ${isAnnual ? 'text-primary' : 'text-muted'}`}>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
               Annual
-              <span className="ml-2 text-accent font-bold">Save 15%</span>
+              <span className="ml-2 text-[#FF6B35] font-bold">Save 15%</span>
             </span>
           </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="pb-20 bg-white">
-        <div className="container-max">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <section className="pb-20 px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tiers.map((tier) => {
               const Icon = tier.icon
               const price = isAnnual ? tier.yearlyPrice : tier.monthlyPrice
+              const monthlyEquivalent = isAnnual ? Math.round(tier.yearlyPrice / 12) : tier.monthlyPrice
               const savings = tier.monthlyPrice * 12 - tier.yearlyPrice
 
               return (
                 <div
                   key={tier.id}
-                  className={`card-elevated relative flex flex-col ${tier.highlighted ? 'border-2 border-accent lg:scale-105 lg:z-10' : ''}`}
+                  className={`relative flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border ${tier.highlighted ? 'border-[#FF6B35] border-2 scale-105 z-10' : 'border-white/30'} p-6 transition-all hover:shadow-2xl`}
                 >
                   {/* Badge */}
                   {tier.badge && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-accent text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#FF6B35] text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
                       {tier.badge}
                     </div>
                   )}
 
                   {/* Icon */}
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${tier.highlighted ? 'bg-accent' : 'bg-surface'}`}>
-                    <Icon className={`w-6 h-6 ${tier.highlighted ? 'text-white' : 'text-accent'}`} />
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center mb-4`}>
+                    <Icon className="w-6 h-6 text-white" />
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-title text-primary mb-2">{tier.name}</h3>
-                  <p className="text-caption text-muted mb-6 min-h-[40px]">{tier.description}</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{tier.name}</h3>
+                  <p className="text-sm text-gray-500 mb-4 min-h-[40px]">{tier.description}</p>
+
+                  {/* Apps included */}
+                  <div className="mb-4">
+                    <span className="text-xs font-medium text-[#FF6B35] uppercase tracking-wide">
+                      {tier.apps.join(', ')}
+                    </span>
+                  </div>
 
                   {/* Price */}
                   <div className="mb-6">
                     <div className="flex items-baseline">
-                      <span className="text-4xl font-bold text-primary">
-                        ${price.toLocaleString()}
+                      <span className="text-4xl font-bold text-gray-900">
+                        ${isAnnual ? monthlyEquivalent : price}
                       </span>
-                      <span className="text-muted ml-2">
-                        /{isAnnual ? 'year' : 'month'}
-                      </span>
+                      <span className="text-gray-500 ml-2">/month</span>
                     </div>
-                    {isAnnual && savings > 0 && (
-                      <p className="text-xs text-accent mt-1">
-                        Save ${savings} per year
+                    {isAnnual && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        ${price}/year <span className="text-green-600 font-medium">(Save ${savings})</span>
                       </p>
                     )}
                   </div>
@@ -244,8 +226,8 @@ export default function PricingPage() {
                   <ul className="space-y-3 mb-8 flex-grow">
                     {tier.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                        <span className="text-caption text-muted">{feature}</span>
+                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-[#FF6B35]' : 'text-green-500'}`} />
+                        <span className="text-sm text-gray-600">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -253,7 +235,11 @@ export default function PricingPage() {
                   {/* CTA */}
                   <Link
                     href={tier.ctaLink}
-                    className={`w-full text-center block ${tier.highlighted ? 'button-primary' : 'button-secondary'}`}
+                    className={`w-full text-center py-3 px-4 rounded-xl font-semibold transition-all ${
+                      tier.highlighted
+                        ? 'bg-[#FF6B35] text-white hover:bg-[#e55a2b] shadow-lg hover:shadow-xl'
+                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    }`}
                   >
                     {tier.cta}
                   </Link>
@@ -264,150 +250,186 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-12 bg-surface">
-        <div className="container-max">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <p className="text-body text-muted">
-              Trusted by restaurants, bars, hotels, and country clubs worldwide
-            </p>
-            <div className="flex items-center justify-center gap-8 text-primary opacity-60">
-              <span className="text-sm font-medium">🍷 Restaurants</span>
-              <span className="text-sm font-medium">🍸 Bars</span>
-              <span className="text-sm font-medium">🏨 Hotels</span>
-              <span className="text-sm font-medium">⛳ Country Clubs</span>
+      {/* Apps Overview */}
+      <section className="py-16 px-6 bg-white/50">
+        <div className="max-w-[1000px] mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Apps</h2>
+            <p className="text-gray-600">Choose the tools that fit your business needs</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Liquor Inventory */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-8">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] flex items-center justify-center mb-4">
+                <Package className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Liquor Inventory</h3>
+              <p className="text-gray-600 mb-4">
+                Complete inventory management with barcode scanning, multi-location support, and real-time analytics.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-[#FF6B35]" /> Barcode scanning
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-[#FF6B35]" /> Stock alerts
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-[#FF6B35]" /> Team collaboration
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-[#FF6B35]" /> Advanced analytics
+                </li>
+              </ul>
+              <Link href="/use-cases/liquor-inventory" className="text-[#FF6B35] font-medium text-sm hover:underline flex items-center gap-1">
+                Learn more <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Consumption Tracker */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-8">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
+                <BarChart3 className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Consumption Tracker</h3>
+              <p className="text-gray-600 mb-4">
+                Track event consumption in real-time with customizable categories and instant email reports.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-blue-500" /> Event-based tracking
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-blue-500" /> Custom categories
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-blue-500" /> Real-time counters
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-blue-500" /> Email reports
+                </li>
+              </ul>
+              <Link href="/use-cases/consumption-tracker" className="text-blue-500 font-medium text-sm hover:underline flex items-center gap-1">
+                Learn more <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-16 px-6">
+        <div className="max-w-[1000px] mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Everything You Need</h2>
+            <p className="text-gray-600">All plans include these essential features</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30">
+              <Smartphone className="w-10 h-10 text-[#FF6B35] mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Mobile Ready</h3>
+              <p className="text-sm text-gray-600">Access from any device. iOS app for hands-free counting.</p>
+            </div>
+            <div className="bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30">
+              <Users className="w-10 h-10 text-[#FF6B35] mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Team Collaboration</h3>
+              <p className="text-sm text-gray-600">Add staff with role-based permissions and PIN access.</p>
+            </div>
+            <div className="bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30">
+              <Shield className="w-10 h-10 text-[#FF6B35] mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Secure & Reliable</h3>
+              <p className="text-sm text-gray-600">Enterprise-grade security with real-time sync.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="section-spacing bg-white">
-        <div className="container-max">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center space-y-4 mb-12">
-              <h2 className="text-headline text-primary">
-                Frequently Asked Questions
-              </h2>
-            </div>
+      <section className="py-16 px-6 bg-white/50">
+        <div className="max-w-[800px] mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+          </div>
 
-            <div className="space-y-6">
-              <div className="card">
-                <h3 className="text-title text-primary mb-2">What's a storage area?</h3>
-                <p className="text-body text-muted">
-                  A storage area can be any room or location where you store inventory - like Main Bar, Wine Cellar,
-                  Kitchen Storage, Pool Bar, or separate restaurant locations.
-                </p>
+          <div className="space-y-4">
+            {[
+              {
+                q: "What's included in the free trial?",
+                a: "All plans include a 30-day free trial with full access to all features. No credit card required to start."
+              },
+              {
+                q: "Can I switch plans later?",
+                a: "Yes! You can upgrade or downgrade at any time. Changes take effect on your next billing cycle, and we'll prorate any differences."
+              },
+              {
+                q: "What's a storage area?",
+                a: "A storage area is any location where you keep inventory - like Main Bar, Wine Cellar, Kitchen, or even different restaurant locations."
+              },
+              {
+                q: "Do you offer discounts for nonprofits?",
+                a: "Yes! We offer special pricing for nonprofits and educational institutions. Contact us for details."
+              },
+              {
+                q: "Can I cancel anytime?",
+                a: "Absolutely. Cancel anytime from your dashboard. You'll keep access until your billing period ends."
+              }
+            ].map((faq, i) => (
+              <div key={i} className="bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30">
+                <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
+                <p className="text-sm text-gray-600">{faq.a}</p>
               </div>
-
-              <div className="card">
-                <h3 className="text-title text-primary mb-2">Is there a free trial?</h3>
-                <p className="text-body text-muted">
-                  Yes! All plans include a 14-day free trial. No credit card required to start.
-                </p>
-              </div>
-
-              <div className="card">
-                <h3 className="text-title text-primary mb-2">Can I change my plan later?</h3>
-                <p className="text-body text-muted">
-                  Absolutely! You can upgrade or downgrade at any time. Changes take effect on your next billing cycle.
-                </p>
-              </div>
-
-              <div className="card">
-                <h3 className="text-title text-primary mb-2">What if I need more storage areas?</h3>
-                <p className="text-body text-muted">
-                  Simply upgrade to the next tier! If you need something custom, Enterprise plan offers unlimited everything.
-                </p>
-              </div>
-
-              <div className="card">
-                <h3 className="text-title text-primary mb-2">Do you offer discounts?</h3>
-                <p className="text-body text-muted">
-                  Yes! Annual plans save 15%. We also offer special pricing for nonprofits, educational institutions,
-                  and early-stage businesses. Contact sales for details.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="section-spacing bg-surface">
-        <div className="container-max">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="card-elevated bg-white">
-              <h2 className="text-headline text-accent mb-4">
-                Ready to Get Started?
-              </h2>
-              <p className="text-body text-primary mb-8">
-                Join hundreds of venues managing their inventory with InvyEasy. Start your free trial today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/signup"
-                  className="button-primary px-8 py-4 text-lg font-semibold flex items-center gap-2 justify-center group"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="button-secondary px-8 py-4 text-lg font-semibold"
-                >
-                  Contact Sales
-                </Link>
-              </div>
+      <section className="py-16 px-6">
+        <div className="max-w-[600px] mx-auto">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-8 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-gray-600 mb-8">
+              Join businesses managing their inventory smarter with InvyEasy.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/signup"
+                className="bg-[#FF6B35] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              >
+                Start Free Trial
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/contact"
+                className="bg-gray-100 text-gray-900 px-8 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+              >
+                Contact Sales
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-stone-gray py-12">
-        <div className="container-max">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">I</span>
-                </div>
-                <span className="text-title text-primary">InvyEasy</span>
-              </div>
-              <p className="text-caption text-muted">
-                Professional liquor inventory management for modern venues.
-              </p>
+      <footer className="py-8 px-6 border-t border-gray-200/50">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-900 font-semibold">InvyEasy</span>
+              <span className="text-xs text-gray-400">by AIGENZ</span>
             </div>
-
-            <div>
-              <h3 className="text-title text-primary mb-4">Product</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><Link href="/#features" className="hover:text-accent transition-colors">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-accent transition-colors">Pricing</Link></li>
-                <li><Link href="/contact" className="hover:text-accent transition-colors">Contact Sales</Link></li>
-              </ul>
+            <div className="flex items-center gap-6 text-sm text-gray-500">
+              <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms</Link>
+              <Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link>
             </div>
-
-            <div>
-              <h3 className="text-title text-primary mb-4">Company</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><Link href="/about" className="hover:text-accent transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-title text-primary mb-4">Legal</h3>
-              <ul className="space-y-2 text-caption text-muted">
-                <li><Link href="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-stone-gray mt-8 pt-8 text-center text-caption text-muted">
-            <p>&copy; 2025 InvyEasy. All rights reserved.</p>
+            <p className="text-sm text-gray-500">
+              &copy; 2025 InvyEasy. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

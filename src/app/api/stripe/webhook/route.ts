@@ -10,16 +10,24 @@ const supabaseAdmin = createClient(
 );
 
 // Determine app access based on plan metadata
+// Tier → App mapping:
+// - starter: Consumption Tracker only
+// - basic: Liquor Inventory only
+// - professional: Liquor Inventory (full features)
+// - business: All apps (Liquor Inventory + Consumption Tracker)
 function getAppsForPlan(planMetadata: any, billingCycle?: string): string[] {
   const plan = planMetadata?.plan;
-  
+
   // Map plan names to apps
-  if (plan === 'bundle' || plan === 'enterprise') {
-    return ['liquor-inventory', 'reservation-management', 'member-database', 'pos-system'];
-  } else if (plan === 'professional') {
-    return ['liquor-inventory', 'reservation-management'];
-  } else if (plan === 'starter') {
+  if (plan === 'business' || plan === 'bundle' || plan === 'enterprise') {
+    // Business tier gets all apps
+    return ['liquor-inventory', 'consumption-tracker'];
+  } else if (plan === 'professional' || plan === 'basic') {
+    // Basic and Professional get Liquor Inventory
     return ['liquor-inventory'];
+  } else if (plan === 'starter') {
+    // Starter tier gets Consumption Tracker only
+    return ['consumption-tracker'];
   } else {
     // Fallback - check primary_app if available
     const primaryApp = planMetadata?.primary_app;
