@@ -21,7 +21,9 @@ import {
   GripVertical,
   Calendar,
   CheckCircle,
-  Clock
+  Clock,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react'
 
 interface Category {
@@ -70,7 +72,7 @@ export default function ConsumptionSettingsPage() {
   const [success, setSuccess] = useState<string | null>(null)
 
   // UI state
-  const [activeTab, setActiveTab] = useState<'categories' | 'emails' | 'events'>('categories')
+  const [activeTab, setActiveTab] = useState<'categories' | 'emails' | 'events' | 'analytics'>('categories')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
   // Form state
@@ -560,6 +562,61 @@ export default function ConsumptionSettingsPage() {
     setExpandedCategories(newExpanded)
   }
 
+  // Analytics calculations
+  const getAnalyticsData = useCallback(() => {
+    const eventsWithData = events.filter(e => e.total_items > 0 || e.total_amount > 0)
+
+    // Total stats
+    const totalEvents = events.length
+    const totalItems = events.reduce((sum, e) => sum + (e.total_items || 0), 0)
+    const totalAmount = events.reduce((sum, e) => sum + (e.total_amount || 0), 0)
+    const avgRevenuePerEvent = totalEvents > 0 ? totalAmount / totalEvents : 0
+    const avgItemsPerEvent = totalEvents > 0 ? totalItems / totalEvents : 0
+
+    // Monthly breakdown
+    const monthlyMap = new Map<string, { month: string; year: number; monthNum: number; totalItems: number; totalAmount: number; eventCount: number }>()
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    events.forEach(event => {
+      const date = new Date(event.event_date)
+      const monthNum = date.getMonth()
+      const year = date.getFullYear()
+      const key = `${year}-${monthNum}`
+
+      const existing = monthlyMap.get(key)
+      if (existing) {
+        existing.totalItems += event.total_items || 0
+        existing.totalAmount += event.total_amount || 0
+        existing.eventCount += 1
+      } else {
+        monthlyMap.set(key, {
+          month: monthNames[monthNum],
+          year,
+          monthNum,
+          totalItems: event.total_items || 0,
+          totalAmount: event.total_amount || 0,
+          eventCount: 1,
+        })
+      }
+    })
+
+    // Sort by date (most recent first)
+    const monthlyData = Array.from(monthlyMap.values()).sort((a, b) => {
+      if (a.year !== b.year) return b.year - a.year
+      return b.monthNum - a.monthNum
+    })
+
+    return {
+      totalEvents,
+      totalItems,
+      totalAmount,
+      avgRevenuePerEvent,
+      avgItemsPerEvent,
+      monthlyData,
+      eventsWithData,
+    }
+  }, [events])
+
   if (loading || loadingData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -635,6 +692,17 @@ export default function ConsumptionSettingsPage() {
             >
               <Calendar className="w-4 h-4" />
               Events
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+                activeTab === 'analytics'
+                  ? 'bg-teal-500 text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Analytics
             </button>
           </div>
         </div>
@@ -1083,6 +1151,97 @@ export default function ConsumptionSettingsPage() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-6">
+              {(() => {
+                const analytics = getAnalyticsData()
+                return (
+                  <>
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 text-center">
+                        <p className="text-3xl font-bold text-white">{analytics.totalEvents}</p>
+                        <p className="text-xs text-slate-400 uppercase mt-1">Total Events</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 text-center">
+                        <p className="text-3xl font-bold text-white">{analytics.totalItems}</p>
+                        <p className="text-xs text-slate-400 uppercase mt-1">Total Drinks</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 text-center">
+                        <p className="text-3xl font-bold text-white">${analytics.avgRevenuePerEvent.toFixed(0)}</p>
+                        <p className="text-xs text-slate-400 uppercase mt-1">Avg Revenue/Event</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 text-center">
+                        <p className="text-3xl font-bold text-white">{analytics.avgItemsPerEvent.toFixed(1)}</p>
+                        <p className="text-xs text-slate-400 uppercase mt-1">Avg Drinks/Event</p>
+                      </div>
+                    </div>
+
+                    {/* Total Revenue Card */}
+                    <div className="bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl p-6 text-center">
+                      <p className="text-4xl md:text-5xl font-bold text-white">${analytics.totalAmount.toFixed(2)}</p>
+                      <p className="text-sm text-white/80 uppercase mt-2">Total Revenue</p>
+                    </div>
+
+                    {/* Monthly Breakdown */}
+                    {analytics.monthlyData.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-4">Monthly Breakdown</h3>
+                        <div className="space-y-3">
+                          {analytics.monthlyData.map((month) => (
+                            <div key={`${month.year}-${month.monthNum}`} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold text-white">{month.month} {month.year}</p>
+                                <p className="text-sm text-slate-400">{month.eventCount} event{month.eventCount !== 1 ? 's' : ''}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm text-slate-400">{month.totalItems} drinks</p>
+                                <p className="font-bold text-teal-400">${month.totalAmount.toFixed(2)}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Events by Revenue */}
+                    {analytics.eventsWithData.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-4">Events by Revenue</h3>
+                        <div className="space-y-3">
+                          {[...analytics.eventsWithData]
+                            .sort((a, b) => (b.total_amount || 0) - (a.total_amount || 0))
+                            .map((event, index) => (
+                              <div key={event.id} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 flex items-center gap-4">
+                                <div className="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0">
+                                  <span className="text-sm font-bold text-teal-400">#{index + 1}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-white truncate">{event.name}</p>
+                                  <p className="text-sm text-slate-400">
+                                    {new Date(event.event_date).toLocaleDateString()} - {event.total_items} drinks
+                                  </p>
+                                </div>
+                                <p className="font-bold text-teal-400 flex-shrink-0">${event.total_amount?.toFixed(2) || '0.00'}</p>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {events.length === 0 && (
+                      <div className="bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700/50">
+                        <BarChart3 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                        <p className="text-slate-400">No data yet. Complete events to see analytics.</p>
+                      </div>
+                    )}
+                  </>
+                )
+              })()}
             </div>
           )}
         </div>
