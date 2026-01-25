@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendWelcomeEmail } from '@/lib/email-service'
+import { sendWelcomeEmail, sendEmailVerificationEmail } from '@/lib/email-service'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -180,11 +180,37 @@ export async function POST(request: NextRequest) {
     // Update organization with owner
     await supabaseAdmin
       .from('organizations')
-      .update({ 
+      .update({
         owner_id: userData.user.id,
         created_by: userData.user.id
       })
       .eq('id', organization.id)
+
+    // Generate email verification link and send via Resend
+    try {
+      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'signup',
+        email: email,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+        }
+      })
+
+      if (linkError) {
+        console.error('Error generating verification link:', linkError)
+      } else if (linkData?.properties?.action_link) {
+        // Send verification email via Resend
+        const emailResult = await sendEmailVerificationEmail({
+          to: email,
+          userName: firstName,
+          verificationUrl: linkData.properties.action_link
+        })
+        console.log('📧 Verification email sent:', emailResult.success ? 'Success' : 'Failed')
+      }
+    } catch (emailError) {
+      console.error('Error sending verification email:', emailError)
+      // Don't fail signup if email fails - user can request resend
+    }
 
     // Log the signup for analytics
     await supabaseAdmin
