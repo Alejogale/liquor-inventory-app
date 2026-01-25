@@ -71,6 +71,14 @@
       "eas": {
         "projectId": "1461833b-4032-4957-ae61-9e295a1ad502"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow InvyEasy to access your camera for barcode scanning."
+        }
+      ]
+    ]
   }
 }
