@@ -562,6 +562,11 @@ export default function ConsumptionSettingsPage() {
     setExpandedCategories(newExpanded)
   }
 
+  // Role-based access control
+  const isOwner = userProfile?.role === 'owner'
+  const isManager = userProfile?.role === 'manager'
+  const canManageEvents = isOwner || isManager
+
   // Analytics calculations
   const getAnalyticsData = useCallback(() => {
     const eventsWithData = events.filter(e => e.total_items > 0 || e.total_amount > 0)
@@ -669,41 +674,49 @@ export default function ConsumptionSettingsPage() {
               }`}
             >
               <Tag className="w-4 h-4" />
-              Categories & Items
+              <span className="hidden sm:inline">Categories & Items</span>
+              <span className="sm:hidden">Items</span>
             </button>
-            <button
-              onClick={() => setActiveTab('emails')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'emails'
-                  ? 'bg-teal-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Mail className="w-4 h-4" />
-              Email Recipients
-            </button>
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'events'
-                  ? 'bg-teal-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              Events
-            </button>
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'analytics'
-                  ? 'bg-teal-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              Analytics
-            </button>
+            {canManageEvents && (
+              <button
+                onClick={() => setActiveTab('emails')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'emails'
+                    ? 'bg-teal-500 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Mail className="w-4 h-4" />
+                <span className="hidden sm:inline">Email Recipients</span>
+                <span className="sm:hidden">Emails</span>
+              </button>
+            )}
+            {canManageEvents && (
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'events'
+                    ? 'bg-teal-500 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                Events
+              </button>
+            )}
+            {canManageEvents && (
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'analytics'
+                    ? 'bg-teal-500 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" />
+                Analytics
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -935,7 +948,7 @@ export default function ConsumptionSettingsPage() {
           )}
 
           {/* Email Recipients Tab */}
-          {activeTab === 'emails' && (
+          {activeTab === 'emails' && canManageEvents && (
             <div className="space-y-6">
               {/* Add Email */}
               <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
@@ -1014,7 +1027,7 @@ export default function ConsumptionSettingsPage() {
           )}
 
           {/* Events Tab */}
-          {activeTab === 'events' && (
+          {activeTab === 'events' && canManageEvents && (
             <div className="space-y-6">
               {/* Events Info */}
               <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
@@ -1155,7 +1168,7 @@ export default function ConsumptionSettingsPage() {
           )}
 
           {/* Analytics Tab */}
-          {activeTab === 'analytics' && (
+          {activeTab === 'analytics' && canManageEvents && (
             <div className="space-y-6">
               {(() => {
                 const analytics = getAnalyticsData()

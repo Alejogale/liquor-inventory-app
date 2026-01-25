@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
-import { Package, ArrowRight, Lock, Sparkles, LogOut, ExternalLink, Mail, Wine } from 'lucide-react'
+import { Package, ArrowRight, Lock, Sparkles, LogOut, ExternalLink, Mail, Wine, Users } from 'lucide-react'
 import Link from 'next/link'
 
 interface AppInfo {
@@ -20,7 +20,7 @@ interface AppInfo {
 
 export default function AppsPage() {
   const router = useRouter()
-  const { user, organization, loading, isSubscriptionActive, signOut } = useAuth()
+  const { user, userProfile, organization, loading, isSubscriptionActive, signOut } = useAuth()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -44,6 +44,11 @@ export default function AppsPage() {
   if (!user) {
     return null
   }
+
+  // Role-based access control
+  const isOwner = userProfile?.role === 'owner'
+  const isManager = userProfile?.role === 'manager'
+  const canManageTeam = isOwner || isManager
 
   // Define available apps
   const apps: AppInfo[] = [
@@ -211,6 +216,26 @@ export default function AppsPage() {
               </button>
             ))}
           </div>
+
+          {/* Organization Section - Only for Owners/Managers */}
+          {canManageTeam && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Organization</h2>
+              <Link
+                href="/team"
+                className="group flex items-center gap-4 p-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 transition-all duration-300"
+              >
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Users className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white">Team Members</h3>
+                  <p className="text-sm text-slate-400">Manage team access & roles</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

@@ -377,6 +377,11 @@ export default function ConsumptionPage() {
   const { totalItems, totalAmount } = calculateTotals()
   const hasCategories = categories.length > 0 && categories.some(c => c.items.length > 0)
 
+  // Role-based access control
+  const isOwner = userProfile?.role === 'owner'
+  const isManager = userProfile?.role === 'manager'
+  const canManageEvents = isOwner || isManager
+
   if (!mounted || loading || loadingData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -459,18 +464,20 @@ export default function ConsumptionPage() {
                 </button>
               ))}
             </div>
-            <div className="p-3 border-t border-slate-700">
-              <button
-                onClick={() => {
-                  setShowEventSelector(false)
-                  setShowEventModal(true)
-                }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                New Event
-              </button>
-            </div>
+            {canManageEvents && (
+              <div className="p-3 border-t border-slate-700">
+                <button
+                  onClick={() => {
+                    setShowEventSelector(false)
+                    setShowEventModal(true)
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Event
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -514,18 +521,22 @@ export default function ConsumptionPage() {
             <div className="bg-slate-800/50 rounded-2xl p-8 text-center border border-slate-700/50">
               <Calendar className="w-16 h-16 text-teal-500 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-white mb-2">
-                Create an Event
+                {canManageEvents ? 'Create an Event' : 'No Active Events'}
               </h2>
               <p className="text-slate-400 mb-6 max-w-md mx-auto">
-                Start tracking consumption by creating a new event.
+                {canManageEvents
+                  ? 'Start tracking consumption by creating a new event.'
+                  : 'There are no active events at the moment. Ask a manager or owner to create an event.'}
               </p>
-              <button
-                onClick={() => setShowEventModal(true)}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
-              >
-                <Plus className="w-5 h-5" />
-                Create Event
-              </button>
+              {canManageEvents && (
+                <button
+                  onClick={() => setShowEventModal(true)}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Event
+                </button>
+              )}
             </div>
           ) : (
             /* Counting Interface */
