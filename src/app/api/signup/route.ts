@@ -154,17 +154,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user profile
+    // Update user profile (trigger already creates it, so we update with org info)
     const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .insert({
+      .upsert({
         id: userData.user.id,
         full_name: `${firstName} ${lastName}`,
         email: email,
         role: 'owner', // First user is owner
         job_title: 'Owner',
         organization_id: organization.id
-      })
+      }, { onConflict: 'id' })
 
     if (profileError) {
       console.error('Profile creation error:', profileError)
