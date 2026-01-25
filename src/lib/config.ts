@@ -8,16 +8,22 @@ export const config = {
    * Platform admin emails - users with unrestricted access to all organizations
    * Can be a comma-separated list in the environment variable
    */
-  platformAdmins: process.env.NEXT_PUBLIC_PLATFORM_ADMINS?.split(',').map(email => email.trim()) || [
-    'alejogaleis@gmail.com' // Fallback for backwards compatibility
-  ],
+  platformAdmins: (process.env.NEXT_PUBLIC_PLATFORM_ADMINS?.split(',').map(email => email.trim().toLowerCase()) || [
+    'alejogaleis@gmail.com'
+  ]),
 
   /**
    * Check if an email belongs to a platform admin
+   * Always grants full access to everything - bypasses all subscription checks
    */
   isPlatformAdmin: (email: string | null | undefined): boolean => {
     if (!email) return false
-    return config.platformAdmins.includes(email.toLowerCase())
+    const normalizedEmail = email.toLowerCase().trim()
+    const isAdmin = config.platformAdmins.includes(normalizedEmail)
+    if (isAdmin) {
+      console.log('🔑 Platform admin access granted for:', normalizedEmail)
+    }
+    return isAdmin
   },
 
   /**

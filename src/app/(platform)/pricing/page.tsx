@@ -81,8 +81,8 @@ export default function PricingPage() {
       id: 'business',
       name: 'Business',
       description: 'Everything unlimited for growing operations',
-      monthlyPrice: 250,
-      yearlyPrice: 2550,
+      monthlyPrice: 500,
+      yearlyPrice: 5100,
       icon: Building2,
       color: 'from-purple-500 to-purple-600',
       apps: ['All Apps'],
@@ -93,13 +93,36 @@ export default function PricingPage() {
         'Unlimited users',
         'Multi-location support',
         'API access',
-        'Custom integrations',
-        'Phone + email support',
+        'Priority phone + email support',
         'Dedicated account manager',
       ],
       highlighted: false,
       cta: 'Start Free Trial',
       ctaLink: '/signup?plan=business',
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      description: 'White-label solutions for large organizations',
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      isCustom: true,
+      icon: Building2,
+      color: 'from-slate-700 to-slate-900',
+      apps: ['Custom Solution'],
+      features: [
+        'Everything in Business',
+        'White-label branding',
+        'Custom apps for your needs',
+        'Custom automations',
+        'Custom integrations',
+        'Dedicated success manager',
+        '24/7 priority support',
+        'On-site training available',
+      ],
+      highlighted: false,
+      cta: 'Contact Sales',
+      ctaLink: '/contact?inquiry=enterprise',
     },
   ]
 
@@ -172,7 +195,7 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="pb-20 px-6">
         <div className="max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {tiers.map((tier) => {
               const Icon = tier.icon
               const price = isAnnual ? tier.yearlyPrice : tier.monthlyPrice
@@ -209,16 +232,27 @@ export default function PricingPage() {
 
                   {/* Price */}
                   <div className="mb-6">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold text-gray-900">
-                        ${isAnnual ? monthlyEquivalent : price}
-                      </span>
-                      <span className="text-gray-500 ml-2">/month</span>
-                    </div>
-                    {isAnnual && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        ${price}/year <span className="text-green-600 font-medium">(Save ${savings})</span>
-                      </p>
+                    {(tier as any).isCustom ? (
+                      <div className="flex items-baseline">
+                        <span className="text-3xl font-bold text-gray-900">
+                          Custom
+                        </span>
+                        <span className="text-gray-500 ml-2">pricing</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline">
+                          <span className="text-4xl font-bold text-gray-900">
+                            ${isAnnual ? monthlyEquivalent : price}
+                          </span>
+                          <span className="text-gray-500 ml-2">/month</span>
+                        </div>
+                        {isAnnual && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            ${price}/year <span className="text-green-600 font-medium">(Save ${savings})</span>
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
 

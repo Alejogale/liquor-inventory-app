@@ -11,15 +11,19 @@ const supabaseAdmin = createClient(
 
 // Determine app access based on plan metadata
 // Tier → App mapping:
-// - starter: Consumption Tracker only
-// - basic: Liquor Inventory only
-// - professional: Liquor Inventory (full features)
-// - business: All apps (Liquor Inventory + Consumption Tracker)
+// - starter ($25): Consumption Tracker only
+// - basic ($99): Liquor Inventory only
+// - professional ($150): Liquor Inventory (full features)
+// - business ($500): All apps (Liquor Inventory + Consumption Tracker)
+// - enterprise (custom): All apps + custom apps/features
 function getAppsForPlan(planMetadata: any, billingCycle?: string): string[] {
   const plan = planMetadata?.plan;
 
   // Map plan names to apps
-  if (plan === 'business' || plan === 'bundle' || plan === 'enterprise') {
+  if (plan === 'enterprise') {
+    // Enterprise gets all apps + any custom apps
+    return ['liquor-inventory', 'consumption-tracker', 'custom-apps'];
+  } else if (plan === 'business' || plan === 'bundle') {
     // Business tier gets all apps
     return ['liquor-inventory', 'consumption-tracker'];
   } else if (plan === 'professional' || plan === 'basic') {

@@ -413,31 +413,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Special handling for admin user - ensure they have an organization
         if (config.isPlatformAdmin(profile.email) || profile.is_platform_admin) {
           console.log('🔧 Admin user detected, ensuring organization access...')
-          
-          // Try to find the default organization
-          const { data: defaultOrg, error: orgError } = await supabase
+
+          // Try to find ANY organization (get the first one)
+          const { data: anyOrg, error: orgError } = await supabase
             .from('organizations')
             .select('*')
-            .eq('id', '34bf8aa4-1c0d-4c5b-a12d-b2d483d2c2f0')
+            .limit(1)
             .single()
-          
-          if (defaultOrg) {
-            console.log('✅ Found default organization for admin:', defaultOrg)
-            setOrganization(defaultOrg)
-            
+
+          if (anyOrg) {
+            console.log('✅ Found organization for admin:', anyOrg.name)
+            setOrganization(anyOrg)
+
             // Link admin user to organization
             const { error: linkError } = await supabase
               .from('user_profiles')
-              .update({ organization_id: defaultOrg.id })
+              .update({ organization_id: anyOrg.id })
               .eq('id', userId)
-            
+
             if (linkError) {
               console.error('❌ Error linking admin to organization:', linkError)
             } else {
-              console.log('✅ Admin linked to default organization')
+              console.log('✅ Admin linked to organization:', anyOrg.name)
             }
           } else {
-            console.log('❌ Default organization not found for admin')
+            console.log('⚠️ No organizations exist - creating default for admin')
+            // Create a default organization for the admin
+            const { data: newOrg, error: createError } = await supabase
+              .from('organizations')
+              .insert({
+                name: 'Admin Organization',
+                owner_id: userId,
+                subscription_status: 'active',
+                subscription_plan: 'business'
+              })
+              .select()
+              .single()
+
+            if (newOrg) {
+              console.log('✅ Created admin organization:', newOrg.id)
+              setOrganization(newOrg)
+
+              // Link admin to new org
+              await supabase
+                .from('user_profiles')
+                .update({ organization_id: newOrg.id })
+                .eq('id', userId)
+            } else {
+              console.error('❌ Failed to create admin organization:', createError)
+            }
           }
         }
       }

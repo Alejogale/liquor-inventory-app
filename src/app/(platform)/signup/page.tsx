@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, Star, Package, Home, Briefcase, ArrowRight, Lock, Mail, User, Building, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Check, Star, Package, Home, Briefcase, ArrowRight, Lock, Mail, User, Building, Eye, EyeOff, Building2 } from 'lucide-react'
 import { trackSignup, trackButtonClick } from '@/lib/analytics'
 
 export default function SignupPage() {
+  const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -66,31 +67,22 @@ export default function SignupPage() {
     })
   }
 
+  const nextStep = () => {
+    if (step < 3) setStep(step + 1)
+  }
+
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1)
+  }
+
+  const canProceedStep1 = formData.firstName && formData.lastName && formData.email && formData.password.length >= 6
+  const canProceedStep2 = formData.organization && formData.useCase
+
   const useCases = [
-    {
-      id: 'bar',
-      title: 'Bar & Nightclub',
-      description: 'Spirits, beer, wine tracking',
-      icon: Briefcase
-    },
-    {
-      id: 'restaurant',
-      title: 'Restaurant',
-      description: 'Beverage inventory management',
-      icon: Package
-    },
-    {
-      id: 'hotel',
-      title: 'Hotel & Resort',
-      description: 'Multi-location operations',
-      icon: Home
-    },
-    {
-      id: 'events',
-      title: 'Event Venue',
-      description: 'Event-based consumption',
-      icon: Star
-    }
+    { id: 'bar', title: 'Bar & Nightclub', icon: Briefcase },
+    { id: 'restaurant', title: 'Restaurant', icon: Package },
+    { id: 'hotel', title: 'Hotel & Resort', icon: Home },
+    { id: 'events', title: 'Event Venue', icon: Star }
   ]
 
   const tiers = [
@@ -100,7 +92,7 @@ export default function SignupPage() {
       app: 'Consumption Tracker',
       monthlyPrice: 25,
       yearlyPrice: 255,
-      features: ['2 storage areas', '100 items', '1 user', 'Email reports']
+      features: ['2 areas', '100 items', '1 user']
     },
     {
       id: 'basic',
@@ -108,7 +100,7 @@ export default function SignupPage() {
       app: 'Liquor Inventory',
       monthlyPrice: 99,
       yearlyPrice: 1010,
-      features: ['5 storage areas', '500 items', '3 users', 'Barcode scanning']
+      features: ['5 areas', '500 items', '3 users']
     },
     {
       id: 'professional',
@@ -117,192 +109,144 @@ export default function SignupPage() {
       monthlyPrice: 150,
       yearlyPrice: 1530,
       popular: true,
-      features: ['15 storage areas', '2,500 items', '10 users', 'Advanced analytics']
+      features: ['15 areas', '2,500 items', '10 users']
     },
     {
       id: 'business',
       name: 'Business',
-      app: 'All Apps Included',
-      monthlyPrice: 250,
-      yearlyPrice: 2550,
-      features: ['Unlimited areas', 'Unlimited items', 'Unlimited users', 'API access']
+      app: 'All Apps',
+      monthlyPrice: 500,
+      yearlyPrice: 5100,
+      features: ['Unlimited', 'API access', 'Priority support']
     }
   ]
 
   const selectedTierData = tiers.find(t => t.id === formData.selectedTier) || tiers[2]
-  const price = formData.billingCycle === 'monthly' ? selectedTierData.monthlyPrice : selectedTierData.yearlyPrice
-  const savings = selectedTierData.monthlyPrice * 12 - selectedTierData.yearlyPrice
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
       {/* Header */}
-      <header className="fixed w-full top-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-gray-200/50" style={{ padding: '12px 0' }}>
-        <nav className="max-w-[1200px] mx-auto px-6 flex justify-between items-center">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 py-3 px-6">
+        <nav className="max-w-[600px] mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-lg font-semibold tracking-tight text-gray-900" style={{ fontFamily: 'system-ui' }}>
-              InvyEasy
-            </span>
+            <span className="text-lg font-semibold tracking-tight text-gray-900">InvyEasy</span>
             <span className="text-xs text-gray-400 font-medium">by AIGENZ</span>
           </Link>
-
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
+          <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Back to Home
+            Back
           </Link>
         </nav>
       </header>
 
       {/* Main Content */}
-      <div className="pt-24 pb-12 px-6">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
+      <div className="flex-1 flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-[480px]">
 
-            {/* Left Side - Benefits */}
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-black mb-3" style={{ fontFamily: 'system-ui' }}>
-                  Smart Tools for Hospitality
-                </h1>
-                <p className="text-gray-600">
-                  Choose the apps your business needs. Start with a 30-day free trial.
-                </p>
+          {isSubmitted ? (
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Check className="w-8 h-8 text-green-600" />
               </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Welcome to InvyEasy!</h3>
+              <p className="text-gray-600 mb-6">Your account has been created. Check your email to verify and get started.</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all"
+              >
+                Sign In <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
 
-              {/* Benefits List */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-6 space-y-4">
+              {/* Progress Steps */}
+              <div className="flex border-b border-gray-100">
                 {[
-                  { title: 'Built for hospitality', desc: 'Purpose-built tools for bars, restaurants, hotels, and events.' },
-                  { title: 'Barcode scanning', desc: 'Lightning-fast inventory counting with your phone camera.' },
-                  { title: 'Multi-location support', desc: 'Manage inventory across all your venues and storage areas.' },
-                  { title: 'Team collaboration', desc: 'Invite staff with role-based access and PIN protection.' }
-                ].map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">{benefit.title}</h3>
-                      <p className="text-gray-600 text-sm">{benefit.desc}</p>
-                    </div>
+                  { num: 1, label: 'Account' },
+                  { num: 2, label: 'Business' },
+                  { num: 3, label: 'Plan' }
+                ].map((s) => (
+                  <div
+                    key={s.num}
+                    className={`flex-1 py-3 px-4 text-center text-sm font-medium transition-colors ${
+                      step === s.num
+                        ? 'bg-[#FF6B35] text-white'
+                        : step > s.num
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-gray-50 text-gray-400'
+                    }`}
+                  >
+                    <span className="hidden sm:inline">{s.label}</span>
+                    <span className="sm:hidden">Step {s.num}</span>
+                    {step > s.num && <Check className="w-4 h-4 inline ml-1" />}
                   </div>
                 ))}
               </div>
 
-              {/* What's Included */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-5">
-                <h3 className="font-semibold text-gray-900 mb-3">Every plan includes:</h3>
-                <div className="space-y-2">
-                  {[
-                    '30-day free trial',
-                    'No credit card required',
-                    'Mobile + web access',
-                    'Real-time sync',
-                    'Cancel anytime'
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-[#FF6B35]" />
-                      {item}
+              <form onSubmit={handleSubmit} className="p-6">
+
+                {/* Step 1: Account Details */}
+                {step === 1 && (
+                  <div className="space-y-4">
+                    <div className="text-center mb-6">
+                      <h2 className="text-xl font-bold text-gray-900">Create your account</h2>
+                      <p className="text-sm text-gray-500 mt-1">Start your 30-day free trial</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Right Side - Signup Form */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-6">
-              {isSubmitted ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Check className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'system-ui' }}>
-                    Welcome to InvyEasy!
-                  </h3>
-                  <p className="text-gray-600 mb-8">
-                    Your account has been created successfully. Our team will contact you shortly to finalize your custom pricing.
-                  </p>
-                  <Link
-                    href="/login"
-                    className="bg-[#FF6B35] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center"
-                  >
-                    Sign In to Your Account
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </div>
-              ) : (
-                <div>
-                  <h2 className="text-2xl font-bold text-black mb-5" style={{ fontFamily: 'system-ui' }}>
-                    Create Your Account
-                  </h2>
-
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Name Fields */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                          First Name
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                           <input
                             type="text"
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleChange}
                             required
-                            className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all text-gray-900 placeholder-gray-400 text-sm"
+                            className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent focus:bg-white transition-all text-gray-900 text-sm"
                             placeholder="John"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                          Last Name
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                           <input
                             type="text"
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleChange}
                             required
-                            className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all text-gray-900 placeholder-gray-400 text-sm"
+                            className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent focus:bg-white transition-all text-gray-900 text-sm"
                             placeholder="Doe"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* Email */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Email Address
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type="email"
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all text-gray-900 placeholder-gray-400 text-sm"
+                          className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent focus:bg-white transition-all text-gray-900 text-sm"
                           placeholder="john@example.com"
                         />
                       </div>
                     </div>
 
-                    {/* Password */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Password
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           name="password"
@@ -310,243 +254,241 @@ export default function SignupPage() {
                           onChange={handleChange}
                           required
                           minLength={6}
-                          className="w-full pl-9 pr-9 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all text-gray-900 placeholder-gray-400 text-sm"
-                          placeholder="Create a secure password"
+                          className="w-full pl-9 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent focus:bg-white transition-all text-gray-900 text-sm"
+                          placeholder="Min. 6 characters"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Must be at least 6 characters long
-                      </p>
                     </div>
 
-                    {/* Organization */}
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      disabled={!canProceedStep1}
+                      className="w-full py-3 bg-[#FF6B35] text-white rounded-xl font-semibold hover:bg-[#e55a2b] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                    >
+                      Continue <ArrowRight className="w-4 h-4" />
+                    </button>
+
+                    <p className="text-center text-sm text-gray-500">
+                      Already have an account?{' '}
+                      <Link href="/login" className="text-[#FF6B35] font-medium hover:underline">Sign in</Link>
+                    </p>
+                  </div>
+                )}
+
+                {/* Step 2: Business Info */}
+                {step === 2 && (
+                  <div className="space-y-4">
+                    <div className="text-center mb-6">
+                      <h2 className="text-xl font-bold text-gray-900">Tell us about your business</h2>
+                      <p className="text-sm text-gray-500 mt-1">We'll customize your experience</p>
+                    </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Organization Name
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
                       <div className="relative">
-                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type="text"
                           name="organization"
                           value={formData.organization}
                           onChange={handleChange}
                           required
-                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all text-gray-900 placeholder-gray-400 text-sm"
-                          placeholder="My Business Name"
+                          className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent focus:bg-white transition-all text-gray-900 text-sm"
+                          placeholder="Your business name"
                         />
                       </div>
                     </div>
 
-                    {/* Use Case Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Business Type
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
                       <div className="grid grid-cols-2 gap-2">
-                        {useCases.map((useCase) => {
-                          const Icon = useCase.icon
-                          const isSelected = formData.useCase === useCase.id
+                        {useCases.map((uc) => {
+                          const Icon = uc.icon
+                          const isSelected = formData.useCase === uc.id
                           return (
                             <label
-                              key={useCase.id}
-                              className={`relative flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                                isSelected
-                                  ? 'border-[#FF6B35] bg-orange-50'
-                                  : 'border-gray-200 hover:border-gray-300'
+                              key={uc.id}
+                              className={`flex items-center gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all ${
+                                isSelected ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
                               }`}
                             >
                               <input
                                 type="radio"
                                 name="useCase"
-                                value={useCase.id}
+                                value={uc.id}
                                 checked={isSelected}
                                 onChange={handleChange}
                                 className="sr-only"
                               />
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 ${
-                                isSelected ? 'bg-[#FF6B35]' : 'bg-gray-200'
-                              }`}>
-                                <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isSelected ? 'bg-[#FF6B35]' : 'bg-gray-100'}`}>
+                                <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-500'}`} />
                               </div>
-                              <span className="text-xs font-medium text-gray-900 text-center">{useCase.title}</span>
-                              {isSelected && (
-                                <div className="absolute top-1 right-1 w-4 h-4 bg-[#FF6B35] rounded-full flex items-center justify-center">
-                                  <Check className="w-2.5 h-2.5 text-white" />
-                                </div>
-                              )}
+                              <span className="text-sm font-medium text-gray-900">{uc.title}</span>
                             </label>
                           )
                         })}
                       </div>
                     </div>
 
-                    {/* Billing Cycle Toggle */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Billing Cycle
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, billingCycle: 'monthly' })}
-                          className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                            formData.billingCycle === 'monthly'
-                              ? 'bg-[#FF6B35] text-white shadow-md'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          Monthly
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, billingCycle: 'annual' })}
-                          className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-1 ${
-                            formData.billingCycle === 'annual'
-                              ? 'bg-[#FF6B35] text-white shadow-md'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          Annual
-                          <span className="text-xs opacity-80">Save 15%</span>
-                        </button>
-                      </div>
+                    <div className="flex gap-3 mt-6">
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!canProceedStep2}
+                        className="flex-1 py-3 bg-[#FF6B35] text-white rounded-xl font-semibold hover:bg-[#e55a2b] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        Continue <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Choose Plan */}
+                {step === 3 && (
+                  <div className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h2 className="text-xl font-bold text-gray-900">Choose your plan</h2>
+                      <p className="text-sm text-gray-500 mt-1">30-day free trial, cancel anytime</p>
                     </div>
 
-                    {/* Tier Selection */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Choose Your Plan
-                      </label>
-                      <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                        {tiers.map((tier) => {
-                          const isSelected = formData.selectedTier === tier.id
-                          const tierPrice = formData.billingCycle === 'monthly' ? tier.monthlyPrice : tier.yearlyPrice
-                          const tierSavings = tier.monthlyPrice * 12 - tier.yearlyPrice
+                    {/* Billing Toggle */}
+                    <div className="flex items-center justify-center gap-3 p-1 bg-gray-100 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, billingCycle: 'monthly' })}
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                          formData.billingCycle === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
+                        }`}
+                      >
+                        Monthly
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, billingCycle: 'annual' })}
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
+                          formData.billingCycle === 'annual' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
+                        }`}
+                      >
+                        Annual <span className="text-green-600 text-xs font-bold">-15%</span>
+                      </button>
+                    </div>
 
-                          return (
-                            <label
-                              key={tier.id}
-                              className={`relative block p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                                isSelected
-                                  ? 'border-[#FF6B35] bg-orange-50'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <input
-                                type="radio"
-                                name="selectedTier"
-                                value={tier.id}
-                                checked={isSelected}
-                                onChange={handleChange}
-                                className="sr-only"
-                              />
-
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-0.5">
-                                    <h3 className="font-semibold text-gray-900 text-sm">{tier.name}</h3>
-                                    {tier.popular && (
-                                      <span className="px-1.5 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full">
-                                        POPULAR
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-xs text-[#FF6B35] font-medium mb-0.5">{tier.app}</p>
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-lg font-bold text-gray-900">
-                                      ${tierPrice.toLocaleString()}
-                                    </span>
-                                    <span className="text-gray-600 text-xs">
-                                      /{formData.billingCycle === 'monthly' ? 'mo' : 'yr'}
-                                    </span>
-                                    {formData.billingCycle === 'annual' && tierSavings > 0 && (
-                                      <span className="text-xs text-green-600 font-medium ml-1">
-                                        Save ${tierSavings}/yr
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-xs text-gray-500 mt-0.5">
-                                    {tier.features.join(' • ')}
-                                  </p>
-                                </div>
-
-                                {isSelected && (
-                                  <div className="w-5 h-5 bg-[#FF6B35] rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                                    <Check className="w-3 h-3 text-white" />
-                                  </div>
-                                )}
+                    {/* Plan Cards */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {tiers.map((tier) => {
+                        const isSelected = formData.selectedTier === tier.id
+                        const price = formData.billingCycle === 'monthly' ? tier.monthlyPrice : Math.round(tier.yearlyPrice / 12)
+                        return (
+                          <label
+                            key={tier.id}
+                            className={`relative p-3 border-2 rounded-xl cursor-pointer transition-all ${
+                              isSelected ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="selectedTier"
+                              value={tier.id}
+                              checked={isSelected}
+                              onChange={handleChange}
+                              className="sr-only"
+                            />
+                            {tier.popular && (
+                              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full">
+                                POPULAR
+                              </span>
+                            )}
+                            <div className="text-center">
+                              <h3 className="font-bold text-gray-900 text-sm">{tier.name}</h3>
+                              <p className="text-[10px] text-[#FF6B35] font-medium">{tier.app}</p>
+                              <div className="mt-2">
+                                <span className="text-2xl font-bold text-gray-900">${price}</span>
+                                <span className="text-gray-500 text-xs">/mo</span>
                               </div>
-                            </label>
-                          )
-                        })}
-                      </div>
-                      <p className="text-xs text-gray-600 mt-2">
-                        All plans include a <span className="font-semibold text-[#FF6B35]">30-day free trial</span>. No credit card required.
-                      </p>
+                              <p className="text-[10px] text-gray-500 mt-1">{tier.features.join(' • ')}</p>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute top-2 right-2 w-5 h-5 bg-[#FF6B35] rounded-full flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </label>
+                        )
+                      })}
                     </div>
 
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-3 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-[#FF6B35] text-white hover:bg-[#e55a2b] shadow-lg hover:shadow-xl"
+                    {/* Enterprise Option */}
+                    <Link
+                      href="/contact?inquiry=enterprise"
+                      className="block p-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 transition-all text-center"
                     >
-                      {isSubmitting ? (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2" />
-                          Creating Account...
-                        </div>
-                      ) : (
-                        <>
-                          Get Started
-                          <ArrowRight className="w-5 h-5" />
-                        </>
-                      )}
-                    </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <Building2 className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700">Enterprise</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">White-label, custom apps & automations</p>
+                      <span className="text-xs text-[#FF6B35] font-medium">Contact Sales →</span>
+                    </Link>
 
-                    {/* Terms */}
-                    <p className="text-xs text-gray-500 text-center">
-                      By creating an account, you agree to our{' '}
-                      <Link href="/terms" className="text-[#FF6B35] hover:text-[#e55a2b]">
-                        Terms & Liability
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-[#FF6B35] hover:text-[#e55a2b]">
-                        Privacy Policy
-                      </Link>
-                    </p>
+                    <div className="flex gap-3 mt-4">
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 py-3 bg-[#FF6B35] text-white rounded-xl font-semibold hover:bg-[#e55a2b] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                            Creating...
+                          </>
+                        ) : (
+                          <>Start Free Trial</>
+                        )}
+                      </button>
+                    </div>
 
-                    {/* Login Link */}
-                    <p className="text-center text-gray-600 text-sm">
-                      Already have an account?{' '}
-                      <Link href="/login" className="text-[#FF6B35] hover:text-[#e55a2b] font-semibold transition-colors">
-                        Sign in
-                      </Link>
+                    <p className="text-[11px] text-gray-400 text-center">
+                      By signing up, you agree to our{' '}
+                      <Link href="/terms" className="text-[#FF6B35] hover:underline">Terms</Link> &{' '}
+                      <Link href="/privacy" className="text-[#FF6B35] hover:underline">Privacy</Link>
                     </p>
-                  </form>
-                </div>
-              )}
+                  </div>
+                )}
+              </form>
             </div>
-          </div>
-        </div>
-      </div>
+          )}
 
-      {/* Footer */}
-      <div className="pb-8 text-center">
-        <p className="text-gray-500 text-sm">
-          A product by{' '}
-          <a href="https://aigenz.com" target="_blank" rel="noopener noreferrer" className="text-[#FF6B35] hover:underline">
-            AIGENZ
-          </a>
-        </p>
+          {/* Trust indicators */}
+          {!isSubmitted && (
+            <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> No credit card</span>
+              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> 30-day trial</span>
+              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Cancel anytime</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
