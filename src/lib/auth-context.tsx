@@ -55,6 +55,7 @@ interface AuthContextType {
   // 🚀 Subscription status
   subscription: SubscriptionInfo
   hasValidSubscription: () => boolean
+  isSubscriptionActive: boolean  // For apps page - true if admin or has active subscription
 }
 
 const defaultSubscription: SubscriptionInfo = {
@@ -75,7 +76,8 @@ const AuthContext = createContext<AuthContextType>({
   canAccessAllOrganizations: () => false,
   getAccessibleOrganizationIds: () => [],
   subscription: defaultSubscription,
-  hasValidSubscription: () => false
+  hasValidSubscription: () => false,
+  isSubscriptionActive: false
 })
 
 // Helper function to calculate subscription status
@@ -512,6 +514,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return userProfile?.organization_id ? [userProfile.organization_id] : []
   }
 
+  // Check if subscription is active (admin or valid subscription)
+  const isSubscriptionActive = subscriptionInfo.isValid || isPlatformAdmin()
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -524,7 +529,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       canAccessAllOrganizations,
       getAccessibleOrganizationIds,
       subscription: subscriptionInfo,
-      hasValidSubscription: () => subscriptionInfo.isValid || isPlatformAdmin()
+      hasValidSubscription: () => isSubscriptionActive,
+      isSubscriptionActive
     }}>
       {children}
     </AuthContext.Provider>
