@@ -61,19 +61,29 @@ function LoginForm() {
       return
     }
 
-    try {
-      const redirectUrl = process.env.NODE_ENV === 'production'
-        ? 'https://invyeasy.com/reset-password'
-        : `${window.location.origin}/reset-password`
+    setIsLoading(true)
+    setError('')
 
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: redirectUrl
+    try {
+      const response = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: formData.email })
       })
-      if (error) throw error
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset email')
+      }
 
       alert('Password reset email sent! Check your inbox for the reset link.')
     } catch (error: any) {
       setError(error.message || 'Failed to send reset email')
+    } finally {
+      setIsLoading(false)
     }
   }
 
