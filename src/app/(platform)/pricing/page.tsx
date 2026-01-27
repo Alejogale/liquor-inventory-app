@@ -4,9 +4,15 @@ import Link from 'next/link'
 import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Building2, LayoutDashboard, CheckCircle, Settings } from 'lucide-react'
 import Script from 'next/script'
 import { useAuth } from '@/lib/auth-context'
+import { useSearchParams } from 'next/navigation'
 
 export default function PricingPage() {
   const { user, loading, organization, subscription } = useAuth()
+  const searchParams = useSearchParams()
+
+  // Get email from URL (from signup redirect) or from logged-in user
+  const emailFromUrl = searchParams.get('email')
+  const customerEmail = emailFromUrl || user?.email || ''
 
   // Check if user has an active subscription
   const hasActiveSubscription = subscription?.isValid && subscription?.status === 'active'
@@ -72,6 +78,30 @@ export default function PricingPage() {
           </p>
         </div>
       </section>
+
+      {/* Welcome Banner - Show when coming from signup */}
+      {emailFromUrl && !user && (
+        <section className="px-6 pb-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <Check className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-1">
+                    Almost there! One more step.
+                  </h3>
+                  <p className="text-blue-700 text-sm">
+                    Your account is created. Select a plan below and add your payment method to start your <strong>30-day free trial</strong>.
+                    You won't be charged until the trial ends.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Already Subscribed Banner */}
       {!loading && user && hasActiveSubscription && (
@@ -146,6 +176,7 @@ export default function PricingPage() {
           <stripe-pricing-table
             pricing-table-id="prctbl_1Su0dBGp6QH8POrPuli88mFg"
             publishable-key="pk_test_51RraBbGp6QH8POrPKBX74oWuWBgbk2eyqu2JTCQWPVT0DeafPQOECWJf1PNGQb8mjZ4c31KaN2bcpdaSN45oSXvD00Y04EptnJ"
+            customer-email={customerEmail || undefined}
           />
         </div>
 

@@ -148,13 +148,22 @@ export default function SignupPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Welcome to InvyEasy!</h3>
-              <p className="text-gray-600 mb-6">Your account has been created. Check your email to verify and get started.</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Account Created!</h3>
+              <p className="text-gray-600 mb-2">Your 30-day free trial is ready.</p>
+              <p className="text-gray-500 text-sm mb-6">
+                Add your payment method to activate your trial. You won't be charged until the trial ends.
+              </p>
+              <Link
+                href={`/pricing?email=${encodeURIComponent(formData.email)}`}
+                className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all w-full justify-center"
+              >
+                Add Payment Method <ArrowRight className="w-5 h-5" />
+              </Link>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all"
+                className="block mt-3 text-sm text-gray-500 hover:text-gray-700 transition-colors"
               >
-                Sign In <ArrowRight className="w-5 h-5" />
+                Skip for now - I'll add payment later
               </Link>
             </div>
           ) : (
