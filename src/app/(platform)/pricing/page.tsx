@@ -1,131 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, Star, Zap, Shield, Building2, ArrowRight, Package, BarChart3, Users, Smartphone } from 'lucide-react'
-import { useState } from 'react'
+import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Building2 } from 'lucide-react'
+import Script from 'next/script'
 
 export default function PricingPage() {
-  const [isAnnual, setIsAnnual] = useState(false)
-
-  const tiers = [
-    {
-      id: 'starter',
-      name: 'Starter',
-      description: 'Perfect for trying out or tracking event consumption',
-      monthlyPrice: 25,
-      yearlyPrice: 255,
-      icon: Star,
-      color: 'from-blue-500 to-blue-600',
-      apps: ['Consumption Tracker'],
-      features: [
-        '1 app (Consumption Tracker)',
-        '2 storage areas',
-        '100 items',
-        '1 user',
-        'Basic reports',
-        'Email support',
-      ],
-      highlighted: false,
-      cta: 'Start Free Trial',
-      ctaLink: '/signup?plan=starter',
-    },
-    {
-      id: 'basic',
-      name: 'Basic',
-      description: 'Essential inventory management for small venues',
-      monthlyPrice: 99,
-      yearlyPrice: 1010,
-      icon: Zap,
-      color: 'from-green-500 to-green-600',
-      apps: ['Liquor Inventory'],
-      features: [
-        '1 app (Liquor Inventory)',
-        '5 storage areas',
-        '500 items',
-        '3 users',
-        'Barcode scanning',
-        'Stock alerts',
-        'Basic analytics',
-        'Email support',
-      ],
-      highlighted: false,
-      cta: 'Start Free Trial',
-      ctaLink: '/signup?plan=basic',
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      description: 'Full-featured inventory for established businesses',
-      monthlyPrice: 150,
-      yearlyPrice: 1530,
-      icon: Shield,
-      color: 'from-[#FF6B35] to-[#e55a2b]',
-      badge: 'MOST POPULAR',
-      apps: ['Liquor Inventory (Full)'],
-      features: [
-        'Liquor Inventory (full features)',
-        '15 storage areas',
-        '2,500 items',
-        '10 users',
-        'Advanced analytics',
-        'Custom reports',
-        'Stock movement tracking',
-        'Export to Excel',
-        'Priority email support',
-      ],
-      highlighted: true,
-      cta: 'Start Free Trial',
-      ctaLink: '/signup?plan=professional',
-    },
-    {
-      id: 'business',
-      name: 'Business',
-      description: 'Everything unlimited for growing operations',
-      monthlyPrice: 500,
-      yearlyPrice: 5100,
-      icon: Building2,
-      color: 'from-purple-500 to-purple-600',
-      apps: ['All Apps'],
-      features: [
-        'All apps included',
-        'Unlimited storage areas',
-        'Unlimited items',
-        'Unlimited users',
-        'Multi-location support',
-        'API access',
-        'Priority phone + email support',
-        'Dedicated account manager',
-      ],
-      highlighted: false,
-      cta: 'Start Free Trial',
-      ctaLink: '/signup?plan=business',
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      description: 'White-label solutions for large organizations',
-      monthlyPrice: 0,
-      yearlyPrice: 0,
-      isCustom: true,
-      icon: Building2,
-      color: 'from-slate-700 to-slate-900',
-      apps: ['Custom Solution'],
-      features: [
-        'Everything in Business',
-        'White-label branding',
-        'Custom apps for your needs',
-        'Custom automations',
-        'Custom integrations',
-        'Dedicated success manager',
-        '24/7 priority support',
-        'On-site training available',
-      ],
-      highlighted: false,
-      cta: 'Contact Sales',
-      ctaLink: '/contact?inquiry=enterprise',
-    },
-  ]
-
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
       {/* Header */}
@@ -156,6 +35,9 @@ export default function PricingPage() {
         </nav>
       </header>
 
+      {/* Stripe Pricing Table Script */}
+      <Script async src="https://js.stripe.com/v3/pricing-table.js" />
+
       {/* Hero Section */}
       <section className="pt-32 pb-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -168,118 +50,38 @@ export default function PricingPage() {
             Choose Your Plan
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-            Start with what you need today. Upgrade as you grow. All plans include a 30-day free trial, no credit card required.
+            Start with what you need today. Upgrade as you grow. All plans include a 30-day free trial.
           </p>
-
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Monthly
-            </span>
-            <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className="relative inline-flex items-center cursor-pointer"
-            >
-              <div className={`w-14 h-8 rounded-full transition-colors duration-200 ${isAnnual ? 'bg-[#FF6B35]' : 'bg-gray-300'}`}>
-                <div className={`absolute top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 shadow-md ${isAnnual ? 'translate-x-7' : 'translate-x-1'}`} />
-              </div>
-            </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annual
-              <span className="ml-2 text-[#FF6B35] font-bold">Save 15%</span>
-            </span>
-          </div>
         </div>
       </section>
 
-      {/* Pricing Cards */}
+      {/* Stripe Pricing Table */}
       <section className="pb-20 px-6">
         <div className="max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {tiers.map((tier) => {
-              const Icon = tier.icon
-              const price = isAnnual ? tier.yearlyPrice : tier.monthlyPrice
-              const monthlyEquivalent = isAnnual ? Math.round(tier.yearlyPrice / 12) : tier.monthlyPrice
-              const savings = tier.monthlyPrice * 12 - tier.yearlyPrice
+          {/* @ts-expect-error - Stripe custom element */}
+          <stripe-pricing-table
+            pricing-table-id="prctbl_1Su0dBGp6QH8POrPuli88mFg"
+            publishable-key="pk_test_51RraBbGp6QH8POrPKBX74oWuWBgbk2eyqu2JTCQWPVT0DeafPQOECWJf1PNGQb8mjZ4c31KaN2bcpdaSN45oSXvD00Y04EptnJ"
+          />
+        </div>
 
-              return (
-                <div
-                  key={tier.id}
-                  className={`relative flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border ${tier.highlighted ? 'border-[#FF6B35] border-2 scale-105 z-10' : 'border-white/30'} p-6 transition-all hover:shadow-2xl`}
-                >
-                  {/* Badge */}
-                  {tier.badge && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#FF6B35] text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
-                      {tier.badge}
-                    </div>
-                  )}
-
-                  {/* Icon */}
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{tier.name}</h3>
-                  <p className="text-sm text-gray-500 mb-4 min-h-[40px]">{tier.description}</p>
-
-                  {/* Apps included */}
-                  <div className="mb-4">
-                    <span className="text-xs font-medium text-[#FF6B35] uppercase tracking-wide">
-                      {tier.apps.join(', ')}
-                    </span>
-                  </div>
-
-                  {/* Price */}
-                  <div className="mb-6">
-                    {(tier as any).isCustom ? (
-                      <div className="flex items-baseline">
-                        <span className="text-3xl font-bold text-gray-900">
-                          Custom
-                        </span>
-                        <span className="text-gray-500 ml-2">pricing</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-baseline">
-                          <span className="text-4xl font-bold text-gray-900">
-                            ${isAnnual ? monthlyEquivalent : price}
-                          </span>
-                          <span className="text-gray-500 ml-2">/month</span>
-                        </div>
-                        {isAnnual && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            ${price}/year <span className="text-green-600 font-medium">(Save ${savings})</span>
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {/* Features */}
-                  <ul className="space-y-3 mb-8 flex-grow">
-                    {tier.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-[#FF6B35]' : 'text-green-500'}`} />
-                        <span className="text-sm text-gray-600">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA */}
-                  <Link
-                    href={tier.ctaLink}
-                    className={`w-full text-center py-3 px-4 rounded-xl font-semibold transition-all ${
-                      tier.highlighted
-                        ? 'bg-[#FF6B35] text-white hover:bg-[#e55a2b] shadow-lg hover:shadow-xl'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tier.cta}
-                  </Link>
-                </div>
-              )
-            })}
+        {/* Enterprise CTA */}
+        <div className="max-w-2xl mx-auto mt-12 text-center">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-8">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center mx-auto mb-4">
+              <Building2 className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
+            <p className="text-gray-600 mb-4">
+              Need white-label solutions, custom integrations, or dedicated support for your organization?
+            </p>
+            <Link
+              href="/contact?inquiry=enterprise"
+              className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-all"
+            >
+              Contact Sales
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
