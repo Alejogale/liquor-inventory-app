@@ -13,8 +13,11 @@ import {
   ArrowUpDown,
   Calendar,
   Users,
-  Package
+  Package,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface BillingData {
   organization: {
@@ -22,6 +25,7 @@ interface BillingData {
     name: string
     plan: string
     status: string
+    hasStripeSubscription: boolean
     currentPeriodStart: string
     currentPeriodEnd: string
   }
@@ -320,6 +324,34 @@ export default function BillingSettings() {
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subscribe CTA - Show if on trial or no active subscription */}
+      {billingData && (billingData.organization.status === 'trial' || billingData.organization.status === 'expired' || billingData.organization.status !== 'active') && (
+        <div className="p-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl text-white">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-white/20 rounded-xl">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold mb-1">
+                {billingData?.organization.status === 'trial' ? 'Upgrade Your Plan' : 'Subscribe to InvyEasy'}
+              </h3>
+              <p className="text-white/90 text-sm mb-4">
+                {billingData?.organization.status === 'trial'
+                  ? 'Your trial is active. Subscribe now to keep access when it ends.'
+                  : 'Choose a plan that fits your business needs and unlock all features.'}
+              </p>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors"
+              >
+                View Plans & Subscribe
+                <ExternalLink className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>

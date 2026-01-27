@@ -115,12 +115,21 @@ export async function GET(request: NextRequest) {
     // Determine the plan name (prefer 'plan' column, fallback to 'subscription_tier')
     const planName = organization.plan || organization.subscription_tier || 'starter'
 
+    // Determine subscription status
+    // - If they have a stripe_subscription_id, use the actual status
+    // - If no stripe subscription, they're on trial (or haven't subscribed yet)
+    let subscriptionStatus = organization.subscription_status
+    if (!subscriptionStatus) {
+      subscriptionStatus = organization.stripe_subscription_id ? 'active' : 'trial'
+    }
+
     return NextResponse.json({
       organization: {
         id: organization.id,
         name: organization.Name,
         plan: planName,
-        status: organization.subscription_status || 'active',
+        status: subscriptionStatus,
+        hasStripeSubscription: !!organization.stripe_subscription_id,
         currentPeriodStart: organization.current_period_start || organization.trial_started_at,
         currentPeriodEnd: organization.current_period_end || organization.trial_ends_at,
         createdAt: organization.created_at,

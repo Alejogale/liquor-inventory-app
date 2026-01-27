@@ -1,10 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Building2 } from 'lucide-react'
+import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Building2, LayoutDashboard, CheckCircle, Settings } from 'lucide-react'
 import Script from 'next/script'
+import { useAuth } from '@/lib/auth-context'
 
 export default function PricingPage() {
+  const { user, loading, organization, subscription } = useAuth()
+
+  // Check if user has an active subscription
+  const hasActiveSubscription = subscription?.isValid && subscription?.status === 'active'
+  const isOnTrial = subscription?.status === 'trial'
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
       {/* Header */}
@@ -25,12 +31,24 @@ export default function PricingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              Sign In
-            </Link>
-            <Link href="/signup" className="bg-[#FF6B35] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#e55a2b] transition-colors">
-              Get Started
-            </Link>
+            {!loading && user ? (
+              <Link
+                href="/apps"
+                className="flex items-center gap-2 bg-[#FF6B35] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#e55a2b] transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Back to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="bg-[#FF6B35] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#e55a2b] transition-colors">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -55,9 +73,75 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Already Subscribed Banner */}
+      {!loading && user && hasActiveSubscription && (
+        <section className="px-6 pb-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-green-100 rounded-full">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-green-900 mb-1">
+                    You're Already Subscribed!
+                  </h3>
+                  <p className="text-green-700 text-sm mb-4">
+                    Your <span className="font-medium capitalize">{organization?.subscription_plan || 'current'}</span> plan is active.
+                    You can manage your subscription, update payment methods, or change your plan from your account settings.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      href="/settings?tab=billing"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Manage Subscription
+                    </Link>
+                    <Link
+                      href="/apps"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white text-green-700 border border-green-300 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Go to Dashboard
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Trial Banner */}
+      {!loading && user && isOnTrial && !hasActiveSubscription && (
+        <section className="px-6 pb-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-amber-100 rounded-full">
+                  <Package className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-amber-900 mb-1">
+                    You're on a Free Trial
+                  </h3>
+                  <p className="text-amber-700 text-sm mb-2">
+                    {subscription?.daysRemaining !== null && subscription.daysRemaining > 0
+                      ? `You have ${subscription.daysRemaining} days left in your trial.`
+                      : 'Your trial is active.'
+                    } Subscribe below to keep access when your trial ends.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Stripe Pricing Table */}
       <section className="pb-20 px-6">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-[1400px] mx-auto">
           {/* @ts-expect-error - Stripe custom element */}
           <stripe-pricing-table
             pricing-table-id="prctbl_1Su0dBGp6QH8POrPuli88mFg"

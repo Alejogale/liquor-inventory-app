@@ -19,8 +19,10 @@ import {
   Clock,
   ChevronDown,
   Play,
-  Building2
+  Building2,
+  LayoutDashboard
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -28,6 +30,7 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const router = useRouter()
+  const { user, loading } = useAuth()
 
   // Custom cursor refs
   const cursorDotRef = useRef<HTMLDivElement>(null)
@@ -403,19 +406,33 @@ export default function LandingPage() {
               <li><Link href="/use-cases/consumption-tracker" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Consumption Tracker</Link></li>
               <li><a href="#pricing" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">Pricing</a></li>
               <li><a href="#faq" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">FAQ</a></li>
-              <li>
-                <Link href="/login" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">
-                  Sign In
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/signup"
-                  className="px-4 py-2 text-sm font-semibold border-2 border-[#465C88] text-[#465C88] rounded-lg hover:bg-[#465C88] hover:text-white transition-all"
-                >
-                  Start Free Trial
-                </Link>
-              </li>
+              {!loading && user ? (
+                <li>
+                  <Link
+                    href="/apps"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-[#FF6B35] text-white rounded-lg hover:bg-[#e55a2b] transition-all"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/login" className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors">
+                      Sign In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/signup"
+                      className="px-4 py-2 text-sm font-semibold border-2 border-[#465C88] text-[#465C88] rounded-lg hover:bg-[#465C88] hover:text-white transition-all"
+                    >
+                      Start Free Trial
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
 
             {/* Mobile menu button */}
@@ -442,10 +459,19 @@ export default function LandingPage() {
                 <a href="#pricing" className="block text-gray-700 py-2">Pricing</a>
                 <a href="#faq" className="block text-gray-700 py-2">FAQ</a>
                 <div className="pt-3 border-t border-gray-100 space-y-3">
-                  <Link href="/login" className="block text-center text-gray-700 py-2">Sign In</Link>
-                  <Link href="/signup" className="block text-center bg-[#FF6B35] text-white py-3 rounded-lg font-medium">
-                    Start Free Trial
-                  </Link>
+                  {!loading && user ? (
+                    <Link href="/apps" className="flex items-center justify-center gap-2 bg-[#FF6B35] text-white py-3 rounded-lg font-medium">
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="/login" className="block text-center text-gray-700 py-2">Sign In</Link>
+                      <Link href="/signup" className="block text-center bg-[#FF6B35] text-white py-3 rounded-lg font-medium">
+                        Start Free Trial
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -855,8 +881,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup?plan=starter" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
-                  Start Free Trial
+                <Link href="/pricing" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
+                  Get Started
                 </Link>
               </div>
 
@@ -879,8 +905,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup?plan=basic" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
-                  Start Free Trial
+                <Link href="/pricing" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
+                  Get Started
                 </Link>
               </div>
 
@@ -906,8 +932,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup?plan=professional" className="block text-center py-2.5 rounded-lg bg-[#FF6B35] text-white font-semibold hover:bg-[#e55a2b] transition-all text-sm">
-                  Start Free Trial
+                <Link href="/pricing" className="block text-center py-2.5 rounded-lg bg-[#FF6B35] text-white font-semibold hover:bg-[#e55a2b] transition-all text-sm">
+                  Get Started
                 </Link>
               </div>
 
@@ -930,8 +956,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup?plan=business" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
-                  Start Free Trial
+                <Link href="/pricing" className="block text-center py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:border-black transition-all text-sm">
+                  Get Started
                 </Link>
               </div>
 

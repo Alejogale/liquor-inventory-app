@@ -17,10 +17,13 @@ import {
   FileText,
   Timer,
   Hash,
-  MousePointer
+  MousePointer,
+  LayoutDashboard
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 export default function ConsumptionTrackerPage() {
+  const { user, loading } = useAuth()
   const features = [
     {
       icon: MousePointer,
@@ -97,12 +100,24 @@ export default function ConsumptionTrackerPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              Sign In
-            </Link>
-            <Link href="/signup?plan=starter" className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
-              Get Started
-            </Link>
+            {!loading && user ? (
+              <Link
+                href="/apps"
+                className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/signup?plan=starter" className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>

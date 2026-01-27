@@ -65,41 +65,101 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        // Handle subscription vs one-time payment
+        if (!session.subscription) {
+          console.log('⚠️ Checkout completed but no subscription (one-time payment?)');
+          break;
+        }
+
         const subscriptionResp = await stripe.subscriptions.retrieve(session.subscription as string);
         const subscription = (subscriptionResp as unknown as Stripe.Subscription);
         const subAny = subscription as any;
-        
-        console.log('🎉 Checkout completed for organization:', session.metadata?.organization_id);
-        
-        // Update organizations table
-        await supabaseAdmin
-          .from('organizations')
-          .update({
-            stripe_subscription_id: subscription.id,
-            stripe_price_id: subscription.items.data[0].price?.id ?? null,
-            subscription_status: subscription.status,
-            subscription_period_start: new Date((subAny.current_period_start as number) * 1000).toISOString(),
-            subscription_period_end: new Date((subAny.current_period_end as number) * 1000).toISOString(),
-          })
-          .eq('id', session.metadata?.organization_id as string);
+
+        // Get organization_id from metadata OR look up by customer email
+        let organizationId = session.metadata?.organization_id;
+        const customerEmail = session.customer_email || session.customer_details?.email;
+
+        console.log('🎉 Checkout completed:', {
+          organizationId,
+          customerEmail,
+          subscriptionId: subscription.id
+        });
+
+        // If no organization_id in metadata, look up by email (Pricing Table flow)
+        if (!organizationId && customerEmail) {
+          console.log('🔍 Looking up organization by customer email:', customerEmail);
+
+          // First, find user by email
+          const { data: userProfile, error: userError } = await supabaseAdmin
+            .from('user_profiles')
+            .select('id, organization_id, email')
+            .eq('email', customerEmail)
+            .single();
+
+          if (userError || !userProfile) {
+            console.log('⚠️ No user found with email:', customerEmail);
+            // Could create a pending subscription record here for later linking
+          } else {
+            organizationId = userProfile.organization_id;
+            console.log('✅ Found organization:', organizationId, 'for user:', userProfile.email);
+          }
+        }
+
+        // Determine plan from price metadata or product name
+        let planName = session.metadata?.plan;
+        if (!planName && subscription.items.data[0]?.price) {
+          const price = subscription.items.data[0].price;
+          // Try to get plan from price metadata or product
+          planName = (price.metadata as any)?.plan;
+          if (!planName && price.product) {
+            const product = await stripe.products.retrieve(price.product as string);
+            planName = product.metadata?.plan || product.name?.toLowerCase().replace(/\s+/g, '-');
+          }
+        }
+        console.log('📋 Plan determined:', planName);
+
+        // Update organizations table if we have an organization
+        if (organizationId) {
+          const { error: orgUpdateError } = await supabaseAdmin
+            .from('organizations')
+            .update({
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: subscription.items.data[0].price?.id ?? null,
+              subscription_status: 'active',
+              subscription_tier: planName || 'professional',
+              subscription_period_start: new Date((subAny.current_period_start as number) * 1000).toISOString(),
+              subscription_period_end: new Date((subAny.current_period_end as number) * 1000).toISOString(),
+            })
+            .eq('id', organizationId);
+
+          if (orgUpdateError) {
+            console.error('❌ Error updating organization:', orgUpdateError);
+          } else {
+            console.log('✅ Organization updated with subscription');
+          }
+        } else {
+          console.log('⚠️ No organization found - subscription created but not linked');
+          // TODO: Could store in a pending_subscriptions table for manual linking
+        }
 
         // 🚨 CRITICAL FIX: Update app_subscriptions table for access control
-        const organizationId = session.metadata?.organization_id;
-        if (organizationId) {
-          const apps = getAppsForPlan(session.metadata);
+        if (finalOrganizationId) {
+          const apps = getAppsForPlan({ plan: planName });
           const subscriptionEndDate = new Date((subAny.current_period_end as number) * 1000);
-          
-          console.log('🔐 Creating app subscriptions:', { organizationId, apps });
-          
+
+          console.log('🔐 Creating app subscriptions:', { organizationId: finalOrganizationId, apps, plan: planName });
+
           // Create or update subscription for each app
           for (const appId of apps) {
             const { error } = await supabaseAdmin
               .from('app_subscriptions')
               .upsert({
-                organization_id: organizationId,
+                organization_id: finalOrganizationId,
                 app_id: appId,
                 subscription_status: 'active',
-                subscription_plan: session.metadata?.plan === 'bundle' ? 'bundle' : 'individual',
+                subscription_plan: planName === 'bundle' || planName === 'business' ? 'bundle' : 'individual',
                 subscription_ends_at: subscriptionEndDate.toISOString(),
                 stripe_subscription_id: subscription.id,
                 trial_ends_at: null, // No longer in trial
@@ -107,11 +167,11 @@ export async function POST(request: NextRequest) {
               }, {
                 onConflict: 'organization_id,app_id'
               });
-              
+
             if (error) {
               console.error(`❌ Error creating app subscription for ${appId}:`, error);
             } else {
-              console.log(`✅ Created/updated app subscription: ${organizationId} -> ${appId}`);
+              console.log(`✅ Created/updated app subscription: ${finalOrganizationId} -> ${appId}`);
             }
           }
         }
