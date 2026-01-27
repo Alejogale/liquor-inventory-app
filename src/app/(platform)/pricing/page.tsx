@@ -5,8 +5,9 @@ import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Build
 import Script from 'next/script'
 import { useAuth } from '@/lib/auth-context'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function PricingPage() {
+function PricingContent() {
   const { user, loading, organization, subscription } = useAuth()
   const searchParams = useSearchParams()
 
@@ -385,5 +386,13 @@ export default function PricingPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <PricingContent />
+    </Suspense>
   )
 }
