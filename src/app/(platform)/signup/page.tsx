@@ -24,8 +24,15 @@ function SignupContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [cancelledMessage, setCancelledMessage] = useState('')
 
-  // Check if user came back from cancelled checkout
+  // Check if user came back from cancelled checkout or has pre-selected plan
   useEffect(() => {
+    // Pre-select plan from URL parameter
+    const planFromUrl = searchParams.get('plan')
+    if (planFromUrl && ['starter', 'basic', 'professional', 'business'].includes(planFromUrl)) {
+      setFormData(prev => ({ ...prev, selectedTier: planFromUrl }))
+    }
+
+    // Handle cancelled checkout
     if (searchParams.get('cancelled') === 'true') {
       setCancelledMessage('Checkout was cancelled. Your information has been saved - you can try again.')
       // Restore form data from sessionStorage if available

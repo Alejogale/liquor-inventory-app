@@ -2,10 +2,133 @@
 
 import Link from 'next/link'
 import { Check, ArrowRight, Package, BarChart3, Users, Smartphone, Shield, Building2, LayoutDashboard, CheckCircle, Settings } from 'lucide-react'
-import Script from 'next/script'
+import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+
+const tiers = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    app: 'Consumption Tracker',
+    monthlyPrice: 25,
+    yearlyPrice: 225,
+    features: ['2 storage areas', '100 items', '1 user', 'Basic reports', 'Email support'],
+  },
+  {
+    id: 'basic',
+    name: 'Basic',
+    app: 'Liquor Inventory',
+    monthlyPrice: 99,
+    yearlyPrice: 1010,
+    features: ['5 storage areas', '500 items', '3 users', 'Advanced reports', 'Priority support'],
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    app: 'Liquor Inventory (Full)',
+    monthlyPrice: 150,
+    yearlyPrice: 1530,
+    popular: true,
+    features: ['15 storage areas', '2,500 items', '10 users', 'Full analytics', 'Phone support'],
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    app: 'All Apps',
+    monthlyPrice: 500,
+    yearlyPrice: 5100,
+    features: ['Unlimited areas', 'Unlimited items', 'Unlimited users', 'API access', 'Dedicated support'],
+  },
+]
+
+function PricingPlans() {
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
+
+  return (
+    <section className="pb-20 px-6">
+      <div className="max-w-[1200px] mx-auto">
+        {/* Billing Toggle */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                billingCycle === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle('annual')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                billingCycle === 'annual' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Annual <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Save 15%</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Plan Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {tiers.map((tier) => {
+            const price = billingCycle === 'monthly' ? tier.monthlyPrice : Math.round(tier.yearlyPrice / 12)
+            return (
+              <div
+                key={tier.id}
+                className={`relative bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border-2 p-6 flex flex-col ${
+                  tier.popular ? 'border-[#FF6B35]' : 'border-white/30'
+                }`}
+              >
+                {tier.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#FF6B35] text-white text-xs font-bold rounded-full">
+                    MOST POPULAR
+                  </div>
+                )}
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">{tier.name}</h3>
+                  <p className="text-sm text-[#FF6B35] font-medium mt-1">{tier.app}</p>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold text-gray-900">${price}</span>
+                    <span className="text-gray-500">/mo</span>
+                  </div>
+                  {billingCycle === 'annual' && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      ${tier.yearlyPrice}/year (billed annually)
+                    </p>
+                  )}
+                </div>
+
+                <ul className="space-y-3 mb-8 flex-1">
+                  {tier.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <Check className="w-4 h-4 text-[#FF6B35] flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href={`/signup?plan=${tier.id}`}
+                  className={`w-full py-3 rounded-xl font-semibold text-center transition-all flex items-center justify-center gap-2 ${
+                    tier.popular
+                      ? 'bg-[#FF6B35] text-white hover:bg-[#e55a2b]'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
+                >
+                  Start Free Trial
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 function PricingContent() {
   const { user, loading, organization, subscription } = useAuth()
@@ -60,8 +183,6 @@ function PricingContent() {
         </nav>
       </header>
 
-      {/* Stripe Pricing Table Script */}
-      <Script async src="https://js.stripe.com/v3/pricing-table.js" />
 
       {/* Hero Section */}
       <section className="pt-32 pb-12 px-6">
@@ -170,19 +291,12 @@ function PricingContent() {
         </section>
       )}
 
-      {/* Stripe Pricing Table */}
-      <section className="pb-20 px-6">
-        <div className="max-w-[1400px] mx-auto">
-          {/* @ts-expect-error - Stripe custom element */}
-          <stripe-pricing-table
-            pricing-table-id="prctbl_1Su0dBGp6QH8POrPuli88mFg"
-            publishable-key="pk_test_51RraBbGp6QH8POrPKBX74oWuWBgbk2eyqu2JTCQWPVT0DeafPQOECWJf1PNGQb8mjZ4c31KaN2bcpdaSN45oSXvD00Y04EptnJ"
-            customer-email={customerEmail || undefined}
-          />
-        </div>
+      {/* Pricing Plans */}
+      <PricingPlans />
 
-        {/* Enterprise CTA */}
-        <div className="max-w-2xl mx-auto mt-12 text-center">
+      {/* Enterprise CTA */}
+      <section className="pb-20 px-6">
+        <div className="max-w-2xl mx-auto text-center">
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 p-8">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center mx-auto mb-4">
               <Building2 className="w-7 h-7 text-white" />
