@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendEmailVerificationEmail } from '@/lib/email-service'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -233,13 +233,14 @@ export async function POST(request: NextRequest) {
       .eq('id', organization.id)
 
     // If coming from Stripe checkout flow, link the subscription
-    if (stripeSessionId && stripe) {
+    if (stripeSessionId) {
       try {
+        const stripeClient = getStripe()
         console.log('🔗 Linking Stripe session to organization:', stripeSessionId)
-        const session = await stripe.checkout.sessions.retrieve(stripeSessionId)
+        const session = await stripeClient.checkout.sessions.retrieve(stripeSessionId)
 
         if (session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+          const subscription = await stripeClient.subscriptions.retrieve(session.subscription as string)
 
           // Update organization with Stripe info
           await supabaseAdmin
