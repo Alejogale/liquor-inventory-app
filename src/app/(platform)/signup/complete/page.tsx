@@ -119,6 +119,7 @@ function CompleteSignupContent() {
       }
 
       // Create the account
+      console.log('📋 Creating account with stripeSessionId:', sessionId)
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
@@ -137,6 +138,7 @@ function CompleteSignupContent() {
           stripeSessionId: sessionId, // Pass session ID for linking
         }),
       })
+      console.log('📋 Signup API response status:', response.status)
 
       const result = await response.json()
 

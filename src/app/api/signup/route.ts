@@ -233,17 +233,20 @@ export async function POST(request: NextRequest) {
       .eq('id', organization.id)
 
     // If coming from Stripe checkout flow, link the subscription
+    console.log('📋 Stripe session ID received:', stripeSessionId || 'NONE')
     if (stripeSessionId) {
       try {
         const stripeClient = getStripe()
-        console.log('🔗 Linking Stripe session to organization:', stripeSessionId)
+        console.log('🔗 Linking Stripe session to organization:', stripeSessionId, 'org:', organization.id)
         const session = await stripeClient.checkout.sessions.retrieve(stripeSessionId)
+        console.log('📦 Stripe session retrieved, subscription:', session.subscription, 'customer:', session.customer)
 
         if (session.subscription) {
           const subscription = await stripeClient.subscriptions.retrieve(session.subscription as string)
+          console.log('📦 Subscription retrieved:', subscription.id, 'status:', subscription.status)
 
           // Update organization with Stripe info
-          await supabaseAdmin
+          const { error: stripeUpdateError } = await supabaseAdmin
             .from('organizations')
             .update({
               stripe_customer_id: session.customer as string,
@@ -255,12 +258,20 @@ export async function POST(request: NextRequest) {
             })
             .eq('id', organization.id)
 
-          console.log('✅ Stripe subscription linked to organization')
+          if (stripeUpdateError) {
+            console.error('❌ Failed to update org with Stripe data:', stripeUpdateError)
+          } else {
+            console.log('✅ Stripe subscription linked to organization successfully')
+          }
+        } else {
+          console.log('⚠️ No subscription found in Stripe session')
         }
       } catch (stripeError) {
         console.error('⚠️ Error linking Stripe session (non-fatal):', stripeError)
         // Don't fail signup if Stripe linking fails - webhook will handle it
       }
+    } else {
+      console.log('⚠️ No stripeSessionId provided - skipping Stripe linking')
     }
 
     // Generate email verification link and send via Resend
