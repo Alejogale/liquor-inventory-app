@@ -70,13 +70,6 @@ export async function POST(request: NextRequest) {
     const PRICE_IDS = getPriceIds()
     const planPrices = PRICE_IDS[plan]
 
-    // Debug logging to Vercel function logs
-    console.log('Plan requested:', plan, 'Billing cycle:', billingCycle)
-    console.log('Available env vars for business:', {
-      monthly: process.env.STRIPE_PRICE_BUSINESS_MONTHLY ? 'SET' : 'NOT SET',
-      yearly: process.env.STRIPE_PRICE_BUSINESS_YEARLY ? 'SET' : 'NOT SET',
-    })
-
     if (!planPrices) {
       return NextResponse.json(
         { error: `Invalid plan: ${plan}` },
@@ -86,7 +79,6 @@ export async function POST(request: NextRequest) {
 
     const priceId = billingCycle === 'annual' ? planPrices.yearly : planPrices.monthly
     if (!priceId) {
-      console.log('Price ID is empty for:', plan, billingCycle)
       return NextResponse.json(
         { error: `Price not configured for plan: ${plan} (${billingCycle})` },
         { status: 400 }
@@ -142,6 +134,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-// Redeploy Thu Jan 29 00:57:06 EST 2026
-// Force redeploy Thu Jan 29 01:15:33 EST 2026
-// Env vars added to correct project Thu Jan 29 01:39:02 EST 2026
