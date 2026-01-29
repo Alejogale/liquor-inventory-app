@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, Star, Package, Home, Briefcase, ArrowRight, Lock, Mail, User, Building, Eye, EyeOff, Building2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { ArrowLeft, Check, Star, Package, Home, Briefcase, ArrowRight, Lock, Mail, User, Building, Eye, EyeOff, Building2, AlertCircle, X, Loader2 } from 'lucide-react'
 import { trackSignup, trackButtonClick } from '@/lib/analytics'
 
-export default function SignupPage() {
+function SignupContent() {
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: '',
@@ -19,45 +21,73 @@ export default function SignupPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [cancelledMessage, setCancelledMessage] = useState('')
+
+  // Check if user came back from cancelled checkout
+  useEffect(() => {
+    if (searchParams.get('cancelled') === 'true') {
+      setCancelledMessage('Checkout was cancelled. Your information has been saved - you can try again.')
+      // Restore form data from sessionStorage if available
+      const savedData = sessionStorage.getItem('signupData')
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData)
+          setFormData(parsed)
+          setStep(3) // Go to plan selection step
+        } catch (e) {
+          console.error('Error restoring form data:', e)
+        }
+      }
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/signup', {
+      // Store signup data in sessionStorage for after Stripe checkout
+      sessionStorage.setItem('signupData', JSON.stringify(formData))
+
+      // Create Stripe Checkout Session
+      const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          businessType: formData.useCase,
-          company: formData.organization,
-          primaryApp: 'liquor-inventory',
+          email: formData.email,
           plan: formData.selectedTier,
           billingCycle: formData.billingCycle,
-          password: formData.password
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          company: formData.organization,
+          businessType: formData.useCase,
         }),
       })
 
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to create account')
+        throw new Error(result.error || 'Failed to create checkout session')
       }
 
-      console.log('Account created successfully:', result)
+      // Track signup attempt
       trackSignup('email')
-      setIsSubmitted(true)
+
+      // Redirect to Stripe Checkout
+      if (result.url) {
+        window.location.href = result.url
+      } else {
+        throw new Error('No checkout URL returned')
+      }
     } catch (error) {
       console.error('Signup error:', error)
-      alert(error instanceof Error ? error.message : 'Failed to create account. Please try again.')
-    } finally {
+      alert(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.')
       setIsSubmitting(false)
     }
+    // Note: Don't set isSubmitting to false on success - user is being redirected
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -143,31 +173,23 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-[480px]">
 
-          {isSubmitted ? (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check className="w-8 h-8 text-green-600" />
+          {/* Cancelled checkout banner */}
+          {cancelledMessage && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-amber-800">{cancelledMessage}</p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Account Created!</h3>
-              <p className="text-gray-600 mb-2">Your 30-day free trial is ready.</p>
-              <p className="text-gray-500 text-sm mb-6">
-                Add your payment method to activate your trial. You won't be charged until the trial ends.
-              </p>
-              <Link
-                href={`/pricing?email=${encodeURIComponent(formData.email)}`}
-                className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#e55a2b] transition-all w-full justify-center"
+              <button
+                onClick={() => setCancelledMessage('')}
+                className="text-amber-600 hover:text-amber-800 transition-colors"
               >
-                Add Payment Method <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/login"
-                className="block mt-3 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Skip for now - I'll add payment later
-              </Link>
+                <X className="w-4 h-4" />
+              </button>
             </div>
-          ) : (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          )}
+
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
 
               {/* Progress Steps */}
               <div className="flex border-b border-gray-100">
@@ -487,18 +509,27 @@ export default function SignupPage() {
                 )}
               </form>
             </div>
-          )}
 
           {/* Trust indicators */}
-          {!isSubmitted && (
-            <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> No credit card</span>
-              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> 30-day trial</span>
-              <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Cancel anytime</span>
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-500">
+            <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> 30-day free trial</span>
+            <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Not charged until trial ends</span>
+            <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Cancel anytime</span>
+          </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)' }}>
+        <Loader2 className="w-8 h-8 text-[#FF6B35] animate-spin" />
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   )
 }

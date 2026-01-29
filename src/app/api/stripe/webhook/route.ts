@@ -121,13 +121,18 @@ export async function POST(request: NextRequest) {
 
         // Update organizations table if we have an organization
         if (organizationId) {
+          // Determine correct status - respect trial status from Stripe
+          const subscriptionStatus = subscription.status === 'trialing' ? 'trial' :
+                                     subscription.status === 'active' ? 'active' :
+                                     subscription.status;
+
           const { error: orgUpdateError } = await supabaseAdmin
             .from('organizations')
             .update({
               stripe_customer_id: session.customer as string,
               stripe_subscription_id: subscription.id,
               stripe_price_id: subscription.items.data[0].price?.id ?? null,
-              subscription_status: 'active',
+              subscription_status: subscriptionStatus,
               subscription_tier: planName || 'professional',
               subscription_period_start: new Date((subAny.current_period_start as number) * 1000).toISOString(),
               subscription_period_end: new Date((subAny.current_period_end as number) * 1000).toISOString(),
@@ -145,18 +150,18 @@ export async function POST(request: NextRequest) {
         }
 
         // 🚨 CRITICAL FIX: Update app_subscriptions table for access control
-        if (finalOrganizationId) {
+        if (organizationId) {
           const apps = getAppsForPlan({ plan: planName });
           const subscriptionEndDate = new Date((subAny.current_period_end as number) * 1000);
 
-          console.log('🔐 Creating app subscriptions:', { organizationId: finalOrganizationId, apps, plan: planName });
+          console.log('🔐 Creating app subscriptions:', { organizationId, apps, plan: planName });
 
           // Create or update subscription for each app
           for (const appId of apps) {
             const { error } = await supabaseAdmin
               .from('app_subscriptions')
               .upsert({
-                organization_id: finalOrganizationId,
+                organization_id: organizationId,
                 app_id: appId,
                 subscription_status: 'active',
                 subscription_plan: planName === 'bundle' || planName === 'business' ? 'bundle' : 'individual',
