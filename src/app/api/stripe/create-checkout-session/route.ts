@@ -7,25 +7,26 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Map plan IDs to Stripe Price IDs
-// You'll need to update these with your actual Stripe Price IDs
-const PRICE_IDS: Record<string, { monthly: string; yearly: string }> = {
-  starter: {
-    monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
-    yearly: process.env.STRIPE_PRICE_STARTER_YEARLY || '',
-  },
-  basic: {
-    monthly: process.env.STRIPE_PRICE_BASIC_MONTHLY || '',
-    yearly: process.env.STRIPE_PRICE_BASIC_YEARLY || '',
-  },
-  professional: {
-    monthly: process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY || '',
-    yearly: process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY || '',
-  },
-  business: {
-    monthly: process.env.STRIPE_PRICE_BUSINESS_MONTHLY || '',
-    yearly: process.env.STRIPE_PRICE_BUSINESS_YEARLY || '',
-  },
+// Helper function to get price IDs fresh from env vars on each request
+function getPriceIds(): Record<string, { monthly: string; yearly: string }> {
+  return {
+    starter: {
+      monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
+      yearly: process.env.STRIPE_PRICE_STARTER_YEARLY || '',
+    },
+    basic: {
+      monthly: process.env.STRIPE_PRICE_BASIC_MONTHLY || '',
+      yearly: process.env.STRIPE_PRICE_BASIC_YEARLY || '',
+    },
+    professional: {
+      monthly: process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY || '',
+      yearly: process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY || '',
+    },
+    business: {
+      monthly: process.env.STRIPE_PRICE_BUSINESS_MONTHLY || '',
+      yearly: process.env.STRIPE_PRICE_BUSINESS_YEARLY || '',
+    },
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -65,8 +66,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get the price ID for the selected plan
+    // Get the price ID for the selected plan (read fresh from env vars)
+    const PRICE_IDS = getPriceIds()
     const planPrices = PRICE_IDS[plan]
+
+    // Debug logging to Vercel function logs
+    console.log('Plan requested:', plan, 'Billing cycle:', billingCycle)
+    console.log('Available env vars for business:', {
+      monthly: process.env.STRIPE_PRICE_BUSINESS_MONTHLY ? 'SET' : 'NOT SET',
+      yearly: process.env.STRIPE_PRICE_BUSINESS_YEARLY ? 'SET' : 'NOT SET',
+    })
+
     if (!planPrices) {
       return NextResponse.json(
         { error: `Invalid plan: ${plan}` },
@@ -76,6 +86,7 @@ export async function POST(request: NextRequest) {
 
     const priceId = billingCycle === 'annual' ? planPrices.yearly : planPrices.monthly
     if (!priceId) {
+      console.log('Price ID is empty for:', plan, billingCycle)
       return NextResponse.json(
         { error: `Price not configured for plan: ${plan} (${billingCycle})` },
         { status: 400 }
