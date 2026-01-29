@@ -1,25 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendEmailVerificationEmail } from '@/lib/email-service'
+import { stripe } from '@/lib/stripe'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// CORS headers for mobile app
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+// Allowed origins for CORS
+const allowedOrigins = [
+  'https://invyeasy.com',
+  'https://www.invyeasy.com',
+  'http://localhost:3000',
+  'http://localhost:3001',
+]
+
+// Get CORS headers based on request origin
+function getCorsHeaders(request: NextRequest) {
+  const origin = request.headers.get('origin') || ''
+  const isAllowed = allowedOrigins.includes(origin)
+
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  }
 }
 
 // Handle OPTIONS request for CORS preflight
 export async function OPTIONS(request: NextRequest) {
-  return NextResponse.json({}, { headers: corsHeaders })
+  return NextResponse.json({}, { headers: getCorsHeaders(request) })
 }
 
 export async function POST(request: NextRequest) {
+  const corsHeaders = getCorsHeaders(request)
+
   try {
     const {
       firstName,
@@ -32,7 +48,8 @@ export async function POST(request: NextRequest) {
       employees,
       primaryApp,
       plan,
-      billingCycle
+      billingCycle,
+      stripeSessionId, // Optional - if coming from Stripe checkout flow
     } = await request.json()
 
     // Validate required fields
@@ -60,10 +77,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
-    const existingUser = existingUsers.users.find(user => user.email === email)
-    if (existingUser) {
+    // Check if user already exists (targeted query - much faster than listUsers())
+    const { data: existingProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('id, email')
+      .eq('email', email)
+      .single()
+
+    if (existingProfile) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409, headers: corsHeaders }
@@ -93,12 +114,37 @@ export async function POST(request: NextRequest) {
     // Calculate trial end date (30 days from now)
     const trialEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 
+    // Generate unique slug
+    let baseSlug = company.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    let slug = baseSlug
+    let slugSuffix = 0
+
+    // Check if slug exists and add suffix if needed
+    while (true) {
+      const { data: existingOrg } = await supabaseAdmin
+        .from('organizations')
+        .select('id')
+        .eq('slug', slug)
+        .single()
+
+      if (!existingOrg) break // Slug is unique
+
+      slugSuffix++
+      slug = `${baseSlug}-${slugSuffix}`
+
+      // Safety limit to prevent infinite loop
+      if (slugSuffix > 100) {
+        slug = `${baseSlug}-${Date.now()}`
+        break
+      }
+    }
+
     // Create organization with tier limits
     const { data: organization, error: orgError } = await supabaseAdmin
       .from('organizations')
       .insert({
         Name: company,
-        slug: company.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        slug: slug,
         subscription_tier: plan,
         storage_area_limit: tierData.storage_area_limit,
         item_limit: tierData.item_limit,
@@ -185,6 +231,36 @@ export async function POST(request: NextRequest) {
         created_by: userData.user.id
       })
       .eq('id', organization.id)
+
+    // If coming from Stripe checkout flow, link the subscription
+    if (stripeSessionId && stripe) {
+      try {
+        console.log('🔗 Linking Stripe session to organization:', stripeSessionId)
+        const session = await stripe.checkout.sessions.retrieve(stripeSessionId)
+
+        if (session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+
+          // Update organization with Stripe info
+          await supabaseAdmin
+            .from('organizations')
+            .update({
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: subscription.items.data[0]?.price?.id || null,
+              subscription_status: subscription.status === 'trialing' ? 'trial' : subscription.status,
+              subscription_period_start: new Date((subscription as any).current_period_start * 1000).toISOString(),
+              subscription_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
+            })
+            .eq('id', organization.id)
+
+          console.log('✅ Stripe subscription linked to organization')
+        }
+      } catch (stripeError) {
+        console.error('⚠️ Error linking Stripe session (non-fatal):', stripeError)
+        // Don't fail signup if Stripe linking fails - webhook will handle it
+      }
+    }
 
     // Generate email verification link and send via Resend
     try {

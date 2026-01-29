@@ -65,6 +65,11 @@ export const InventoryDetail: React.FC = () => {
   const { userProfile } = useAuth();
   const itemId = route.params?.itemId;
 
+  // Role-based access control
+  const isOwner = userProfile?.role === 'owner';
+  const isManager = userProfile?.role === 'manager';
+  const canEdit = isOwner || isManager;
+
   const [isLoading, setIsLoading] = useState(true);
   const [item, setItem] = useState<InventoryItem | null>(null);
   const [roomCounts, setRoomCounts] = useState<RoomCount[]>([]);
@@ -323,12 +328,16 @@ export const InventoryDetail: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>Item Details</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton} onPress={handleEdit}>
-            <Edit3 size={20} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton} onPress={handleDelete}>
-            <Trash2 size={20} color={colors.error} />
-          </TouchableOpacity>
+          {canEdit && (
+            <>
+              <TouchableOpacity style={styles.headerButton} onPress={handleEdit}>
+                <Edit3 size={20} color={colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.headerButton} onPress={handleDelete}>
+                <Trash2 size={20} color={colors.error} />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
 

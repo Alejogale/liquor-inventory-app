@@ -55,6 +55,12 @@ interface CategoryStock {
 export const Reports: React.FC = () => {
   const navigation = useNavigation<any>();
   const { userProfile } = useAuth();
+
+  // Role-based access control - Only Owner/Manager can view reports
+  const isOwner = userProfile?.role === 'owner';
+  const isManager = userProfile?.role === 'manager';
+  const canViewReports = isOwner || isManager;
+
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [summary, setSummary] = useState<SummaryStats>({
@@ -194,6 +200,26 @@ export const Reports: React.FC = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
           <LoadingSpinner variant="branded" message="Loading reports..." />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Staff and Viewers cannot view reports
+  if (!canViewReports) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Reports</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <Text style={{ color: colors.textSecondary, textAlign: 'center', paddingHorizontal: 20 }}>
+            You don't have permission to view reports. Contact your manager for access.
+          </Text>
         </View>
       </SafeAreaView>
     );

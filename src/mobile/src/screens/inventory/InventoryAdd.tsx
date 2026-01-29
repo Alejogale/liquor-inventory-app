@@ -38,6 +38,10 @@ interface Supplier {
 export const InventoryAdd: React.FC = () => {
   const navigation = useNavigation<any>();
   const { userProfile } = useAuth();
+
+  // Role-based access control - Viewers cannot add items
+  const isViewer = userProfile?.role === 'viewer';
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -151,6 +155,26 @@ export const InventoryAdd: React.FC = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
           <LoadingSpinner variant="branded" message="Loading..." />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Viewers cannot add items
+  if (isViewer) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Add Item</Text>
+          <View style={{ width: 60 }} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <Text style={{ color: colors.textSecondary, textAlign: 'center', paddingHorizontal: 20 }}>
+            You don't have permission to add items. Contact your manager for access.
+          </Text>
         </View>
       </SafeAreaView>
     );

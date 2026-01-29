@@ -56,6 +56,10 @@ interface CountEntry {
 export const InventoryCount: React.FC = () => {
   const navigation = useNavigation<any>();
   const { userProfile } = useAuth();
+
+  // Role-based access control - Viewers cannot save counts
+  const isViewer = userProfile?.role === 'viewer';
+
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -396,13 +400,17 @@ export const InventoryCount: React.FC = () => {
           <Text style={styles.roomTitle}>{selectedRoom.name}</Text>
           <Text style={styles.itemCount}>{getTotalCount()} items counted</Text>
         </View>
-        <TouchableOpacity
-          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-          onPress={handleSaveCounts}
-          disabled={isSaving}
-        >
-          <Check size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
+        {!isViewer ? (
+          <TouchableOpacity
+            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+            onPress={handleSaveCounts}
+            disabled={isSaving}
+          >
+            <Check size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 44 }} />
+        )}
       </View>
 
       {/* Scan Barcode Button */}
@@ -503,23 +511,29 @@ export const InventoryCount: React.FC = () => {
           <Text style={styles.totalLabel}>Total Items</Text>
           <Text style={styles.totalValue}>{getTotalCount()}</Text>
         </View>
-        <TouchableOpacity
-          style={[styles.saveButtonLarge, isSaving && styles.saveButtonDisabled]}
-          onPress={handleSaveCounts}
-          disabled={isSaving}
-        >
-          <LinearGradient
-            colors={colors.gradientPrimary}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.saveButtonGradient}
+        {isViewer ? (
+          <View style={styles.viewOnlyBadge}>
+            <Text style={styles.viewOnlyText}>View Only</Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[styles.saveButtonLarge, isSaving && styles.saveButtonDisabled]}
+            onPress={handleSaveCounts}
+            disabled={isSaving}
           >
-            <Check size={20} color={colors.textPrimary} />
-            <Text style={styles.saveButtonText}>
-              {isSaving ? 'Saving...' : 'Save Count'}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={colors.gradientPrimary}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.saveButtonGradient}
+            >
+              <Check size={20} color={colors.textPrimary} />
+              <Text style={styles.saveButtonText}>
+                {isSaving ? 'Saving...' : 'Save Count'}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Barcode Scanner Modal */}
@@ -794,6 +808,17 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
+  },
+  viewOnlyBadge: {
+    backgroundColor: colors.surfaceLight,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.base,
+  },
+  viewOnlyText: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium,
+    color: colors.textTertiary,
   },
 });
 

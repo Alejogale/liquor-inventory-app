@@ -73,32 +73,23 @@ function ResetPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('🔥 Form submitted!')
-    console.log('🔥 Password length:', password.length)
-    console.log('🔥 Passwords match:', password === confirmPassword)
-    
     setIsLoading(true)
     setError('')
 
     if (password !== confirmPassword) {
-      console.log('❌ Passwords do not match')
       setError('Passwords do not match')
       setIsLoading(false)
       return
     }
 
     if (password.length < 6) {
-      console.log('❌ Password too short')
       setError('Password must be at least 6 characters')
       setIsLoading(false)
       return
     }
 
-    console.log('✅ Validation passed, proceeding with update')
-
     try {
       // Use the session that's already established by Supabase auth state changes
-      console.log('🔄 Using established session to update password...')
       
       // Add timeout since updateUser sometimes hangs even after success
       const updatePromise = supabase.auth.updateUser({

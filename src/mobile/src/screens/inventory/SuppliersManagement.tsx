@@ -44,6 +44,12 @@ interface Supplier {
 export const SuppliersManagement: React.FC = () => {
   const navigation = useNavigation<any>();
   const { userProfile } = useAuth();
+
+  // Role-based access control - Only Owner/Manager can manage suppliers
+  const isOwner = userProfile?.role === 'owner';
+  const isManager = userProfile?.role === 'manager';
+  const canManage = isOwner || isManager;
+
   const [isLoading, setIsLoading] = useState(true);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -230,6 +236,26 @@ export const SuppliersManagement: React.FC = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
           <LoadingSpinner variant="branded" message="Loading suppliers..." />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Staff and Viewers cannot manage suppliers
+  if (!canManage) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Suppliers</Text>
+          <View style={{ width: 44 }} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <Text style={{ color: colors.textSecondary, textAlign: 'center', paddingHorizontal: 20 }}>
+            You don't have permission to manage suppliers. Contact your manager for access.
+          </Text>
         </View>
       </SafeAreaView>
     );

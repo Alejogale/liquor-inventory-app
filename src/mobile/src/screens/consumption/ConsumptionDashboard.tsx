@@ -82,7 +82,9 @@ export const ConsumptionDashboard: React.FC = () => {
   // Role-based access control
   const isOwner = userProfile?.role === 'owner';
   const isManager = userProfile?.role === 'manager';
+  const isViewer = userProfile?.role === 'viewer';
   const canManageEvents = isOwner || isManager;
+  const canUpdateCounts = !isViewer; // Viewers cannot update counts
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -216,6 +218,11 @@ export const ConsumptionDashboard: React.FC = () => {
   }, []);
 
   const updateCount = useCallback(async (itemId: string, delta: number) => {
+    if (!canUpdateCounts) {
+      Alert.alert('View Only', 'You don\'t have permission to update counts.');
+      return;
+    }
+
     if (!selectedEvent) {
       Alert.alert('No Event', 'Please select an event first.');
       return;
@@ -248,7 +255,7 @@ export const ConsumptionDashboard: React.FC = () => {
       setCounts(prev => ({ ...prev, [itemId]: currentCount }));
       Alert.alert('Error', 'Failed to update count.');
     }
-  }, [selectedEvent, counts]);
+  }, [selectedEvent, counts, canUpdateCounts]);
 
   const handleEventSelect = useCallback((event: Event) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -688,28 +695,34 @@ export const ConsumptionDashboard: React.FC = () => {
             <Text style={styles.totalAmount}>${getTotalAmount().toFixed(2)}</Text>
           </View>
         </View>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <RotateCcw size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.sendButton, isSendingReport && styles.sendButtonDisabled]}
-            onPress={handleSendReport}
-            disabled={isSendingReport}
-          >
-            <LinearGradient
-              colors={colors.gradientPrimary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.sendButtonGradient}
+        {isViewer ? (
+          <View style={styles.viewOnlyBadge}>
+            <Text style={styles.viewOnlyText}>View Only</Text>
+          </View>
+        ) : (
+          <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+              <RotateCcw size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.sendButton, isSendingReport && styles.sendButtonDisabled]}
+              onPress={handleSendReport}
+              disabled={isSendingReport}
             >
-              <Send size={20} color={colors.textPrimary} />
-              <Text style={styles.sendButtonText}>
-                {isSendingReport ? 'Sending...' : 'Send Report'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+              <LinearGradient
+                colors={colors.gradientPrimary}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.sendButtonGradient}
+              >
+                <Send size={20} color={colors.textPrimary} />
+                <Text style={styles.sendButtonText}>
+                  {isSendingReport ? 'Sending...' : 'Send Report'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -993,6 +1006,17 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     fontWeight: typography.weight.semibold,
     color: colors.textPrimary,
+  },
+  viewOnlyBadge: {
+    backgroundColor: colors.surfaceLight,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.base,
+  },
+  viewOnlyText: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium,
+    color: colors.textTertiary,
   },
   // Create Event Button
   createEventButton: {

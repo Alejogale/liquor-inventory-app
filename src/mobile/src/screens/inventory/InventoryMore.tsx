@@ -62,6 +62,11 @@ export const InventoryMore: React.FC = () => {
   const navigation = useNavigation<any>();
   const { userProfile, signOut } = useAuth();
 
+  // Role-based access control
+  const isOwner = userProfile?.role === 'owner';
+  const isManager = userProfile?.role === 'manager';
+  const canManage = isOwner || isManager;
+
   const handleNavigate = useCallback((screen: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate(screen);
@@ -123,61 +128,72 @@ export const InventoryMore: React.FC = () => {
           </View>
         </View>
 
-        {/* Inventory Section */}
-        <Text style={styles.sectionTitle}>Inventory</Text>
-        <View style={styles.menuSection}>
-          <MenuItem
-            icon={<Building2 size={22} color={colors.primary} />}
-            label="Rooms"
-            description="Manage storage locations"
-            onPress={() => handleNavigate('RoomsManagement')}
-          />
-          <MenuItem
-            icon={<Tag size={22} color={colors.primary} />}
-            label="Categories"
-            description="Organize your items"
-            onPress={() => handleNavigate('CategoriesManagement')}
-          />
-          <MenuItem
-            icon={<Truck size={22} color={colors.primary} />}
-            label="Suppliers"
-            description="Manage vendors"
-            onPress={() => handleNavigate('SuppliersManagement')}
-          />
-          <MenuItem
-            icon={<ShoppingCart size={22} color={colors.primary} />}
-            label="Orders"
-            description="Track purchase orders"
-            onPress={() => handleComingSoon('Orders')}
-          />
-        </View>
+        {/* Inventory Section - Only for Owner/Manager */}
+        {canManage && (
+          <>
+            <Text style={styles.sectionTitle}>Inventory</Text>
+            <View style={styles.menuSection}>
+              <MenuItem
+                icon={<Building2 size={22} color={colors.primary} />}
+                label="Rooms"
+                description="Manage storage locations"
+                onPress={() => handleNavigate('RoomsManagement')}
+              />
+              <MenuItem
+                icon={<Tag size={22} color={colors.primary} />}
+                label="Categories"
+                description="Organize your items"
+                onPress={() => handleNavigate('CategoriesManagement')}
+              />
+              <MenuItem
+                icon={<Truck size={22} color={colors.primary} />}
+                label="Suppliers"
+                description="Manage vendors"
+                onPress={() => handleNavigate('SuppliersManagement')}
+              />
+              <MenuItem
+                icon={<ShoppingCart size={22} color={colors.primary} />}
+                label="Orders"
+                description="Track purchase orders"
+                onPress={() => handleComingSoon('Orders')}
+              />
+            </View>
+          </>
+        )}
 
-        {/* Reports Section */}
-        <Text style={styles.sectionTitle}>Reports & Analytics</Text>
-        <View style={styles.menuSection}>
-          <MenuItem
-            icon={<BarChart3 size={22} color={colors.primary} />}
-            label="Reports"
-            description="View inventory reports"
-            onPress={() => handleNavigate('Reports')}
-          />
-          <MenuItem
-            icon={<TrendingUp size={22} color={colors.primary} />}
-            label="Analytics"
-            description="Stock trends and insights"
-            onPress={() => handleComingSoon('Analytics')}
-          />
-        </View>
+        {/* Reports Section - Only for Owner/Manager */}
+        {canManage && (
+          <>
+            <Text style={styles.sectionTitle}>Reports & Analytics</Text>
+            <View style={styles.menuSection}>
+              <MenuItem
+                icon={<BarChart3 size={22} color={colors.primary} />}
+                label="Reports"
+                description="View inventory reports"
+                onPress={() => handleNavigate('Reports')}
+              />
+              <MenuItem
+                icon={<TrendingUp size={22} color={colors.primary} />}
+                label="Analytics"
+                description="Stock trends and insights"
+                onPress={() => handleComingSoon('Analytics')}
+              />
+            </View>
+          </>
+        )}
 
         {/* Settings Section */}
         <Text style={styles.sectionTitle}>Settings</Text>
         <View style={styles.menuSection}>
-          <MenuItem
-            icon={<Crown size={22} color={colors.warning} />}
-            label="Subscription"
-            description="Manage your plan"
-            onPress={() => navigation.navigate('Paywall', { appName: 'InvyEasy', reason: 'upgrade_required' })}
-          />
+          {/* Subscription - Owner only */}
+          {isOwner && (
+            <MenuItem
+              icon={<Crown size={22} color={colors.warning} />}
+              label="Subscription"
+              description="Manage your plan"
+              onPress={() => navigation.navigate('Paywall', { appName: 'InvyEasy', reason: 'upgrade_required' })}
+            />
+          )}
           <MenuItem
             icon={<Settings size={22} color={colors.primary} />}
             label="Settings"
