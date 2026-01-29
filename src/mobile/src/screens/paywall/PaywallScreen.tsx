@@ -213,27 +213,35 @@ export const PaywallScreen: React.FC = () => {
           <Text style={styles.plansTitle}>Choose Your Plan</Text>
 
           <PlanCard
-            name="Personal"
-            price="19"
+            name="Starter"
+            price="25"
             period="month"
-            features={['1 location', '500 items', 'Basic reports']}
+            features={['2 storage areas', '100 items', '1 user']}
             onPress={handleSubscribe}
           />
 
           <PlanCard
-            name="Starter"
-            price="89"
+            name="Basic"
+            price="99"
             period="month"
-            features={['3 locations', 'Unlimited items', 'Advanced reports', 'Email support']}
+            features={['5 storage areas', '500 items', '3 users']}
+            onPress={handleSubscribe}
+          />
+
+          <PlanCard
+            name="Professional"
+            price="150"
+            period="month"
+            features={['15 storage areas', '2,500 items', '10 users']}
             popular
             onPress={handleSubscribe}
           />
 
           <PlanCard
-            name="Pro"
-            price="229"
+            name="Business"
+            price="500"
             period="month"
-            features={['Unlimited locations', 'Unlimited items', 'All features', 'Priority support', 'API access']}
+            features={['Unlimited areas', 'Unlimited items', 'API access', 'Priority support']}
             onPress={handleSubscribe}
           />
         </View>
